@@ -284,14 +284,21 @@
     wrap="off"
 >a</textarea>
 #errors
-/textarea/@wrap;enumerated:invalid;m
+/textarea/@wrap;enumerated:non-conforming;m
 
 #data
 <textarea xmlns="http://www.w3.org/1999/xhtml"
     wrap="physical"
 >a</textarea>
 #errors
-/textarea/@wrap;enumerated:invalid;m
+/textarea/@wrap;enumerated:non-conforming;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    wrap="virtual"
+>a</textarea>
+#errors
+/textarea/@wrap;enumerated:non-conforming;m
 
 #data
 <textarea xmlns="http://www.w3.org/1999/xhtml"

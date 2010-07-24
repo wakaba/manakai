@@ -3686,6 +3686,17 @@ $Element->{$HTML_NS}->{plaintext} = {
   }), # check_attrs
 }; # plaintext
 
+$Element->{$HTML_NS}->{xml} = {
+  %HTMLTextChecker,
+  status => FEATURE_OBSVOCAB,
+  check_attrs => $GetHTMLAttrsChecker->({
+    src => $NonEmptyURLChecker,
+  }, {
+    %HTMLAttrStatus,
+    src => FEATURE_OBSVOCAB,
+  }), # check_attrs
+}; # xml
+
 $Element->{$HTML_NS}->{blockquote} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLFlowContentChecker,
@@ -3856,10 +3867,9 @@ $Element->{$HTML_NS}->{ul} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML2X_RFC,
-    compact => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
-    type => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_OBSVOCAB,
+    compact => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    type => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # ul
 
@@ -4873,14 +4883,13 @@ $Element->{$HTML_NS}->{b} = $Element->{$HTML_NS}->{i};
 
 $Element->{$HTML_NS}->{tt} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     #
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
 }; # tt
 
 $Element->{$HTML_NS}->{s} = {
@@ -4913,7 +4922,7 @@ $Element->{$HTML_NS}->{nobr} = {
 
 $Element->{$HTML_NS}->{wbr} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # wbr
 
 $Element->{$HTML_NS}->{ruby} = {
@@ -6691,7 +6700,7 @@ $Element->{$HTML_NS}->{table} = {
     bgcolor => $HTMLColorAttrChecker,
     border => sub {
       my ($self, $attr) = @_;
-      ## HTML4 definition: %Pixels; = [0-9]+; with <table border> support.
+      ## A valid non-negative integer or the empty string.
       unless ($attr->value =~ /\A[0-9]*\z/) {
         $self->{onerror}->(node => $attr,
                            type => 'tableborder:syntax error', # XXXdocumentation
@@ -6699,10 +6708,13 @@ $Element->{$HTML_NS}->{table} = {
       }
     }, # border
     bordercolor => $HTMLColorAttrChecker,
+    bordercolordark => $HTMLColorAttrChecker,
+    bordercolorlight => $HTMLColorAttrChecker,
+    cellborder => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cellpadding => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cellspacing => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    datapagesize => sub { }, ## CDATA [HTML4]
+    datapagesize => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     frame => $GetHTMLEnumeratedAttrChecker->({
       void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
       lhs => 1, rhs => 1, box => 1, border => 1,
@@ -6718,28 +6730,33 @@ $Element->{$HTML_NS}->{table} = {
                          type => 'table summary', # XXX documentatin
                          level => $self->{level}->{obsconforming});
     },
+    tableborder => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     vspace => $HTMLLengthAttrChecker,
     width => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    align => FEATURE_HTML5_OBSOLETE,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    border => FEATURE_HTML5_OBSOLETE,
-    #bordercolor WA1 prose
-    cellpadding => FEATURE_HTML5_OBSOLETE,
-    cellspacing => FEATURE_HTML5_OBSOLETE,
-    cols => FEATURE_RFC1942,
-    datapagesize => FEATURE_M12N10_REC,
-    frame => FEATURE_HTML5_OBSOLETE,
-    #height WA1 prose
-    #hspace WA1 prose
-    rules => FEATURE_HTML5_OBSOLETE,
+    border => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    bordercolor => FEATURE_OBSVOCAB,
+    bordercolordark => FEATURE_OBSVOCAB,
+    bordercolorlight => FEATURE_OBSVOCAB,
+    cellborder => FEATURE_OBSVOCAB,
+    cellpadding => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    cellspacing => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    cols => FEATURE_OBSVOCAB,
+    datapagesize => FEATURE_OBSVOCAB,
+    frame => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    height => FEATURE_OBSVOCAB,
+    hspace => FEATURE_OBSVOCAB,
+    rules => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     summary => FEATURE_HTML5_LC,
-    width => FEATURE_HTML5_OBSOLETE,
-    #vspace WA1 prose
-  }),
+    tableborder => FEATURE_OBSVOCAB,
+    width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    vspace => FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before caption';
@@ -7146,6 +7163,9 @@ $Element->{$HTML_NS}->{tr} = {
     %cellalign,
     background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
+    bordercolor => $HTMLColorAttrChecker,
+    bordercolordark => $HTMLColorAttrChecker,
+    bordercolorlight => $HTMLColorAttrChecker,
     height => $HTMLLengthAttrChecker,
   }, {
     %HTMLAttrStatus,
@@ -7153,12 +7173,14 @@ $Element->{$HTML_NS}->{tr} = {
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    bordercolor => FEATURE_OBSVOCAB,
+    bordercolordark => FEATURE_OBSVOCAB,
+    bordercolorlight => FEATURE_OBSVOCAB,
     ch => FEATURE_OBSVOCAB,
     char => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     charoff => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     choff => FEATURE_OBSVOCAB,
-    #height WA1 prose
-    lang => FEATURE_HTML5_REC,
+    height => FEATURE_OBSVOCAB,
     valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
   check_attrs2 => sub {
@@ -7202,10 +7224,13 @@ $Element->{$HTML_NS}->{td} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
-    axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
+    abbr => sub {},
+    axis => sub {},
     background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
+    bordercolor => $HTMLColorAttrChecker,
+    bordercolordark => $HTMLColorAttrChecker,
+    bordercolorlight => $HTMLColorAttrChecker,
     %cellalign,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
@@ -7223,23 +7248,26 @@ $Element->{$HTML_NS}->{td} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    abbr => FEATURE_HTML5_OBSOLETE,
+    abbr => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    axis => FEATURE_HTML5_OBSOLETE,
+    axis => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    bordercolor => FEATURE_OBSVOCAB,
+    bordercolordark => FEATURE_OBSVOCAB,
+    bordercolorlight => FEATURE_OBSVOCAB,
     ch => FEATURE_OBSVOCAB,
     char => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     charoff => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     choff => FEATURE_OBSVOCAB,
     colspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     headers => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    height => FEATURE_HTML5_OBSOLETE,
-    nowrap => FEATURE_HTML5_OBSOLETE,
+    height => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    nowrap => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     rowspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     scope => FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    width => FEATURE_HTML5_OBSOLETE,
+    width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }),
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -7253,10 +7281,13 @@ $Element->{$HTML_NS}->{th} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     %cellalign,
-    abbr => sub {}, ## NOTE: HTML4 %Text; and SHOULD be short.
-    axis => sub {}, ## NOTE: HTML4 "cdata", comma-separated
+    abbr => sub {},
+    axis => sub {},
     background => $NonEmptyURLChecker,
     bgcolor => $HTMLColorAttrChecker,
+    bordercolor => $HTMLColorAttrChecker,
+    bordercolordark => $HTMLColorAttrChecker,
+    bordercolorlight => $HTMLColorAttrChecker,
     colspan => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     headers => sub {
       ## NOTE: Will be checked as part of |table| element checker.
@@ -7273,23 +7304,27 @@ $Element->{$HTML_NS}->{th} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    abbr => FEATURE_HTML5_OBSOLETE,
-    align => FEATURE_HTML5_OBSOLETE,
-    axis => FEATURE_HTML5_OBSOLETE,
+    abbr => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    axis => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    char => FEATURE_M12N10_REC,
-    charoff => FEATURE_HTML5_OBSOLETE,
+    bordercolor => FEATURE_OBSVOCAB,
+    bordercolordark => FEATURE_OBSVOCAB,
+    bordercolorlight => FEATURE_OBSVOCAB,
+    ch => FEATURE_OBSVOCAB,
+    char => FEATURE_OBSVOCAB,
+    charoff => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    choff => FEATURE_OBSVOCAB,
     colspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     headers => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    height => FEATURE_HTML5_OBSOLETE,
-    lang => FEATURE_HTML5_REC,
-    nowrap => FEATURE_HTML5_OBSOLETE,
+    height => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    nowrap => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     rowspan => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     scope => FEATURE_HTML5_REC,
-    valign => FEATURE_HTML5_OBSOLETE,
-    width => FEATURE_HTML5_OBSOLETE,
-  }),
+    valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -8730,14 +8765,13 @@ $Element->{$HTML_NS}->{textarea} = {
     rows => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     wrap => $GetHTMLEnumeratedAttrChecker->({
       soft => 1, hard => 1,
-      ## |off| affects rendering, but it is not a keyword according to
-      ## Web Applications 1.0.
+      off => -1, virtual => -1, physical => -1,
     }),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accept => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
-    'accept-charset' => FEATURE_HTML2X_RFC,
+    accept => FEATURE_OBSVOCAB,
+    'accept-charset' => FEATURE_OBSVOCAB,
     autocapitalize => FEATURE_OBSVOCAB,
     autocorrect => FEATURE_OBSVOCAB,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -8752,7 +8786,7 @@ $Element->{$HTML_NS}->{textarea} = {
     maxlength => FEATURE_HTML5_DEFAULT | FEATURE_WF2X,
     mode => FEATURE_OBSVOCAB,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    pattern => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+    pattern => FEATURE_OBSVOCAB,
     placeholder => FEATURE_HTML5_LC,
     readonly => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     required => FEATURE_HTML5_LC | FEATURE_WF2X,

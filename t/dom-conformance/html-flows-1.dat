@@ -4858,6 +4858,57 @@ aaa
 /plaintext/@clear;enumerated:non-conforming;m
 
 #data
+<xml xmlns="http://www.w3.org/1999/xhtml"></xml>
+#errors
+/xml;element not defined;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml">   </xml>
+#errors
+/xml;element not defined;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml">abc</xml>
+#errors
+/xml;element not defined;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml"><p>a</p></xml>
+#errors
+/xml;element not defined;m
+/xml/p;element not allowed:text;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml"><!----></xml>
+#errors
+/xml;element not defined;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml">&lt;a/></xml>
+#errors
+/xml;element not defined;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml" src=""></xml>
+#errors
+/xml;element not defined;m
+/xml/@src;attribute not defined;m
+/xml/@src;url:empty;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml" src="abc"></xml>
+#errors
+/xml;element not defined;m
+/xml/@src;attribute not defined;m
+
+#data
+<xml xmlns="http://www.w3.org/1999/xhtml" src="[]"></xml>
+#errors
+/xml;element not defined;m
+/xml/@src;attribute not defined;m
+/xml/@src;syntax error:iriref3987;m
+
+#data
 <ol start="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /ol/@start;integer:syntax error;m

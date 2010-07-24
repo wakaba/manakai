@@ -1996,7 +1996,16 @@ ok 1885
 ok 1886
 ok 1887
 ok 1888
-not ok 1889 - <ins xmlns="http://www.w3.org/1999/xhtml"
+ok 1889
+ok 1890
+ok 1891
+ok 1892
+ok 1893
+ok 1894
+ok 1895
+ok 1896
+ok 1897
+not ok 1898 - <ins xmlns="http://www.w3.org/1999/xhtml"
 #     datetime="0000-03-14T14:33Z">x</ins>
 #   Failed test '<ins xmlns="http://www.w3.org/1999/xhtml"
 #     datetime="0000-03-14T14:33Z">x</ins>'
@@ -2006,15 +2015,6 @@ not ok 1889 - <ins xmlns="http://www.w3.org/1999/xhtml"
 # +---+-----+---+------------------------------------+
 # |   |     *  1|/ins/@datetime;datetime:bad year;m  *
 # +---+-----+---+------------------------------------+
-ok 1890
-ok 1891
-ok 1892
-ok 1893
-ok 1894
-ok 1895
-ok 1896
-ok 1897
-ok 1898
 ok 1899
 ok 1900
 ok 1901
@@ -2042,7 +2042,16 @@ ok 1922
 ok 1923
 ok 1924
 ok 1925
-not ok 1926 - <ins xmlns="http://www.w3.org/1999/xhtml"
+ok 1926
+ok 1927
+ok 1928
+ok 1929
+ok 1930
+ok 1931
+ok 1932
+ok 1933
+ok 1934
+not ok 1935 - <ins xmlns="http://www.w3.org/1999/xhtml"
 #     datetime="2007-02-21T23:00-24:00">x</ins>
 #   Failed test '<ins xmlns="http://www.w3.org/1999/xhtml"
 #     datetime="2007-02-21T23:00-24:00">x</ins>'
@@ -2052,15 +2061,6 @@ not ok 1926 - <ins xmlns="http://www.w3.org/1999/xhtml"
 # +---+-----+---+---------------------------------------------+
 # |   |     *  1|/ins/@datetime;datetime:bad timezone hour;m  *
 # +---+-----+---+---------------------------------------------+
-ok 1927
-ok 1928
-ok 1929
-ok 1930
-ok 1931
-ok 1932
-ok 1933
-ok 1934
-ok 1935
 ok 1936
 ok 1937
 ok 1938
@@ -2116,7 +2116,6 @@ ok 1987
 ok 1988
 ok 1989
 ok 1990
-# ../t/dom-conformance/html-texts-1.dat
 ok 1991
 ok 1992
 ok 1993
@@ -2126,6 +2125,7 @@ ok 1996
 ok 1997
 ok 1998
 ok 1999
+# ../t/dom-conformance/html-texts-1.dat
 ok 2000
 ok 2001
 ok 2002
@@ -2570,7 +2570,6 @@ ok 2440
 ok 2441
 ok 2442
 ok 2443
-# ../t/dom-conformance/html-links-1.dat
 ok 2444
 ok 2445
 ok 2446
@@ -2580,6 +2579,7 @@ ok 2449
 ok 2450
 ok 2451
 ok 2452
+# ../t/dom-conformance/html-links-1.dat
 ok 2453
 ok 2454
 ok 2455
@@ -2956,7 +2956,6 @@ ok 2825
 ok 2826
 ok 2827
 ok 2828
-# ../t/dom-conformance/html-objects-1.dat
 ok 2829
 ok 2830
 ok 2831
@@ -2966,6 +2965,7 @@ ok 2834
 ok 2835
 ok 2836
 ok 2837
+# ../t/dom-conformance/html-objects-1.dat
 ok 2838
 ok 2839
 ok 2840
@@ -4051,7 +4051,16 @@ ok 3919
 ok 3920
 ok 3921
 ok 3922
-not ok 3923 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+ok 3923
+ok 3924
+ok 3925
+ok 3926
+ok 3927
+ok 3928
+ok 3929
+ok 3930
+ok 3931
+not ok 3932 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <video src="">aa</video>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4063,7 +4072,7 @@ not ok 3923 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/video/video;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 3924 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3933 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><video src="">aa</video></p>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4075,7 +4084,7 @@ not ok 3924 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/video/p/video;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 3925 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3934 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><video src="">aa</video></ins>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4087,7 +4096,7 @@ not ok 3925 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/video/ins/video;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-not ok 3926 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3935 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <audio src="">aa</audio>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4099,7 +4108,7 @@ not ok 3926 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/video/audio;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 3927 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3936 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><audio src="">aa</audio></p>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4111,7 +4120,7 @@ not ok 3927 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/video/p/audio;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 3928 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 3937 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><audio src="">aa</audio></ins>
 # </video>
 #   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4123,15 +4132,6 @@ not ok 3928 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/video/ins/audio;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-ok 3929
-ok 3930
-ok 3931
-ok 3932
-ok 3933
-ok 3934
-ok 3935
-ok 3936
-ok 3937
 ok 3938
 ok 3939
 ok 3940
@@ -4191,7 +4191,16 @@ ok 3993
 ok 3994
 ok 3995
 ok 3996
-not ok 3997 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+ok 3997
+ok 3998
+ok 3999
+ok 4000
+ok 4001
+ok 4002
+ok 4003
+ok 4004
+ok 4005
+not ok 4006 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <video src="">aa</video>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4203,7 +4212,7 @@ not ok 3997 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/audio/video;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 3998 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 4007 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><video src="">aa</video></p>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4215,7 +4224,7 @@ not ok 3998 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/audio/p/video;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 3999 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 4008 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><video src="">aa</video></ins>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4227,7 +4236,7 @@ not ok 3999 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/audio/ins/video;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-not ok 4000 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 4009 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <audio src="">aa</audio>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4239,7 +4248,7 @@ not ok 4000 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+------------------------------------------+
 # |   |     *  1|/audio/audio;element not allowed:minus;m  *
 # +---+-----+---+------------------------------------------+
-not ok 4001 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 4010 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <p><audio src="">aa</audio></p>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4251,7 +4260,7 @@ not ok 4001 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+--------------------------------------------+
 # |   |     *  1|/audio/p/audio;element not allowed:minus;m  *
 # +---+-----+---+--------------------------------------------+
-not ok 4002 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+not ok 4011 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 #   <ins><audio src="">aa</audio></ins>
 # </audio>
 #   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
@@ -4263,15 +4272,6 @@ not ok 4002 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
 # +---+-----+---+----------------------------------------------+
 # |   |     *  1|/audio/ins/audio;element not allowed:minus;m  *
 # +---+-----+---+----------------------------------------------+
-ok 4003
-ok 4004
-ok 4005
-ok 4006
-ok 4007
-ok 4008
-ok 4009
-ok 4010
-ok 4011
 ok 4012
 ok 4013
 ok 4014
@@ -4506,7 +4506,6 @@ ok 4242
 ok 4243
 ok 4244
 ok 4245
-# ../t/dom-conformance/html-tables-1.dat
 ok 4246
 ok 4247
 ok 4248
@@ -4516,6 +4515,7 @@ ok 4251
 ok 4252
 ok 4253
 ok 4254
+# ../t/dom-conformance/html-tables-1.dat
 ok 4255
 ok 4256
 ok 4257
@@ -5032,7 +5032,6 @@ ok 4767
 ok 4768
 ok 4769
 ok 4770
-# ../t/dom-conformance/html-tables-2.dat
 ok 4771
 ok 4772
 ok 4773
@@ -5059,7 +5058,6 @@ ok 4793
 ok 4794
 ok 4795
 ok 4796
-# ../t/dom-conformance/html-forms-1.dat
 ok 4797
 ok 4798
 ok 4799
@@ -5132,6 +5130,7 @@ ok 4865
 ok 4866
 ok 4867
 ok 4868
+# ../t/dom-conformance/html-tables-2.dat
 ok 4869
 ok 4870
 ok 4871
@@ -5158,6 +5157,7 @@ ok 4891
 ok 4892
 ok 4893
 ok 4894
+# ../t/dom-conformance/html-forms-1.dat
 ok 4895
 ok 4896
 ok 4897
@@ -5478,7 +5478,6 @@ ok 5211
 ok 5212
 ok 5213
 ok 5214
-# ../t/dom-conformance/html-form-label.dat
 ok 5215
 ok 5216
 ok 5217
@@ -5562,7 +5561,6 @@ ok 5294
 ok 5295
 ok 5296
 ok 5297
-# ../t/dom-conformance/html-form-input-1.dat
 ok 5298
 ok 5299
 ok 5300
@@ -5578,6 +5576,7 @@ ok 5309
 ok 5310
 ok 5311
 ok 5312
+# ../t/dom-conformance/html-form-label.dat
 ok 5313
 ok 5314
 ok 5315
@@ -5661,6 +5660,7 @@ ok 5392
 ok 5393
 ok 5394
 ok 5395
+# ../t/dom-conformance/html-form-input-1.dat
 ok 5396
 ok 5397
 ok 5398
@@ -6126,7 +6126,6 @@ ok 5857
 ok 5858
 ok 5859
 ok 5860
-Parse error (lt in attr value) at line 3 column 12
 ok 5861
 ok 5862
 ok 5863
@@ -6225,6 +6224,7 @@ ok 5955
 ok 5956
 ok 5957
 ok 5958
+Parse error (lt in attr value) at line 3 column 12
 ok 5959
 ok 5960
 ok 5961
@@ -7262,21 +7262,7 @@ ok 6992
 ok 6993
 ok 6994
 ok 6995
-not ok 6996 - <map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
-# <input type="image"
-#     usemap="\#abc"/>x
-# </map>
-#   Failed test '<map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
-# <input type="image"
-#     usemap="\#abc"/>x
-# </map>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+--------------------------------------------+
-# | Ln|Got                                         |Expected                                    |
-# +---+--------------------------------------------+--------------------------------------------+
-# |  1|/map/input/@usemap;attribute not defined;m  |/map/input/@usemap;attribute not defined;m  |
-# *  2|/map/input/@usemap;hashref:wrong case;m     |/map/input/@usemap;no referenced map;m      *
-# +---+--------------------------------------------+--------------------------------------------+
+ok 6996
 ok 6997
 ok 6998
 ok 6999
@@ -7374,7 +7360,21 @@ ok 7090
 ok 7091
 ok 7092
 ok 7093
-ok 7094
+not ok 7094 - <map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
+# <input type="image"
+#     usemap="\#abc"/>x
+# </map>
+#   Failed test '<map xmlns="http://www.w3.org/1999/xhtml" name="ABC">
+# <input type="image"
+#     usemap="\#abc"/>x
+# </map>'
+#   at content-checker-test-ok line 1.
+# +---+--------------------------------------------+--------------------------------------------+
+# | Ln|Got                                         |Expected                                    |
+# +---+--------------------------------------------+--------------------------------------------+
+# |  1|/map/input/@usemap;attribute not defined;m  |/map/input/@usemap;attribute not defined;m  |
+# *  2|/map/input/@usemap;hashref:wrong case;m     |/map/input/@usemap;no referenced map;m      *
+# +---+--------------------------------------------+--------------------------------------------+
 ok 7095
 ok 7096
 ok 7097
@@ -7660,56 +7660,11 @@ ok 7376
 ok 7377
 ok 7378
 ok 7379
-not ok 7380 - <input type="date" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11-22"/>
-#   Failed test '<input type="date" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11-22"/>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/input/@value;datetime:bad year;m  *
-# +---+-----+---+-----------------------------------+
-not ok 7381 - <input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11-22T00:11:22Z"/>
-#   Failed test '<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11-22T00:11:22Z"/>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/input/@value;datetime:bad year;m  *
-# +---+-----+---+-----------------------------------+
-not ok 7382 - <input type="month" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11"/>
-#   Failed test '<input type="month" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11"/>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/input/@value;datetime:bad year;m  *
-# +---+-----+---+-----------------------------------+
-not ok 7383 - <input type="week" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-W11"/>
-#   Failed test '<input type="week" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-W11"/>'
-#   at content-checker-test-ok line 1.
-# +---+-------------------------------+-----------------------------------+
-# | Ln|Got                            |Expected                           |
-# +---+-------------------------------+-----------------------------------+
-# *  1|/input/@value;week:bad year;m  |/input/@value;datetime:bad year;m  *
-# +---+-------------------------------+-----------------------------------+
-not ok 7384 - <input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11-22T00:11:22"/>
-#   Failed test '<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
-#     value="0000-11-22T00:11:22"/>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/input/@value;datetime:bad year;m  *
-# +---+-----+---+-----------------------------------+
+ok 7380
+ok 7381
+ok 7382
+ok 7383
+ok 7384
 ok 7385
 ok 7386
 ok 7387
@@ -7803,11 +7758,56 @@ ok 7474
 ok 7475
 ok 7476
 ok 7477
-ok 7478
-ok 7479
-ok 7480
-ok 7481
-ok 7482
+not ok 7478 - <input type="date" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11-22"/>
+#   Failed test '<input type="date" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11-22"/>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+-----------------------------------+
+# | Ln|Got  | Ln|Expected                           |
+# +---+-----+---+-----------------------------------+
+# |   |     *  1|/input/@value;datetime:bad year;m  *
+# +---+-----+---+-----------------------------------+
+not ok 7479 - <input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11-22T00:11:22Z"/>
+#   Failed test '<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11-22T00:11:22Z"/>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+-----------------------------------+
+# | Ln|Got  | Ln|Expected                           |
+# +---+-----+---+-----------------------------------+
+# |   |     *  1|/input/@value;datetime:bad year;m  *
+# +---+-----+---+-----------------------------------+
+not ok 7480 - <input type="month" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11"/>
+#   Failed test '<input type="month" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11"/>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+-----------------------------------+
+# | Ln|Got  | Ln|Expected                           |
+# +---+-----+---+-----------------------------------+
+# |   |     *  1|/input/@value;datetime:bad year;m  *
+# +---+-----+---+-----------------------------------+
+not ok 7481 - <input type="week" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-W11"/>
+#   Failed test '<input type="week" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-W11"/>'
+#   at content-checker-test-ok line 1.
+# +---+-------------------------------+-----------------------------------+
+# | Ln|Got                            |Expected                           |
+# +---+-------------------------------+-----------------------------------+
+# *  1|/input/@value;week:bad year;m  |/input/@value;datetime:bad year;m  *
+# +---+-------------------------------+-----------------------------------+
+not ok 7482 - <input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11-22T00:11:22"/>
+#   Failed test '<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+#     value="0000-11-22T00:11:22"/>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+-----------------------------------+
+# | Ln|Got  | Ln|Expected                           |
+# +---+-----+---+-----------------------------------+
+# |   |     *  1|/input/@value;datetime:bad year;m  *
+# +---+-----+---+-----------------------------------+
 ok 7483
 ok 7484
 ok 7485
@@ -8170,7 +8170,6 @@ ok 7841
 ok 7842
 ok 7843
 ok 7844
-# ../t/dom-conformance/html-form-button.dat
 ok 7845
 ok 7846
 ok 7847
@@ -8269,6 +8268,7 @@ ok 7939
 ok 7940
 ok 7941
 ok 7942
+# ../t/dom-conformance/html-form-button.dat
 ok 7943
 ok 7944
 ok 7945
@@ -8384,7 +8384,6 @@ ok 8054
 ok 8055
 ok 8056
 ok 8057
-# ../t/dom-conformance/html-form-select.dat
 ok 8058
 ok 8059
 ok 8060
@@ -8476,7 +8475,6 @@ ok 8145
 ok 8146
 ok 8147
 ok 8148
-# ../t/dom-conformance/html-form-datalist.dat
 ok 8149
 ok 8150
 ok 8151
@@ -8484,6 +8482,7 @@ ok 8152
 ok 8153
 ok 8154
 ok 8155
+# ../t/dom-conformance/html-form-select.dat
 ok 8156
 ok 8157
 ok 8158
@@ -8537,7 +8536,6 @@ ok 8205
 ok 8206
 ok 8207
 ok 8208
-# ../t/dom-conformance/html-form-textarea.dat
 ok 8209
 ok 8210
 ok 8211
@@ -8576,6 +8574,7 @@ ok 8243
 ok 8244
 ok 8245
 ok 8246
+# ../t/dom-conformance/html-form-datalist.dat
 ok 8247
 ok 8248
 ok 8249
@@ -8636,6 +8635,7 @@ ok 8303
 ok 8304
 ok 8305
 ok 8306
+# ../t/dom-conformance/html-form-textarea.dat
 ok 8307
 ok 8308
 ok 8309
@@ -8708,7 +8708,6 @@ ok 8375
 ok 8376
 ok 8377
 ok 8378
-# ../t/dom-conformance/html-form-keygen.dat
 ok 8379
 ok 8380
 ok 8381
@@ -8745,76 +8744,21 @@ ok 8411
 ok 8412
 ok 8413
 ok 8414
-# ../t/dom-conformance/html-interactive-1.dat
 ok 8415
 ok 8416
 ok 8417
 ok 8418
 ok 8419
-not ok 8420 - <head xmlns="http://www.w3.org/1999/xhtml">
-# <title/>
-# <noscript>
-# <meta name="keywords" content=""/>
-# </noscript>
-# </head>
-#   Failed test '<head xmlns="http://www.w3.org/1999/xhtml">
-# <title/>
-# <noscript>
-# <meta name="keywords" content=""/>
-# </noscript>
-# </head>'
-#   at content-checker-test-ok line 1.
-# +---+---------------------------------------------------------+---+---------------------------------------------------------+
-# | Ln|Got                                                      | Ln|Expected                                                 |
-# +---+---------------------------------------------------------+---+---------------------------------------------------------+
-# *  1|/head/noscript/meta/@name;metadata:proposed;keywords;w   *   |                                                         |
-# |  2|/head/noscript/meta;element not allowed:head noscript;m  |  1|/head/noscript/meta;element not allowed:head noscript;m  |
-# |  3|/head/noscript;in XML:noscript;m                         |  2|/head/noscript;in XML:noscript;m                         |
-# +---+---------------------------------------------------------+---+---------------------------------------------------------+
+ok 8420
 ok 8421
-not ok 8422 - <head xmlns="http://www.w3.org/1999/xhtml">
-# <title/>
-# <noscript>
-# <event-source src=""/>
-# </noscript>
-# </head>
-#   Failed test '<head xmlns="http://www.w3.org/1999/xhtml">
-# <title/>
-# <noscript>
-# <event-source src=""/>
-# </noscript>
-# </head>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------------------------------------+---+-----------------------------------------------------------------+
-# | Ln|Got                                                              | Ln|Expected                                                         |
-# +---+-----------------------------------------------------------------+---+-----------------------------------------------------------------+
-# |  1|/head/noscript/event-source/@src;attribute not defined;m         |  1|/head/noscript/event-source/@src;attribute not defined;m         |
-# *  2|/head/noscript/event-source/@src;url:empty;m                     *   |                                                                 |
-# |  3|/head/noscript/event-source;element not allowed:head noscript;m  |  2|/head/noscript/event-source;element not allowed:head noscript;m  |
-# |  4|/head/noscript/event-source;element not defined;m                |  3|/head/noscript/event-source;element not defined;m                |
-# |  5|/head/noscript;in XML:noscript;m                                 |  4|/head/noscript;in XML:noscript;m                                 |
-# +---+-----------------------------------------------------------------+---+-----------------------------------------------------------------+
+ok 8422
 ok 8423
 ok 8424
 ok 8425
 ok 8426
 ok 8427
 ok 8428
-not ok 8429 - <noscript xmlns="http://www.w3.org/1999/xhtml">
-# <meta name="keywords" content=""/>
-# </noscript>
-#   Failed test '<noscript xmlns="http://www.w3.org/1999/xhtml">
-# <meta name="keywords" content=""/>
-# </noscript>'
-#   at content-checker-test-ok line 1.
-# +---+---------------------------------------------------+---+-------------------------------------------+
-# | Ln|Got                                                | Ln|Expected                                   |
-# +---+---------------------------------------------------+---+-------------------------------------------+
-# *  1|/noscript/meta/@name;metadata:proposed;keywords;w  *   |                                           |
-# |  2|/noscript/meta;element not allowed:flow;m          |  1|/noscript/meta;element not allowed:flow;m  |
-# |  3|/noscript;in XML:noscript;m                        |  2|/noscript;in XML:noscript;m                |
-# |  4|/noscript;no significant content;s                 |  3|/noscript;no significant content;s         |
-# +---+---------------------------------------------------+---+-------------------------------------------+
+ok 8429
 ok 8430
 ok 8431
 ok 8432
@@ -8863,6 +8807,7 @@ ok 8474
 ok 8475
 ok 8476
 ok 8477
+# ../t/dom-conformance/html-form-keygen.dat
 ok 8478
 ok 8479
 ok 8480
@@ -8899,21 +8844,76 @@ ok 8510
 ok 8511
 ok 8512
 ok 8513
+# ../t/dom-conformance/html-interactive-1.dat
 ok 8514
 ok 8515
 ok 8516
 ok 8517
 ok 8518
-ok 8519
+not ok 8519 - <head xmlns="http://www.w3.org/1999/xhtml">
+# <title/>
+# <noscript>
+# <meta name="keywords" content=""/>
+# </noscript>
+# </head>
+#   Failed test '<head xmlns="http://www.w3.org/1999/xhtml">
+# <title/>
+# <noscript>
+# <meta name="keywords" content=""/>
+# </noscript>
+# </head>'
+#   at content-checker-test-ok line 1.
+# +---+---------------------------------------------------------+---+---------------------------------------------------------+
+# | Ln|Got                                                      | Ln|Expected                                                 |
+# +---+---------------------------------------------------------+---+---------------------------------------------------------+
+# *  1|/head/noscript/meta/@name;metadata:proposed;keywords;w   *   |                                                         |
+# |  2|/head/noscript/meta;element not allowed:head noscript;m  |  1|/head/noscript/meta;element not allowed:head noscript;m  |
+# |  3|/head/noscript;in XML:noscript;m                         |  2|/head/noscript;in XML:noscript;m                         |
+# +---+---------------------------------------------------------+---+---------------------------------------------------------+
 ok 8520
-ok 8521
+not ok 8521 - <head xmlns="http://www.w3.org/1999/xhtml">
+# <title/>
+# <noscript>
+# <event-source src=""/>
+# </noscript>
+# </head>
+#   Failed test '<head xmlns="http://www.w3.org/1999/xhtml">
+# <title/>
+# <noscript>
+# <event-source src=""/>
+# </noscript>
+# </head>'
+#   at content-checker-test-ok line 1.
+# +---+-----------------------------------------------------------------+---+-----------------------------------------------------------------+
+# | Ln|Got                                                              | Ln|Expected                                                         |
+# +---+-----------------------------------------------------------------+---+-----------------------------------------------------------------+
+# |  1|/head/noscript/event-source/@src;attribute not defined;m         |  1|/head/noscript/event-source/@src;attribute not defined;m         |
+# *  2|/head/noscript/event-source/@src;url:empty;m                     *   |                                                                 |
+# |  3|/head/noscript/event-source;element not allowed:head noscript;m  |  2|/head/noscript/event-source;element not allowed:head noscript;m  |
+# |  4|/head/noscript/event-source;element not defined;m                |  3|/head/noscript/event-source;element not defined;m                |
+# |  5|/head/noscript;in XML:noscript;m                                 |  4|/head/noscript;in XML:noscript;m                                 |
+# +---+-----------------------------------------------------------------+---+-----------------------------------------------------------------+
 ok 8522
 ok 8523
 ok 8524
 ok 8525
 ok 8526
 ok 8527
-ok 8528
+not ok 8528 - <noscript xmlns="http://www.w3.org/1999/xhtml">
+# <meta name="keywords" content=""/>
+# </noscript>
+#   Failed test '<noscript xmlns="http://www.w3.org/1999/xhtml">
+# <meta name="keywords" content=""/>
+# </noscript>'
+#   at content-checker-test-ok line 1.
+# +---+---------------------------------------------------+---+-------------------------------------------+
+# | Ln|Got                                                | Ln|Expected                                   |
+# +---+---------------------------------------------------+---+-------------------------------------------+
+# *  1|/noscript/meta/@name;metadata:proposed;keywords;w  *   |                                           |
+# |  2|/noscript/meta;element not allowed:flow;m          |  1|/noscript/meta;element not allowed:flow;m  |
+# |  3|/noscript;in XML:noscript;m                        |  2|/noscript;in XML:noscript;m                |
+# |  4|/noscript;no significant content;s                 |  3|/noscript;no significant content;s         |
+# +---+---------------------------------------------------+---+-------------------------------------------+
 ok 8529
 ok 8530
 ok 8531
@@ -9065,7 +9065,6 @@ ok 8676
 ok 8677
 ok 8678
 ok 8679
-# ../t/dom-conformance/html-scripting-1.dat
 ok 8680
 ok 8681
 ok 8682
@@ -9143,7 +9142,6 @@ ok 8753
 ok 8754
 ok 8755
 ok 8756
-# ../t/dom-conformance/html-scripting-2.dat
 ok 8757
 ok 8758
 ok 8759
@@ -9166,6 +9164,7 @@ ok 8775
 ok 8776
 ok 8777
 ok 8778
+# ../t/dom-conformance/html-scripting-1.dat
 ok 8779
 ok 8780
 ok 8781
@@ -9237,13 +9236,13 @@ ok 8846
 ok 8847
 ok 8848
 ok 8849
-# ../t/dom-conformance/html-repetitions.dat
 ok 8850
 ok 8851
 ok 8852
 ok 8853
 ok 8854
 ok 8855
+# ../t/dom-conformance/html-scripting-2.dat
 ok 8856
 ok 8857
 ok 8858
@@ -9321,7 +9320,6 @@ ok 8929
 ok 8930
 ok 8931
 ok 8932
-# ../t/dom-conformance/html-datatemplate.dat
 ok 8933
 ok 8934
 ok 8935
@@ -9338,6 +9336,7 @@ ok 8945
 ok 8946
 ok 8947
 ok 8948
+# ../t/dom-conformance/html-repetitions.dat
 ok 8949
 ok 8950
 ok 8951
@@ -9421,6 +9420,7 @@ ok 9028
 ok 9029
 ok 9030
 ok 9031
+# ../t/dom-conformance/html-datatemplate.dat
 ok 9032
 ok 9033
 ok 9034
@@ -9637,87 +9637,20 @@ ok 9244
 ok 9245
 ok 9246
 ok 9247
-not ok 9248 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
-#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>'
-#   at content-checker-test-ok line 1.
-# +---+-----------------------------------+---+-----------------------------------+
-# | Ln|Got                                | Ln|Expected                           |
-# +---+-----------------------------------+---+-----------------------------------+
-# |   |                                   *  1|/div/@ref;attribute not allowed;m  *
-# |  1|/div/@ref;attribute not defined;m  |  2|/div/@ref;attribute not defined;m  |
-# +---+-----------------------------------+---+-----------------------------------+
-not ok 9249 - <div xmlns="http://www.w3.org/1999/xhtml"
-#     registrationmark="">x</div>
-#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml"
-#     registrationmark="">x</div>'
-#   at content-checker-test-ok line 1.
-# +---+------------------------------------------------+---+------------------------------------------------+
-# | Ln|Got                                             | Ln|Expected                                        |
-# +---+------------------------------------------------+---+------------------------------------------------+
-# |   |                                                *  1|/div/@registrationmark;attribute not allowed;m  *
-# |  1|/div/@registrationmark;attribute not defined;m  |  2|/div/@registrationmark;attribute not defined;m  |
-# +---+------------------------------------------------+---+------------------------------------------------+
-not ok 9250 - <rule xmlns="http://www.w3.org/1999/xhtml"
-#     registrationmark="">x</rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml"
-#     registrationmark="">x</rule>'
-#   at content-checker-test-ok line 1.
-# +---+-------------------------------------------------+---+-------------------------------------------------+
-# | Ln|Got                                              | Ln|Expected                                         |
-# +---+-------------------------------------------------+---+-------------------------------------------------+
-# |   |                                                 *  1|/rule/@registrationmark;attribute not allowed;m  *
-# |  1|/rule/@registrationmark;attribute not defined;m  |  2|/rule/@registrationmark;attribute not defined;m  |
-# |  2|/rule;element not defined;m                      |  3|/rule;element not defined;m                      |
-# +---+-------------------------------------------------+---+-------------------------------------------------+
+ok 9248
+ok 9249
+ok 9250
 ok 9251
 ok 9252
 ok 9253
 ok 9254
 ok 9255
 ok 9256
-not ok 9257 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
-#   <rule>
-#   </rule>
-#   <div registrationmark="a">x</div>
-# </datatemplate>
-#   Failed test '<datatemplate xmlns="http://www.w3.org/1999/xhtml">
-#   <rule>
-#   </rule>
-#   <div registrationmark="a">x</div>
-# </datatemplate>'
-#   at content-checker-test-ok line 1.
-# +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
-# | Ln|Got                                                          | Ln|Expected                                                     |
-# +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
-# |   |                                                             *  1|/datatemplate/div/@registrationmark;attribute not allowed;m  *
-# |  1|/datatemplate/div/@registrationmark;attribute not defined;m  |  2|/datatemplate/div/@registrationmark;attribute not defined;m  |
-# |  2|/datatemplate/rule;element not defined;m                     |  3|/datatemplate/rule;element not defined;m                     |
-# |  3|/datatemplate;element not defined;m                          |  4|/datatemplate;element not defined;m                          |
-# +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
+ok 9257
 ok 9258
-not ok 9259 - <rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div>x
-#     <nest registrationmark="a"/>
-#   </div>
-# </rule>
-#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
-#   <div>x
-#     <nest registrationmark="a"/>
-#   </div>
-# </rule>'
-#   at content-checker-test-ok line 1.
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-# | Ln|Got                                                       | Ln|Expected                                                  |
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
-# |   |                                                          *  1|/rule/div/nest/@registrationmark;attribute not allowed;m  *
-# |  1|/rule/div/nest/@registrationmark;attribute not defined;m  |  2|/rule/div/nest/@registrationmark;attribute not defined;m  |
-# *  2|/rule/div/nest;element not allowed:flow;m                 *   |                                                          |
-# |  3|/rule/div/nest;element not defined;m                      |  3|/rule/div/nest;element not defined;m                      |
-# |  4|/rule;element not defined;m                               |  4|/rule;element not defined;m                               |
-# +---+----------------------------------------------------------+---+----------------------------------------------------------+
+ok 9259
 ok 9260
 ok 9261
-# ../t/dom-conformance/html-frames.dat
 ok 9262
 ok 9263
 ok 9264
@@ -9803,20 +9736,87 @@ ok 9343
 ok 9344
 ok 9345
 ok 9346
-ok 9347
-ok 9348
-ok 9349
+not ok 9347 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
+#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>'
+#   at content-checker-test-ok line 1.
+# +---+-----------------------------------+---+-----------------------------------+
+# | Ln|Got                                | Ln|Expected                           |
+# +---+-----------------------------------+---+-----------------------------------+
+# |   |                                   *  1|/div/@ref;attribute not allowed;m  *
+# |  1|/div/@ref;attribute not defined;m  |  2|/div/@ref;attribute not defined;m  |
+# +---+-----------------------------------+---+-----------------------------------+
+not ok 9348 - <div xmlns="http://www.w3.org/1999/xhtml"
+#     registrationmark="">x</div>
+#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml"
+#     registrationmark="">x</div>'
+#   at content-checker-test-ok line 1.
+# +---+------------------------------------------------+---+------------------------------------------------+
+# | Ln|Got                                             | Ln|Expected                                        |
+# +---+------------------------------------------------+---+------------------------------------------------+
+# |   |                                                *  1|/div/@registrationmark;attribute not allowed;m  *
+# |  1|/div/@registrationmark;attribute not defined;m  |  2|/div/@registrationmark;attribute not defined;m  |
+# +---+------------------------------------------------+---+------------------------------------------------+
+not ok 9349 - <rule xmlns="http://www.w3.org/1999/xhtml"
+#     registrationmark="">x</rule>
+#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml"
+#     registrationmark="">x</rule>'
+#   at content-checker-test-ok line 1.
+# +---+-------------------------------------------------+---+-------------------------------------------------+
+# | Ln|Got                                              | Ln|Expected                                         |
+# +---+-------------------------------------------------+---+-------------------------------------------------+
+# |   |                                                 *  1|/rule/@registrationmark;attribute not allowed;m  *
+# |  1|/rule/@registrationmark;attribute not defined;m  |  2|/rule/@registrationmark;attribute not defined;m  |
+# |  2|/rule;element not defined;m                      |  3|/rule;element not defined;m                      |
+# +---+-------------------------------------------------+---+-------------------------------------------------+
 ok 9350
 ok 9351
 ok 9352
 ok 9353
 ok 9354
 ok 9355
-ok 9356
+not ok 9356 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
+#   <rule>
+#   </rule>
+#   <div registrationmark="a">x</div>
+# </datatemplate>
+#   Failed test '<datatemplate xmlns="http://www.w3.org/1999/xhtml">
+#   <rule>
+#   </rule>
+#   <div registrationmark="a">x</div>
+# </datatemplate>'
+#   at content-checker-test-ok line 1.
+# +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
+# | Ln|Got                                                          | Ln|Expected                                                     |
+# +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
+# |   |                                                             *  1|/datatemplate/div/@registrationmark;attribute not allowed;m  *
+# |  1|/datatemplate/div/@registrationmark;attribute not defined;m  |  2|/datatemplate/div/@registrationmark;attribute not defined;m  |
+# |  2|/datatemplate/rule;element not defined;m                     |  3|/datatemplate/rule;element not defined;m                     |
+# |  3|/datatemplate;element not defined;m                          |  4|/datatemplate;element not defined;m                          |
+# +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
 ok 9357
-ok 9358
+not ok 9358 - <rule xmlns="http://www.w3.org/1999/xhtml">
+#   <div>x
+#     <nest registrationmark="a"/>
+#   </div>
+# </rule>
+#   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml">
+#   <div>x
+#     <nest registrationmark="a"/>
+#   </div>
+# </rule>'
+#   at content-checker-test-ok line 1.
+# +---+----------------------------------------------------------+---+----------------------------------------------------------+
+# | Ln|Got                                                       | Ln|Expected                                                  |
+# +---+----------------------------------------------------------+---+----------------------------------------------------------+
+# |   |                                                          *  1|/rule/div/nest/@registrationmark;attribute not allowed;m  *
+# |  1|/rule/div/nest/@registrationmark;attribute not defined;m  |  2|/rule/div/nest/@registrationmark;attribute not defined;m  |
+# *  2|/rule/div/nest;element not allowed:flow;m                 *   |                                                          |
+# |  3|/rule/div/nest;element not defined;m                      |  3|/rule/div/nest;element not defined;m                      |
+# |  4|/rule;element not defined;m                               |  4|/rule;element not defined;m                               |
+# +---+----------------------------------------------------------+---+----------------------------------------------------------+
 ok 9359
 ok 9360
+# ../t/dom-conformance/html-frames.dat
 ok 9361
 ok 9362
 ok 9363
@@ -9948,5 +9948,104 @@ ok 9488
 ok 9489
 ok 9490
 ok 9491
-# Looks like you planned 7891 tests but ran 9491.
-# Looks like you failed 34 tests of 9491 run.
+ok 9492
+ok 9493
+ok 9494
+ok 9495
+ok 9496
+ok 9497
+ok 9498
+ok 9499
+ok 9500
+ok 9501
+ok 9502
+ok 9503
+ok 9504
+ok 9505
+ok 9506
+ok 9507
+ok 9508
+ok 9509
+ok 9510
+ok 9511
+ok 9512
+ok 9513
+ok 9514
+ok 9515
+ok 9516
+ok 9517
+ok 9518
+ok 9519
+ok 9520
+ok 9521
+ok 9522
+ok 9523
+ok 9524
+ok 9525
+ok 9526
+ok 9527
+ok 9528
+ok 9529
+ok 9530
+ok 9531
+ok 9532
+ok 9533
+ok 9534
+ok 9535
+ok 9536
+ok 9537
+ok 9538
+ok 9539
+ok 9540
+ok 9541
+ok 9542
+ok 9543
+ok 9544
+ok 9545
+ok 9546
+ok 9547
+ok 9548
+ok 9549
+ok 9550
+ok 9551
+ok 9552
+ok 9553
+ok 9554
+ok 9555
+ok 9556
+ok 9557
+ok 9558
+ok 9559
+ok 9560
+ok 9561
+ok 9562
+ok 9563
+ok 9564
+ok 9565
+ok 9566
+ok 9567
+ok 9568
+ok 9569
+ok 9570
+ok 9571
+ok 9572
+ok 9573
+ok 9574
+ok 9575
+ok 9576
+ok 9577
+ok 9578
+ok 9579
+ok 9580
+ok 9581
+ok 9582
+ok 9583
+ok 9584
+ok 9585
+ok 9586
+ok 9587
+ok 9588
+ok 9589
+ok 9590
+# Looks like you planned 7891 tests but ran 9590.
+# Looks like you failed 34 tests of 9590 run.
