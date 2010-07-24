@@ -2181,16 +2181,6 @@ $Element->{$HTML_NS}->{html} = {
   },
 }; # html
 
-$Element->{$HTML_NS}->{'pre-html'} = {
-  %{$Element->{$HTML_NS}->{html}},
-  status => FEATURE_OBSVOCAB,
-  check_attrs => $GetHTMLAttrsChecker->({
-    #
-  }, {
-    %HTMLAttrStatus,
-  }), # check_attrs
-}; # pre-html
-
 # ---- Document metadata ----
 
 $Element->{$HTML_NS}->{head} = {
@@ -4060,17 +4050,6 @@ $Element->{$HTML_NS}->{center} = {
     clear => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # center
-
-$Element->{$HTML_NS}->{div1} = {
-  %HTMLFlowContentChecker,
-  status => FEATURE_OBSVOCAB,
-}; # div1
-
-$Element->{$HTML_NS}->{div2} = $Element->{$HTML_NS}->{div1};
-$Element->{$HTML_NS}->{div3} = $Element->{$HTML_NS}->{div1};
-$Element->{$HTML_NS}->{div4} = $Element->{$HTML_NS}->{div1};
-$Element->{$HTML_NS}->{div5} = $Element->{$HTML_NS}->{div1};
-$Element->{$HTML_NS}->{div6} = $Element->{$HTML_NS}->{div1};
 
 $Element->{$HTML_NS}->{marquee} = {
   %HTMLFlowContentChecker,
@@ -9578,11 +9557,12 @@ $Element->{$HTML_NS}->{noframes} = {
 ## lh, bodytext, abbrev, au, bq, bt, credit, fig, figtext, person,
 ## lang, tab, math, above, added, array, atop, bar, below, box, ddot,
 ## dot, hat, left, of, over, overlay, range, right, root, row, spot,
-## sqrt, tilde, vec [HTML30], access [ACCESS], blockcode, standby, nl,
-## l, h, separator [XHTML2ED], m, x, t, dc, ds, date, datatemplate,
-## rule, nest, calendar, card, switch, eventsource, sidebar, bb [WA1
-## draft], repeat [WF2 draft], centre, noflames, noframe, textflow,
-## app, server, htmlarea, animate, h7, h8, h9, entity, hype, key, tbl,
+## sqrt, tilde, vec [HTML30], pre-html, div1, div2, div3, div4, div5,
+## div6 [ISOHTMLUG], access [ACCESS], blockcode, standby, nl, l, h,
+## separator [XHTML2ED], m, x, t, dc, ds, date, datatemplate, rule,
+## nest, calendar, card, switch, eventsource, sidebar, bb [WA1 draft],
+## repeat [WF2 draft], centre, noflames, noframe, textflow, app,
+## server, htmlarea, animate, h7, h8, h9, entity, hype, key, tbl,
 ## audioscope, limittext, nosmartquotes, shadow, sound, noimg,
 ## element, attrib, csactionitem, csactions, csaction, csscriptdict,
 ## csactiondict, csobj, madebywz, x-sas-window, yomi, fn-contents,
