@@ -5659,6 +5659,14 @@ $Element->{$HTML_NS}->{img} = {
                          level => $self->{level}->{must});
     }
 
+    if (my $attr = $el->get_attribute_node_ns (undef, 'start')) {
+      unless ($el->has_attribute_ns (undef, 'dynsrc')) {
+        $self->{onerror}->(node => $attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
+
     ## XXXresource: external resource check
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
@@ -7618,11 +7626,12 @@ $Element->{$HTML_NS}->{input} = {
          start => FEATURE_OBSVOCAB,
          step => FEATURE_HTML5_LC | FEATURE_WF2X,
          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-         target => FEATURE_HTML5_DROPPED | FEATURE_WF2X,
+         target => FEATURE_OBSVOCAB,
          template => FEATURE_OBSVOCAB,
          type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-         usemap => FEATURE_HTML5_DROPPED | FEATURE_HTML5_OBSOLETE,
+         usemap => FEATURE_OBSVOCAB,
          value => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+         vcard_name => FEATURE_OBSVOCAB,
          viblength => FEATURE_OBSVOCAB,
          vibration => FEATURE_OBSVOCAB,
          volume => FEATURE_OBSVOCAB,
@@ -7700,9 +7709,11 @@ $Element->{$HTML_NS}->{input} = {
            radio => 1, file => 1, submit => 1, image => 1, reset => 1,
            button => 1,
            add => -1, 'move-up' => -1, 'move-down' => -1, remove => -1,
+           quote => -1,
          }),
          usemap => '',
          value => '',
+         vcard_name => '',
          viblength => $GetHTMLNonNegativeIntegerAttrChecker->(sub {
            1 <= $_[0] and $_[0] <= 9;
          }),
@@ -7916,19 +7927,12 @@ $Element->{$HTML_NS}->{input} = {
             ## TODO: alt & src are required.
           } elsif ({
                     reset => 1, button => 1,
-                    ## NOTE: From Web Forms 2.0:
                     remove => 1, 'move-up' => 1, 'move-down' => 1,
                     add => 1,
+                    quote => 1,
                    }->{$state}) {
             $checker = 
             {
-             ## NOTE: According to Web Forms 2.0, |input| attribute
-             ## has |template| attribute to support the |add| button
-             ## type (as part of the repetition template feature).  It
-             ## conflicts with the |template| global attribute
-             ## introduced as part of the data template feature.
-             ## NOTE: |template| attribute as defined in Web Forms 2.0
-             ## has no author requirement.
              template => ($state eq 'add' ? $HTMLAttrChecker->{'repeat-template'} : undef),
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
@@ -8029,6 +8033,20 @@ $Element->{$HTML_NS}->{input} = {
                  }
                }
              },
+              vcard_name => $GetHTMLEnumeratedAttrChecker->({qw(
+                vcard.business.city 1 vcard.business.country 1
+                vcard.business.fax 1 vcard.business.phone 1
+                vcard.business.state 1 vcard.business.streetaddress 1
+                vcard.business.url 1 vcard.business.zipcode 1
+                vcard.cellular 1 vcard.company 1 vcard.department 1
+                vcard.displayname 1 vcard.email 1 vcard.firstname 1
+                vcard.gender 1 vcard.home.city 1 vcard.home.country 1
+                vcard.home.fax 1 vcard.home.phone 1 vcard.home.state 1
+                vcard.home.streetaddress 1 vcard.home.zipcode 1
+                vcard.homepage 1 vcard.jobtitle 1 vcard.lastname 1
+                vcard.middlename 1 vcard.notes 1 vcard.office 1
+                vcard.pager 1
+              )}),
             }->{$attr_ln} || $checker;
             if ($state eq 'password') {
               $checker = '' if $attr_ln eq 'list';
@@ -8126,6 +8144,14 @@ $Element->{$HTML_NS}->{input} = {
                                type => 'attribute not allowed',
                                level => $self->{level}->{must});
           }
+        }
+      }
+    } elsif ($state eq 'image') {
+      if (my $attr = $el->get_attribute_node_ns (undef, 'start')) {
+        unless ($el->has_attribute_ns (undef, 'dynsrc')) {
+          $self->{onerror}->(node => $attr,
+                             type => 'attribute not allowed',
+                             level => $self->{level}->{must});
         }
       }
     }

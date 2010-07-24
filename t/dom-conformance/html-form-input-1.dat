@@ -15833,49 +15833,63 @@
 
 #data
 <input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
-    start=""/>
+    start="" dynsrc="b"/>
 #errors
 /input/@start;attribute not defined;m
 /input/@start;enumerated:invalid;m
+/input/@dynsrc;attribute not defined;m
 
 #data
 <input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
-    start="fileopen"/>
+    start="fileopen" dynsrc="b"/>
 #errors
 /input/@start;attribute not defined;m
+/input/@dynsrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mouseover" dynsrc="b"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@dynsrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="FILEOPEN" dynsrc="b"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@dynsrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="none" dynsrc="b"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;enumerated:invalid;m
+/input/@dynsrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mousemove" dynsrc="b"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;enumerated:invalid;m
+/input/@dynsrc;attribute not defined;m
+
+#data
+<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="onmouseover" dynsrc="b"/>
+#errors
+/input/@start;attribute not defined;m
+/input/@start;enumerated:invalid;m
+/input/@dynsrc;attribute not defined;m
 
 #data
 <input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
     start="mouseover"/>
 #errors
 /input/@start;attribute not defined;m
-
-#data
-<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
-    start="FILEOPEN"/>
-#errors
-/input/@start;attribute not defined;m
-
-#data
-<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
-    start="none"/>
-#errors
-/input/@start;attribute not defined;m
-/input/@start;enumerated:invalid;m
-
-#data
-<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
-    start="mousemove"/>
-#errors
-/input/@start;attribute not defined;m
-/input/@start;enumerated:invalid;m
-
-#data
-<input type="image" alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
-    start="onmouseover"/>
-#errors
-/input/@start;attribute not defined;m
-/input/@start;enumerated:invalid;m
+/input/@start;attribute not allowed;m
 
 #data
 <input type="button" xmlns="http://www.w3.org/1999/xhtml"
@@ -17023,3 +17037,81 @@
 #errors
 /input/@results;attribute not defined;m
 /input/@results;input attr not applicable;text;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    vcard_name=""/>
+#errors
+/input/@vcard_name;attribute not defined;m
+/input/@vcard_name;enumerated:invalid;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    vcard_name="vcard"/>
+#errors
+/input/@vcard_name;attribute not defined;m
+/input/@vcard_name;enumerated:invalid;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    vcard_name="vcard.home.fax"/>
+#errors
+/input/@vcard_name;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    vcard_name="vCard.DisplayName"/>
+#errors
+/input/@vcard_name;attribute not defined;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    vcard_name=" vcard.office "/>
+#errors
+/input/@vcard_name;attribute not defined;m
+/input/@vcard_name;enumerated:invalid;m
+
+#data
+<input type="text" xmlns="http://www.w3.org/1999/xhtml"
+    vcard_name="auto"/>
+#errors
+/input/@vcard_name;attribute not defined;m
+/input/@vcard_name;enumerated:invalid;m
+
+#data
+<input type="button" xmlns="http://www.w3.org/1999/xhtml"
+    vcard_name=""/>
+#errors
+/input/@vcard_name;attribute not defined;m
+/input/@vcard_name;input attr not applicable;button;m
+
+#data
+<input type="quote" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@type;enumerated:non-conforming;m
+
+#data
+<input type="quote" maxlength="3" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/input/@type;enumerated:non-conforming;m
+/input/@maxlength;input attr not applicable;quote;m
+
+#data
+<input type="quote" xmlns="http://www.w3.org/1999/xhtml"
+    name="abc"/>
+#errors
+/input/@type;enumerated:non-conforming;m
+
+#data
+<input type="quote" xmlns="http://www.w3.org/1999/xhtml"
+    value="xyz"/>
+#errors
+/input/@type;enumerated:non-conforming;m
+
+#data
+<input type="quote" xmlns="http://www.w3.org/1999/xhtml"
+    template=""/>
+#errors
+/input/@type;enumerated:non-conforming;m
+/input/@template;attribute not defined;m
+/input/@template;input attr not applicable;quote;m
