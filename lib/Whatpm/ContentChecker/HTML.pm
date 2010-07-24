@@ -3575,10 +3575,32 @@ $Element->{$HTML_NS}->{spacer} = {
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $EmbeddedAlignChecker,
+    height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    type => $GetHTMLEnumeratedAttrChecker->({
+      vertical => 1, horizontal => 1, block => 1,
+    }),
+    width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
     %HTMLAttrStatus,
     align => FEATURE_OBSVOCAB,
   }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
+    my $type = $el->get_attribute_ns (undef, 'type') || '';
+    $type =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    for my $name (
+      $type ne 'block' ? qw(align width height) : qw(size)
+    ) {
+      my $attr = $el->get_attribute_node_ns (undef, $name);
+      if ($attr) {
+        $self->{onerror}->(node => $attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
+  }, # check_attrs2
 }; # spacer
 
 $Element->{$HTML_NS}->{br} = {

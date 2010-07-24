@@ -6385,6 +6385,338 @@ a
 /spacer/p;element not allowed:empty;m
 
 #data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="10"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="000"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    width="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;attribute not allowed;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="horizontal"
+    width="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;attribute not allowed;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    width="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;attribute not allowed;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width=""/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="-10"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="200.0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="10%"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="30px"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    width="auto"/>
+#errors
+/spacer;element not defined;m
+/spacer/@width;attribute not defined;m
+/spacer/@width;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="10"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="000"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    height="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;attribute not allowed;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="horizontal"
+    height="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;attribute not allowed;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    height="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;attribute not allowed;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height=""/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="-10"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="200.0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="10%"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="30px"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    height="auto"/>
+#errors
+/spacer;element not defined;m
+/spacer/@height;attribute not defined;m
+/spacer/@height;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    size="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    size="10"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    size="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@size;attribute not allowed;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="horizontal"
+    size="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    size="0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    size=""/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@size;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    size="-10"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@size;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    size="200.0"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@size;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    size="10%"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@size;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    size="30px"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@size;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    size="auto"/>
+#errors
+/spacer;element not defined;m
+/spacer/@size;attribute not defined;m
+/spacer/@size;nninteger:syntax error;m
+/spacer/@type;attribute not defined;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml"><spacer/></p>
 #errors
 /p/spacer;element not defined;m
@@ -6399,111 +6731,324 @@ a
 /div;no significant content;s
 
 #data
-<spacer align="" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="char" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="char" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="justify" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="center" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="bottom" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="middle" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="middle" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="top" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="top" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="left" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="right" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="right" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="abscenter" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-/spacer;element not defined;m
-/spacer/@align;attribute not defined;m
-/spacer/@align;enumerated:non-conforming;m
-
-#data
-<spacer align="texttop" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-/spacer;element not defined;m
-/spacer/@align;attribute not defined;m
-/spacer/@align;enumerated:non-conforming;m
-
-#data
-<spacer align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"/>
-#errors
-/spacer;element not defined;m
-/spacer/@align;attribute not defined;m
-/spacer/@align;enumerated:non-conforming;m
-
-#data
-<spacer align="baseline" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="abscenter" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
 
 #data
-<spacer align="TEXT-top" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="texttop" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer align="baseline" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer align="TEXT-top" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
 
 #data escaped
-<spacer align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
 
 #data escaped
-<spacer align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"/>
+<spacer align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"
+    type="block"/>
 #errors
 /spacer;element not defined;m
 /spacer/@align;attribute not defined;m
 /spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="left"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="top"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="left"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    align="left"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;attribute not allowed;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="horizontal"
+    align="left"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;attribute not allowed;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="vertical"
+    align="left"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;attribute not allowed;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="right"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="TOP"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="Middle"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="Bottom"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="baseline"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="center"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="texttop"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="abscenter"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="absmiddle"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:non-conforming;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="textbottom"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="centre"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align="auto"/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
+
+#data
+<spacer xmlns="http://www.w3.org/1999/xhtml"
+    type="block"
+    align=" LEFT "/>
+#errors
+/spacer;element not defined;m
+/spacer/@align;attribute not defined;m
+/spacer/@align;enumerated:invalid;m
+/spacer/@type;attribute not defined;m
 
 #data
 <div align="" xmlns="http://www.w3.org/1999/xhtml">x</div>
