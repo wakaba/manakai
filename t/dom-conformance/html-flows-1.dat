@@ -360,7 +360,6 @@ para
 #data
 <section cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml">a</section>
 #errors
-/section/@cite;syntax error:iriref3987;m
 /section/@cite;attribute not defined;m
 
 #data
@@ -397,21 +396,18 @@ para
 <article xmlns="http://www.w3.org/1999/xhtml"
     pubdate="2009-01-01 02:02:02Z">x</article>
 #errors
-/article/@pubdate;datetime:syntax error;m
 /article/@pubdate;attribute not defined;m
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml"
     pubdate="2009-01-01">x</article>
 #errors
-/article/@pubdate;datetime:syntax error;m
 /article/@pubdate;attribute not defined;m
 
 #data
 <article xmlns="http://www.w3.org/1999/xhtml"
     pubdate="02:02:03">x</article>
 #errors
-/article/@pubdate;datetime:syntax error;m
 /article/@pubdate;attribute not defined;m
 
 #data
@@ -422,7 +418,6 @@ para
 #data
 <article cite="http://test/%" xmlns="http://www.w3.org/1999/xhtml">a</article>
 #errors
-/article/@cite;syntax error:iriref3987;m
 /article/@cite;attribute not defined;m
 
 #data
@@ -2852,6 +2847,14 @@ aaa
 </dialog>
 #errors
 /dialog;element not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <dialog>a</dialog>
+</div>
+#errors
+/div/dialog;element not defined;m
+/div/dialog;element not allowed:flow;m
 
 #data
 <dt nowrap="" xmlns="http://www.w3.org/1999/xhtml">x</dt>

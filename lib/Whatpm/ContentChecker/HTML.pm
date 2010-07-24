@@ -193,7 +193,7 @@ my $HTMLFlowContent = {
     section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
     h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, hgroup => 1,
     header => 1,
-    footer => 1, address => 1, p => 1, hr => 1, dialog => 1, pre => 1,
+    footer => 1, address => 1, p => 1, hr => 1, pre => 1,
     ol => 1, ul => 1, dl => 1, menu => 1, figure => 1, table => 1,
     form => 1, fieldset => 1,
     details => 1,
@@ -1347,7 +1347,6 @@ my $HTMLAttrChecker = {
   disabled => $GetHTMLBooleanAttrChecker->('disabled'),
   hidden => $GetHTMLBooleanAttrChecker->('hidden'),
   hidefocus => $GetHTMLBooleanAttrChecker->('hidefocus'),
-  irrelevant => $GetHTMLBooleanAttrChecker->('irrelevant'),
   language => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
@@ -1503,7 +1502,6 @@ my %HTMLAttrStatus = (
   hidden => FEATURE_HTML5_LC,
   hidefocus => FEATURE_OBSVOCAB,
   id => FEATURE_HTML5_REC,
-  irrelevant => FEATURE_HTML5_DROPPED,
   lang => FEATURE_HTML5_REC,
   language => FEATURE_OBSVOCAB,
   property => FEATURE_OBSVOCAB,
@@ -1549,13 +1547,9 @@ my %XHTML2CommonAttrStatus = (
   ## Core
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED,
   id => FEATURE_HTML5_REC,
-  #xml:id
-  layout => FEATURE_XHTML2_ED,
   title => FEATURE_HTML5_REC,
 
   ## Hypertext
-  cite => FEATURE_XHTML2_ED,
-  href => FEATURE_XHTML2_ED,
   hreflang => FEATURE_XHTML2_ED,
   hrefmedia => FEATURE_XHTML2_ED,
   hreftype => FEATURE_XHTML2_ED,
@@ -1564,29 +1558,8 @@ my %XHTML2CommonAttrStatus = (
   target => FEATURE_XHTML2_ED,
   #xml:base
 
-  ## I18N
-  #xml:lang
-
   ## Bi-directional
   dir => FEATURE_HTML5_REC,
-
-  ## Edit
-  edit => FEATURE_XHTML2_ED,
-  datetime => FEATURE_XHTML2_ED,
-
-  ## Embedding
-  encoding => FEATURE_XHTML2_ED,
-  src => FEATURE_XHTML2_ED,
-  srctype => FEATURE_XHTML2_ED,
-
-  ## Image Map
-  usemap => FEATURE_XHTML2_ED,
-  ismap => FEATURE_XHTML2_ED,
-  shape => FEATURE_XHTML2_ED,
-  coords => FEATURE_XHTML2_ED,
-
-  ## Media
-  media => FEATURE_XHTML2_ED,
 
   ## Role
   role => FEATURE_XHTML2_ED,
@@ -1601,7 +1574,6 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
 
   class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   dir => FEATURE_HTML5_REC,
-  href => FEATURE_RDFA_REC,
   id => FEATURE_HTML5_REC,
   style => FEATURE_HTML5_REC,
   title => FEATURE_HTML5_REC,
@@ -1640,10 +1612,6 @@ for (qw(
   $HTMLAttrStatus{$_} = FEATURE_OBSVOCAB;
 }
 
-## Following attributes are not supported (at least as global
-## attributes): onbeforeunload, onhashchange, onresize, onstorage,
-## onunload, ondataunavailable, onmessage.
-
 ## ------ Attributes in the HTML namespace ------
 
 ## Global attributes whoes namespace URL is the HTML namespace,
@@ -1665,19 +1633,10 @@ for (qw(
   $AttrStatus->{$HTML_NS}->{$_} = FEATURE_OBSVOCAB;
 }
 
-## Following attributes are not supported: html:active [WA1 draft],
-## html:instanceof [RDFa draft], html:cite, html:coords,
-## html:datetime, html:edit, html:encoding, html:href, html:hreflang,
-## html:hrefmedia, html:hreftype, html:ismap, html:layout, html:media,
-## html:nextfocus, html:prevfocus, html:shape, html:src, html:srctype,
-## html:style, html:target, html:usemap [XHTML2 ED].
-
 ## ------ ------
 
 my $HTMLDatasetAttrChecker = sub {
-  ## NOTE: "Authors should ... when the attributes are ignored and
-  ## any associated CSS dropped, the page is still usable." (semantic
-  ## constraint.)
+  #
 }; # $HTMLDatasetAttrChecker
 
 my $HTMLDatasetAttrStatus = FEATURE_HTML5_LC;
@@ -2257,17 +2216,7 @@ $Element->{$HTML_NS}->{head} = {
 $Element->{$HTML_NS}->{title} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    #
-  }, {
-    %HTMLAttrStatus,
-    %XHTML2CommonAttrStatus,
-    class => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_HTML2X_RFC,
-    dir => FEATURE_HTML5_REC,
-    id => FEATURE_HTML5_REC,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+}; # title
 
 $Element->{$HTML_NS}->{base} = {
   status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
@@ -2328,11 +2277,10 @@ $Element->{$HTML_NS}->{base} = {
     }, {
       %HTMLAttrStatus,
       href => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-      id => FEATURE_HTML5_REC,
       target => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     })->($self, $item, $element_state);
-  },
-};
+  }, # check_attrs
+}; # base
 
 $Element->{$HTML_NS}->{basefont} = {
   %HTMLEmptyChecker,
@@ -2797,16 +2745,10 @@ $Element->{$HTML_NS}->{style} = {
   }, {
     %HTMLAttrStatus,
     %XHTML2CommonAttrStatus,
-    dir => FEATURE_HTML5_REC,
-    disabled => FEATURE_XHTML2_ED,
-    href => FEATURE_RDFA_REC | FEATURE_XHTML2_ED,
-    id => FEATURE_HTML5_REC,
-    lang => FEATURE_HTML5_REC,
     media => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     scoped => FEATURE_HTML5_FD,
-    title => FEATURE_HTML5_REC,
     type => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -3113,8 +3055,7 @@ $Element->{$HTML_NS}->{noscript} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -3313,13 +3254,12 @@ $Element->{$HTML_NS}->{section} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED,
   check_attrs => $GetHTMLAttrsChecker->({
-    cite => $HTMLURIAttrChecker,
+    #
   }, {
     %HTMLAttrStatus,
     %XHTML2CommonAttrStatus,
-    cite => FEATURE_HTML5_DROPPED | FEATURE_XHTML2_ED,
-  }),
-};
+  }), # check_attrs
+}; # section
 
 $Element->{$HTML_NS}->{nav} = {
   status => FEATURE_HTML5_LC,
@@ -3329,14 +3269,6 @@ $Element->{$HTML_NS}->{nav} = {
 $Element->{$HTML_NS}->{article} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC,
-  check_attrs => $GetHTMLAttrsChecker->({
-    cite => $HTMLURIAttrChecker,
-    pubdate => $GetDateTimeAttrChecker->('global_date_and_time_string'),
-  }, {
-    %HTMLAttrStatus,
-    cite => FEATURE_HTML5_DROPPED,
-    pubdate => FEATURE_HTML5_LC_DROPPED,
-  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -3507,7 +3439,6 @@ $Element->{$HTML_NS}->{address} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_OBSVOCAB,
     clear => FEATURE_OBSVOCAB,
-    lang => FEATURE_HTML5_REC,
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -3544,7 +3475,7 @@ $Element->{$HTML_NS}->{p} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    clear => FEATURE_OBSVOCAB | FEATURE_OBSVOCAB,
+    clear => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # p
 
@@ -3584,6 +3515,10 @@ $Element->{$HTML_NS}->{spacer} = {
   }, {
     %HTMLAttrStatus,
     align => FEATURE_OBSVOCAB,
+    height => FEATURE_OBSVOCAB,
+    size => FEATURE_OBSVOCAB,
+    type => FEATURE_OBSVOCAB,
+    width => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -3612,11 +3547,7 @@ $Element->{$HTML_NS}->{br} = {
     }),
   }, {
     %HTMLAttrStatus,
-    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     clear => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    id => FEATURE_HTML5_REC,
-    style => FEATURE_HTML5_REC,
-    title => FEATURE_HTML5_REC,
   }), # check_attrs
 }; # br
 
@@ -3713,7 +3644,7 @@ $Element->{$HTML_NS}->{blockquote} = {
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_OBSVOCAB,
     cite => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
+    clear => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -3724,77 +3655,6 @@ $Element->{$HTML_NS}->{blockquote} = {
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
-
-$Element->{$HTML_NS}->{dialog} = {
-  status => FEATURE_HTML5_DROPPED,
-  %HTMLChecker,
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $element_state->{phase} = 'before dt';
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_child_element => sub {
-    my ($self, $item, $child_el, $child_nsuri, $child_ln,
-        $child_is_transparent, $element_state) = @_;
-    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
-      $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:minus',
-                         level => $self->{level}->{must});
-    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-      #
-    } elsif ($element_state->{phase} eq 'before dt') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
-        $element_state->{phase} = 'before dd';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
-        $self->{onerror}
-            ->(node => $child_el, type => 'ps element missing',
-               text => 'dt',
-               level => $self->{level}->{must});
-        $element_state->{phase} = 'before dt';
-      } else {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed',
-                           level => $self->{level}->{must});
-      }
-    } elsif ($element_state->{phase} eq 'before dd') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
-        $element_state->{phase} = 'before dt';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
-        $self->{onerror}
-            ->(node => $child_el, type => 'ps element missing',
-               text => 'dd',
-               level => $self->{level}->{must});
-        $element_state->{phase} = 'before dd';
-      } else {
-        $self->{onerror}->(node => $child_el, type => 'element not allowed',
-                           level => $self->{level}->{must});
-      }
-    } else {
-      die "check_child_element: Bad |dialog| phase: $element_state->{phase}";
-    }
-  },
-  check_child_text => sub {
-    my ($self, $item, $child_node, $has_significant, $element_state) = @_;
-    if ($has_significant) {
-      $self->{onerror}->(node => $child_node, type => 'character not allowed',
-                         level => $self->{level}->{must});
-    }
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    if ($element_state->{phase} eq 'before dd') {
-      $self->{onerror}->(node => $item->{node},
-                         type => 'child element missing',
-                         text => 'dd',
-                         level => $self->{level}->{must});
-    }
-
-    $HTMLChecker{check_end}->(@_);
-  },
-}; # dialog
 
 $Element->{$HTML_NS}->{ol} = {
   %HTMLChecker,
@@ -4162,11 +4022,6 @@ $Element->{$HTML_NS}->{font} = {
 $Element->{$HTML_NS}->{layer} = {
   %HTMLFlowContentChecker,
   status => FEATURE_OBSVOCAB,
-  check_attrs => $GetHTMLAttrsChecker->({
-    #
-  }, {
-    %HTMLAttrStatus,
-  }), # check_attrs
 }; # layer
 
 $Element->{$HTML_NS}->{nolayer} = {
@@ -4192,7 +4047,6 @@ $Element->{$HTML_NS}->{a} = {
         $status = {
           %HTMLAttrStatus,
           %HTMLM12NXHTML2CommonAttrStatus,
-          accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
           charset => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           coords => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           cti => FEATURE_OBSVOCAB,
@@ -4421,7 +4275,7 @@ $Element->{$HTML_NS}->{a} = {
     $NameAttrCheckEnd->(@_);
     $HTMLTransparentChecker{check_end}->(@_);
   },
-};
+}; # a
 
 $Element->{$HTML_NS}->{em} = {
   %HTMLPhrasingContentChecker,
@@ -4431,9 +4285,8 @@ $Element->{$HTML_NS}->{em} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # em
 
 $Element->{$HTML_NS}->{strong} = {
   %HTMLPhrasingContentChecker,
@@ -4443,9 +4296,8 @@ $Element->{$HTML_NS}->{strong} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # strong
 
 $Element->{$HTML_NS}->{small} = {
   %HTMLPhrasingContentChecker,
@@ -4453,19 +4305,17 @@ $Element->{$HTML_NS}->{small} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # small
 
 $Element->{$HTML_NS}->{big} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # big
 
 $Element->{$HTML_NS}->{cite} = {
   %HTMLPhrasingContentChecker,
@@ -4475,9 +4325,8 @@ $Element->{$HTML_NS}->{cite} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # cite
 
 $Element->{$HTML_NS}->{q} = {
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -4488,8 +4337,7 @@ $Element->{$HTML_NS}->{q} = {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     cite => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -4511,8 +4359,7 @@ $Element->{$HTML_NS}->{dfn} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {dfn => 1}});
@@ -4564,8 +4411,8 @@ $Element->{$HTML_NS}->{dfn} = {
     $self->_remove_minus_elements ($element_state);
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
-  },
-};
+  }, # check_end
+}; # dfn
 
 $Element->{$HTML_NS}->{abbr} = {
   %HTMLPhrasingContentChecker,
@@ -4573,16 +4420,14 @@ $Element->{$HTML_NS}->{abbr} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    full => FEATURE_XHTML2_ED,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   ## NOTE: "If an abbreviation is pluralised, the expansion's grammatical
   ## number (plural vs singular) must match the grammatical number of the
   ## contents of the element."  Though this can be checked by machine,
   ## it requires language-specific knowledge and dictionary, such that
   ## we don't support the check of the requirement.
   ## ISSUE: Is <abbr title="Cascading Style Sheets">CSS</abbr> conforming?
-};
+}; # abbr
 
 $Element->{$HTML_NS}->{acronym} = {
   %HTMLPhrasingContentChecker,
@@ -4590,7 +4435,6 @@ $Element->{$HTML_NS}->{acronym} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
   }), # check_attrs
 }; # acronym
 
@@ -4811,9 +4655,8 @@ $Element->{$HTML_NS}->{code} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # code
 
 $Element->{$HTML_NS}->{var} = {
   %HTMLPhrasingContentChecker,
@@ -4823,9 +4666,8 @@ $Element->{$HTML_NS}->{var} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # var
 
 $Element->{$HTML_NS}->{samp} = {
   %HTMLPhrasingContentChecker,
@@ -4835,9 +4677,8 @@ $Element->{$HTML_NS}->{samp} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # samp
 
 $Element->{$HTML_NS}->{kbd} = {
   %HTMLPhrasingContentChecker,
@@ -4847,9 +4688,8 @@ $Element->{$HTML_NS}->{kbd} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # kbd
 
 $Element->{$HTML_NS}->{sub} = {
   %HTMLPhrasingContentChecker,
@@ -4859,9 +4699,8 @@ $Element->{$HTML_NS}->{sub} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # sub
 
 $Element->{$HTML_NS}->{sup} = $Element->{$HTML_NS}->{sub};
 
@@ -4875,9 +4714,8 @@ $Element->{$HTML_NS}->{i} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # i
 
 $Element->{$HTML_NS}->{b} = $Element->{$HTML_NS}->{i};
 
@@ -4931,8 +4769,7 @@ $Element->{$HTML_NS}->{ruby} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus, # XHTML 1.1 & XHTML 2.0 & XHTML+RDFa 1.0
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -5190,7 +5027,7 @@ $Element->{$HTML_NS}->{ruby} = {
       $item->{real_parent_state}->{has_significant} = 1;
     }    
   },
-};
+}; # ruby
 
 $Element->{$HTML_NS}->{rb} = {
   %HTMLPhrasingContentChecker,
@@ -5315,19 +5152,8 @@ $Element->{$HTML_NS}->{rtc} = {
 $Element->{$HTML_NS}->{bdo} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
-  check_attrs => sub {
+  check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
-    $GetHTMLAttrsChecker->({
-      #
-    }, {
-      %HTMLAttrStatus,
-      class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      dir => FEATURE_HTML5_REC,
-      id => FEATURE_HTML5_REC,
-      style => FEATURE_HTML5_REC,
-      title => FEATURE_HTML5_REC,
-      lang => FEATURE_HTML5_REC,
-    })->($self, $item, $element_state);
     unless ($item->{node}->has_attribute_ns (undef, 'dir')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing',
@@ -5335,8 +5161,7 @@ $Element->{$HTML_NS}->{bdo} = {
                          level => $self->{level}->{must});
     }
   },
-  ## ISSUE: The spec does not directly say that |dir| is a enumerated attr.
-};
+}; # bdo
 
 $Element->{$HTML_NS}->{span} = {
   %HTMLPhrasingContentChecker,
@@ -5346,9 +5171,8 @@ $Element->{$HTML_NS}->{span} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
-};
+  }), # check_attrs
+}; # span
 
 $Element->{$HTML_NS}->{comment} = {
   %HTMLTextChecker,
@@ -5391,8 +5215,7 @@ $Element->{$HTML_NS}->{ins} = {
     %HTMLM12NCommonAttrStatus,
     cite => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     datetime => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -5401,7 +5224,7 @@ $Element->{$HTML_NS}->{ins} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-};
+}; # ins
 
 $Element->{$HTML_NS}->{del} = {
   %HTMLTransparentChecker,
@@ -5414,8 +5237,7 @@ $Element->{$HTML_NS}->{del} = {
     %HTMLM12NCommonAttrStatus,
     cite => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     datetime => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     if ($element_state->{has_significant}) {
@@ -5436,7 +5258,7 @@ $Element->{$HTML_NS}->{del} = {
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
-};
+}; # del
 
 # ---- Embedded content ----
 
@@ -5528,13 +5350,6 @@ $Element->{$HTML_NS}->{figcaption} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT,
 }; # figcaption
-
-my $AttrCheckerNotImplemented = sub {
-  my ($self, $attr) = @_;
-  $self->{onerror}->(node => $attr,
-                     type => 'unknown attribute',
-                     level => $self->{level}->{uncertain});
-};
 
 $Element->{$HTML_NS}->{img} = {
   %HTMLEmptyChecker,
@@ -5947,11 +5762,10 @@ $Element->{$HTML_NS}->{object} = {
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     archive => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     border => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    classid => FEATURE_HTML5_OBSOLETE,
+    classid => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     code => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     codebase => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     codetype => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    'content-length' => FEATURE_XHTML2_ED,
     copyright => FEATURE_OBSVOCAB,
     data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     declare => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
@@ -6096,20 +5910,16 @@ $Element->{$HTML_NS}->{applet} = {
     align => FEATURE_OBSVOCAB,
     alt => FEATURE_OBSVOCAB,
     archive => FEATURE_OBSVOCAB,
-    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     code => FEATURE_OBSVOCAB,
     codebase => FEATURE_OBSVOCAB,
     height => FEATURE_OBSVOCAB,
     hspace => FEATURE_OBSVOCAB,
-    id => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     mayscript => FEATURE_OBSVOCAB,
     name => FEATURE_OBSVOCAB,
     object => FEATURE_OBSVOCAB,
-    style => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    title => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     vspace => FEATURE_OBSVOCAB,
     width => FEATURE_OBSVOCAB,
-  }),
+  }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
     my $el = $item->{node};
@@ -6474,23 +6284,8 @@ $Element->{$HTML_NS}->{map} = {
       },
     }, {
       %HTMLAttrStatus,
-      class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      dir => FEATURE_HTML5_REC,
-      id => FEATURE_HTML5_REC,
-      lang => FEATURE_HTML5_REC,
       #name => FEATURE_HTML5_LC | FEATURE_M12N10_REC_DEPRECATED,
       name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      onclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      ondblclick => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onmousedown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onmouseup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onmouseover => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onmousemove => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onmouseout => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onkeypress => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onkeydown => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      onkeyup => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-      title => FEATURE_HTML5_REC,
     })->(@_);
 
     if ($has_name) {
@@ -6548,7 +6343,7 @@ $Element->{$HTML_NS}->{map} = {
     
     $HTMLFlowContentChecker{check_end}->(@_);
   },
-};
+}; # map
 
 $Element->{$HTML_NS}->{area} = {
   %HTMLEmptyChecker,
@@ -6566,20 +6361,15 @@ $Element->{$HTML_NS}->{area} = {
         $status = {
           %HTMLAttrStatus,
           %HTMLM12NCommonAttrStatus,
-          accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
           alt => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
           coords => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
           href => FEATURE_HTML5_WD | FEATURE_RDFA_REC | FEATURE_M12N10_REC,
           hreflang => FEATURE_HTML5_WD,
-          lang => FEATURE_HTML5_REC,
           media => FEATURE_HTML5_WD,
           nohref => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-          onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-          onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           ping => FEATURE_HTML5_WD,
           rel => FEATURE_HTML5_WD | FEATURE_RDFA_REC,
           shape => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-          tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
           target => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
           type => FEATURE_HTML5_WD,
         }->{$attr_ln};
@@ -7457,7 +7247,6 @@ $Element->{$HTML_NS}->{fieldset} = {
     %HTMLM12NCommonAttrStatus,
     disabled => FEATURE_HTML5_WD | FEATURE_WF2X,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
-    lang => FEATURE_HTML5_REC,
     name => FEATURE_HTML5_LC,
   }), # check_attrs
   ## NOTE: legend?, Flow
@@ -7532,13 +7321,9 @@ $Element->{$HTML_NS}->{label} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    accesskey => FEATURE_HTML5_FD | FEATURE_WF2 | FEATURE_M12N10_REC,
     for => FEATURE_HTML5_REC,
     form => FEATURE_HTML5_LC,
-    lang => FEATURE_HTML5_REC,
-    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {$HTML_NS => {label => 1}});
@@ -7607,7 +7392,6 @@ $Element->{$HTML_NS}->{input} = {
          %HTMLM12NCommonAttrStatus,
          accept => FEATURE_HTML5_DEFAULT | FEATURE_WF2X | FEATURE_M12N10_REC,
          'accept-charset' => FEATURE_OBSVOCAB,
-         accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
          action => FEATURE_OBSVOCAB,
          align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          alt => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
@@ -8358,24 +8142,23 @@ $Element->{$HTML_NS}->{button} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accesskey => FEATURE_M12N10_REC | FEATURE_HTML5_FD,
-    action => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    action => FEATURE_OBSVOCAB,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-    enctype => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    enctype => FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     formaction => FEATURE_HTML5_LC,
     formenctype => FEATURE_HTML5_LC,
     formmethod => FEATURE_HTML5_LC,
     formnovalidate => FEATURE_HTML5_LC,
     formtarget => FEATURE_HTML5_LC,
-    method => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    method => FEATURE_OBSVOCAB,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     replace => FEATURE_OBSVOCAB,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    target => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
+    target => FEATURE_OBSVOCAB,
     template => FEATURE_OBSVOCAB,
     type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -8457,17 +8240,12 @@ $Element->{$HTML_NS}->{select} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
-    accesskey => FEATURE_HTML5_FD | FEATURE_WF2,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     data => FEATURE_OBSVOCAB,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
-    lang => FEATURE_HTML5_REC,
     multiple => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    onblur => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onchange => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     size => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }), # check_attrs
@@ -8627,8 +8405,7 @@ $Element->{$HTML_NS}->{optgroup} = {
     %HTMLM12NCommonAttrStatus,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     label => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
     
@@ -8670,15 +8447,14 @@ $Element->{$HTML_NS}->{option} = {
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
-    label => sub {}, ## NOTE: No restriction.
-    selected => $GetHTMLBooleanAttrChecker->('selected'), ## ISSUE: Not a "boolean attribute"
-    value => sub {}, ## NOTE: No restriction.
+    label => sub { },
+    selected => $GetHTMLBooleanAttrChecker->('selected'),
+    value => sub { },
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X |  FEATURE_M12N10_REC,
     label => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    lang => FEATURE_HTML5_REC,
     selected => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }),
@@ -9199,14 +8975,14 @@ $Element->{$HTML_NS}->{summary} = {
 
 $Element->{$HTML_NS}->{datagrid} = {
   %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_DROPPED,
+  status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
   }, {
     %HTMLAttrStatus,
-    disabled => FEATURE_HTML5_DROPPED,
-    multiple => FEATURE_HTML5_DROPPED,
+    disabled => FEATURE_OBSVOCAB,
+    multiple => FEATURE_OBSVOCAB,
   }), # check_attrs
 }; # datagrid
 
@@ -9215,7 +8991,6 @@ $Element->{$HTML_NS}->{command} = {
   status => FEATURE_HTML5_WD,
   check_attrs => $GetHTMLAttrsChecker->({
     checked => $GetHTMLBooleanAttrChecker->('checked'),
-    default => $GetHTMLBooleanAttrChecker->('default'),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     icon => $HTMLURIAttrChecker,
     label => sub {
@@ -9234,7 +9009,6 @@ $Element->{$HTML_NS}->{command} = {
   }, {
     %HTMLAttrStatus,
     checked => FEATURE_HTML5_WD,
-    default => FEATURE_HTML5_DROPPED, # HTML5 revision 3067
     disabled => FEATURE_HTML5_WD,
     icon => FEATURE_HTML5_WD,
     label => FEATURE_HTML5_WD,
@@ -9297,31 +9071,6 @@ $Element->{$HTML_NS}->{command} = {
     $HTMLEmptyChecker{check_end}->(@_);
   }, # check_end
 }; # command
-
-$Element->{$HTML_NS}->{bb} = {
-  %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_DROPPED,
-  check_attrs => $GetHTMLAttrsChecker->({
-    type => $GetHTMLEnumeratedAttrChecker->({makeapp => 1}),
-  }, {
-    %HTMLAttrStatus,
-    type => FEATURE_HTML5_DROPPED,
-  }),
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    $self->_remove_minus_elements ($element_state);
-
-    $HTMLTransparentChecker{check_end}->(@_);
-  },
-};
 
 $Element->{$HTML_NS}->{menu} = {
   %HTMLPhrasingContentChecker,
@@ -9608,19 +9357,28 @@ $Element->{$HTML_NS}->{noframes} = {
 ## sqrt, tilde, vec [HTML30], pre-html, div1, div2, div3, div4, div5,
 ## div6 [ISOHTMLUG], access [ACCESS], blockcode, standby, nl, l, h,
 ## separator [XHTML2ED], m, x, t, dc, ds, date, datatemplate, rule,
-## nest, calendar, card, switch, eventsource, sidebar, bb [WA1 draft],
-## repeat [WF2 draft], centre, noflames, noframe, textflow, app,
-## server, htmlarea, animate, h7, h8, h9, entity, hype, key, tbl,
+## nest, calendar, card, switch, eventsource, sidebar, bb, dialog [WA1
+## draft], repeat [WF2 draft], centre, noflames, noframe, textflow,
+## app, server, htmlarea, animate, h7, h8, h9, entity, hype, key, tbl,
 ## audioscope, limittext, nosmartquotes, shadow, sound, noimg,
 ## element, attrib, csactionitem, csactions, csaction, csscriptdict,
 ## csactiondict, csobj, madebywz, x-sas-window, yomi, fn-contents,
 ## module, ilayer
 
-## Following attributes are explicitly not supported: @ht* (XHTML
-## architectural form attributes), @sda* (SDA attributes), dl/@type,
-## layer/@*, menu/@autosubmit, multicol/@baseline, multicol/@height,
+## Following attributes are explicitly not supported: */@active,
+## */@cite, */@coords, */@datetime, */@edit, */@encoding, */@href,
+## */@hreflang, */@hrefmedia, */@hreftype, */@ht* (XHTML architectural
+## form attributes), */@instanceof, */@irrelevant, */@ismap,
+## */@layout, */@media, */@nextfocus, */@onbeforeunload,
+## */@onhashchange, */@onresize, */@onstorage, */@onunload,
+## */@ondataunavailable, */@onmessage, */@prevfocus, */@runat, */@sda*
+## (SDA attributes), */@shape, */@src, */@srctype, */@target,
+## */@usemap, abbr/@full, article/@cite, article/@pubdate,
+## command/@default, dl/@type, font/@pointsize, layer/@*,
+## menu/@autosubmit, multicol/@baseline, multicol/@height,
 ## multicol/@width, multicol/@gutter, multicol/@cols, nextid/@n,
-## script/@implements
+## object/@content-length, script/@implements, section/@cite,
+## style/@disabled
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 

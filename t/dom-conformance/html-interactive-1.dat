@@ -756,13 +756,11 @@
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb;no significant content;s
 /bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">   </bb>
 #errors
-/bb;no significant content;s
 /bb;element not defined;m
 
 #data
@@ -783,15 +781,12 @@
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><p>x</p></bb>
 #errors
-/bb/p;element not allowed:phrasing;m
 /bb;element not defined;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><meta name="keywords" content="y"/></bb>
 #errors
-/bb/meta;element not allowed:phrasing;m
 /bb/meta/@name;metadata:proposed;keywords;w
-/bb;no significant content;s
 /bb;element not defined;m
 
 #data
@@ -809,7 +804,6 @@
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml"><ins><p>x</p></ins></bb>
 #errors
-/bb/ins/p;element not allowed:phrasing;m
 /bb;element not defined;m
 
 #data
@@ -857,7 +851,6 @@
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><bb><style></style>x</bb></p>
 #errors
-/p/bb/style;element not allowed:phrasing;m
 /p/bb/style;SUBDOC;text/css
 /p/bb;element not defined;m
 /p/bb;element not allowed:phrasing;m
@@ -867,7 +860,6 @@
 <a>a</a>
 </bb>
 #errors
-/bb/a;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -882,7 +874,6 @@
 <video src="" controls="">a</video>
 </bb>
 #errors
-/bb/video;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -897,7 +888,6 @@
 <audio src="" controls="">a</audio>
 </bb>
 #errors
-/bb/audio;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -905,7 +895,6 @@
 <label>a</label>
 </bb>
 #errors
-/bb/label;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -913,7 +902,6 @@
 <input/>x
 </bb>
 #errors
-/bb/input;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -921,7 +909,6 @@
 <button>a</button>
 </bb>
 #errors
-/bb/button;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -929,7 +916,6 @@
 <select><option>a</option></select>
 </bb>
 #errors
-/bb/select;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -937,7 +923,6 @@
 <textarea>a</textarea>
 </bb>
 #errors
-/bb/textarea;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -946,7 +931,6 @@
 </bb>
 #errors
 /bb;element not defined;m
-/bb/details;element not allowed:minus;m
 /bb/details;child element missing;summary;m
 /bb/details/legend;element not allowed:flow;m
 
@@ -956,7 +940,6 @@
 </bb>
 #errors
 /bb;element not defined;m
-/bb/datagrid;element not allowed:phrasing;m
 /bb/datagrid;element not defined;m
 
 #data
@@ -965,7 +948,6 @@
 </bb>
 #errors
 /bb;element not defined;m
-/bb/bb;element not allowed:phrasing;m
 /bb/bb;element not defined;m
 
 #data
@@ -974,14 +956,12 @@
 </bb>
 #errors
 /bb;element not defined;m
-/bb/menu;element not allowed:phrasing;m
 
 #data
 <bb xmlns="http://www.w3.org/1999/xhtml">
 <menu type="toolbar">a</menu>
 </bb>
 #errors
-/bb/menu;element not allowed:minus;m
 /bb;element not defined;m
 
 #data
@@ -997,8 +977,6 @@
 </datatemplate>
 </bb>
 #errors
-/bb/datatemplate/rule/content/div/a;element not allowed:minus;m
-/bb/datatemplate;element not allowed:phrasing;m
 /bb;element not defined;m
 /bb/datatemplate;element not defined;m
 /bb/datatemplate/rule;element not defined;m
@@ -1401,7 +1379,6 @@
 #data
 <command default="true" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/command/@default;boolean:invalid;m
 /command/@default;attribute not defined;m
 /command;attribute missing;label;m
 
@@ -1696,62 +1673,48 @@
 #data
 <bb type="" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb;no significant content;s
-/bb/@type;enumerated:invalid;m
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 
 #data
 <bb type="type" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb;no significant content;s
-/bb/@type;enumerated:invalid;m
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 
 #data
 <bb type="null" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb;no significant content;s
-/bb/@type;enumerated:invalid;m
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 
 #data
 <bb type="makeapp" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb;no significant content;s
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 
 #data
 <bb type="make application" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb/@type;enumerated:invalid;m
-/bb;no significant content;s
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 
 #data
 <bb type="MakeApp" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb;no significant content;s
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 
 #data
 <bb type=" makeapp " xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb/@type;enumerated:invalid;m
-/bb;no significant content;s
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 
 #data
 <bb type="button" xmlns="http://www.w3.org/1999/xhtml"></bb>
 #errors
-/bb/@type;enumerated:invalid;m
-/bb;no significant content;s
 /bb;element not defined;m
 /bb/@type;attribute not defined;m
 

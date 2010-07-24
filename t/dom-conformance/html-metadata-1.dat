@@ -1086,6 +1086,25 @@ p {color: green}
 /style;SUBDOC;text/css
 
 #data
+<style disabled="" xmlns="http://www.w3.org/1999/xhtml"></style>
+#errors
+/style;SUBDOC;text/css
+/style/@disabled;attribute not defined;m
+
+#data
+<style disabled="disabled" xmlns="http://www.w3.org/1999/xhtml"></style>
+#errors
+/style;SUBDOC;text/css
+/style/@disabled;attribute not defined;m
+
+#data
+<style disabled="abc" xmlns="http://www.w3.org/1999/xhtml"></style>
+#errors
+/style;SUBDOC;text/css
+/style/@disabled;attribute not defined;m
+/style/@disabled;boolean:invalid;m
+
+#data
 <html xmlns="http://www.w3.org/1999/xhtml" version="">
 <head><title>x</title></head>
 <body>y</body>
