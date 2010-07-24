@@ -8808,19 +8808,25 @@ $Element->{$HTML_NS}->{keygen} = {
   status => FEATURE_HTML5_FD,
   check_attrs => $GetHTMLAttrsChecker->({
     autofocus => $AutofocusAttrChecker,
-    challenge => sub { }, ## No constraints.
+    challenge => sub { },
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     form => $HTMLFormAttrChecker,
-    keytype => $GetHTMLEnumeratedAttrChecker->({rsa => 1}),
+    keyparams => sub { },
+    keytype => $GetHTMLEnumeratedAttrChecker->({
+      rsa => 1, dsa => -1, ec => -1,
+    }),
     name => $FormControlNameAttrChecker,
+    pqg => sub { },
   }, {
     %HTMLAttrStatus,
     autofocus => FEATURE_HTML5_LC,
     challenge => FEATURE_HTML5_FD,
     disabled => FEATURE_HTML5_LC,
     form => FEATURE_HTML5_LC,
+    keyparams => FEATURE_OBSVOCAB,
     keytype => FEATURE_HTML5_FD,
     name => FEATURE_HTML5_LC,
+    pqg => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -8833,6 +8839,52 @@ $Element->{$HTML_NS}->{keygen} = {
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
     $FAECheckAttrs2->($self, $item, $element_state);
+
+    my $el = $item->{node};
+    my $keytype = $el->get_attribute_ns (undef, 'keytype') || '';
+    $keytype =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    if ($keytype eq 'dsa') {
+      if ($el->has_attribute_ns (undef, 'keyparams')) {
+        my $pqg_attr = $el->get_attribute_node_ns (undef, 'pqg');
+        if ($pqg_attr) {
+          $self->{onerror}->(node => $pqg_attr,
+                             type => 'attribute not allowed',
+                             level => $self->{level}->{must});
+        }
+      } else {
+        unless ($el->has_attribute_ns (undef, 'pqg')) {
+          $self->{onerror}->(node => $el,
+                             type => 'attribute missing:keyparams|pqg', # XXXdocumentation
+                             level => $self->{level}->{must});
+        }
+      }
+    } elsif ($keytype eq 'ec') {
+      unless ($el->has_attribute_ns (undef, 'keyparams')) {
+        $self->{onerror}->(node => $el,
+                           type => 'attribute missing',
+                           text => 'keyparams',
+                           level => $self->{level}->{must});
+      }
+      my $pqg_attr = $el->get_attribute_node_ns (undef, 'pqg');
+      if ($pqg_attr) {
+        $self->{onerror}->(node => $pqg_attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    } else {
+      my $keyparams_attr = $el->get_attribute_node_ns (undef, 'keyparams');
+      if ($keyparams_attr) {
+        $self->{onerror}->(node => $keyparams_attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+      my $pqg_attr = $el->get_attribute_node_ns (undef, 'pqg');
+      if ($pqg_attr) {
+        $self->{onerror}->(node => $pqg_attr,
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{must});
+      }
+    }
   }, # check_attrs2
 }; # keygen
 

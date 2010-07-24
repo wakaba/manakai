@@ -8677,13 +8677,24 @@ ok 8343
 ok 8344
 ok 8345
 ok 8346
-# ../t/dom-conformance/html-interactive-1.dat
 ok 8347
 ok 8348
 ok 8349
 ok 8350
 ok 8351
-not ok 8352 - <head xmlns="http://www.w3.org/1999/xhtml">
+ok 8352
+ok 8353
+ok 8354
+ok 8355
+ok 8356
+ok 8357
+# ../t/dom-conformance/html-interactive-1.dat
+ok 8358
+ok 8359
+ok 8360
+ok 8361
+ok 8362
+not ok 8363 - <head xmlns="http://www.w3.org/1999/xhtml">
 # <title/>
 # <noscript>
 # <meta name="keywords" content=""/>
@@ -8703,8 +8714,8 @@ not ok 8352 - <head xmlns="http://www.w3.org/1999/xhtml">
 # |  2|/head/noscript/meta;element not allowed:head noscript;m  |  1|/head/noscript/meta;element not allowed:head noscript;m  |
 # |  3|/head/noscript;in XML:noscript;m                         |  2|/head/noscript;in XML:noscript;m                         |
 # +---+---------------------------------------------------------+---+---------------------------------------------------------+
-ok 8353
-not ok 8354 - <head xmlns="http://www.w3.org/1999/xhtml">
+ok 8364
+not ok 8365 - <head xmlns="http://www.w3.org/1999/xhtml">
 # <title/>
 # <noscript>
 # <event-source src=""/>
@@ -8726,13 +8737,13 @@ not ok 8354 - <head xmlns="http://www.w3.org/1999/xhtml">
 # |  4|/head/noscript/event-source;element not defined;m                |  3|/head/noscript/event-source;element not defined;m                |
 # |  5|/head/noscript;in XML:noscript;m                                 |  4|/head/noscript;in XML:noscript;m                                 |
 # +---+-----------------------------------------------------------------+---+-----------------------------------------------------------------+
-ok 8355
-ok 8356
-ok 8357
-ok 8358
-ok 8359
-ok 8360
-not ok 8361 - <noscript xmlns="http://www.w3.org/1999/xhtml">
+ok 8366
+ok 8367
+ok 8368
+ok 8369
+ok 8370
+ok 8371
+not ok 8372 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # <meta name="keywords" content=""/>
 # </noscript>
 #   Failed test '<noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -8747,17 +8758,6 @@ not ok 8361 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/noscript;in XML:noscript;m                        |  2|/noscript;in XML:noscript;m                |
 # |  4|/noscript;no significant content;s                 |  3|/noscript;no significant content;s         |
 # +---+---------------------------------------------------+---+-------------------------------------------+
-ok 8362
-ok 8363
-ok 8364
-ok 8365
-ok 8366
-ok 8367
-ok 8368
-ok 8369
-ok 8370
-ok 8371
-ok 8372
 ok 8373
 ok 8374
 ok 8375
@@ -8997,7 +8997,6 @@ ok 8608
 ok 8609
 ok 8610
 ok 8611
-# ../t/dom-conformance/html-scripting-1.dat
 ok 8612
 ok 8613
 ok 8614
@@ -9009,6 +9008,7 @@ ok 8619
 ok 8620
 ok 8621
 ok 8622
+# ../t/dom-conformance/html-scripting-1.dat
 ok 8623
 ok 8624
 ok 8625
@@ -9075,7 +9075,6 @@ ok 8685
 ok 8686
 ok 8687
 ok 8688
-# ../t/dom-conformance/html-scripting-2.dat
 ok 8689
 ok 8690
 ok 8691
@@ -9087,6 +9086,7 @@ ok 8696
 ok 8697
 ok 8698
 ok 8699
+# ../t/dom-conformance/html-scripting-2.dat
 ok 8700
 ok 8701
 ok 8702
@@ -9156,7 +9156,6 @@ ok 8765
 ok 8766
 ok 8767
 ok 8768
-# ../t/dom-conformance/html-repetitions.dat
 ok 8769
 ok 8770
 ok 8771
@@ -9168,6 +9167,7 @@ ok 8776
 ok 8777
 ok 8778
 ok 8779
+# ../t/dom-conformance/html-repetitions.dat
 ok 8780
 ok 8781
 ok 8782
@@ -9240,7 +9240,6 @@ ok 8848
 ok 8849
 ok 8850
 ok 8851
-# ../t/dom-conformance/html-datatemplate.dat
 ok 8852
 ok 8853
 ok 8854
@@ -9252,6 +9251,7 @@ ok 8859
 ok 8860
 ok 8861
 ok 8862
+# ../t/dom-conformance/html-datatemplate.dat
 ok 8863
 ok 8864
 ok 8865
@@ -9556,7 +9556,18 @@ ok 9163
 ok 9164
 ok 9165
 ok 9166
-not ok 9167 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
+ok 9167
+ok 9168
+ok 9169
+ok 9170
+ok 9171
+ok 9172
+ok 9173
+ok 9174
+ok 9175
+ok 9176
+ok 9177
+not ok 9178 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>'
 #   at content-checker-test-ok line 1.
 # +---+-----------------------------------+---+-----------------------------------+
@@ -9565,7 +9576,7 @@ not ok 9167 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
 # |   |                                   *  1|/div/@ref;attribute not allowed;m  *
 # |  1|/div/@ref;attribute not defined;m  |  2|/div/@ref;attribute not defined;m  |
 # +---+-----------------------------------+---+-----------------------------------+
-not ok 9168 - <div xmlns="http://www.w3.org/1999/xhtml"
+not ok 9179 - <div xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</div>'
@@ -9576,7 +9587,7 @@ not ok 9168 - <div xmlns="http://www.w3.org/1999/xhtml"
 # |   |                                                *  1|/div/@registrationmark;attribute not allowed;m  *
 # |  1|/div/@registrationmark;attribute not defined;m  |  2|/div/@registrationmark;attribute not defined;m  |
 # +---+------------------------------------------------+---+------------------------------------------------+
-not ok 9169 - <rule xmlns="http://www.w3.org/1999/xhtml"
+not ok 9180 - <rule xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</rule>
 #   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</rule>'
@@ -9588,13 +9599,13 @@ not ok 9169 - <rule xmlns="http://www.w3.org/1999/xhtml"
 # |  1|/rule/@registrationmark;attribute not defined;m  |  2|/rule/@registrationmark;attribute not defined;m  |
 # |  2|/rule;element not defined;m                      |  3|/rule;element not defined;m                      |
 # +---+-------------------------------------------------+---+-------------------------------------------------+
-ok 9170
-ok 9171
-ok 9172
-ok 9173
-ok 9174
-ok 9175
-not ok 9176 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
+ok 9181
+ok 9182
+ok 9183
+ok 9184
+ok 9185
+ok 9186
+not ok 9187 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
 #   <rule>
 #   </rule>
 #   <div registrationmark="a">x</div>
@@ -9613,8 +9624,8 @@ not ok 9176 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
 # |  2|/datatemplate/rule;element not defined;m                     |  3|/datatemplate/rule;element not defined;m                     |
 # |  3|/datatemplate;element not defined;m                          |  4|/datatemplate;element not defined;m                          |
 # +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
-ok 9177
-not ok 9178 - <rule xmlns="http://www.w3.org/1999/xhtml">
+ok 9188
+not ok 9189 - <rule xmlns="http://www.w3.org/1999/xhtml">
 #   <div>x
 #     <nest registrationmark="a"/>
 #   </div>
@@ -9634,20 +9645,9 @@ not ok 9178 - <rule xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/rule/div/nest;element not defined;m                      |  3|/rule/div/nest;element not defined;m                      |
 # |  4|/rule;element not defined;m                               |  4|/rule;element not defined;m                               |
 # +---+----------------------------------------------------------+---+----------------------------------------------------------+
-ok 9179
-ok 9180
-# ../t/dom-conformance/html-frames.dat
-ok 9181
-ok 9182
-ok 9183
-ok 9184
-ok 9185
-ok 9186
-ok 9187
-ok 9188
-ok 9189
 ok 9190
 ok 9191
+# ../t/dom-conformance/html-frames.dat
 ok 9192
 ok 9193
 ok 9194
@@ -9867,5 +9867,16 @@ ok 9407
 ok 9408
 ok 9409
 ok 9410
-# Looks like you planned 7891 tests but ran 9410.
-# Looks like you failed 34 tests of 9410 run.
+ok 9411
+ok 9412
+ok 9413
+ok 9414
+ok 9415
+ok 9416
+ok 9417
+ok 9418
+ok 9419
+ok 9420
+ok 9421
+# Looks like you planned 7891 tests but ran 9421.
+# Looks like you failed 34 tests of 9421 run.

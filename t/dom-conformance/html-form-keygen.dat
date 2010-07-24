@@ -137,3 +137,87 @@
 <keygen pqg="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /keygen/@pqg;attribute not defined;m
+/keygen/@pqg;attribute not allowed;m
+
+#data
+<keygen xmlns="http://www.w3.org/1999/xhtml"
+    keyparams=""/>
+#errors
+/keygen/@keyparams;attribute not defined;m
+/keygen/@keyparams;attribute not allowed;m
+
+#data
+<keygen keytype="RSA" xmlns="http://www.w3.org/1999/xhtml"
+    keyparams=""/>
+#errors
+/keygen/@keyparams;attribute not defined;m
+/keygen/@keyparams;attribute not allowed;m
+
+#data
+<keygen keytype="dsa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen;attribute missing:keyparams|pqg;m
+
+#data
+<keygen keytype="dsa" xmlns="http://www.w3.org/1999/xhtml"
+    keyparams=""/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen/@keyparams;attribute not defined;m
+
+#data
+<keygen keytype="dsa" xmlns="http://www.w3.org/1999/xhtml"
+    pqg=""/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen/@pqg;attribute not defined;m
+
+#data
+<keygen keytype="dsa" xmlns="http://www.w3.org/1999/xhtml"
+    keyparams="" pqg=""/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen/@keyparams;attribute not defined;m
+/keygen/@pqg;attribute not defined;m
+/keygen/@pqg;attribute not allowed;m
+
+#data
+<keygen keytype="DSA" xmlns="http://www.w3.org/1999/xhtml"
+    keyparams="" pqg=""/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen/@keyparams;attribute not defined;m
+/keygen/@pqg;attribute not defined;m
+/keygen/@pqg;attribute not allowed;m
+
+#data
+<keygen keytype="ec" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen;attribute missing;keyparams;m
+
+#data
+<keygen keytype="ec" xmlns="http://www.w3.org/1999/xhtml"
+    keyparams=""/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen/@keyparams;attribute not defined;m
+
+#data
+<keygen keytype="ec" xmlns="http://www.w3.org/1999/xhtml"
+    pqg=""/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen/@pqg;attribute not defined;m
+/keygen/@pqg;attribute not allowed;m
+/keygen;attribute missing;keyparams;m
+
+#data
+<keygen keytype="EC" xmlns="http://www.w3.org/1999/xhtml"
+    pqg=""/>
+#errors
+/keygen/@keytype;enumerated:non-conforming;m
+/keygen/@pqg;attribute not defined;m
+/keygen/@pqg;attribute not allowed;m
+/keygen;attribute missing;keyparams;m
