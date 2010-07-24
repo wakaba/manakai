@@ -2612,3 +2612,117 @@ x<br autofocus=""/>
 #errors
 /legend/@align;attribute not defined;m
 /legend/@align;enumerated:invalid;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/isindex;element not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml">  </isindex>
+#errors
+/isindex;element not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml">abc</isindex>
+#errors
+/isindex;element not defined;m
+/isindex/"abc";character not allowed:empty;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"><p>a</p></isindex>
+#errors
+/isindex;element not defined;m
+/isindex/p;element not allowed:empty;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"><ins><p>a</p></ins></isindex>
+#errors
+/isindex;element not defined;m
+/isindex/ins;element not allowed:empty;m
+/isindex/ins/p;element not allowed:empty;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    action=""/>
+#errors
+/isindex;element not defined;m
+/isindex/@action;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    action="abc"/>
+#errors
+/isindex;element not defined;m
+/isindex/@action;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    action="[]"/>
+#errors
+/isindex;element not defined;m
+/isindex/@action;attribute not defined;m
+/isindex/@action;syntax error:iriref3987;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    prompt=""/>
+#errors
+/isindex;element not defined;m
+/isindex/@prompt;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    prompt=" "/>
+#errors
+/isindex;element not defined;m
+/isindex/@prompt;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    prompt="abc"/>
+#errors
+/isindex;element not defined;m
+/isindex/@prompt;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    prompt="a b c"/>
+#errors
+/isindex;element not defined;m
+/isindex/@prompt;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    type="password"/>
+#errors
+/isindex;element not defined;m
+/isindex/@type;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    type="password"/>
+#errors
+/isindex;element not defined;m
+/isindex/@type;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    type="khtml_isindex"/>
+#errors
+/isindex;element not defined;m
+/isindex/@type;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    name="isindex"/>
+#errors
+/isindex;element not defined;m
+/isindex/@name;attribute not defined;m
+
+#data
+<isindex xmlns="http://www.w3.org/1999/xhtml"
+    size="400"/>
+#errors
+/isindex;element not defined;m
+/isindex/@size;attribute not defined;m

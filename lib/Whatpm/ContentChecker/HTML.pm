@@ -9031,19 +9031,15 @@ $Element->{$HTML_NS}->{meter} = {
 
 $Element->{$HTML_NS}->{isindex} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
-    prompt => sub {}, ## NOTE: Text [M12N]
+    action => $HTMLURIAttrChecker,
+    prompt => sub {},
   }, {
     %HTMLAttrStatus,
-    class => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    dir => FEATURE_HTML5_REC,
-    id => FEATURE_HTML5_REC,
-    lang => FEATURE_HTML5_REC,
-    prompt => FEATURE_M12N10_REC_DEPRECATED,
-    style => FEATURE_HTML5_REC,
-    title => FEATURE_HTML5_REC,
-  }),
+    action => FEATURE_OBSVOCAB,
+    prompt => FEATURE_OBSVOCAB,
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
@@ -9051,7 +9047,7 @@ $Element->{$HTML_NS}->{isindex} = {
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
     $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
-  },
+  }, # check_start
 }; # isindex
 
 # ---- Interactive elements ----
