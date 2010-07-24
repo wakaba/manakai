@@ -368,28 +368,87 @@
 /script;SUBDOC;text/javascript
 
 #data
+<script event="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@event;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script event="onload" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@event;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script event="onload()" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@event;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
 <script for="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@for;attribute not defined;m
+/script/@for;no referenced element;m
 /script;SUBDOC;text/javascript
 
 #data
 <script for="abc" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@for;attribute not defined;m
+/script/@for;no referenced element;m
 /script;SUBDOC;text/javascript
+
+#data
+<script id="abc" for="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/script/@for;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script for="abc" xmlns="http://www.w3.org/1999/xhtml"><b id="abc">a</b></script>
+#errors
+/script/@for;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<div id="a" xmlns="http://www.w3.org/1999/xhtml">
+  <script for="a"></script>b
+</div>
+#errors
+/div/script;SUBDOC;text/javascript
+/div/script/@for;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <span id="a">c</span>
+  <script for="a"></script>b
+</div>
+#errors
+/div/script;SUBDOC;text/javascript
+/div/script/@for;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <script for="a"></script>b
+  <span id="a">c</span>
+</div>
+#errors
+/div/script;SUBDOC;text/javascript
+/div/script/@for;attribute not defined;m
 
 #data
 <script for="#xyz" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@for;attribute not defined;m
+/script/@for;no referenced element;m
 /script;SUBDOC;text/javascript
 
 #data
 <script for="[]" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /script/@for;attribute not defined;m
-/script/@for;syntax error:iriref3987;m
+/script/@for;no referenced element;m
 /script;SUBDOC;text/javascript
 
 #data
@@ -479,3 +538,35 @@
 #errors
 /a;unknown element;u
 /a/@language;attribute not defined;m
+
+#data
+<script archive="" xmlns="http://www.w3.org/1999/xhtml"></script>
+#errors
+/script/@archive;attribute not defined;m
+/script/@archive;url:empty;m
+/script;SUBDOC;text/javascript
+
+#data
+<script archive="abc" xmlns="http://www.w3.org/1999/xhtml"></script>
+#errors
+/script/@archive;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script archive="[]" xmlns="http://www.w3.org/1999/xhtml"></script>
+#errors
+/script/@archive;attribute not defined;m
+/script/@archive;syntax error:iriref3987;m
+/script;SUBDOC;text/javascript
+
+#data
+<script implements="" xmlns="http://www.w3.org/1999/xhtml"></script>
+#errors
+/script/@implements;attribute not defined;m
+/script;SUBDOC;text/javascript
+
+#data
+<script implement="" xmlns="http://www.w3.org/1999/xhtml"></script>
+#errors
+/script/@implement;attribute not defined;m
+/script;SUBDOC;text/javascript

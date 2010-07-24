@@ -2915,6 +2915,7 @@ $Element->{$HTML_NS}->{script} = {
   %HTMLChecker,
   status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    archive => $NonEmptyURLChecker,
     async => $GetHTMLBooleanAttrChecker->('async'),
     defer => $GetHTMLBooleanAttrChecker->('defer'),
     charset => sub {
@@ -2925,8 +2926,13 @@ $Element->{$HTML_NS}->{script} = {
 
       $HTMLCharsetChecker->($attr->value, @_);
     },
-    event => sub { }, ## Reserved in HTML4 without no restriction.
-    for => $HTMLURIAttrChecker, ## Reserved in HTML4
+    event => sub { },
+    for => sub {
+      my ($self, $attr) = @_;
+
+      ## NOTE: MUST be an ID of an element.
+      push @{$self->{idref}}, ['any', $attr->value, $attr];
+    },
     language => sub {},
     src => $HTMLURIAttrChecker, ## TODO: pointed resource MUST be in type of type="" (resource error)
     type => sub {
@@ -2943,18 +2949,16 @@ $Element->{$HTML_NS}->{script} = {
     }, # type
   }, {
     %HTMLAttrStatus,
+    archive => FEATURE_OBSVOCAB,
     async => FEATURE_HTML5_WD,
     charset => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     defer => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-    event => FEATURE_HTML5_OBSOLETE,
-    for => FEATURE_HTML5_OBSOLETE,
-    href => FEATURE_RDFA_REC,
-    id => FEATURE_HTML5_REC,
-    #implements [XHTML 1.2]
+    event => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    for => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     language => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
     my $el = $item->{node};
@@ -5159,12 +5163,11 @@ $Element->{$HTML_NS}->{ruby} = {
 
 $Element->{$HTML_NS}->{rb} = {
   %HTMLPhrasingContentChecker,
-  status => FEATURE_HTML5_OBSOLETE,
+  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
 }; # rb
 
 $Element->{$HTML_NS}->{rt} = {
@@ -5175,9 +5178,8 @@ $Element->{$HTML_NS}->{rt} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-    rbspan => FEATURE_RUBY_REC,
-  }),
+    rbspan => FEATURE_OBSVOCAB,
+  }), # check_attrs
 }; # rt
 
 $Element->{$HTML_NS}->{rp} = {
@@ -5186,17 +5188,15 @@ $Element->{$HTML_NS}->{rp} = {
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
-  }),
+  }), # check_attrs
 }; # rp
 
 $Element->{$HTML_NS}->{rbc} = {
   %HTMLChecker,
-  status => FEATURE_RUBY_REC,
+  status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
   }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -5238,11 +5238,10 @@ $Element->{$HTML_NS}->{rbc} = {
 
 $Element->{$HTML_NS}->{rtc} = {
   %HTMLChecker,
-  status => FEATURE_RUBY_REC,
+  status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
-    lang => FEATURE_HTML5_REC,
   }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -6322,7 +6321,7 @@ $Element->{$HTML_NS}->{source} = {
     }, {
       %HTMLAttrStatus,
       media => FEATURE_HTML5_LC,
-      pixelratio => FEATURE_HTML5_DROPPED,
+      pixelratio => FEATURE_OBSVOCAB,
       src => FEATURE_HTML5_LC,
       type => FEATURE_HTML5_LC,
     })->(@_);
@@ -6339,7 +6338,7 @@ $Element->{$HTML_NS}->{source} = {
     ## NOTE: The |pixelratio| attribute should have been forbidden
     ## when the parent of the |source| element is an |audio| element,
     ## but the attribute itself has been dropped from the spec.
-  },
+  }, # check_attrs
 }; # source
 
 $Element->{$HTML_NS}->{bgsound} = {
@@ -7319,8 +7318,6 @@ $Element->{$HTML_NS}->{form} = {
       }
     },
     novalidate => $GetHTMLBooleanAttrChecker->('novalidate'),
-    onformchange => $HTMLEventHandlerAttrChecker,
-    onforminput => $HTMLEventHandlerAttrChecker,
     onreceived => $HTMLEventHandlerAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
     target => $HTMLTargetAttrChecker,
@@ -8399,11 +8396,6 @@ $Element->{$HTML_NS}->{select} = {
     form => $HTMLFormAttrChecker,
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
     name => $FormControlNameAttrChecker,
-    ## TODO: tests for on*
-    onformchange => $HTMLEventHandlerAttrChecker,
-    onforminput => $HTMLEventHandlerAttrChecker,
-    oninput => $HTMLEventHandlerAttrChecker,
-    oninvalid => $HTMLEventHandlerAttrChecker,
     size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }, {
     %HTMLAttrStatus,
@@ -8421,7 +8413,7 @@ $Element->{$HTML_NS}->{select} = {
     onfocus => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     size => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-  }),
+  }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $FAECheckStart->($self, $item, $element_state);
@@ -9571,7 +9563,8 @@ $Element->{$HTML_NS}->{noframes} = {
 ## Following attributes are explicitly not supported: @ht* (XHTML
 ## architectural form attributes), @sda* (SDA attributes), dl/@type,
 ## layer/@*, menu/@autosubmit, multicol/@baseline, multicol/@height,
-## multicol/@width, multicol/@gutter, multicol/@cols, nextid/@n
+## multicol/@width, multicol/@gutter, multicol/@cols, nextid/@n,
+## script/@implements
 
 $Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
 

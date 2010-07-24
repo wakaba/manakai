@@ -9170,7 +9170,6 @@ ok 8779
 ok 8780
 ok 8781
 ok 8782
-# ../t/dom-conformance/html-repetitions.dat
 ok 8783
 ok 8784
 ok 8785
@@ -9184,6 +9183,7 @@ ok 8792
 ok 8793
 ok 8794
 ok 8795
+# ../t/dom-conformance/html-repetitions.dat
 ok 8796
 ok 8797
 ok 8798
@@ -9254,7 +9254,6 @@ ok 8862
 ok 8863
 ok 8864
 ok 8865
-# ../t/dom-conformance/html-datatemplate.dat
 ok 8866
 ok 8867
 ok 8868
@@ -9268,6 +9267,7 @@ ok 8875
 ok 8876
 ok 8877
 ok 8878
+# ../t/dom-conformance/html-datatemplate.dat
 ok 8879
 ok 8880
 ok 8881
@@ -9570,7 +9570,20 @@ ok 9177
 ok 9178
 ok 9179
 ok 9180
-not ok 9181 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
+ok 9181
+ok 9182
+ok 9183
+ok 9184
+ok 9185
+ok 9186
+ok 9187
+ok 9188
+ok 9189
+ok 9190
+ok 9191
+ok 9192
+ok 9193
+not ok 9194 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>'
 #   at content-checker-test-ok line 1.
 # +---+-----------------------------------+---+-----------------------------------+
@@ -9579,7 +9592,7 @@ not ok 9181 - <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
 # |   |                                   *  1|/div/@ref;attribute not allowed;m  *
 # |  1|/div/@ref;attribute not defined;m  |  2|/div/@ref;attribute not defined;m  |
 # +---+-----------------------------------+---+-----------------------------------+
-not ok 9182 - <div xmlns="http://www.w3.org/1999/xhtml"
+not ok 9195 - <div xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</div>
 #   Failed test '<div xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</div>'
@@ -9590,7 +9603,7 @@ not ok 9182 - <div xmlns="http://www.w3.org/1999/xhtml"
 # |   |                                                *  1|/div/@registrationmark;attribute not allowed;m  *
 # |  1|/div/@registrationmark;attribute not defined;m  |  2|/div/@registrationmark;attribute not defined;m  |
 # +---+------------------------------------------------+---+------------------------------------------------+
-not ok 9183 - <rule xmlns="http://www.w3.org/1999/xhtml"
+not ok 9196 - <rule xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</rule>
 #   Failed test '<rule xmlns="http://www.w3.org/1999/xhtml"
 #     registrationmark="">x</rule>'
@@ -9602,13 +9615,13 @@ not ok 9183 - <rule xmlns="http://www.w3.org/1999/xhtml"
 # |  1|/rule/@registrationmark;attribute not defined;m  |  2|/rule/@registrationmark;attribute not defined;m  |
 # |  2|/rule;element not defined;m                      |  3|/rule;element not defined;m                      |
 # +---+-------------------------------------------------+---+-------------------------------------------------+
-ok 9184
-ok 9185
-ok 9186
-ok 9187
-ok 9188
-ok 9189
-not ok 9190 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
+ok 9197
+ok 9198
+ok 9199
+ok 9200
+ok 9201
+ok 9202
+not ok 9203 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
 #   <rule>
 #   </rule>
 #   <div registrationmark="a">x</div>
@@ -9627,8 +9640,8 @@ not ok 9190 - <datatemplate xmlns="http://www.w3.org/1999/xhtml">
 # |  2|/datatemplate/rule;element not defined;m                     |  3|/datatemplate/rule;element not defined;m                     |
 # |  3|/datatemplate;element not defined;m                          |  4|/datatemplate;element not defined;m                          |
 # +---+-------------------------------------------------------------+---+-------------------------------------------------------------+
-ok 9191
-not ok 9192 - <rule xmlns="http://www.w3.org/1999/xhtml">
+ok 9204
+not ok 9205 - <rule xmlns="http://www.w3.org/1999/xhtml">
 #   <div>x
 #     <nest registrationmark="a"/>
 #   </div>
@@ -9648,22 +9661,9 @@ not ok 9192 - <rule xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/rule/div/nest;element not defined;m                      |  3|/rule/div/nest;element not defined;m                      |
 # |  4|/rule;element not defined;m                               |  4|/rule;element not defined;m                               |
 # +---+----------------------------------------------------------+---+----------------------------------------------------------+
-ok 9193
-ok 9194
-# ../t/dom-conformance/html-frames.dat
-ok 9195
-ok 9196
-ok 9197
-ok 9198
-ok 9199
-ok 9200
-ok 9201
-ok 9202
-ok 9203
-ok 9204
-ok 9205
 ok 9206
 ok 9207
+# ../t/dom-conformance/html-frames.dat
 ok 9208
 ok 9209
 ok 9210
@@ -9881,5 +9881,18 @@ ok 9421
 ok 9422
 ok 9423
 ok 9424
-# Looks like you planned 7891 tests but ran 9424.
-# Looks like you failed 34 tests of 9424 run.
+ok 9425
+ok 9426
+ok 9427
+ok 9428
+ok 9429
+ok 9430
+ok 9431
+ok 9432
+ok 9433
+ok 9434
+ok 9435
+ok 9436
+ok 9437
+# Looks like you planned 7891 tests but ran 9437.
+# Looks like you failed 34 tests of 9437 run.
