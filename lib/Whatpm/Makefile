@@ -10,7 +10,7 @@ LANGUAGE_SUBTAG_REGISTRY_PM = _LangTagReg.pm
 
 all: \
   _update \
-  Atom-all Charset-all CSS-all HTML-all XML-all \
+  Atom-all Charset-all CSS-all HTML-all XML-all ContentChecker-all \
   HTML/Tokenizer.pm \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
@@ -30,6 +30,9 @@ HTML-all:
 
 XML-all:
 	cd XML && make all
+
+ContentChecker-all:
+	cd ContentChecker && make all
 
 update: update-remove-old _update
 
