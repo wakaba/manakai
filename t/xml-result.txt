@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Aug  2 07:38:43 2010
-# Current time GMT:   Sun Aug  1 22:38:43 2010
+# Current time local: Mon Aug  2 07:40:24 2010
+# Current time GMT:   Sun Aug  1 22:40:24 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1455,19 +1455,13 @@ ok 1384
 ok 1385
 ok 1386
 ok 1387
-not ok 1388
-# Test 1388 got: "<!ENTITY b \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #50)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY b \x{27}')
+ok 1388
 ok 1389
 ok 1390
-not ok 1391
-# Test 1391 got: "<!ENTITY b \"a\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #51)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY b \x{27}a')
+ok 1391
 ok 1392
 ok 1393
-not ok 1394
-# Test 1394 got: "<!ENTITY b \"xy\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #52)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY b \x{27}xy')
+ok 1394
 ok 1395
 ok 1396
 ok 1397
