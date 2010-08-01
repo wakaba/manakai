@@ -1,4 +1,55 @@
 #data
+<!DOCTYPE a [
+<!ELEM
+#errors
+2;1;bogus comment;;;m
+2;6;no root element;;;m
+2;6;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a [
+<!ELEMENT
+#errors
+2;9;no root element;;;m
+2;9;unclosed internal subset;;;m
+2;9;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data escpaed
+<!DOCTYPE a [
+<!ELEMENT\u0020
+#errors
+2;10;no space before md name;;;m
+2;15;no root element;;;m
+2;15;unclosed internal subset;;;m
+2;15;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data escaped
+<!DOCTYPE a [
+<!ELEMENT \u0020
+#errors
+2;11;no root element;;;m
+2;11;unclosed internal subset;;;m
+2;11;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a [
+<!ELEMENT abc
+#errors
+2;13;no root element;;;m
+2;13;unclosed internal subset;;;m
+2;13;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
 <!DOCTYPE a[
 <!ELEMENT b ANY>
 ]><a/>

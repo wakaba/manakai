@@ -3888,7 +3888,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         !!!next-input-character;
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed internal subset'); ## TODO: type
         delete $self->{in_subset};
         $self->{state} = DATA_STATE;
@@ -3911,7 +3911,7 @@ sub _get_next_token ($) {
         !!!next-input-character;
         !!!emit ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed DOCTYPE');
         $self->{state} = DATA_STATE;
         ## Reconsume.
@@ -3931,7 +3931,7 @@ sub _get_next_token ($) {
         !!!next-input-character;
         !!!emit ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{state} = DATA_STATE;
         ## Reconsume.
         !!!emit ({type => END_OF_DOCTYPE_TOKEN});
@@ -3950,7 +3950,7 @@ sub _get_next_token ($) {
         $self->{state} = PI_STATE;
         !!!next-input-character;
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'bare stago');
         $self->{state} = DATA_STATE;
         ## Reconsume.
@@ -4022,7 +4022,7 @@ sub _get_next_token ($) {
         !!!parse-error (type => 'bogus comment',
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 2
-                            + 1 * ($nc == -1));
+                            + 1 * ($nc == EOF_CHAR));
         ## Reconsume.
         $self->{state} = BOGUS_COMMENT_STATE;
         $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
@@ -4069,7 +4069,7 @@ sub _get_next_token ($) {
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 1
                             - (length $self->{kwd})
-                            + 1 * ($nc == -1));
+                            + 1 * ($nc == EOF_CHAR));
         $self->{state} = BOGUS_COMMENT_STATE;
         ## Reconsume.
         $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
@@ -4118,7 +4118,7 @@ sub _get_next_token ($) {
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 1
                             - (length $self->{kwd})
-                            + 1 * ($nc == -1));
+                            + 1 * ($nc == EOF_CHAR));
         $self->{state} = BOGUS_COMMENT_STATE;
         ## Reconsume.
         $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
@@ -4168,7 +4168,7 @@ sub _get_next_token ($) {
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 1
                              - (length $self->{kwd})
-                             + 1 * ($nc == -1));
+                             + 1 * ($nc == EOF_CHAR));
         $self->{state} = BOGUS_COMMENT_STATE;
         ## Reconsume.
         $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
@@ -4219,7 +4219,7 @@ sub _get_next_token ($) {
                         line => $self->{line_prev},
                         column => $self->{column_prev} - 1
                             - (length $self->{kwd})
-                            + 1 * ($nc == -1));
+                            + 1 * ($nc == EOF_CHAR));
         $self->{state} = BOGUS_COMMENT_STATE;
         ## Reconsume.
         $self->{ct} = {type => COMMENT_TOKEN, data => ''}; ## Will be discarded
@@ -4241,7 +4241,7 @@ sub _get_next_token ($) {
         $self->{state} = DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE;
         !!!next-input-character;
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         ## Reconsume.
@@ -4277,7 +4277,7 @@ sub _get_next_token ($) {
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         ## Reconsume.
@@ -4302,7 +4302,7 @@ sub _get_next_token ($) {
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md');
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         ## Reconsume.
@@ -4338,12 +4338,11 @@ sub _get_next_token ($) {
         !!!next-input-character;
         !!!emit ($self->{ct}); # ELEMENT/ENTITY/ATTLIST/NOTATION
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         ## XML5: [ATTLIST] No parse error.
         !!!parse-error (type => 'unclosed md');
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         ## Reconsume.
-        !!!emit ($self->{ct}); # ELEMENT/ENTITY/ATTLIST/NOTATION
         redo A;
       } else {
         ## XML5: [ATTLIST] Not defined yet.
