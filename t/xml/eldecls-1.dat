@@ -346,6 +346,16 @@
 #document
 | <!DOCTYPE a>
 
+#data escaped
+<!DOCTYPE a[
+<!ELEMENT b (x)\u0009
+#errors
+2;16;no root element;;;m
+2;16;unclosed internal subset;;;m
+2;16;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
 #data
 <!DOCTYPE a[
 <!ELEMENT b (x)+

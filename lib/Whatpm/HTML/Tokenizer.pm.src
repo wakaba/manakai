@@ -5285,11 +5285,11 @@ sub _get_next_token ($) {
         !!!next-input-character;
         !!!emit ($self->{ct}); # ENTITY/ELEMENT
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
-        !!!emit ($self->{ct}); # ENTITY/ELEMENT
+        ## Discard the current token.
         redo A;
       } else {
         !!!parse-error (type => 'string after md def'); ## TODO: type

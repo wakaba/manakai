@@ -187,17 +187,6 @@
 | <!DOCTYPE a>
 #entities
 
-#data escaped
-<!DOCTYPE a[
-<!ENTITY % abc  \u0009
-#errors
-2;17;unclosed md;;;m
-2;17;unclosed internal subset;;;m
-2;17;no root element;;;m
-#document
-| <!DOCTYPE a>
-#entities
-
 #data
 <!DOCTYPE a[
 <!ENTITY   bc PUBLIC>
@@ -454,6 +443,50 @@
 2;36;no root element;;;m
 2;36;unclosed internal subset;;;m
 2;36;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY b ""
+#errors
+2;13;no root element;;;m
+2;13;unclosed internal subset;;;m
+2;13;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY b ''
+#errors
+2;13;no root element;;;m
+2;13;unclosed internal subset;;;m
+2;13;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b ""\u0020
+#errors
+2;14;no root element;;;m
+2;14;unclosed internal subset;;;m
+2;14;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b ''\u0020
+#errors
+2;14;no root element;;;m
+2;14;unclosed internal subset;;;m
+2;14;unclosed md;;;m
 #document
 | <!DOCTYPE a>
 #entities
