@@ -5081,7 +5081,7 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no pic'); ## TODO: type
         if ($self->{in_subset}) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -5089,7 +5089,10 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         ## Reconsume.
-        return  ($self->{ct}); # pi
+        return  ({type => COMMENT_TOKEN,
+                  data => '?' . $self->{ct}->{target},
+                  line => $self->{ct}->{line},
+                  column => $self->{ct}->{column}});
         redo A;
       } elsif ($nc == 0x003F) { # ?
         $self->{state} = PI_AFTER_STATE;

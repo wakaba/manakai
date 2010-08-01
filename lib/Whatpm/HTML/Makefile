@@ -3,10 +3,12 @@ POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
 
 HTML_FILES = Serializer.html
 
-all: $(HTML_FILES)
+all: $(HTML_FILES) Tokenizer.pm
 
 %.html: %.pod
 	$(POD2HTML) $< > $@
 
+Tokenizer.pm: Tokenizer.pm.src
+	cd .. && make HTML/Tokenizer.pm
+
 ## License: Public Domain.
-## $Date: 2007/11/11 04:59:36 $

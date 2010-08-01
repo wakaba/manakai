@@ -3741,7 +3741,7 @@ sub _get_next_token ($) {
         $self->{state} = PI_TARGET_AFTER_STATE;
         !!!next-input-character;
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'no pic'); ## TODO: type
         if ($self->{in_subset}) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -3749,7 +3749,10 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         ## Reconsume.
-        !!!emit ($self->{ct}); # pi
+        !!!emit ({type => COMMENT_TOKEN,
+                  data => '?' . $self->{ct}->{target},
+                  line => $self->{ct}->{line},
+                  column => $self->{ct}->{column}});
         redo A;
       } elsif ($nc == 0x003F) { # ?
         $self->{state} = PI_AFTER_STATE;
