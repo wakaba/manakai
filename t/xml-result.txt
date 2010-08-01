@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Aug  2 08:02:30 2010
-# Current time GMT:   Sun Aug  1 23:02:30 2010
+# Current time local: Mon Aug  2 08:03:16 2010
+# Current time GMT:   Sun Aug  1 23:03:16 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -998,14 +998,12 @@ ok 971
 ok 972
 ok 973
 ok 974
-not ok 975
-# Test 975 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)>\n" (t/XML-Parser.t at line 164 fail #429)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x)')
-#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
+ok 975
 ok 976
 not ok 977
 # Test 977 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)+>\n" (t/XML-Parser.t at line 164 fail #430)
 #     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x)+')
+#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
 ok 978
 not ok 979
 # Test 979 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)*>\n" (t/XML-Parser.t at line 164 fail #431)
@@ -1031,9 +1029,7 @@ ok 993
 ok 994
 ok 995
 ok 996
-not ok 997
-# Test 997 got: "<!DOCTYPE a>\n  <!ELEMENT b ((x))>\n" (t/XML-Parser.t at line 164 fail #440)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b ((x)')
+ok 997
 ok 998
 ok 999
 ok 1000
