@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Aug  2 07:33:20 2010
-# Current time GMT:   Sun Aug  1 22:33:20 2010
+# Current time local: Mon Aug  2 07:33:53 2010
+# Current time GMT:   Sun Aug  1 22:33:53 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1415,19 +1415,11 @@ ok 1348
 ok 1349
 ok 1350
 ok 1351
-not ok 1352
-# Test 1352 got: "<!ENTITY bc \"\" \"x\" \"y\" a>" (t/XML-Parser.t at line 159 fail #38)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA a')
-not ok 1353
-# Test 1353 got: "<!DOCTYPE a>\n  <!ENTITY bc \"\" \"x\" \"y\" a>\n" (t/XML-Parser.t at line 164 fail #599)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA a')
+ok 1352
+ok 1353
 ok 1354
-not ok 1355
-# Test 1355 got: "<!ENTITY bc \"\" \"x\" \"y\" ac>" (t/XML-Parser.t at line 159 fail #39)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA ac')
-not ok 1356
-# Test 1356 got: "<!DOCTYPE a>\n  <!ENTITY bc \"\" \"x\" \"y\" ac>\n" (t/XML-Parser.t at line 164 fail #600)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA ac')
+ok 1355
+ok 1356
 ok 1357
 not ok 1358
 # Test 1358 got: "<!ENTITY bc \"\" \"x\" \"y\" ac>" (t/XML-Parser.t at line 159 fail #40)
