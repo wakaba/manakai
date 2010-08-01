@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Aug  1 23:41:06 2010
-# Current time GMT:   Sun Aug  1 14:41:06 2010
+# Current time local: Sun Aug  1 23:43:13 2010
+# Current time GMT:   Sun Aug  1 14:43:13 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1280,8 +1280,12 @@ ok 1221
 ok 1222
 ok 1223
 ok 1224
-ok 1225
-ok 1226
+not ok 1225
+# Test 1225 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c CDATA () IMPLIED \"\"\n" (t/XML-Parser.t at line 164 fail #554)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c CDATA #IMPLIED')
+not ok 1226
+# Test 1226 got: "3;18;no root element;;;m\n3;18;unclosed internal subset;;;m\n3;18;unclosed md;;;m" (t/XML-Parser.t at line 107 fail #555)
+#      Expected: "3;16;no root element;;;m\n3;16;unclosed internal subset;;;m\n3;16;unclosed md;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c CDATA #IMPLIED\x{09} ')
 ok 1227
 ok 1228
 ok 1229
@@ -1291,11 +1295,11 @@ ok 1232
 ok 1233
 ok 1234
 ok 1235
-# t/xml/entities-1.dat
 ok 1236
 ok 1237
 ok 1238
 ok 1239
+# t/xml/entities-1.dat
 ok 1240
 ok 1241
 ok 1242
@@ -1338,24 +1342,24 @@ ok 1278
 ok 1279
 ok 1280
 ok 1281
-not ok 1282
-# Test 1282 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #16)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc ')
-#  t/XML-Parser.t line 159 is:     ok join ("\x0A", @e), $test->{entities}->[0],
+ok 1282
 ok 1283
 ok 1284
-not ok 1285
-# Test 1285 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #17)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}')
-ok 1286
+ok 1285
+not ok 1286
+# Test 1286 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #16)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc ')
+#  t/XML-Parser.t line 159 is:     ok join ("\x0A", @e), $test->{entities}->[0],
 ok 1287
-not ok 1288
-# Test 1288 got: "<!ENTITY % abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #18)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}')
-ok 1289
+ok 1288
+not ok 1289
+# Test 1289 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #17)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}')
 ok 1290
 ok 1291
-ok 1292
+not ok 1292
+# Test 1292 got: "<!ENTITY % abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #18)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}')
 ok 1293
 ok 1294
 ok 1295
@@ -1478,11 +1482,11 @@ ok 1411
 ok 1412
 ok 1413
 ok 1414
-# t/xml/entities-2.dat
 ok 1415
 ok 1416
 ok 1417
 ok 1418
+# t/xml/entities-2.dat
 ok 1419
 ok 1420
 ok 1421
@@ -1560,11 +1564,11 @@ ok 1492
 ok 1493
 ok 1494
 ok 1495
-# t/xml/notations-1.dat
 ok 1496
 ok 1497
 ok 1498
 ok 1499
+# t/xml/notations-1.dat
 ok 1500
 ok 1501
 ok 1502
@@ -1582,25 +1586,25 @@ ok 1513
 ok 1514
 ok 1515
 ok 1516
-not ok 1517
-# Test 1517 got: "<!DOCTYPE a>\n  <!NOTATION S \"\" \"\">\n<{} a>\n" (t/XML-Parser.t at line 164 fail #662)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>')
+ok 1517
 ok 1518
 ok 1519
 ok 1520
-ok 1521
+not ok 1521
+# Test 1521 got: "<!DOCTYPE a>\n  <!NOTATION S \"\" \"\">\n<{} a>\n" (t/XML-Parser.t at line 164 fail #664)
+#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>')
 ok 1522
 ok 1523
 ok 1524
 ok 1525
 ok 1526
-not ok 1527
-# Test 1527 got: "<!DOCTYPE a>\n  <!NOTATION b \"\" \"\">\n" (t/XML-Parser.t at line 164 fail #667)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b ')
+ok 1527
 ok 1528
 ok 1529
 ok 1530
-ok 1531
+not ok 1531
+# Test 1531 got: "<!DOCTYPE a>\n  <!NOTATION b \"\" \"\">\n" (t/XML-Parser.t at line 164 fail #669)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b ')
 ok 1532
 ok 1533
 ok 1534
@@ -1651,11 +1655,11 @@ ok 1578
 ok 1579
 ok 1580
 ok 1581
-# t/xml/entrefs-1.dat
 ok 1582
 ok 1583
 ok 1584
 ok 1585
+# t/xml/entrefs-1.dat
 ok 1586
 ok 1587
 ok 1588
@@ -1692,11 +1696,11 @@ ok 1618
 ok 1619
 ok 1620
 ok 1621
-# t/xml/entrefs-2.dat
 ok 1622
 ok 1623
 ok 1624
 ok 1625
+# t/xml/entrefs-2.dat
 ok 1626
 ok 1627
 ok 1628
@@ -1759,3 +1763,7 @@ ok 1684
 ok 1685
 ok 1686
 ok 1687
+ok 1688
+ok 1689
+ok 1690
+ok 1691

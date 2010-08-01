@@ -1559,6 +1559,28 @@ c CDATA #
 <!DOCTYPE a[
 <!ATTLIST b
 c CDATA #IMPLIED
+#errors
+3;16;no root element;;;m
+3;16;unclosed internal subset;;;m
+3;16;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #IMPLIED\u0009\u0020
+#errors
+3;18;no root element;;;m
+3;18;unclosed internal subset;;;m
+3;18;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #IMPLIED
 c CDATA #REQUIRED>
 ]><a/>
 #errors

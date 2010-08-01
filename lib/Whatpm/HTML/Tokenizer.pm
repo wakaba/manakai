@@ -7357,7 +7357,7 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # ATTLIST
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         ## XML5: No parse error.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         push @{$self->{ct}->{attrdefs}}, $self->{ca};
@@ -7373,7 +7373,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-        return  ($self->{ct});
+        ## Discard the current token.
         redo A;
       } else {
         ## XML5: Not defined yet.
