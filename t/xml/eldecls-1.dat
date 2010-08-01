@@ -49,6 +49,16 @@
 #document
 | <!DOCTYPE a>
 
+#data escaped
+<!DOCTYPE a [
+<!ELEMENT abc\u0020
+#errors
+2;14;no root element;;;m
+2;14;unclosed internal subset;;;m
+2;14;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
 #data
 <!DOCTYPE a[
 <!ELEMENT b ANY>

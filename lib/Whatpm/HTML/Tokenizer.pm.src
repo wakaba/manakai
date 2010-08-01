@@ -5015,13 +5015,13 @@ sub _get_next_token ($) {
     } elsif ($state == ENTITY_VALUE_ENTITY_STATE) {
       if ($is_space->{$nc} or
           {
-            0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
+            0x003C => 1, 0x0026 => 1, (EOF_CHAR) => 1, # <, &
             $self->{entity_add} => 1,
           }->{$nc}) {
         !!!parse-error (type => 'bare ero',
                         line => $self->{line_prev},
                         column => $self->{column_prev}
-                            + ($nc == -1 ? 1 : 0));
+                            + ($nc == EOF_CHAR ? 1 : 0));
         ## Don't consume
         ## Return nothing.
         #
@@ -5056,11 +5056,11 @@ sub _get_next_token ($) {
         !!!next-input-character;
         !!!emit ($self->{ct}); # ELEMENT
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
-        !!!emit ($self->{ct}); # ELEMENT
+        ## Discard the current token.
         redo A;
       } else {
         $self->{ct}->{content} = [chr $nc];
