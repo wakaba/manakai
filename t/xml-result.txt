@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Aug  1 23:37:29 2010
-# Current time GMT:   Sun Aug  1 14:37:29 2010
+# Current time local: Sun Aug  1 23:38:56 2010
+# Current time GMT:   Sun Aug  1 14:38:56 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1249,12 +1249,8 @@ not ok 1195
 #      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x >\x{0A}]><a/>')
 ok 1196
 ok 1197
-not ok 1198
-# Test 1198 got: "2;1;empty attlist decl;;b;w\n3;6;no root element;;;m\n3;6;unclosed internal subset;;;m\n3;6;unclosed md;;;m" (t/XML-Parser.t at line 107 fail #541)
-#      Expected: "3;6;no root element;;;m\n3;6;unclosed internal subset;;;m\n3;6;unclosed md;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x)\x{09}')
-not ok 1199
-# Test 1199 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n" (t/XML-Parser.t at line 164 fail #541)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x)\x{09}')
+ok 1198
+ok 1199
 not ok 1200
 # Test 1200 got: "2;1;empty attlist decl;;b;w\n3;6;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #542)
 #      Expected: "3;6;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x|>\x{0A}]><a/>')
