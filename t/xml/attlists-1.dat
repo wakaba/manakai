@@ -1268,78 +1268,66 @@ c (||) "x"
 <!ATTLIST b
 c (
 #errors
-2;1;empty attlist decl;;b;w
 3;3;unclosed md;;;m
 3;3;unclosed internal subset;;;m
 3;3;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 
 #data escaped
 <!DOCTYPE a[
 <!ATTLIST b
 c (\u0020
 #errors
-2;1;empty attlist decl;;b;w
 3;4;unclosed md;;;m
 3;4;unclosed internal subset;;;m
 3;4;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 
 #data
 <!DOCTYPE a[
 <!ATTLIST b
 c (x
 #errors
-2;1;empty attlist decl;;b;w
 3;4;unclosed md;;;m
 3;4;unclosed internal subset;;;m
 3;4;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 
 #data
 <!DOCTYPE a[
 <!ATTLIST b
 c (xy
 #errors
-2;1;empty attlist decl;;b;w
 3;5;unclosed md;;;m
 3;5;unclosed internal subset;;;m
 3;5;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 
 #data escaped
 <!DOCTYPE a[
 <!ATTLIST b
 c (x\u0020
 #errors
-2;1;empty attlist decl;;b;w
 3;5;unclosed md;;;m
 3;5;unclosed internal subset;;;m
 3;5;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 
 #data
 <!DOCTYPE a[
 <!ATTLIST b
 c (x|
 #errors
-2;1;empty attlist decl;;b;w
 3;5;unclosed md;;;m
 3;5;unclosed internal subset;;;m
 3;5;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 
 #data
 <!DOCTYPE a[
@@ -1347,11 +1335,9 @@ c (x|
 c (>
 ]><a/>
 #errors
-2;1;empty attlist decl;;b;w
 3;4;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 | <{} a>
 
 #data
@@ -1361,10 +1347,8 @@ c ( >
 ]><a/>
 #errors
 3;5;unclosed allowed tokens;;;m
-2;1;empty attlist decl;;b;w
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 | <{} a>
 
 #data
@@ -1373,11 +1357,9 @@ c ( >
 c (a>
 ]><a/>
 #errors
-2;1;empty attlist decl;;b;w
 3;5;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 | <{} a>
 
 #data
@@ -1386,11 +1368,9 @@ c (a>
 c (ab>
 ]><a/>
 #errors
-2;1;empty attlist decl;;b;w
 3;6;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 | <{} a>
 
 #data
@@ -1399,11 +1379,9 @@ c (ab>
 c (x >
 ]><a/>
 #errors
-2;1;empty attlist decl;;b;w
 3;6;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 | <{} a>
 
 #data
@@ -1412,11 +1390,9 @@ c (x >
 c (x|>
 ]><a/>
 #errors
-2;1;empty attlist decl;;b;w
 3;6;unclosed allowed tokens;;;m
 #document
 | <!DOCTYPE a>
-|   <!ELEMENT b >
 | <{} a>
 
 #data
