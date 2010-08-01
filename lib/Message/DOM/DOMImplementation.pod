@@ -1,6 +1,6 @@
 =head1 NAME
 
-Message::DOM::DOMImplementation - manakai - The C<DOMImplementation> Interface
+Message::DOM::DOMImplementation - The |DOMImplementation| object
 
 =head1 SYNOPSIS
 
@@ -38,17 +38,20 @@ For example, a DOM C<Document> object can be created by:
 For the full explainations for DOM methods and attributes, see DOM
 specification listed in the L</SEE ALSO> section below.
 
-Methods and attributes supported by manakai includes:
+=head1 DOM Objects
+
+Various DOM objects are implemented and documented by the following
+modules:
 
 =over 4
 
-=item C<Document> object
+=item C<Document>
 
-=over 4
+L<Message::DOM::Document>
 
-=item $doc->manakai_is_srcdoc [manakai extension]
+=item C<DOMImplementation>
 
-=back
+L<Message::DOM::DOMImplementation> (i.e. this document)
 
 =back
 
@@ -65,9 +68,9 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
