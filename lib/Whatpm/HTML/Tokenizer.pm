@@ -5069,6 +5069,7 @@ sub _get_next_token ($) {
     } elsif ($state == PI_TARGET_STATE) {
       if ($is_space->{$nc}) {
         $self->{state} = PI_TARGET_AFTER_STATE;
+        $self->{kwd} = chr $nc; # "temporary buffer"
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -5096,6 +5097,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($nc == 0x003F) { # ?
         $self->{state} = PI_AFTER_STATE;
+        $self->{kwd} = ''; # "temporary buffer"
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -5126,6 +5128,7 @@ sub _get_next_token ($) {
       }
     } elsif ($state == PI_TARGET_AFTER_STATE) {
       if ($is_space->{$nc}) {
+        $self->{kwd} .= chr $nc; # "temporary buffer"
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -5159,7 +5162,7 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no pic'); ## TODO: type
         if ($self->{in_subset}) {
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state"
@@ -5167,7 +5170,12 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         ## Reprocess.
-        return  ($self->{ct}); # pi
+        return  ({type => COMMENT_TOKEN,
+                  data => '?' . $self->{ct}->{target} .
+                      $self->{kwd} . # "temporary buffer"
+                      $self->{ct}->{data},
+                  line => $self->{ct}->{line},
+                  column => $self->{ct}->{column}});
         redo A;
       } else {
         $self->{ct}->{data} .= chr $nc; # pi
