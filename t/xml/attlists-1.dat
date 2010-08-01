@@ -1547,6 +1547,17 @@ c (x     y) #IMPLIED>
 #data
 <!DOCTYPE a[
 <!ATTLIST b
+c CDATA #
+#errors
+3;9;no root element;;;m
+3;9;unclosed internal subset;;;m
+3;9;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
 c CDATA #IMPLIED
 c CDATA #REQUIRED>
 ]><a/>

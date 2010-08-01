@@ -7163,7 +7163,7 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # ATTLIST
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         ## XML5: No parse error.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
@@ -7178,7 +7178,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-        return  ($self->{ct});
+        ## Discard the current token.
         redo A;
       } else {
         $self->{ca}->{default} = chr $nc;
