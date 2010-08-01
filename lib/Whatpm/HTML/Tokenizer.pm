@@ -7678,11 +7678,11 @@ sub _get_next_token ($) {
   
         redo A;
 ## TODO: %
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed entity value'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         ## Reconsume.
-        return  ($self->{ct}); # ENTITY
+        ## Discard the current token.
         redo A;
       } else {
         $self->{ct}->{value} .= chr $nc; # ENTITY

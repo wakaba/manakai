@@ -4978,11 +4978,11 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
 ## TODO: %
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed entity value'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         ## Reconsume.
-        !!!emit ($self->{ct}); # ENTITY
+        ## Discard the current token.
         redo A;
       } else {
         $self->{ct}->{value} .= chr $nc; # ENTITY
