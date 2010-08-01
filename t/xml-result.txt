@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Aug  1 23:35:32 2010
-# Current time GMT:   Sun Aug  1 14:35:32 2010
+# Current time local: Sun Aug  1 23:37:29 2010
+# Current time GMT:   Sun Aug  1 14:37:29 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1247,16 +1247,20 @@ not ok 1194
 not ok 1195
 # Test 1195 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #539)
 #      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x >\x{0A}]><a/>')
-not ok 1196
-# Test 1196 got: "2;1;empty attlist decl;;b;w\n3;6;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #540)
+ok 1196
+ok 1197
+not ok 1198
+# Test 1198 got: "2;1;empty attlist decl;;b;w\n3;6;no root element;;;m\n3;6;unclosed internal subset;;;m\n3;6;unclosed md;;;m" (t/XML-Parser.t at line 107 fail #541)
+#      Expected: "3;6;no root element;;;m\n3;6;unclosed internal subset;;;m\n3;6;unclosed md;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x)\x{09}')
+not ok 1199
+# Test 1199 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n" (t/XML-Parser.t at line 164 fail #541)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x)\x{09}')
+not ok 1200
+# Test 1200 got: "2;1;empty attlist decl;;b;w\n3;6;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #542)
 #      Expected: "3;6;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x|>\x{0A}]><a/>')
-not ok 1197
-# Test 1197 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #540)
+not ok 1201
+# Test 1201 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #542)
 #      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x|>\x{0A}]><a/>')
-ok 1198
-ok 1199
-ok 1200
-ok 1201
 ok 1202
 ok 1203
 ok 1204
@@ -1285,11 +1289,11 @@ ok 1226
 ok 1227
 ok 1228
 ok 1229
-# t/xml/entities-1.dat
 ok 1230
 ok 1231
 ok 1232
 ok 1233
+# t/xml/entities-1.dat
 ok 1234
 ok 1235
 ok 1236
@@ -1332,24 +1336,24 @@ ok 1272
 ok 1273
 ok 1274
 ok 1275
-not ok 1276
-# Test 1276 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #16)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc ')
-#  t/XML-Parser.t line 159 is:     ok join ("\x0A", @e), $test->{entities}->[0],
+ok 1276
 ok 1277
 ok 1278
-not ok 1279
-# Test 1279 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #17)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}')
-ok 1280
+ok 1279
+not ok 1280
+# Test 1280 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #16)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc ')
+#  t/XML-Parser.t line 159 is:     ok join ("\x0A", @e), $test->{entities}->[0],
 ok 1281
-not ok 1282
-# Test 1282 got: "<!ENTITY % abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #18)
-#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}')
-ok 1283
+ok 1282
+not ok 1283
+# Test 1283 got: "<!ENTITY abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #17)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}')
 ok 1284
 ok 1285
-ok 1286
+not ok 1286
+# Test 1286 got: "<!ENTITY % abc \"\" \"\" \"\" >" (t/XML-Parser.t at line 159 fail #18)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}')
 ok 1287
 ok 1288
 ok 1289
@@ -1472,11 +1476,11 @@ ok 1405
 ok 1406
 ok 1407
 ok 1408
-# t/xml/entities-2.dat
 ok 1409
 ok 1410
 ok 1411
 ok 1412
+# t/xml/entities-2.dat
 ok 1413
 ok 1414
 ok 1415
@@ -1554,11 +1558,11 @@ ok 1486
 ok 1487
 ok 1488
 ok 1489
-# t/xml/notations-1.dat
 ok 1490
 ok 1491
 ok 1492
 ok 1493
+# t/xml/notations-1.dat
 ok 1494
 ok 1495
 ok 1496
@@ -1576,25 +1580,25 @@ ok 1507
 ok 1508
 ok 1509
 ok 1510
-not ok 1511
-# Test 1511 got: "<!DOCTYPE a>\n  <!NOTATION S \"\" \"\">\n<{} a>\n" (t/XML-Parser.t at line 164 fail #659)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>')
+ok 1511
 ok 1512
 ok 1513
 ok 1514
-ok 1515
+not ok 1515
+# Test 1515 got: "<!DOCTYPE a>\n  <!NOTATION S \"\" \"\">\n<{} a>\n" (t/XML-Parser.t at line 164 fail #661)
+#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>')
 ok 1516
 ok 1517
 ok 1518
 ok 1519
 ok 1520
-not ok 1521
-# Test 1521 got: "<!DOCTYPE a>\n  <!NOTATION b \"\" \"\">\n" (t/XML-Parser.t at line 164 fail #664)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b ')
+ok 1521
 ok 1522
 ok 1523
 ok 1524
-ok 1525
+not ok 1525
+# Test 1525 got: "<!DOCTYPE a>\n  <!NOTATION b \"\" \"\">\n" (t/XML-Parser.t at line 164 fail #666)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b ')
 ok 1526
 ok 1527
 ok 1528
@@ -1645,11 +1649,11 @@ ok 1572
 ok 1573
 ok 1574
 ok 1575
-# t/xml/entrefs-1.dat
 ok 1576
 ok 1577
 ok 1578
 ok 1579
+# t/xml/entrefs-1.dat
 ok 1580
 ok 1581
 ok 1582
@@ -1686,11 +1690,11 @@ ok 1612
 ok 1613
 ok 1614
 ok 1615
-# t/xml/entrefs-2.dat
 ok 1616
 ok 1617
 ok 1618
 ok 1619
+# t/xml/entrefs-2.dat
 ok 1620
 ok 1621
 ok 1622
@@ -1753,3 +1757,7 @@ ok 1678
 ok 1679
 ok 1680
 ok 1681
+ok 1682
+ok 1683
+ok 1684
+ok 1685

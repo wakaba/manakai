@@ -1387,6 +1387,28 @@ c (x >
 #data
 <!DOCTYPE a[
 <!ATTLIST b
+c (x)
+#errors
+3;5;no root element;;;m
+3;5;unclosed internal subset;;;m
+3;5;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (x)\u0009
+#errors
+3;6;no root element;;;m
+3;6;unclosed internal subset;;;m
+3;6;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
 c (x|>
 ]><a/>
 #errors
