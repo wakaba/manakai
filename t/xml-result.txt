@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Aug  1 23:34:56 2010
-# Current time GMT:   Sun Aug  1 14:34:56 2010
+# Current time local: Sun Aug  1 23:35:32 2010
+# Current time GMT:   Sun Aug  1 14:35:32 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1212,18 +1212,14 @@ ok 1178
 ok 1179
 ok 1180
 ok 1181
-not ok 1182
-# Test 1182 got: "2;1;empty attlist decl;;b;w\n3;5;no root element;;;m\n3;5;unclosed internal subset;;;m\n3;5;unclosed md;;;m" (t/XML-Parser.t at line 107 fail #533)
-#      Expected: "3;5;no root element;;;m\n3;5;unclosed internal subset;;;m\n3;5;unclosed md;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x ')
-#  t/XML-Parser.t line 107 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
-not ok 1183
-# Test 1183 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n" (t/XML-Parser.t at line 164 fail #533)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x ')
+ok 1182
+ok 1183
 ok 1184
 ok 1185
 not ok 1186
 # Test 1186 got: "2;1;empty attlist decl;;b;w\n3;4;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #535)
 #      Expected: "3;4;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (>\x{0A}]><a/>')
+#  t/XML-Parser.t line 107 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
 not ok 1187
 # Test 1187 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #535)
 #      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (>\x{0A}]><a/>')
