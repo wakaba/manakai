@@ -1,0 +1,108 @@
+=head1 NAME
+
+Message::DOM::Document - The DOM |Document| Object
+
+=head1 SYNOPSIS
+
+  use Message::DOM::DOMImplementation;
+  $dom = Message::DOM::DOMImplementation->new;
+  $doc = $dom->create_document;
+  
+  is $doc->node_type, $doc->DOCUMENT_NODE;
+  $doc->append_child ($doctype);
+  $doc->append_child ($element);
+  
+  print $doc->inner_html;
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::Document> module is used to implement the DOM
+C<Document> object.  The class implements the DOM C<Document>
+interface, as well as other interfaces that have to be implemented by
+C<Document> objects, including C<HTMLDocument> and
+C<DocumentTraversal>.
+
+=head1 METHODS
+
+A C<Document> object provides DOM methods, attributes, and constants
+as Perl methods as specified by DOM Perl binding specification.  For
+more information on the bahavior of these methods, see the relevant
+specifications.
+
+=over 4
+
+=item From the C<Node> and C<EventTarget> interfaces
+
+C<node_type>, C<append_child>, C<ELEMENT_NODE>, C<can_dispatch>, and
+so on.  See L<Message::DOM::Node> for the full list.
+
+=item From the C<Document> interface (DOM Level 3 Core)
+
+C<adopt_node>, C<create_attribute>, C<create_attribute_ns>,
+C<create_cdata_section>, C<create_comment>,
+C<create_document_fragment>, C<create_element>, C<create_element_ns>,
+C<create_entity_reference>, C<create_notation>,
+C<create_processing_instruction>, C<create_text_node>, C<doctype>,
+C<document_element>, C<document_uri>, C<dom_config>,
+C<get_element_by_id>, C<get_elements_by_tag_name>,
+C<get_elements_by_tag_name_ns>, C<implementation>, C<input_encoding>,
+C<strict_error_checking>, C<xml_encoding>, C<xml_standalone>,
+C<xml_version>.
+
+=item From the C<HTMLDocument> interface (Web Applications 1.0)
+
+C<compat_mode>, C<inner_html>, C<ready_state>.
+
+=item From the C<DocumentEvent> interface (DOM Level 3 Events)
+
+C<create_event>.
+
+=item From the C<DocumentStyle> interface (CSSOM)
+
+C<default_view>.
+
+=item From the C<DocumentTraversal> interface (DOM Level 2 Traversal)
+
+C<create_tree_walker>.
+
+=item From the C<DocumentSelector> interface (Selectors API)
+
+C<query_selector>, C<query_selector_all>.
+
+=item From DOM Document Type Definitions module
+
+C<create_attribute_definition>, C<create_document_type_definition>,
+C<create_element_type_definition>, C<create_general_entity>.
+
+=item manakai extensions
+
+C<all_declarations_processed>, C<manakai_charset>,
+C<manakai_compat_mode>, C<manakai_create_serial_walker>,
+C<manakai_entity_base_uri>, C<manakai_has_bom>, C<manakai_head>,
+C<manakai_html>, C<manakai_is_html>, C<manakai_is_srcdoc>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Message::DOM::DOMImplementation>.
+
+L<Message::DOM::Node>.
+
+Web DOM Core <http://simon.html5.org/specs/web-dom-core>.
+
+Web Applications 1.0
+<http://www.whatwg.org/specs/web-apps/current-work/complete.html>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

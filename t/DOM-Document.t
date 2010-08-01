@@ -427,6 +427,30 @@ sub _adopt_note : Test(19) {
 
 ## TODO: manakai_entity_base_uri
 
+sub _ready_state_initial : Test(1) {
+  my $doc = Message::DOM::DOMImplementation->new->create_document;
+  is $doc->ready_state, 'complete';
+} # _ready_state_initial
+
+sub _ready_state_initial_with_parser : Test(1) {
+  local $TODO = 'creation of document with a parser is not supported yet';
+  my $doc = Message::DOM::DOMImplementation->new->create_document;
+  is $doc->ready_state, 'interactive';
+} # _ready_state_initial
+
+sub _ready_state_changed : Test(3) {
+  my $doc = Message::DOM::DOMImplementation->new->create_document;
+
+  $doc->_set_ready_state ('interactive');
+  is $doc->ready_state, 'interactive';
+
+  $doc->_set_ready_state ('loading');
+  is $doc->ready_state, 'loading';
+
+  $doc->_set_ready_state ('complete');
+  is $doc->ready_state, 'complete';
+} # _ready_state_changed
+
 __PACKAGE__->runtests;
 
 1;

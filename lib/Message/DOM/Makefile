@@ -3,7 +3,7 @@ POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
 RM = rm
 RMALL = $(RM) -fv
 
-HTML_FILES = DOMImplementation.html
+HTML_FILES = DOMImplementation.html Document.html
 
 all: $(HTML_FILES)
 

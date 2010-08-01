@@ -1234,6 +1234,19 @@ sub manakai_is_srcdoc ($;$) {
   return ${$_[0]}->{manakai_is_srcdoc};
 } # manakai_is_srcdoc
 
+sub ready_state ($) {
+  return ${$_[0]}->{ready_state} || 'complete';
+} # ready_state
+
+sub _set_ready_state ($$) {
+  if ($_[1] eq 'complete') {
+    delete ${$_[0]}->{ready_state};
+  } else {
+    ${$_[0]}->{ready_state} = $_[1];
+  }
+  # XXX fire a simple event named |readystatechange|
+} # _set_ready_state
+
 package Message::IF::Document;
 package Message::IF::DocumentTraversal;
 package Message::IF::DocumentXDoctype;
