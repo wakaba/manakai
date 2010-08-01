@@ -4365,6 +4365,7 @@ sub _get_next_token ($) {
         ## XML5: No parse error.
         !!!parse-error (type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
+        ## Discard the current token.
         redo A;
       } else {
         ## XML5: Not defined yet.
@@ -4393,12 +4394,12 @@ sub _get_next_token ($) {
         $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
         !!!next-input-character;
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         ## XML5: No parse error.
         !!!parse-error (type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         !!!next-input-character;
-        !!!emit ($self->{ct}); # ATTLIST
+        ## Discard the current token.
         redo A;
       } else {
         ## XML5: Not defined yet.
