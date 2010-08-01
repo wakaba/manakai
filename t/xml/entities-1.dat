@@ -367,6 +367,17 @@
 
 #data
 <!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA
+#errors
+2;32;no root element;;;m
+2;32;unclosed internal subset;;;m
+2;32;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
 <!ENTITY bc PUBLIC "x" "y" NDATA >
 ]><a/>
 #errors
@@ -376,6 +387,17 @@
 | <{} a>
 #entities
 | <!ENTITY bc "" "x" "y" >
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA\u0020
+#errors
+2;33;no root element;;;m
+2;33;unclosed internal subset;;;m
+2;33;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
 
 #data
 <!DOCTYPE a[
@@ -402,6 +424,39 @@
 | <{} a>
 #entities
 | <!ENTITY bc "" "x" "y" z>
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA a
+#errors
+2;34;no root element;;;m
+2;34;unclosed internal subset;;;m
+2;34;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA ac
+#errors
+2;35;no root element;;;m
+2;35;unclosed internal subset;;;m
+2;35;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY bc PUBLIC "x" "y" NDATA ac\u0020
+#errors
+2;36;no root element;;;m
+2;36;unclosed internal subset;;;m
+2;36;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+#entities
 
 #data
 <!DOCTYPE a[

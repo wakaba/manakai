@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Aug  1 23:44:45 2010
-# Current time GMT:   Sun Aug  1 14:44:45 2010
+# Current time local: Mon Aug  2 07:32:26 2010
+# Current time GMT:   Sun Aug  1 22:32:26 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1406,7 +1406,9 @@ ok 1339
 ok 1340
 ok 1341
 ok 1342
-ok 1343
+not ok 1343
+# Test 1343 got: "<!ENTITY bc \"\" \"x\" \"y\" >" (t/XML-Parser.t at line 159 fail #35)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA ')
 ok 1344
 ok 1345
 ok 1346
@@ -1415,14 +1417,26 @@ ok 1348
 ok 1349
 ok 1350
 ok 1351
-ok 1352
-ok 1353
+not ok 1352
+# Test 1352 got: "<!ENTITY bc \"\" \"x\" \"y\" a>" (t/XML-Parser.t at line 159 fail #38)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA a')
+not ok 1353
+# Test 1353 got: "<!DOCTYPE a>\n  <!ENTITY bc \"\" \"x\" \"y\" a>\n" (t/XML-Parser.t at line 164 fail #599)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA a')
 ok 1354
-ok 1355
-ok 1356
+not ok 1355
+# Test 1355 got: "<!ENTITY bc \"\" \"x\" \"y\" ac>" (t/XML-Parser.t at line 159 fail #39)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA ac')
+not ok 1356
+# Test 1356 got: "<!DOCTYPE a>\n  <!ENTITY bc \"\" \"x\" \"y\" ac>\n" (t/XML-Parser.t at line 164 fail #600)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA ac')
 ok 1357
-ok 1358
-ok 1359
+not ok 1358
+# Test 1358 got: "<!ENTITY bc \"\" \"x\" \"y\" ac>" (t/XML-Parser.t at line 159 fail #40)
+#      Expected: "" (Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA ac ')
+not ok 1359
+# Test 1359 got: "<!DOCTYPE a>\n  <!ENTITY bc \"\" \"x\" \"y\" ac>\n" (t/XML-Parser.t at line 164 fail #601)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY bc PUBLIC "x" "y" NDATA ac ')
 ok 1360
 ok 1361
 ok 1362
@@ -1482,7 +1496,6 @@ ok 1415
 ok 1416
 ok 1417
 ok 1418
-# t/xml/entities-2.dat
 ok 1419
 ok 1420
 ok 1421
@@ -1498,6 +1511,7 @@ ok 1430
 ok 1431
 ok 1432
 ok 1433
+# t/xml/entities-2.dat
 ok 1434
 ok 1435
 ok 1436
@@ -1564,7 +1578,6 @@ ok 1496
 ok 1497
 ok 1498
 ok 1499
-# t/xml/notations-1.dat
 ok 1500
 ok 1501
 ok 1502
@@ -1580,15 +1593,14 @@ ok 1511
 ok 1512
 ok 1513
 ok 1514
+# t/xml/notations-1.dat
 ok 1515
 ok 1516
 ok 1517
 ok 1518
 ok 1519
 ok 1520
-not ok 1521
-# Test 1521 got: "<!DOCTYPE a>\n  <!NOTATION S \"\" \"\">\n<{} a>\n" (t/XML-Parser.t at line 164 fail #664)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>')
+ok 1521
 ok 1522
 ok 1523
 ok 1524
@@ -1598,14 +1610,14 @@ ok 1527
 ok 1528
 ok 1529
 ok 1530
-not ok 1531
-# Test 1531 got: "<!DOCTYPE a>\n  <!NOTATION b \"\" \"\">\n" (t/XML-Parser.t at line 164 fail #669)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b ')
+ok 1531
 ok 1532
 ok 1533
 ok 1534
 ok 1535
-ok 1536
+not ok 1536
+# Test 1536 got: "<!DOCTYPE a>\n  <!NOTATION S \"\" \"\">\n<{} a>\n" (t/XML-Parser.t at line 164 fail #669)
+#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>')
 ok 1537
 ok 1538
 ok 1539
@@ -1615,7 +1627,9 @@ ok 1542
 ok 1543
 ok 1544
 ok 1545
-ok 1546
+not ok 1546
+# Test 1546 got: "<!DOCTYPE a>\n  <!NOTATION b \"\" \"\">\n" (t/XML-Parser.t at line 164 fail #674)
+#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b ')
 ok 1547
 ok 1548
 ok 1549
@@ -1655,7 +1669,6 @@ ok 1582
 ok 1583
 ok 1584
 ok 1585
-# t/xml/entrefs-1.dat
 ok 1586
 ok 1587
 ok 1588
@@ -1671,6 +1684,7 @@ ok 1597
 ok 1598
 ok 1599
 ok 1600
+# t/xml/entrefs-1.dat
 ok 1601
 ok 1602
 ok 1603
@@ -1696,7 +1710,6 @@ ok 1622
 ok 1623
 ok 1624
 ok 1625
-# t/xml/entrefs-2.dat
 ok 1626
 ok 1627
 ok 1628
@@ -1712,6 +1725,7 @@ ok 1637
 ok 1638
 ok 1639
 ok 1640
+# t/xml/entrefs-2.dat
 ok 1641
 ok 1642
 ok 1643
@@ -1763,3 +1777,18 @@ ok 1688
 ok 1689
 ok 1690
 ok 1691
+ok 1692
+ok 1693
+ok 1694
+ok 1695
+ok 1696
+ok 1697
+ok 1698
+ok 1699
+ok 1700
+ok 1701
+ok 1702
+ok 1703
+ok 1704
+ok 1705
+ok 1706

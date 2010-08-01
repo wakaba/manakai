@@ -7388,7 +7388,7 @@ sub _get_next_token ($) {
       }
     } elsif ($state == AFTER_ATTLIST_ATTR_VALUE_QUOTED_STATE) {
       if ($is_space->{$nc} or
-          $nc == -1 or
+          $nc == EOF_CHAR or
           $nc == 0x003E) { # >
         $self->{state} = DOCTYPE_ATTLIST_NAME_AFTER_STATE;
         ## Reconsume.
@@ -7496,7 +7496,7 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # ENTITY
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
@@ -7510,7 +7510,6 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-        return  ($self->{ct}); # ENTITY
         redo A;
       } else {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after literal', ## TODO: type
