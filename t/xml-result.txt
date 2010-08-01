@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Aug  2 07:57:21 2010
-# Current time GMT:   Sun Aug  1 22:57:21 2010
+# Current time local: Mon Aug  2 07:58:24 2010
+# Current time GMT:   Sun Aug  1 22:58:24 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -970,30 +970,24 @@ ok 943
 ok 944
 ok 945
 ok 946
-not ok 947
-# Test 947 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)>\n" (t/XML-Parser.t at line 164 fail #415)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x')
-#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
+ok 947
 ok 948
 not ok 949
 # Test 949 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)>\n" (t/XML-Parser.t at line 164 fail #416)
 #     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x ')
+#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
 ok 950
 ok 951
 ok 952
 ok 953
 ok 954
-not ok 955
-# Test 955 got: "<!DOCTYPE a>\n  <!ELEMENT b (x&)>\n" (t/XML-Parser.t at line 164 fail #419)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x&')
+ok 955
 ok 956
 ok 957
 ok 958
 ok 959
 ok 960
-not ok 961
-# Test 961 got: "<!DOCTYPE a>\n  <!ELEMENT b (x, y)>\n" (t/XML-Parser.t at line 164 fail #422)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x,y')
+ok 961
 ok 962
 not ok 963
 # Test 963 got: "<!DOCTYPE a>\n  <!ELEMENT b (x, y)>\n" (t/XML-Parser.t at line 164 fail #423)
@@ -1059,17 +1053,11 @@ ok 1011
 ok 1012
 ok 1013
 ok 1014
-not ok 1015
-# Test 1015 got: "<!DOCTYPE a>\n  <!ELEMENT b (#)>\n" (t/XML-Parser.t at line 164 fail #449)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (#')
+ok 1015
 ok 1016
-not ok 1017
-# Test 1017 got: "<!DOCTYPE a>\n  <!ELEMENT b (#PCD)>\n" (t/XML-Parser.t at line 164 fail #450)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (#PCD')
+ok 1017
 ok 1018
-not ok 1019
-# Test 1019 got: "<!DOCTYPE a>\n  <!ELEMENT b (#PCDATA)>\n" (t/XML-Parser.t at line 164 fail #451)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (#PCDATA')
+ok 1019
 ok 1020
 not ok 1021
 # Test 1021 got: "<!DOCTYPE a>\n  <!ELEMENT b (#PCDATA)>\n" (t/XML-Parser.t at line 164 fail #452)

@@ -8125,7 +8125,7 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # ELEMENT
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
@@ -8140,7 +8140,7 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-        return  ($self->{ct}); # ELEMENT
+        ## Discard the token.
         redo A;
       } else {
         $self->{ct}->{content}->[-1] .= chr $nc;

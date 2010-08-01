@@ -5165,12 +5165,12 @@ sub _get_next_token ($) {
         !!!next-input-character;
         !!!emit ($self->{ct}); # ELEMENT
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
         push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
-        !!!emit ($self->{ct}); # ELEMENT
+        ## Discard the token.
         redo A;
       } else {
         $self->{ct}->{content}->[-1] .= chr $nc;
