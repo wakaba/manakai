@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Sun Aug  1 23:22:59 2010
-# Current time GMT:   Sun Aug  1 14:22:59 2010
+# Current time local: Sun Aug  1 23:24:15 2010
+# Current time GMT:   Sun Aug  1 14:24:15 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1008,14 +1008,8 @@ ok 980
 ok 981
 ok 982
 ok 983
-not ok 984
-# Test 984 got: "2;12;no root element;;;m\n2;12;unclosed internal subset;;;m\n2;12;unclosed md;;;m\n2;1;empty attlist decl;;b;w" (t/XML-Parser.t at line 107 fail #434)
-#     Expected: "2;12;no root element;;;m\n2;12;unclosed internal subset;;;m\n2;12;unclosed md;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b ')
-#  t/XML-Parser.t line 107 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
-not ok 985
-# Test 985 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n" (t/XML-Parser.t at line 164 fail #434)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b ')
-#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
+ok 984
+ok 985
 ok 986
 ok 987
 ok 988
@@ -1091,14 +1085,13 @@ not ok 1055
 #      Lines 2-2 are missing:
 #       - "  <!ELEMENT b >\n"
 #       - "    c ID () EXPLICIT \"d> ]><a/>\"\n"
+#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
 ok 1056
 ok 1057
 ok 1058
 ok 1059
 ok 1060
-not ok 1061
-# Test 1061 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 164 fail #472)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d"')
+ok 1061
 ok 1062
 ok 1063
 ok 1064
@@ -1108,9 +1101,7 @@ ok 1067
 ok 1068
 ok 1069
 ok 1070
-not ok 1071
-# Test 1071 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n    c ID () EXPLICIT \"d\"\n" (t/XML-Parser.t at line 164 fail #477)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID \x{27}d\x{27}')
+ok 1071
 ok 1072
 ok 1073
 ok 1074

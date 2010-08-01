@@ -156,6 +156,50 @@
 
 #data
 <!DOCTYPE a[
+<!ENTITY abc
+#errors
+2;12;unclosed md;;;m
+2;12;unclosed internal subset;;;m
+2;12;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY abc\u0020
+#errors
+2;13;unclosed md;;;m
+2;13;unclosed internal subset;;;m
+2;13;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY abc  \u0009
+#errors
+2;15;unclosed md;;;m
+2;15;unclosed internal subset;;;m
+2;15;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY % abc  \u0009
+#errors
+2;17;unclosed md;;;m
+2;17;unclosed internal subset;;;m
+2;17;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
 <!ENTITY   bc PUBLIC>
 ]><a/>
 #errors
