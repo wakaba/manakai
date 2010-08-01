@@ -5123,7 +5123,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
-        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        #push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
         ## Discard the current token.
@@ -5167,7 +5167,7 @@ sub _get_next_token ($) {
         redo A;
       } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
-        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        #push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
         ## Discard the token.
@@ -5202,12 +5202,12 @@ sub _get_next_token ($) {
         !!!next-input-character;
         !!!emit ($self->{ct}); # ELEMENT
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         !!!parse-error (type => 'unclosed md'); ## TODO: type
-        push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
+        #push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         !!!next-input-character;
-        !!!emit ($self->{ct}); # ELEMENT
+        ## Discard the current token.
         redo A;
       } else {
         !!!parse-error (type => 'after element name'); ## TODO: type

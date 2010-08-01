@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Aug  2 07:58:24 2010
-# Current time GMT:   Sun Aug  1 22:58:24 2010
+# Current time local: Mon Aug  2 07:59:39 2010
+# Current time GMT:   Sun Aug  1 22:59:39 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -972,10 +972,7 @@ ok 945
 ok 946
 ok 947
 ok 948
-not ok 949
-# Test 949 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)>\n" (t/XML-Parser.t at line 164 fail #416)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x ')
-#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
+ok 949
 ok 950
 ok 951
 ok 952
@@ -989,9 +986,7 @@ ok 959
 ok 960
 ok 961
 ok 962
-not ok 963
-# Test 963 got: "<!DOCTYPE a>\n  <!ELEMENT b (x, y)>\n" (t/XML-Parser.t at line 164 fail #423)
-#     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x,y ')
+ok 963
 ok 964
 ok 965
 ok 966
@@ -1006,6 +1001,7 @@ ok 974
 not ok 975
 # Test 975 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)>\n" (t/XML-Parser.t at line 164 fail #429)
 #     Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (x)')
+#  t/XML-Parser.t line 164 is:   ok $result, $test->{document}->[0],
 ok 976
 not ok 977
 # Test 977 got: "<!DOCTYPE a>\n  <!ELEMENT b (x)+>\n" (t/XML-Parser.t at line 164 fail #430)
@@ -1059,9 +1055,7 @@ ok 1017
 ok 1018
 ok 1019
 ok 1020
-not ok 1021
-# Test 1021 got: "<!DOCTYPE a>\n  <!ELEMENT b (#PCDATA)>\n" (t/XML-Parser.t at line 164 fail #452)
-#      Expected: "<!DOCTYPE a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ELEMENT b (#PCDATA ')
+ok 1021
 ok 1022
 ok 1023
 ok 1024
