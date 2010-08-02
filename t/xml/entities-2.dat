@@ -57,6 +57,149 @@
 
 #data
 <!DOCTYPE a[
+<!ENTITY % abc  #
+#errors
+2;17;string after DOCTYPE name;;;m
+2;17;unclosed internal subset;;;m
+2;17;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC
+#errors
+2;21;unclosed md;;;m
+2;21;unclosed internal subset;;;m
+2;21;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC\u0020
+#errors
+2;22;unclosed md;;;m
+2;22;unclosed internal subset;;;m
+2;22;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC #
+#errors
+2;23;string after PUBLIC;;;m
+2;23;unclosed internal subset;;;m
+2;23;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc SYSTEM
+#errors
+2;21;unclosed md;;;m
+2;21;unclosed internal subset;;;m
+2;21;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY % abc SYSTEM\u0020
+#errors
+2;22;unclosed md;;;m
+2;22;unclosed internal subset;;;m
+2;22;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC #
+#errors
+2;23;string after PUBLIC;;;m
+2;23;unclosed internal subset;;;m
+2;23;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC "a"x
+#errors
+2;26;string after PUBLIC literal;;;m
+2;26;unclosed internal subset;;;m
+2;26;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC "a" x
+#errors
+2;27;string after PUBLIC literal;;;m
+2;27;unclosed internal subset;;;m
+2;27;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc SYSTEM "a"x
+#errors
+2;26;string after SYSTEM literal;;;m
+2;26;unclosed internal subset;;;m
+2;26;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc SYSTEM "a" x
+#errors
+2;27;string after SYSTEM literal;;;m
+2;27;unclosed internal subset;;;m
+2;27;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC "a" "b"x
+#errors
+2;30;string after SYSTEM literal;;;m
+2;30;unclosed internal subset;;;m
+2;30;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % abc PUBLIC "a" "b" x
+#errors
+2;31;string after SYSTEM literal;;;m
+2;31;unclosed internal subset;;;m
+2;31;no root element;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
 <!ENTITY % bc PUBLIC>
 ]><a/>
 #errors
@@ -161,6 +304,50 @@
 | <{} a>
 #entities
 | <!ENTITY % bc "" "x" "y" >
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x" "y" NDATA#
+#errors
+2;30;string after SYSTEM literal;;;m
+2;35;no root element;;;m
+2;35;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x" "y" NDATA #
+#errors
+2;30;string after SYSTEM literal;;;m
+2;36;no root element;;;m
+2;36;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x" "y" NDATA z#
+#errors
+2;30;string after SYSTEM literal;;;m
+2;37;no root element;;;m
+2;37;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+#entities
+
+#data
+<!DOCTYPE a[
+<!ENTITY % bc PUBLIC "x" "y" NDATA z #
+#errors
+2;30;string after SYSTEM literal;;;m
+2;38;no root element;;;m
+2;38;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+#entities
 
 #data
 <!DOCTYPE a[

@@ -686,6 +686,52 @@ c CDATA'd'
 #data
 <!DOCTYPE a[
 <!ATTLIST b
+c CDATA #
+#errors
+3;9;no root element;;;m
+3;9;unclosed internal subset;;;m
+3;9;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA #\u0020
+#errors
+3;10;no default type;;;m
+3;10;no root element;;;m
+3;10;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA ##
+#errors
+3;10;no root element;;;m
+3;10;unclosed internal subset;;;m
+3;10;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
+c CDATA ##
+>]><a/>
+#errors
+3;1;unknown default type;;#;m
+#document
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () 0 ""
+| <{} a>
+
+#data
+<!DOCTYPE a[
+<!ATTLIST b
 c CDATA#REQUIRED
 >]><a/>
 #errors

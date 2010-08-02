@@ -7115,6 +7115,7 @@ sub _get_next_token ($) {
         ## Reconsume.
         redo A;
       } elsif ($nc == 0x0022) { # "
+        # XXX parse error?
         ## XML5: Same as "anything else".
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
@@ -7131,6 +7132,7 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($nc == 0x0027) { # '
+        # XXX parse error?
         ## XML5: Same as "anything else".
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
@@ -8433,10 +8435,10 @@ sub _get_next_token ($) {
   
         return  ($self->{ct}); # ATTLIST/ENTITY/NOTATION
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         ## Reconsume.
-        return  ($self->{ct}); # ATTLIST/ENTITY/NOTATION
+        ## Discard the current token.
         redo A;
       } else {
         ## Stay in the state.

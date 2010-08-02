@@ -409,6 +409,26 @@
 
 #data
 <!DOCTYPE a[
+<!ELEMENT b (x#
+#errors
+2;15;no root element;;;m
+2;15;unclosed internal subset;;;m
+2;15;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x #
+#errors
+2;16;after element name;;;m
+2;16;no root element;;;m
+2;16;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
 <!ELEMENT b ((
 #errors
 2;14;no root element;;;m
@@ -732,6 +752,86 @@
 | <!DOCTYPE a>
 |   <!ELEMENT b (x)>
 | <{} a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x#
+#errors
+2;15;no root element;;;m
+2;15;unclosed internal subset;;;m
+2;15;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x #
+#errors
+2;16;after element name;;;m
+2;16;no root element;;;m
+2;16;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x,#
+#errors
+2;16;no root element;;;m
+2;16;unclosed internal subset;;;m
+2;16;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x, #
+#errors
+2;17;no root element;;;m
+2;17;unclosed internal subset;;;m
+2;17;unclosed md;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x)#
+#errors
+2;16;string after md def;;;m
+2;16;no root element;;;m
+2;16;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x) #
+#errors
+2;17;string after md def;;;m
+2;17;no root element;;;m
+2;17;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x)+#
+#errors
+2;17;string after md def;;;m
+2;17;no root element;;;m
+2;17;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!ELEMENT b (x)? #
+#errors
+2;18;string after md def;;;m
+2;18;no root element;;;m
+2;18;unclosed internal subset;;;m
+#document
+| <!DOCTYPE a>
 
 #data
 <!DOCTYPE a[

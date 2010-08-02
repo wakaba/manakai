@@ -185,6 +185,136 @@
 
 #data
 <!DOCTYPE a[
+<!NOTATION abc  #
+#errors
+2;17;string after DOCTYPE name;;;m
+2;17;unclosed internal subset;;;m
+2;17;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC
+#errors
+2;21;unclosed md;;;m
+2;21;unclosed internal subset;;;m
+2;21;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data escaped
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC\u0020
+#errors
+2;22;unclosed md;;;m
+2;22;unclosed internal subset;;;m
+2;22;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC #
+#errors
+2;23;string after PUBLIC;;;m
+2;23;unclosed internal subset;;;m
+2;23;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc SYSTEM
+#errors
+2;21;unclosed md;;;m
+2;21;unclosed internal subset;;;m
+2;21;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data escaped
+<!DOCTYPE a[
+<!NOTATION abc SYSTEM\u0020
+#errors
+2;22;unclosed md;;;m
+2;22;unclosed internal subset;;;m
+2;22;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC #
+#errors
+2;23;string after PUBLIC;;;m
+2;23;unclosed internal subset;;;m
+2;23;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC "a"x
+#errors
+2;26;string after PUBLIC literal;;;m
+2;26;unclosed internal subset;;;m
+2;26;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC "a" x
+#errors
+2;27;string after PUBLIC literal;;;m
+2;27;unclosed internal subset;;;m
+2;27;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc SYSTEM "a"x
+#errors
+2;26;string after SYSTEM literal;;;m
+2;26;unclosed internal subset;;;m
+2;26;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc SYSTEM "a" x
+#errors
+2;27;string after SYSTEM literal;;;m
+2;27;unclosed internal subset;;;m
+2;27;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC "a" "b"x
+#errors
+2;30;string after SYSTEM literal;;;m
+2;30;unclosed internal subset;;;m
+2;30;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION abc PUBLIC "a" "b" x
+#errors
+2;31;string after SYSTEM literal;;;m
+2;31;unclosed internal subset;;;m
+2;31;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
 <!NOTATION bcd PUBLIC>
 ]><a/>
 #errors
@@ -376,7 +506,16 @@
 2;28;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!NOTATION bcd "efg" "">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC 'efg'x
+#errors
+2;28;string after PUBLIC literal;;;m
+2;28;unclosed internal subset;;;m
+2;28;no root element;;;m
+#document
+| <!DOCTYPE a>
 
 #data
 <!DOCTYPE a[
@@ -398,7 +537,26 @@
 2;28;no root element;;;m
 #document
 | <!DOCTYPE a>
-|   <!NOTATION bcd "" "efg">
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM 'efg'x
+#errors
+2;28;string after SYSTEM literal;;;m
+2;28;unclosed internal subset;;;m
+2;28;no root element;;;m
+#document
+| <!DOCTYPE a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd SYSTEM 'efg'xyz<!
+#errors
+2;28;string after SYSTEM literal;;;m
+2;32;unclosed internal subset;;;m
+2;32;no root element;;;m
+#document
+| <!DOCTYPE a>
 
 #data
 <!DOCTYPE a[
@@ -459,3 +617,13 @@
 |   <!NOTATION b "" "x">
 |   <!NOTATION c "" "y">
 | <{} a>
+
+#data
+<!DOCTYPE a[
+<!NOTATION bcd PUBLIC "ab" 'efg'xy
+#errors
+2;33;string after SYSTEM literal;;;m
+2;34;unclosed internal subset;;;m
+2;34;no root element;;;m
+#document
+| <!DOCTYPE a>
