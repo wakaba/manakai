@@ -5922,7 +5922,7 @@ sub _tree_construction_main ($) {
           } else {
             
             push @tokens, {type => CHARACTER_TOKEN,
-                           data => 'This is a searchable index. Insert your search keywords here: ',
+                           data => 'This is a searchable index. Enter search keywords: ',
                            #line => $token->{line}, column => $token->{column},
                           }; # SHOULD
             ## TODO: make this configurable
