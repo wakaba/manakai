@@ -1,7 +1,7 @@
 1..1649
 # Running under perl version 5.010001 for linux
-# Current time local: Mon Aug  2 22:43:03 2010
-# Current time GMT:   Mon Aug  2 13:43:03 2010
+# Current time local: Mon Aug  2 22:48:01 2010
+# Current time GMT:   Mon Aug  2 13:48:01 2010
 # Using Test.pm version 1.25_02
 Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
 Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
@@ -1324,47 +1324,22 @@ ok 1290
 ok 1291
 ok 1292
 ok 1293
-not ok 1294
-# Test 1294 got: "2;1;empty attlist decl;;b;w\n3;4;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #589)
-#      Expected: "3;4;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (>\x{0A}]><a/>')
-#  t/XML-Parser.t line 107 is:   ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
-not ok 1295
-# Test 1295 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #589)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (>\x{0A}]><a/>')
-not ok 1296
-# Test 1296 got: "2;1;empty attlist decl;;b;w\n3;5;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #590)
-#      Expected: "3;5;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c ( >\x{0A}]><a/>')
-not ok 1297
-# Test 1297 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #590)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c ( >\x{0A}]><a/>')
-not ok 1298
-# Test 1298 got: "2;1;empty attlist decl;;b;w\n3;5;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #591)
-#      Expected: "3;5;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (a>\x{0A}]><a/>')
-not ok 1299
-# Test 1299 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #591)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (a>\x{0A}]><a/>')
-not ok 1300
-# Test 1300 got: "2;1;empty attlist decl;;b;w\n3;6;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #592)
-#      Expected: "3;6;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (ab>\x{0A}]><a/>')
-not ok 1301
-# Test 1301 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #592)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (ab>\x{0A}]><a/>')
-not ok 1302
-# Test 1302 got: "2;1;empty attlist decl;;b;w\n3;6;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #593)
-#      Expected: "3;6;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x >\x{0A}]><a/>')
-not ok 1303
-# Test 1303 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #593)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x >\x{0A}]><a/>')
+ok 1294
+ok 1295
+ok 1296
+ok 1297
+ok 1298
+ok 1299
+ok 1300
+ok 1301
+ok 1302
+ok 1303
 ok 1304
 ok 1305
 ok 1306
 ok 1307
-not ok 1308
-# Test 1308 got: "2;1;empty attlist decl;;b;w\n3;6;unclosed allowed tokens;;;m" (t/XML-Parser.t at line 107 fail #596)
-#      Expected: "3;6;unclosed allowed tokens;;;m" (Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x|>\x{0A}]><a/>')
-not ok 1309
-# Test 1309 got: "<!DOCTYPE a>\n  <!ELEMENT b >\n<{} a>\n" (t/XML-Parser.t at line 164 fail #596)
-#      Expected: "<!DOCTYPE a>\n<{} a>\n" (Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b\x{0A}c (x|>\x{0A}]><a/>')
+ok 1308
+ok 1309
 ok 1310
 ok 1311
 ok 1312
