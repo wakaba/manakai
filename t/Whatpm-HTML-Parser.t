@@ -102,7 +102,7 @@ sub _html_parser_change_the_encoding_fragment : Test(2) {
   ok !$called;
 } # _html_parser_change_the_encoding
 
-sub _html_parser_change_the_encoding_byte_string : Test(16) {
+sub _html_parser_change_the_encoding_byte_string : Test(20) {
   my $parser = Whatpm::HTML->new;
   my $called = 0;
   my $onerror = sub {
@@ -118,8 +118,10 @@ sub _html_parser_change_the_encoding_byte_string : Test(16) {
     '<meta http-equiv=Content-Type content="text/html;charset=shift_jis">',
     '<meta http-equiv=Content-Type content=text/html; charset=shift_jis>',
     '<meta http-equiv=CONTENT-TYPE content="TEXT/HTML; CHARSET=shift_jis">',
-    '<meta content="text/html; charset=shift_jis" name="content-type">',
+    '<meta content="text/html; charset=shift_jis" http-equiv="content-type">',
     '<body><meta http-equiv="Content-Type" content="text/html; charset=shift_jis">',
+    '<meta http-equiv=content-type content="application/xhtml+xml; charset=shift_jis">',
+    '<meta http-equiv=content-type content="charset=shift_jis">',
   ) {
     my $doc = $dom->create_document;
     $parser->parse_byte_string (undef, (' ' x 1024) . $input => $doc, $onerror);
@@ -143,7 +145,7 @@ sub _html_parser_change_the_encoding_byte_string_not_called : Test(12) {
     '<meta content="text/html; charset=shift_jis">',
     '<meta name=content-type content="text/html; charset=shift_jis">',
     '<meta http-equiv=content-style-type content="text/html; charset=shift_jis">',
-    '<meta http-equiv=content-type content="application/xhtml+xml; charset=shift_jis">',
+    '<meta http-equiv=content_type content="text/html; charset=shift_jis">',
   ) {
     my $doc = $dom->create_document;
     $parser->parse_byte_string (undef, (' ' x 1024) . $input => $doc, $onerror);

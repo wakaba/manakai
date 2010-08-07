@@ -2624,16 +2624,19 @@ sub _tree_construction_main ($) {
                       ->set_user_data (manakai_has_reference =>
                                            $token->{attributes}->{charset}
                                                ->{has_reference});
-                } elsif ($token->{attributes}->{content}) {
-                  if ($token->{attributes}->{content}->{value}
+                } elsif ($token->{attributes}->{content} and
+                         $token->{attributes}->{'http-equiv'}) {
+                  if ($token->{attributes}->{'http-equiv'}->{value}
+                      =~ /\A[Cc][Oo][Nn][Tt][Ee][Nn][Tt]-[Tt][Yy][Pp][Ee]\z/ and
+                      $token->{attributes}->{content}->{value}
                       =~ /[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
                           [\x09\x0A\x0C\x0D\x20]*=
                           [\x09\x0A\x0C\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
                           ([^"'\x09\x0A\x0C\x0D\x20]
                            [^\x09\x0A\x0C\x0D\x20\x3B]*))/x) {
                     
-                    ## NOTE: Whether the encoding is supported or not is handled
-                    ## in the {change_encoding} callback.
+                    ## NOTE: Whether the encoding is supported or not
+                    ## is handled in the {change_encoding} callback.
                     $self->{change_encoding}
                         ->($self, defined $1 ? $1 : defined $2 ? $2 : $3,
                            $token);
@@ -5101,8 +5104,8 @@ sub _tree_construction_main ($) {
         unless ($self->{confident}) {
           if ($token->{attributes}->{charset}) {
             
-            ## NOTE: Whether the encoding is supported or not is handled
-            ## in the {change_encoding} callback.
+            ## NOTE: Whether the encoding is supported or not is
+            ## handled in the {change_encoding} callback.
             $self->{change_encoding}
                 ->($self, $token->{attributes}->{charset}->{value}, $token);
             
@@ -5110,8 +5113,11 @@ sub _tree_construction_main ($) {
                 ->set_user_data (manakai_has_reference =>
                                      $token->{attributes}->{charset}
                                          ->{has_reference});
-          } elsif ($token->{attributes}->{content}) {
-            if ($token->{attributes}->{content}->{value}
+          } elsif ($token->{attributes}->{content} and
+                   $token->{attributes}->{'http-equiv'}) {
+            if ($token->{attributes}->{'http-equiv'}->{value}
+                =~ /\A[Cc][Oo][Nn][Tt][Ee][Nn][Tt]-[Tt][Yy][Pp][Ee]\z/ and
+                $token->{attributes}->{content}->{value}
                 =~ /[Cc][Hh][Aa][Rr][Ss][Ee][Tt]
                     [\x09\x0A\x0C\x0D\x20]*=
                     [\x09\x0A\x0C\x0D\x20]*(?>"([^"]*)"|'([^']*)'|
