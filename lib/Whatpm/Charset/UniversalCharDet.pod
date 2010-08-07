@@ -1,7 +1,6 @@
 =head1 NAME
 
-Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet
-Character Encoding Detection
+Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet Character Encoding Detection
 
 =head1 SYNOPSIS
 
@@ -15,12 +14,12 @@ Character Encoding Detection
 The C<Whatpm::Charset::UniversalCharDet> module is a Perl interface to
 the universalchardet character encoding detection.
 
-The universalchardet is originally developed by Mozilla project
-and then ported to other platforms.  The C<Whatpm::Charset::UniversalCharDet>
-module provides a Perl interface to Universal Encoding Detector,
-a Python port of the Mozilla's universalchardet code.  Future
-version of this module might provide an interface to another
-port of the universalchardet.
+The universalchardet is originally developed by Mozilla project and
+then ported to other platforms.  The
+C<Whatpm::Charset::UniversalCharDet> module provides a Perl interface
+to Universal Encoding Detector, a Python port of the Mozilla's
+universalchardet code.  Future version of this module might provide an
+interface to another port of the universalchardet.
 
 =head1 METHOD
 
@@ -38,13 +37,12 @@ The byte string.
 
 =item I<$charset>
 
-The name of the character encoding, detected by universalchardet,
-in lowercase.
-If no character encoding can be detected, because, e.g., no implementation
-for universalchardet is found, C<undef> is returned.
+The name of the character encoding, detected by universalchardet, in
+lowercase.  If no character encoding can be detected, because, e.g.,
+no implementation for universalchardet is found, C<undef> is returned.
 
-For the list of supported encodings, see documentation for
-Universal Encoding Detector
+For the list of supported encodings, see documentation for Universal
+Encoding Detector
 <http://chardet.feedparser.org/docs/supported-encodings.html>.
 
 =back
@@ -73,16 +71,16 @@ Available at <http://www.python.org/download/>.
 
 Available at <http://chardet.feedparser.org/download/>.
 
-Expand the archive and then execute C<python setup.py install>
-in the expanded directory.
+Expand the archive and then execute C<python setup.py install> in the
+expanded directory.
 
 =back
 
 =head1 TROUBLESHOOTING
 
-The C<Whatpm::Charset::UniversalCharDet> module does not raise
-error even when it fails to load the universalchardet library;
-it simply C<warn>s the error message.
+The C<Whatpm::Charset::UniversalCharDet> module does not raise error
+even when it fails to load the universalchardet library; it simply
+C<warn>s the error message.
 
 This behavior can be changed by setting a true value to the flag
 C<$Whatpm::Charset::UniversalCharDet::DEBUG> - it will make any error
@@ -98,7 +96,9 @@ Module L<Inline> is not installed.
 
 =item Error. You have specified 'Python' as an Inline programming language.
 
-Module L<Inline::Python> is not installed.
+Module L<Inline::Python> is not installed.  If you B<did> install the
+module, please find "the Inline DIRECTORY" (e.g. C<./_Inline>) and
+remove it.
 
 =item Couldn't find an appropriate DIRECTORY for Inline to use.
 
@@ -115,13 +115,13 @@ Universal Encoding Detector is not installed.
 =head1 SEE ALSO
 
 UNIVCHARDET - SuikaWiki
-<http://suika.fam.cx/gate/2005/sw/UNIVCHARDET>
+<http://suika.fam.cx/gate/2005/sw/UNIVCHARDET>.
 
-Universal Encoding Detector: character encoding auto-detection in Python
-<http://chardet.feedparser.org/>
+Universal Encoding Detector: character encoding auto-detection in
+Python <http://chardet.feedparser.org/>.
 
 A composite approach to language/encoding detection
-<http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html>
+<http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html>.
 
 =head1 AUTHOR
 
@@ -129,11 +129,9 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
-
-## $Date: 2008/10/05 06:42:04 $

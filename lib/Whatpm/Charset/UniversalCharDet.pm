@@ -1,10 +1,11 @@
 package Whatpm::Charset::UniversalCharDet;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.2 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.3';
 
 our $DEBUG;
 
-sub _detect ($) { undef }
+sub _detect { undef }
 
 eval q{
   use Inline Python => '
@@ -41,13 +42,11 @@ sub detect_byte_string ($$) {
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
 1;
-## $Date: 2008/02/10 07:34:10 $
-#  LocalWords:  noClear JIS

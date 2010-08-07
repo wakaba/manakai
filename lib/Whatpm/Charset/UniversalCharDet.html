@@ -2,11 +2,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet
-Character Encoding Detection</title>
+<title>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet Character Encoding Detection</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:wakaba@suika.fam.cx" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
@@ -36,8 +35,7 @@ Character Encoding Detection</title>
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet
-Character Encoding Detection</p>
+<p>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet Character Encoding Detection</p>
 <p>
 </p>
 <hr />
@@ -53,131 +51,115 @@ Character Encoding Detection</p>
 <h1><a name="description">DESCRIPTION</a></h1>
 <p>The <code>Whatpm::Charset::UniversalCharDet</code> module is a Perl interface to
 the universalchardet character encoding detection.</p>
-<p>The universalchardet is originally developed by Mozilla project
-and then ported to other platforms.  The <code>Whatpm::Charset::UniversalCharDet</code>
-module provides a Perl interface to Universal Encoding Detector,
-a Python port of the Mozilla's universalchardet code.  Future
-version of this module might provide an interface to another
-port of the universalchardet.</p>
+<p>The universalchardet is originally developed by Mozilla project and
+then ported to other platforms.  The
+<code>Whatpm::Charset::UniversalCharDet</code> module provides a Perl interface
+to Universal Encoding Detector, a Python port of the Mozilla's
+universalchardet code.  Future version of this module might provide an
+interface to another port of the universalchardet.</p>
 <p>
 </p>
 <hr />
 <h1><a name="method">METHOD</a></h1>
 <dl>
-<dt><strong><a name="detect_byte_string" class="item"><em>$charset</em> = Whatpm::Charset::UniversalCharDet-&gt;detect_byte_string (<em>$s</em>)</a></strong>
+<dt><strong><a name="detect_byte_string" class="item"><em>$charset</em> = Whatpm::Charset::UniversalCharDet-&gt;detect_byte_string (<em>$s</em>)</a></strong></dt>
 
 <dd>
 <p>Detect the character encoding of the specified byte string.</p>
-</dd>
 <dl>
-<dt><strong><a name="_s" class="item"><em>$s</em></a></strong>
+<dt><strong><a name="_s" class="item"><em>$s</em></a></strong></dt>
 
 <dd>
 <p>The byte string.</p>
 </dd>
-</li>
-<dt><strong><a name="_charset" class="item"><em>$charset</em></a></strong>
+<dt><strong><a name="_charset" class="item"><em>$charset</em></a></strong></dt>
 
 <dd>
-<p>The name of the character encoding, detected by universalchardet,
-in lowercase.
-If no character encoding can be detected, because, e.g., no implementation
-for universalchardet is found, <code>undef</code> is returned.</p>
-</dd>
-<dd>
-<p>For the list of supported encodings, see documentation for
-Universal Encoding Detector
+<p>The name of the character encoding, detected by universalchardet, in
+lowercase.  If no character encoding can be detected, because, e.g.,
+no implementation for universalchardet is found, <code>undef</code> is returned.</p>
+<p>For the list of supported encodings, see documentation for Universal
+Encoding Detector
 &lt;http://chardet.feedparser.org/docs/supported-encodings.html&gt;.</p>
 </dd>
-</li>
 </dl>
+</dd>
 </dl>
 <p>
 </p>
 <hr />
 <h1><a name="dependency">DEPENDENCY</a></h1>
 <dl>
-<dt><strong><a name="inline_python" class="item"><a href="../../Inline/Python.html">the Inline::Python manpage</a></a></strong>
+<dt><strong><a name="inline_python" class="item"><a href="../../Inline/Python.html">the Inline::Python manpage</a></a></strong></dt>
 
 <dd>
 <p>A Perl module available at CPAN
 &lt;http://search.cpan.org/~neilw/Inline-Python-0.22/&gt;.</p>
-</dd>
-<dd>
 <p>To install the module using <em>CPAN.pm</em>:</p>
-</dd>
-<dd>
 <pre>
   root# perl -MCPAN -eshell
   cpan&gt; install Inline::Python</pre>
 </dd>
-</li>
-<dt><strong><a name="python" class="item">Python</a></strong>
+<dt><strong><a name="python" class="item">Python</a></strong></dt>
 
 <dd>
 <p>Available at &lt;http://www.python.org/download/&gt;.</p>
 </dd>
-</li>
-<dt><strong><a name="universal_encoding_detector" class="item">Universal Encoding Detector</a></strong>
+<dt><strong><a name="universal_encoding_detector" class="item">Universal Encoding Detector</a></strong></dt>
 
 <dd>
 <p>Available at &lt;http://chardet.feedparser.org/download/&gt;.</p>
+<p>Expand the archive and then execute <code>python setup.py install</code> in the
+expanded directory.</p>
 </dd>
-<dd>
-<p>Expand the archive and then execute <code>python setup.py install</code>
-in the expanded directory.</p>
-</dd>
-</li>
 </dl>
 <p>
 </p>
 <hr />
 <h1><a name="troubleshooting">TROUBLESHOOTING</a></h1>
-<p>The <code>Whatpm::Charset::UniversalCharDet</code> module does not raise
-error even when it fails to load the universalchardet library;
-it simply <code>warn</code>s the error message.</p>
+<p>The <code>Whatpm::Charset::UniversalCharDet</code> module does not raise error
+even when it fails to load the universalchardet library; it simply
+<code>warn</code>s the error message.</p>
 <p>This behavior can be changed by setting a true value to the flag
 <code>$Whatpm::Charset::UniversalCharDet::DEBUG</code> - it will make any error
 invoke <code>die</code> instead of <code>warn</code>.</p>
 <p>Common error messages are as follows:</p>
 <dl>
-<dt><strong><a name="can_t_locate_inline_pm_in_inc" class="item">Can't locate Inline.pm in @INC</a></strong>
+<dt><strong><a name="can_t_locate_inline_pm_in_inc" class="item">Can't locate Inline.pm in @INC</a></strong></dt>
 
 <dd>
 <p>Module <em>Inline</em> is not installed.</p>
 </dd>
-</li>
-<dt><strong><a name="error_you_have_specified_python_as_an_inline_programming_language" class="item">Error. You have specified 'Python' as an Inline programming language.</a></strong>
+<dt><strong><a name="error_you_have_specified_python_as_an_inline_programming_language" class="item">Error. You have specified 'Python' as an Inline programming language.</a></strong></dt>
 
 <dd>
-<p>Module <a href="../../Inline/Python.html">the Inline::Python manpage</a> is not installed.</p>
+<p>Module <a href="../../Inline/Python.html">the Inline::Python manpage</a> is not installed.  If you <strong>did</strong> install the
+module, please find &quot;the Inline DIRECTORY&quot; (e.g. <code>./_Inline</code>) and
+remove it.</p>
 </dd>
-</li>
-<dt><strong><a name="couldn_t_find_an_appropriate_directory_for_inline_to_use" class="item">Couldn't find an appropriate DIRECTORY for Inline to use.</a></strong>
+<dt><strong><a name="couldn_t_find_an_appropriate_directory_for_inline_to_use" class="item">Couldn't find an appropriate DIRECTORY for Inline to use.</a></strong></dt>
 
 <dd>
 <p>The temporary directory for the <em>Inline</em> module is not available.
 See <a href="../../Inline/Python.html#the_inline_directory">The Inline DIRECTORY in the Inline::Python manpage</a> or
 &lt;http://search.cpan.org/~ingy/Inline-0.44/Inline.pod#The_Inline_DIRECTORY&gt;.</p>
 </dd>
-</li>
-<dt><strong><a name="error_py_eval_raised_an_exception" class="item">Error -- py_eval raised an exception</a></strong>
+<dt><strong><a name="error_py_eval_raised_an_exception" class="item">Error -- py_eval raised an exception</a></strong></dt>
 
 <dd>
 <p>Universal Encoding Detector is not installed.</p>
 </dd>
-</li>
 </dl>
 <p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p>UNIVCHARDET - SuikaWiki
-&lt;http://suika.fam.cx/gate/2005/sw/UNIVCHARDET&gt;</p>
-<p>Universal Encoding Detector: character encoding auto-detection in Python
-&lt;http://chardet.feedparser.org/&gt;</p>
+&lt;http://suika.fam.cx/gate/2005/sw/UNIVCHARDET&gt;.</p>
+<p>Universal Encoding Detector: character encoding auto-detection in
+Python &lt;http://chardet.feedparser.org/&gt;.</p>
 <p>A composite approach to language/encoding detection
-&lt;http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html&gt;</p>
+&lt;http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html&gt;.</p>
 <p>
 </p>
 <hr />
@@ -187,9 +169,9 @@ See <a href="../../Inline/Python.html#the_inline_directory">The Inline DIRECTORY
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.</p>
+<p>Copyright 2007-2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
 
 </body>
 
