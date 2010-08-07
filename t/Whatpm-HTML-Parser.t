@@ -121,7 +121,7 @@ sub _html_parser_change_the_encoding_byte_string : Test(14) {
     '<meta content="text/html; charset=shift_jis" name="content-type">',
   ) {
     my $doc = $dom->create_document;
-    $parser->parse_byte_string (undef, ("\xFF" x 1024) . $input => $doc, $onerror);
+    $parser->parse_byte_string (undef, (' ' x 1024) . $input => $doc, $onerror);
     ok $called;
     is $doc->input_encoding, 'shift_jis';
   }
@@ -145,9 +145,9 @@ sub _html_parser_change_the_encoding_byte_string_not_called : Test(12) {
     '<meta http-equiv=content-type content="application/xhtml+xml; charset=shift_jis">',
   ) {
     my $doc = $dom->create_document;
-    $parser->parse_byte_string (undef, ("\xFF" x 1024) . $input => $doc, $onerror);
+    $parser->parse_byte_string (undef, (' ' x 1024) . $input => $doc, $onerror);
     ok !$called;
-    is $doc->input_encoding, 'windows-1252';
+    like $doc->input_encoding, qr[windows-1252|us-ascii];
   }
 } # _html_parser_change_the_encoding_byte_string_not_called
 
