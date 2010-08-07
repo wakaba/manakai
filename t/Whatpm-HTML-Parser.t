@@ -102,7 +102,7 @@ sub _html_parser_change_the_encoding_fragment : Test(2) {
   ok !$called;
 } # _html_parser_change_the_encoding
 
-sub _html_parser_change_the_encoding_byte_string : Test(14) {
+sub _html_parser_change_the_encoding_byte_string : Test(16) {
   my $parser = Whatpm::HTML->new;
   my $called = 0;
   my $onerror = sub {
@@ -119,6 +119,7 @@ sub _html_parser_change_the_encoding_byte_string : Test(14) {
     '<meta http-equiv=Content-Type content=text/html; charset=shift_jis>',
     '<meta http-equiv=CONTENT-TYPE content="TEXT/HTML; CHARSET=shift_jis">',
     '<meta content="text/html; charset=shift_jis" name="content-type">',
+    '<body><meta http-equiv="Content-Type" content="text/html; charset=shift_jis">',
   ) {
     my $doc = $dom->create_document;
     $parser->parse_byte_string (undef, (' ' x 1024) . $input => $doc, $onerror);
