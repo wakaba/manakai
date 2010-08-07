@@ -152,6 +152,25 @@ sub _html_parser_change_the_encoding_byte_string_not_called : Test(12) {
   }
 } # _html_parser_change_the_encoding_byte_string_not_called
 
+sub _html_parser_change_the_encoding_byte_string_with_charset : Test(2) {
+  my $parser = Whatpm::HTML->new;
+  my $called = 0;
+  my $onerror = sub {
+    my %args = @_;
+    $called = 1 if $args{type} eq 'charset label detected';
+  };
+  my $dom = Message::DOM::DOMImplementation->new;
+
+  for my $input (
+    '<meta http-equiv=content-type content="text/html; charset=shift_jis">',
+  ) {
+    my $doc = $dom->create_document;
+    $parser->parse_byte_string ('euc-jp', (' ' x 1024) . $input => $doc, $onerror);
+    ok !$called;
+    is $doc->input_encoding, 'euc-jp';
+  }
+} # _html_parser_change_the_encoding_byte_string_with_charset
+
 __PACKAGE__->runtests;
 
 1;
