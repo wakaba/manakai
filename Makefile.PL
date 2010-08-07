@@ -13,6 +13,7 @@ WriteMakefile (
       'Exporter' => 0,
       'Config' => 0,
       'Getopt::Long' => 0,
+      'Inline::Python' => 0,
       'Socket' => 0,
       'Path::Class' => 0,
       'Tie::Array' => 0,
