@@ -6758,7 +6758,14 @@ sub _tree_construction_main ($) {
 ## XXX: How this method is organized is somewhat out of date, although
 ## it still does what the current spec documents.
 sub set_inner_html ($$$$;$) {
-  my $class = shift;
+  my ($class, $self);
+  if (ref $_[0]) {
+    $self = shift;
+    $class = ref $self;
+  } else {
+    $class = shift;
+    $self = $class->new;
+  }
   my $node = shift; # /context/
   #my $s = \$_[0];
   my $onerror = $_[1];
@@ -6779,7 +6786,7 @@ sub set_inner_html ($$$$;$) {
     }
 
     ## Step 3, 4, 5 # MUST
-    $class->parse_char_string ($_[0] => $node, $onerror, $get_wrapper);
+    $self->parse_char_string ($_[0] => $node, $onerror, $get_wrapper);
   } elsif ($nt == 1) { # Element (invoke the algorithm with /context/ element)
     ## TODO: If non-html element
 
@@ -6797,7 +6804,7 @@ sub set_inner_html ($$$$;$) {
     $doc->manakai_compat_mode ($node_doc->manakai_compat_mode);
 
     ## F3. Create an HTML parser
-    my $p = $class->new;
+    my $p = $self;
     $p->{document} = $doc;
 
     ## Step 8 # MUST
