@@ -68,9 +68,10 @@ sub _html_parser_srcdoc : Test(3) {
 sub _html_parser_change_the_encoding_char_string : Test(4) {
   my $parser = Whatpm::HTML->new;
   my $called = 0;
-  $parser->{change_encoding} = sub {
-    $called = 1;
-  }; # change_encoding
+  my $onerror = sub {
+    my %args = @_;
+    $called = 1 if $args{type} eq 'charset label detected';
+  };
   
   my $doc = Message::DOM::DOMImplementation->new->create_document;
   $parser->parse_char_string ('<meta charset=shift_jis>' => $doc, sub { });
@@ -86,9 +87,10 @@ sub _html_parser_change_the_encoding_char_string : Test(4) {
 sub _html_parser_change_the_encoding_fragment : Test(2) {
   my $parser = Whatpm::HTML->new;
   my $called = 0;
-  $parser->{change_encoding} = sub {
-    $called = 1;
-  }; # change_encoding
+  my $onerror = sub {
+    my %args = @_;
+    $called = 1 if $args{type} eq 'charset label detected';
+  };
   
   my $doc = Message::DOM::DOMImplementation->new->create_document;
   my $el = $doc->create_element ('div');
@@ -99,6 +101,55 @@ sub _html_parser_change_the_encoding_fragment : Test(2) {
   $parser->set_inner_html ($el, '<meta http-equiv=content-type content="text/html; charset=shift_jis">', sub { });
   ok !$called;
 } # _html_parser_change_the_encoding
+
+sub _html_parser_change_the_encoding_byte_string : Test(14) {
+  my $parser = Whatpm::HTML->new;
+  my $called = 0;
+  my $onerror = sub {
+    my %args = @_;
+    $called = 1 if $args{type} eq 'charset label detected';
+  };
+  my $dom = Message::DOM::DOMImplementation->new;
+
+  for my $input (
+    '<meta charset=shift_jis>',
+    '<meta http-equiv=Content-Type content="text/html; charset=shift_jis">',
+    '<meta http-equiv="Content-Type" content="text/html; charset=shift_jis">',
+    '<meta http-equiv=Content-Type content="text/html;charset=shift_jis">',
+    '<meta http-equiv=Content-Type content=text/html; charset=shift_jis>',
+    '<meta http-equiv=CONTENT-TYPE content="TEXT/HTML; CHARSET=shift_jis">',
+    '<meta content="text/html; charset=shift_jis" name="content-type">',
+  ) {
+    my $doc = $dom->create_document;
+    $parser->parse_byte_string (undef, ("\xFF" x 1024) . $input => $doc, $onerror);
+    ok $called;
+    is $doc->input_encoding, 'shift_jis';
+  }
+} # _html_parser_change_the_encoding_byte_string
+
+sub _html_parser_change_the_encoding_byte_string_not_called : Test(12) {
+  my $parser = Whatpm::HTML->new;
+  my $called = 0;
+  my $onerror = sub {
+    my %args = @_;
+    $called = 1 if $args{type} eq 'charset label detected';
+  };
+  my $dom = Message::DOM::DOMImplementation->new;
+
+  for my $input (
+    '',
+    '<meta content=shift_jis>',
+    '<meta content="text/html; charset=shift_jis">',
+    '<meta name=content-type content="text/html; charset=shift_jis">',
+    '<meta http-equiv=content-style-type content="text/html; charset=shift_jis">',
+    '<meta http-equiv=content-type content="application/xhtml+xml; charset=shift_jis">',
+  ) {
+    my $doc = $dom->create_document;
+    $parser->parse_byte_string (undef, ("\xFF" x 1024) . $input => $doc, $onerror);
+    ok !$called;
+    is $doc->input_encoding, 'windows-1252';
+  }
+} # _html_parser_change_the_encoding_byte_string_not_called
 
 __PACKAGE__->runtests;
 
