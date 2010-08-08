@@ -2489,7 +2489,9 @@ sub _tree_construction_main ($) {
           
           $token = $self->_get_next_token;
           next B;
-        } elsif ($token->{tag_name} eq 'link') {
+        } elsif ({
+          link => 1, basefont => 1, bgsound => 1,
+        }->{$token->{tag_name}}) {
           ## NOTE: There is a "as if in head" code clone.
           if ($self->{insertion_mode} == AFTER_HEAD_IM) {
             
@@ -5048,8 +5050,8 @@ sub _tree_construction_main ($) {
         $parse_rcdata->($self, $insert, $open_tables, 0); # RAWTEXT
         next B;
       } elsif ({
-                base => 1, command => 1, link => 1,
-               }->{$token->{tag_name}}) {
+        base => 1, command => 1, link => 1, basefont => 1, bgsound => 1,
+      }->{$token->{tag_name}}) {
         
         ## NOTE: This is an "as if in head" code clone, only "-t" differs
         
@@ -6300,10 +6302,8 @@ sub _tree_construction_main ($) {
           pop @{$self->{open_elements}};
           delete $self->{self_closing};
         } elsif ({
-                  area => 1, basefont => 1, bgsound => 1, br => 1,
-                  embed => 1, img => 1, wbr => 1,
-                  keygen => 1,
-                 }->{$token->{tag_name}}) {
+          area => 1, br => 1, embed => 1, img => 1, wbr => 1, keygen => 1,
+        }->{$token->{tag_name}}) {
           
 
           pop @{$self->{open_elements}};

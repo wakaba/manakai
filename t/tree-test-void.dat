@@ -34,6 +34,30 @@ unexpected EOF
 |       "a"
 
 #data
+<bgsound> a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <bgsound>
+|     " "
+|   <body>
+|     "a"
+
+#data
+<basefont> a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <basefont>
+|     " "
+|   <body>
+|     "a"
+
+#data
 <head><command>a
 #errors
 no DOCTYPE
@@ -67,6 +91,30 @@ unexpected EOF
 |   <body>
 |     <event-source>
 |       "a"
+
+#data
+<head><bgsound> a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <bgsound>
+|     " "
+|   <body>
+|     "a"
+
+#data
+<head><basefont> a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|     <basefont>
+|     " "
+|   <body>
+|     "a"
 
 #data
 </head><command>a
@@ -104,6 +152,32 @@ unexpected EOF
 |       "x"
 
 #data
+</head><bgsound> a
+#errors
+no DOCTYPE
+bgsound after </head>
+#document
+| <html>
+|   <head>
+|     <bgsound>
+|   " "
+|   <body>
+|     "a"
+
+#data
+</head><basefont> a
+#errors
+no DOCTYPE
+basefont after </head>
+#document
+| <html>
+|   <head>
+|     <basefont>
+|   " "
+|   <body>
+|     "a"
+
+#data
 <body><command>a
 #errors
 no DOCTYPE
@@ -137,6 +211,28 @@ unexpected EOF
 |   <body>
 |     <event-source>
 |       "x"
+
+#data
+<body><bgsound> a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <bgsound>
+|     " a"
+
+#data
+<body><basefont> a
+#errors
+no DOCTYPE
+#document
+| <html>
+|   <head>
+|   <body>
+|     <basefont>
+|     " a"
 
 #data
 <head><noscript><command>x
@@ -180,6 +276,34 @@ unexpected EOF
 |       "x"
 
 #data
+<head><noscript><bgsound> a
+#errors
+no DOCTYPE
+no </noscript>
+#document
+| <html>
+|   <head>
+|     <noscript>
+|       <bgsound>
+|       " "
+|   <body>
+|     "a"
+
+#data
+<head><noscript><basefont> a
+#errors
+no DOCTYPE
+no </noscript>
+#document
+| <html>
+|   <head>
+|     <noscript>
+|       <basefont>
+|       " "
+|   <body>
+|     "a"
+
+#data
 <b><i></b><area>
 #errors
 no DOCTYPE
@@ -199,30 +323,26 @@ unexpected EOF
 #errors
 no DOCTYPE
 no </i> before </b>
-unexpected EOF
 #document
 | <html>
 |   <head>
 |   <body>
 |     <b>
 |       <i>
-|     <i>
-|       <basefont>
+|     <basefont>
 
 #data
 <b><i></b><bgsound>
 #errors
 no DOCTYPE
 no </i> before </b>
-unexpected EOF
 #document
 | <html>
 |   <head>
 |   <body>
 |     <b>
 |       <i>
-|     <i>
-|       <bgsound>
+|     <bgsound>
 
 #data
 <b><i></b><br>
