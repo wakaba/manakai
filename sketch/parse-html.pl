@@ -14,5 +14,5 @@ $doc->manakai_is_html (1);
 
 $doc->inner_html ($input);
 
-print $doc->inner_html;
-print "\n";
+use Whatpm::HTML::Dumper qw/dumptree/;
+print dumptree $doc;
