@@ -1840,3 +1840,254 @@ there
 | "
 |     "
 | there"
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td>
+#errors
+EOF in foreign content
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td>a
+#errors
+EOF in foreign content
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|                 "a"
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></td>b
+#errors
+EOF in foreign content
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|               "b"
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></td><td>
+#errors
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|           <td>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>
+#errors
+"b" in table row
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|                 "a"
+|               "b"
+|           <td>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td><tr>
+#errors
+EOF in foreign content
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|                 <svg tr>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>
+#errors
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>
+#errors
+no </tr>
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|         <tr>
+|           " "
+|           <td>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>
+#errors
+no </tr>
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|                 <svg tr>
+|               " "
+|           <td>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>
+#errors
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|       <tbody>
+|         <tr>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td><tbody>
+#errors
+EOF in foreign content
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|                 <svg tbody>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>
+#errors
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>
+#errors
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|       <tbody>
+
+#data
+<!DOCTYPE HTML><table><tr><td><svg><td></table>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg td>
+|     "a"
