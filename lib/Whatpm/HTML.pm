@@ -3139,7 +3139,8 @@ sub _tree_construction_main ($) {
         
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
-        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+        if ($self->{frameset_ok} and
+            $token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
           delete $self->{frameset_ok};
         }
 
