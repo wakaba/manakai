@@ -3,6 +3,7 @@ use strict;
 our $VERSION = '2.0';
 use Error qw(:try);
 
+
 use Whatpm::HTML::Tokenizer;
 
 ## NOTE: This module don't check all HTML5 parse errors; character
@@ -869,6 +870,8 @@ sub IN_SELECT_IM () { SELECT_IMS | 0b01 }
 sub IN_SELECT_IN_TABLE_IM () { SELECT_IMS | 0b10 }
 sub IN_COLUMN_GROUP_IM () { 0b10 }
 
+
+
 sub _initialize_tree_constructor ($) {
   my $self = shift;
   ## NOTE: $self->{document} MUST be specified before this method is called
@@ -1477,6 +1480,8 @@ sub _reset_insertion_mode ($) {
           last AFE;
         } elsif ($active_formatting_elements->[$_]->[0]->manakai_local_name
                      eq $tag_name) {
+          ## NOTE: Non-HTML elements can't be in the list of active
+          ## formatting elements.
           
           $formatting_element = $active_formatting_elements->[$_];
           $formatting_element_i_in_active = $_;
@@ -1886,6 +1891,7 @@ sub _tree_construction_main ($) {
   my $open_tables = [[$self->{open_elements}->[0]->[0]]];
 
   B: while (1) {
+    
 
     ## The "in table text" insertion mode.
     if ($self->{insertion_mode} & TABLE_IMS and

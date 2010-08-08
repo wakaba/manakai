@@ -1,11 +1,12 @@
 #!/usr/bin/perl 
 use strict;
 
-my $DEBUG = $ENV{DEBUG};
+my $TokenizerDebug = $ENV{TOKENIZER_DEBUG};
+my $ParserDebug = $ENV{PARSER_DEBUG};
 
 while (<>) {
   s{!!!emit\b}{
-    ($DEBUG ? q{
+    ($TokenizerDebug ? q{
       (warn "EMIT " . (join ' ', %$_) . "\n" and
        return $_)
         for
@@ -23,7 +24,7 @@ while (<>) {
     }
   }}ge;
   s{!!!nack\s*\(\s*'([^']+)'\s*\)\s*;}{
-    ($DEBUG ? qq{
+    ($TokenizerDebug ? qq{
       if (\$self->{self_closing}) {
         !!!cp ('$1.2');
       } else {
@@ -143,7 +144,7 @@ while (<>) {
   }ge;
   s{!!!back-token\s*\(}{q{unshift @{$self->{token}}, (}}ge;
   s{!!!cp\s*\(\s*(\S+)\s*\)\s*;}{
-    $DEBUG ? qq{
+    $TokenizerDebug ? qq{
       #print STDERR "$1, ";
       \$Whatpm::HTML::Debug::cp_pass->($1) if \$Whatpm::HTML::Debug::cp_pass;
       BEGIN {
@@ -151,8 +152,11 @@ while (<>) {
       }
     } : ''
   }ge;
-  s{!!!debug\s*(\{.*\})\s*;}{
-    $DEBUG ? $1 : ''
+  s{!!!tdebug\s*(\{.*\})\s*;}{
+    $TokenizerDebug ? $1 : ''
+  }ge;
+  s{!!!pdebug\s*(\{.*\})\s*;}{
+    $ParserDebug ? $1 : ''
   }ge;
   print;
 }

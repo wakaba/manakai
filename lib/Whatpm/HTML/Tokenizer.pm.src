@@ -1214,7 +1214,7 @@ sub _get_next_token ($) {
     my $nc = $self->{nc};
     my $state = $self->{state};
 
-    !!!debug { printf STDERR "U+%04X\t%d\n", $nc, $state };
+    !!!tdebug { printf STDERR "U+%04X\t%d\n", $nc, $state };
 
     my $c = $nc > 0x007F ? KEY_ELSE_CHAR : $c_to_key->[$nc];
     my $action = $Action->[$state]->[$c] || $Action->[$state]->[KEY_ELSE_CHAR];
@@ -1226,7 +1226,7 @@ sub _get_next_token ($) {
     }
 
     if ($action and not $action->{skip}) {
-      !!!debug { warn "ACTION: $action->{name}\n" };
+      !!!tdebug { warn "ACTION: $action->{name}\n" };
 
       if (defined $action->{error}) {
         if ($action->{error_delta}) {
@@ -1295,7 +1295,7 @@ sub _get_next_token ($) {
         $self->{kwd} .= chr ($nc + $action->{buffer}->{append})
             if defined $action->{buffer}->{append};
 
-        !!!debug { warn "BUFFER: " . $self->{kwd} . "\n" if defined $self->{kwd} and length $self->{kwd} };
+        !!!tdebug { warn "BUFFER: " . $self->{kwd} . "\n" if defined $self->{kwd} and length $self->{kwd} };
       }
 
       if (defined $action->{emit}) {

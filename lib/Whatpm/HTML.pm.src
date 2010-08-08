@@ -2,6 +2,7 @@ package Whatpm::HTML; # -*- Perl -*-
 use strict;
 our $VERSION = '2.0';
 use Error qw(:try);
+!!!pdebug { use Data::Dumper; };
 
 use Whatpm::HTML::Tokenizer;
 
@@ -869,6 +870,8 @@ sub IN_SELECT_IM () { SELECT_IMS | 0b01 }
 sub IN_SELECT_IN_TABLE_IM () { SELECT_IMS | 0b10 }
 sub IN_COLUMN_GROUP_IM () { 0b10 }
 
+!!!pdebug { sub _printim ($) { my $v = shift; (print STDERR "F-") && ($v = $v & ~IN_FOREIGN_CONTENT_IM) if $v & IN_FOREIGN_CONTENT_IM; (print STDERR "C-") && ($v = $v & ~IN_CDATA_RCDATA_IM) if $v & IN_CDATA_RCDATA_IM; for (grep { /_IM$/ } keys %Whatpm::HTML::) { if (__PACKAGE__->$_ == $v) { print STDERR $_, "\n"; return; } } print STDERR $v, "\n"; } };
+
 sub _initialize_tree_constructor ($) {
   my $self = shift;
   ## NOTE: $self->{document} MUST be specified before this method is called
@@ -1411,6 +1414,8 @@ sub _reset_insertion_mode ($) {
           last AFE;
         } elsif ($active_formatting_elements->[$_]->[0]->manakai_local_name
                      eq $tag_name) {
+          ## NOTE: Non-HTML elements can't be in the list of active
+          ## formatting elements.
           !!!cp ('t51');
           $formatting_element = $active_formatting_elements->[$_];
           $formatting_element_i_in_active = $_;
@@ -1786,6 +1791,7 @@ sub _tree_construction_main ($) {
   my $open_tables = [[$self->{open_elements}->[0]->[0]]];
 
   B: while (1) {
+    !!!pdebug { print STDERR join ' ', map { $_->[0]->manakai_local_name } @{$self->{open_elements}}; print STDERR ' '; _printim ($self->{insertion_mode}); warn Dumper $token; };
 
     ## The "in table text" insertion mode.
     if ($self->{insertion_mode} & TABLE_IMS and
