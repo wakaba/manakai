@@ -317,3 +317,26 @@ unclosed frameset
 | <html>
 |   <head>
 |   <frameset>
+
+#data escaped
+\uFFFD<frameset>
+#errors
+no DOCTYPE
+no </frameset>
+elements not closed before EOF
+#document
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+\u0000<frameset>
+#errors
+NULL
+no DOCTYPE
+no </frameset>
+elements not closed before EOF
+#document
+| <html>
+|   <head>
+|   <frameset>
