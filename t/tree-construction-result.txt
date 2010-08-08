@@ -248,20 +248,17 @@ ok 212 - SHOULD-level error: qq'<!DOCTYPE html><noscript>abc</noscript'; ;
 not ok 213 - Document tree: qq'<!DOCTYPE html><noscript>abc</noscript'
 #   Failed test 'Document tree: qq'<!DOCTYPE html><noscript>abc</noscript''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <noscript>
-#   <body>
-#     "abc"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <noscript>
-#       "abc</noscript"
-# '
+# +---+-----------------+---+-----------------------+
+# | Ln|Got              | Ln|Expected               |
+# +---+-----------------+---+-----------------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>        |
+# |  2|<html>           |  2|<html>                 |
+# |  3|  <head>         |  3|  <head>               |
+# *  4|    <noscript>   *   |                       |
+# |  5|  <body>         |  4|  <body>               |
+# *  6|    "abc"        *  5|    <noscript>         *
+# |   |                 *  6|      "abc</noscript"  *
+# +---+-----------------+---+-----------------------+
 ok 214 - Parse error: qq'<style><!-- </style> --></style>'; 1:32:unmatched end tag;unmatched </style>
 ok 215 - SHOULD-level error: qq'<style><!-- </style> --></style>'; ;
 ok 216 - Document tree: qq'<style><!-- </style> --></style>'
@@ -623,22 +620,17 @@ ok 566 - SHOULD-level error: qq'<h1>Hello<h2>World'; ;
 not ok 567 - Document tree: qq'<h1>Hello<h2>World'
 #   Failed test 'Document tree: qq'<h1>Hello<h2>World''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <h1>
-#       "Hello"
-#     <h2>
-#       "World"
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <h1>
-#       "Hello"
-#       <h2>
-#         "World"
-# '
+# +---+---------------+-----------------+
+# | Ln|Got            |Expected         |
+# +---+---------------+-----------------+
+# |  1|<html>         |<html>           |
+# |  2|  <head>       |  <head>         |
+# |  3|  <body>       |  <body>         |
+# |  4|    <h1>       |    <h1>         |
+# |  5|      "Hello"  |      "Hello"    |
+# *  6|    <h2>       |      <h2>       *
+# *  7|      "World"  |        "World"  *
+# +---+---------------+-----------------+
 ok 568 - Parse error: qq'<a><p>X<a>Y</a>Z</p></a>'; 1:4:no DOCTYPE, 1:11:in a:a, 1:11:not closed, 1:24:unmatched end tag;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 10 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 10 End tag (a) violates step 1, paragraph 3 of the adoption agency algorithm., Line: 1 Col: 24 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm.
 ok 569 - SHOULD-level error: qq'<a><p>X<a>Y</a>Z</p></a>'; ;
 ok 570 - Document tree: qq'<a><p>X<a>Y</a>Z</p></a>'
@@ -669,44 +661,29 @@ ok 590 - SHOULD-level error: qq'<a><table><td><a><table></table><a></tr><a></tab
 not ok 591 - Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y'
 #   Failed test 'Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><b>X</b>C<a>Y''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <a>
-#                 <table>
-#               <a>
-#     <a>
-#     <a>
-#       <b>
-#         "X"
-#       "C"
-#     <a>
-#       "Y"
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       <a>
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <a>
-#                 <table>
-#               <a>
-#     <a>
-#       <b>
-#         "X"
-#       "C"
-#     <a>
-#       "Y"
-# '
+# +---+-------------------------+---+-------------------------+
+# | Ln|Got                      | Ln|Expected                 |
+# +---+-------------------------+---+-------------------------+
+# |  1|<html>                   |  1|<html>                   |
+# |  2|  <head>                 |  2|  <head>                 |
+# |  3|  <body>                 |  3|  <body>                 |
+# |  4|    <a>                  |  4|    <a>                  |
+# |   |                         *  5|      <a>                *
+# |  5|      <table>            |  6|      <table>            |
+# |  6|        <tbody>          |  7|        <tbody>          |
+# |  7|          <tr>           |  8|          <tr>           |
+# |  8|            <td>         |  9|            <td>         |
+# |  9|              <a>        | 10|              <a>        |
+# | 10|                <table>  | 11|                <table>  |
+# | 11|              <a>        | 12|              <a>        |
+# * 12|    <a>                  *   |                         |
+# | 13|    <a>                  | 13|    <a>                  |
+# | 14|      <b>                | 14|      <b>                |
+# | 15|        "X"              | 15|        "X"              |
+# | 16|      "C"                | 16|      "C"                |
+# | 17|    <a>                  | 17|    <a>                  |
+# | 18|      "Y"                | 18|      "Y"                |
+# +---+-------------------------+---+-------------------------+
 ok 592 - Parse error: qq'<a X>0<b>1<a Y>2'; 1:6:no DOCTYPE, 1:16:in a:a, 1:16:not closed, 1:16:in body:\#eof;Line: 1 Col: 5 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 15 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 15 End tag (a) violates step 1, paragraph 3 of the adoption agency algorithm., Line: 1 Col: 16 Expected closing tag. Unexpected end of file.
 ok 593 - SHOULD-level error: qq'<a X>0<b>1<a Y>2'; ;
 ok 594 - Document tree: qq'<a X>0<b>1<a Y>2'
@@ -719,41 +696,27 @@ ok 596 - SHOULD-level error: qq'<!-----><font><div>hello<table>excite!<b>me!<th>
 not ok 597 - Document tree: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->'
 #   Failed test 'Document tree: qq'<!-----><font><div>hello<table>excite!<b>me!<th><i>please!</tr><!--X-->''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!-- - -->
-# <html>
-#   <head>
-#   <body>
-#     <font>
-#       <div>
-#         "hello"
-#         "excite!"
-#         <b>
-#           "me!"
-#         <table>
-#           <tbody>
-#             <tr>
-#               <th>
-#                 <i>
-#                   "please!"
-#             <!-- X -->
-# '
-#     expected: '<!-- - -->
-# <html>
-#   <head>
-#   <body>
-#     <font>
-#       <div>
-#         "helloexcite!"
-#         <b>
-#           "me!"
-#         <table>
-#           <tbody>
-#             <tr>
-#               <th>
-#                 <i>
-#                   "please!"
-#             <!-- X -->
-# '
+# +---+-----------------------------+---+-----------------------------+
+# | Ln|Got                          | Ln|Expected                     |
+# +---+-----------------------------+---+-----------------------------+
+# |  1|<!-- - -->                   |  1|<!-- - -->                   |
+# |  2|<html>                       |  2|<html>                       |
+# |  3|  <head>                     |  3|  <head>                     |
+# |  4|  <body>                     |  4|  <body>                     |
+# |  5|    <font>                   |  5|    <font>                   |
+# |  6|      <div>                  |  6|      <div>                  |
+# *  7|        "hello"              *  7|        "helloexcite!"       *
+# *  8|        "excite!"            *   |                             |
+# |  9|        <b>                  |  8|        <b>                  |
+# | 10|          "me!"              |  9|          "me!"              |
+# | 11|        <table>              | 10|        <table>              |
+# | 12|          <tbody>            | 11|          <tbody>            |
+# | 13|            <tr>             | 12|            <tr>             |
+# | 14|              <th>           | 13|              <th>           |
+# | 15|                <i>          | 14|                <i>          |
+# | 16|                  "please!"  | 15|                  "please!"  |
+# | 17|            <!-- X -->       | 16|            <!-- X -->       |
+# +---+-----------------------------+---+-----------------------------+
 not ok 598 - Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).
 #   Failed test 'Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).'
 #   at HTML-tree.t test () ok line 3.
@@ -770,30 +733,21 @@ ok 602 - SHOULD-level error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</o
 not ok 603 - Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'
 #   Failed test 'Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "A"
-#     <option>
-#       "B"
-#     <optgroup>
-#       "C"
-#       <select>
-#         "DE"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "A"
-#     <option>
-#       "B"
-#       <optgroup>
-#         "C"
-#         <select>
-#           "DE"
-# '
+# +---+-----------------+------------------+
+# | Ln|Got              |Expected          |
+# +---+-----------------+------------------+
+# |  1|<!DOCTYPE html>  |<!DOCTYPE html>   |
+# |  2|<html>           |<html>            |
+# |  3|  <head>         |  <head>          |
+# |  4|  <body>         |  <body>          |
+# |  5|    "A"          |    "A"           |
+# |  6|    <option>     |    <option>      |
+# |  7|      "B"        |      "B"         |
+# *  8|    <optgroup>   |      <optgroup>  *
+# *  9|      "C"        |        "C"       *
+# * 10|      <select>   |        <select>  *
+# * 11|        "DE"     |          "DE"    *
+# +---+-----------------+------------------+
 ok 604 - Parse error: qq'<'; 1:0:bare stago, 1:1:no DOCTYPE;Line: 1 Col: 1 Expected tag name. Got something else instead, Line: 1 Col: 1 Unexpected non-space characters. Expected DOCTYPE.
 ok 605 - SHOULD-level error: qq'<'; ;
 ok 606 - Document tree: qq'<'
@@ -848,24 +802,18 @@ ok 650 - SHOULD-level error: qq'<!DOCTYPE html><script> <!-- </script> --> </scr
 not ok 651 - Document tree: qq'<!DOCTYPE html><script> <!-- </script> --> </script> EOF'
 #   Failed test 'Document tree: qq'<!DOCTYPE html><script> <!-- </script> --> </script> EOF''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <script>
-#       " <!-- "
-#     " "
-#   <body>
-#     "-->  EOF"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <script>
-#       " <!-- </script> --> "
-#     " "
-#   <body>
-#     "EOF"
-# '
+# +---+-----------------+------------------------------+
+# | Ln|Got              |Expected                      |
+# +---+-----------------+------------------------------+
+# |  1|<!DOCTYPE html>  |<!DOCTYPE html>               |
+# |  2|<html>           |<html>                        |
+# |  3|  <head>         |  <head>                      |
+# |  4|    <script>     |    <script>                  |
+# *  5|      " <!-- "   |      " <!-- </script> --> "  *
+# |  6|    " "          |    " "                       |
+# |  7|  <body>         |  <body>                      |
+# *  8|    "-->  EOF"   |    "EOF"                     *
+# +---+-----------------+------------------------------+
 ok 652 - Parse error: qq'<b><p></b>TEST'; 1:4:no DOCTYPE, 1:11:not closed;Line: 1 Col: 3 Unexpected start tag (b). Expected DOCTYPE., Line: 1 Col: 10 End tag (b) violates step 1, paragraph 3 of the adoption agency algorithm.
 ok 653 - SHOULD-level error: qq'<b><p></b>TEST'; ;
 ok 654 - Document tree: qq'<b><p></b>TEST'
@@ -901,43 +849,28 @@ ok 683 - SHOULD-level error: qq'<cite><b><cite><i><cite><i><cite><i><div>X</b>TE
 not ok 684 - Document tree: qq'<cite><b><cite><i><cite><i><cite><i><div>X</b>TEST'
 #   Failed test 'Document tree: qq'<cite><b><cite><i><cite><i><cite><i><div>X</b>TEST''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <cite>
-#       <b>
-#         <cite>
-#           <i>
-#             <cite>
-#               <i>
-#                 <cite>
-#                   <i>
-#       <i>
-#         <i>
-#           <i>
-#             <div>
-#               <b>
-#                 "X"
-#               "TEST"
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <cite>
-#       <b>
-#         <cite>
-#           <i>
-#             <cite>
-#               <i>
-#                 <cite>
-#       <i>
-#         <i>
-#           <i>
-#             <div>
-#               <b>
-#                 "X"
-#               "TEST"
-# '
+# +---+------------------------+---+------------------------+
+# | Ln|Got                     | Ln|Expected                |
+# +---+------------------------+---+------------------------+
+# |  1|<html>                  |  1|<html>                  |
+# |  2|  <head>                |  2|  <head>                |
+# |  3|  <body>                |  3|  <body>                |
+# |  4|    <cite>              |  4|    <cite>              |
+# |  5|      <b>               |  5|      <b>               |
+# |  6|        <cite>          |  6|        <cite>          |
+# |  7|          <i>           |  7|          <i>           |
+# |  8|            <cite>      |  8|            <cite>      |
+# |  9|              <i>       |  9|              <i>       |
+# | 10|                <cite>  | 10|                <cite>  |
+# * 11|                  <i>   *   |                        |
+# | 12|      <i>               | 11|      <i>               |
+# | 13|        <i>             | 12|        <i>             |
+# | 14|          <i>           | 13|          <i>           |
+# | 15|            <div>       | 14|            <div>       |
+# | 16|              <b>       | 15|              <b>       |
+# | 17|                "X"     | 16|                "X"     |
+# | 18|              "TEST"    | 17|              "TEST"    |
+# +---+------------------------+---+------------------------+
 No #errors section () at HTML-tree.t test () skip line 56.
 not ok 685 - Parse error: qq''; 1:0:no DOCTYPE;
 #   Failed test 'Parse error: qq''; 1:0:no DOCTYPE;'
@@ -949,11 +882,13 @@ Use of uninitialized value in length at HTML-tree.t test () ok line 8.
 not ok 687 - Document tree: qq''
 #   Failed test 'Document tree: qq'''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-# '
-#     expected: undef
+# +---+----------+---+----------+
+# | Ln|Got       | Ln|Expected  |
+# +---+----------+---+----------+
+# *  1|<html>    *   |          |
+# *  2|  <head>  *   |          |
+# *  3|  <body>  *   |          |
+# +---+----------+---+----------+
 Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 26.
 Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 29.
 ok 688 - Parse error: qq''; 1:0:no DOCTYPE;Line: 1 Col: 0 Unexpected End of file. Expected DOCTYPE.
@@ -1014,27 +949,29 @@ Use of uninitialized value in length at HTML-tree.t test () ok line 8.
 not ok 738 - Document tree: qq'<a href="blah">aba<table><a href="foo">br<tr><td></td></tr>x</table>aoe'
 #   Failed test 'Document tree: qq'<a href="blah">aba<table><a href="foo">br<tr><td></td></tr>x</table>aoe''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       href="blah"
-#       "aba"
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#     <a>
-#       href="foo"
-#       "br"
-#     <a>
-#       href="foo"
-#       "x"
-#     <a>
-#       href="foo"
-#       "aoe"
-# '
-#     expected: undef
+# +---+-------------------+---+----------+
+# | Ln|Got                | Ln|Expected  |
+# +---+-------------------+---+----------+
+# *  1|<html>             *   |          |
+# *  2|  <head>           *   |          |
+# *  3|  <body>           *   |          |
+# *  4|    <a>            *   |          |
+# *  5|      href="blah"  *   |          |
+# *  6|      "aba"        *   |          |
+# *  7|      <table>      *   |          |
+# *  8|        <tbody>    *   |          |
+# *  9|          <tr>     *   |          |
+# * 10|            <td>   *   |          |
+# * 11|    <a>            *   |          |
+# * 12|      href="foo"   *   |          |
+# * 13|      "br"         *   |          |
+# * 14|    <a>            *   |          |
+# * 15|      href="foo"   *   |          |
+# * 16|      "x"          *   |          |
+# * 17|    <a>            *   |          |
+# * 18|      href="foo"   *   |          |
+# * 19|      "aoe"        *   |          |
+# +---+-------------------+---+----------+
 Use of uninitialized value in concatenation (.) or string at HTML-tree.t test () skip line 56.
 No #errors section () at HTML-tree.t test () skip line 56.
 Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 26.
@@ -1052,66 +989,53 @@ Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t li
 not ok 741 - Document tree: qq''
 #   Failed test 'Document tree: qq'''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       href="blah"
-#       "aba"
-#       <a>
-#         href="foo"
-#         "br"
-#       <a>
-#         href="foo"
-#         "x"
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#     <a>
-#       href="foo"
-#       "aoe"
-# '
+# +---+----------+---+--------------------+
+# | Ln|Got       | Ln|Expected            |
+# +---+----------+---+--------------------+
+# |  1|<html>    |  1|<html>              |
+# |  2|  <head>  |  2|  <head>            |
+# |  3|  <body>  |  3|  <body>            |
+# |   |          *  4|    <a>             *
+# |   |          *  5|      href="blah"   *
+# |   |          *  6|      "aba"         *
+# |   |          *  7|      <a>           *
+# |   |          *  8|        href="foo"  *
+# |   |          *  9|        "br"        *
+# |   |          * 10|      <a>           *
+# |   |          * 11|        href="foo"  *
+# |   |          * 12|        "x"         *
+# |   |          * 13|      <table>       *
+# |   |          * 14|        <tbody>     *
+# |   |          * 15|          <tr>      *
+# |   |          * 16|            <td>    *
+# |   |          * 17|    <a>             *
+# |   |          * 18|      href="foo"    *
+# |   |          * 19|      "aoe"         *
+# +---+----------+---+--------------------+
 ok 742 - Parse error: qq'<a href="blah">aba<table><tr><td><a href="foo">br</td></tr>x</table>aoe'; 1:16:no DOCTYPE, 1:55:not closed, 1:69:in table:\#text, 1:71:in body:\#eof;Line: 1 Col: 15 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 54 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 60 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.
 ok 743 - SHOULD-level error: qq'<a href="blah">aba<table><tr><td><a href="foo">br</td></tr>x</table>aoe'; ;
 not ok 744 - Document tree: qq'<a href="blah">aba<table><tr><td><a href="foo">br</td></tr>x</table>aoe'
 #   Failed test 'Document tree: qq'<a href="blah">aba<table><tr><td><a href="foo">br</td></tr>x</table>aoe''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       href="blah"
-#       "aba"
-#       "x"
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <a>
-#                 href="foo"
-#                 "br"
-#       "aoe"
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       href="blah"
-#       "abax"
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <a>
-#                 href="foo"
-#                 "br"
-#       "aoe"
-# '
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|<html>                      |  1|<html>                      |
+# |  2|  <head>                    |  2|  <head>                    |
+# |  3|  <body>                    |  3|  <body>                    |
+# |  4|    <a>                     |  4|    <a>                     |
+# |  5|      href="blah"           |  5|      href="blah"           |
+# *  6|      "aba"                 *  6|      "abax"                *
+# *  7|      "x"                   *   |                            |
+# |  8|      <table>               |  7|      <table>               |
+# |  9|        <tbody>             |  8|        <tbody>             |
+# | 10|          <tr>              |  9|          <tr>              |
+# | 11|            <td>            | 10|            <td>            |
+# | 12|              <a>           | 11|              <a>           |
+# | 13|                href="foo"  | 12|                href="foo"  |
+# | 14|                "br"        | 13|                "br"        |
+# | 15|      "aoe"                 | 14|      "aoe"                 |
+# +---+----------------------------+---+----------------------------+
 ok 745 - Parse error: qq'<table><a href="blah">aba<tr><td><a href="foo">br</td></tr>x</table>aoe'; 1:8:no DOCTYPE, 1:23:in table, 1:30:in table:\#text, 1:55:not closed, 1:69:in table:\#text, 1:71:in body:\#eof;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 22 Unexpected start tag (a) in table context caused voodoo mode., Line: 1 Col: 29 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 54 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 68 Unexpected implied end tag (a) in the table phase., Line: 1 Col: 71 Expected closing tag. Unexpected end of file.
 ok 746 - SHOULD-level error: qq'<table><a href="blah">aba<tr><td><a href="foo">br</td></tr>x</table>aoe'; ;
 ok 747 - Document tree: qq'<table><a href="blah">aba<tr><td><a href="foo">br</td></tr>x</table>aoe'
@@ -1127,25 +1051,19 @@ ok 752 - SHOULD-level error: qq'<wbr><strike><code></strike><code><strike></code
 not ok 753 - Document tree: qq'<wbr><strike><code></strike><code><strike></code>'
 #   Failed test 'Document tree: qq'<wbr><strike><code></strike><code><strike></code>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <wbr>
-#     <strike>
-#       <code>
-#     <code>
-#       <code>
-#         <strike>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <wbr>
-#     <strike>
-#       <code>
-#     <code>
-#       <strike>
-# '
+# +---+------------------+---+----------------+
+# | Ln|Got               | Ln|Expected        |
+# +---+------------------+---+----------------+
+# |  1|<html>            |  1|<html>          |
+# |  2|  <head>          |  2|  <head>        |
+# |  3|  <body>          |  3|  <body>        |
+# |  4|    <wbr>         |  4|    <wbr>       |
+# |  5|    <strike>      |  5|    <strike>    |
+# |  6|      <code>      |  6|      <code>    |
+# |  7|    <code>        |  7|    <code>      |
+# *  8|      <code>      *  8|      <strike>  *
+# *  9|        <strike>  *   |                |
+# +---+------------------+---+----------------+
 ok 754 - Parse error: qq'<title><meta></title><link><title><meta></title>'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE.
 ok 755 - SHOULD-level error: qq'<title><meta></title><link><title><meta></title>'; ;
 ok 756 - Document tree: qq'<title><meta></title><link><title><meta></title>'
@@ -1158,21 +1076,18 @@ ok 758 - SHOULD-level error: qq'<style><!--</style><meta><script>--><link></scri
 not ok 759 - Document tree: qq'<style><!--</style><meta><script>--><link></script>'
 #   Failed test 'Document tree: qq'<style><!--</style><meta><script>--><link></script>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <style>
-#       "<!--"
-#     <meta>
-#     <script>
-#       "--><link>"
-#   <body>
-# '
-#     expected: '<html>
-#   <head>
-#     <style>
-#       "<!--</style><meta><script>--><link></script>"
-#   <body>
-# '
+# +---+-------------------+---+------------------------------------------------------+
+# | Ln|Got                | Ln|Expected                                              |
+# +---+-------------------+---+------------------------------------------------------+
+# |  1|<html>             |  1|<html>                                                |
+# |  2|  <head>           |  2|  <head>                                              |
+# |  3|    <style>        |  3|    <style>                                           |
+# *  4|      "<!--"       *  4|      "<!--</style><meta><script>--><link></script>"  *
+# *  5|    <meta>         *   |                                                      |
+# *  6|    <script>       *   |                                                      |
+# *  7|      "--><link>"  *   |                                                      |
+# |  8|  <body>           |  5|  <body>                                              |
+# +---+-------------------+---+------------------------------------------------------+
 ok 760 - Parse error: qq'<head><meta></head><link>'; 1:7:no DOCTYPE, 1:25:after head;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE., Line: 1 Col: 25 Unexpected start tag (link) that can be in head. Moved.
 ok 761 - SHOULD-level error: qq'<head><meta></head><link>'; ;
 ok 762 - Document tree: qq'<head><meta></head><link>'
@@ -1201,28 +1116,21 @@ ok 776 - SHOULD-level error: qq'<a><table><a></table><p><a><div><a>'; ;
 not ok 777 - Document tree: qq'<a><table><a></table><p><a><div><a>'
 #   Failed test 'Document tree: qq'<a><table><a></table><p><a><div><a>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       <table>
-#     <a>
-#     <p>
-#       <a>
-#     <div>
-#       <a>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       <a>
-#       <table>
-#     <p>
-#       <a>
-#     <div>
-#       <a>
-# '
+# +---+---------------+---+---------------+
+# | Ln|Got            | Ln|Expected       |
+# +---+---------------+---+---------------+
+# |  1|<html>         |  1|<html>         |
+# |  2|  <head>       |  2|  <head>       |
+# |  3|  <body>       |  3|  <body>       |
+# |  4|    <a>        |  4|    <a>        |
+# |   |               *  5|      <a>      *
+# |  5|      <table>  |  6|      <table>  |
+# *  6|    <a>        *   |               |
+# |  7|    <p>        |  7|    <p>        |
+# |  8|      <a>      |  8|      <a>      |
+# |  9|    <div>      |  9|    <div>      |
+# | 10|      <a>      | 10|      <a>      |
+# +---+---------------+---+---------------+
 not ok 778 - Parse error: qq'<head></p><meta><p>'; 1:7:no DOCTYPE, 1:11:unmatched end tag;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 10: Stray end tag “p”., 16: “meta” element outside “head”.
 #   Failed test 'Parse error: qq'<head></p><meta><p>'; 1:7:no DOCTYPE, 1:11:unmatched end tag;6: Start tag seen without seeing a doctype first. Expected “<!DOCTYPE html>”., 10: Stray end tag “p”., 16: “meta” element outside “head”.'
 #   at HTML-tree.t test () ok line 3.
@@ -1239,18 +1147,16 @@ ok 782 - SHOULD-level error: qq'<head></html><meta><p>'; ;
 not ok 783 - Document tree: qq'<head></html><meta><p>'
 #   Failed test 'Document tree: qq'<head></html><meta><p>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <meta>
-#     <p>
-# '
-#     expected: '<html>
-#   <head>
-#     <meta>
-#   <body>
-#     <p>
-# '
+# +---+------------+---+------------+
+# | Ln|Got         | Ln|Expected    |
+# +---+------------+---+------------+
+# |  1|<html>      |  1|<html>      |
+# |  2|  <head>    |  2|  <head>    |
+# *  3|  <body>    *   |            |
+# |  4|    <meta>  |  3|    <meta>  |
+# |   |            *  4|  <body>    *
+# |  5|    <p>     |  5|    <p>     |
+# +---+------------+---+------------+
 ok 784 - Parse error: qq'<b><table><td><i></table>'; 1:4:no DOCTYPE, 1:15:missing start tag:tr, 1:25:not closed, 1:25:in body:\#eof;Line: 1 Col: 3 Unexpected start tag (b). Expected DOCTYPE., Line: 1 Col: 14 Unexpected table cell start tag (td) in the table body phase., Line: 1 Col: 25 Got table cell end tag (td) while required end tags are missing., Line: 1 Col: 25 Expected closing tag. Unexpected end of file.
 ok 785 - SHOULD-level error: qq'<b><table><td><i></table>'; ;
 ok 786 - Document tree: qq'<b><table><td><i></table>'
@@ -1266,18 +1172,15 @@ ok 791 - SHOULD-level error: qq'<h1><h2>'; ;
 not ok 792 - Document tree: qq'<h1><h2>'
 #   Failed test 'Document tree: qq'<h1><h2>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <h1>
-#     <h2>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <h1>
-#       <h2>
-# '
+# +---+----------+------------+
+# | Ln|Got       |Expected    |
+# +---+----------+------------+
+# |  1|<html>    |<html>      |
+# |  2|  <head>  |  <head>    |
+# |  3|  <body>  |  <body>    |
+# |  4|    <h1>  |    <h1>    |
+# *  5|    <h2>  |      <h2>  *
+# +---+----------+------------+
 ok 793 - Parse error: qq'<a><p><a></a></p></a>'; 1:4:no DOCTYPE, 1:10:in a:a, 1:10:not closed, 1:21:unmatched end tag;Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE., Line: 1 Col: 9 Unexpected start tag (a) implies end tag (a)., Line: 1 Col: 9 End tag (a) violates step 1, paragraph 3 of the adoption agency algorithm., Line: 1 Col: 21 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm.
 ok 794 - SHOULD-level error: qq'<a><p><a></a></p></a>'; ;
 ok 795 - Document tree: qq'<a><p><a></a></p></a>'
@@ -1308,34 +1211,24 @@ ok 815 - SHOULD-level error: qq'<a><table><td><a><table></table><a></tr><a></tab
 not ok 816 - Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><a>'
 #   Failed test 'Document tree: qq'<a><table><td><a><table></table><a></tr><a></table><a>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <a>
-#                 <table>
-#               <a>
-#     <a>
-#     <a>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <a>
-#       <a>
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <a>
-#                 <table>
-#               <a>
-#     <a>
-# '
+# +---+-------------------------+---+-------------------------+
+# | Ln|Got                      | Ln|Expected                 |
+# +---+-------------------------+---+-------------------------+
+# |  1|<html>                   |  1|<html>                   |
+# |  2|  <head>                 |  2|  <head>                 |
+# |  3|  <body>                 |  3|  <body>                 |
+# |  4|    <a>                  |  4|    <a>                  |
+# |   |                         *  5|      <a>                *
+# |  5|      <table>            |  6|      <table>            |
+# |  6|        <tbody>          |  7|        <tbody>          |
+# |  7|          <tr>           |  8|          <tr>           |
+# |  8|            <td>         |  9|            <td>         |
+# |  9|              <a>        | 10|              <a>        |
+# | 10|                <table>  | 11|                <table>  |
+# | 11|              <a>        | 12|              <a>        |
+# * 12|    <a>                  *   |                         |
+# | 13|    <a>                  | 13|    <a>                  |
+# +---+-------------------------+---+-------------------------+
 ok 817 - Parse error: qq'<ul><li></li><div><li></div><li><li><div><li><address><li><b><em></b><li></ul>'; 1:5:no DOCTYPE, 1:46:not closed, 1:59:not closed, 1:70:not closed;Line: 1 Col: 4 Unexpected start tag (ul). Expected DOCTYPE., Line: 1 Col: 45 Missing end tag (div, li)., Line: 1 Col: 58 Missing end tag (address, li)., Line: 1 Col: 69 End tag (b) violates step 1, paragraph 3 of the adoption agency algorithm.
 ok 818 - SHOULD-level error: qq'<ul><li></li><div><li></div><li><li><div><li><address><li><b><em></b><li></ul>'; ;
 ok 819 - Document tree: qq'<ul><li></li><div><li></div><li><li><div><li><address><li><b><em></b><li></ul>'
@@ -1350,28 +1243,20 @@ ok 827 - SHOULD-level error: qq'<h1><table><td><h3></table><h3></h1>'; ;
 not ok 828 - Document tree: qq'<h1><table><td><h3></table><h3></h1>'
 #   Failed test 'Document tree: qq'<h1><table><td><h3></table><h3></h1>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <h1>
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <h3>
-#     <h3>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <h1>
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               <h3>
-#       <h3>
-# '
+# +---+--------------------+--------------------+
+# | Ln|Got                 |Expected            |
+# +---+--------------------+--------------------+
+# |  1|<html>              |<html>              |
+# |  2|  <head>            |  <head>            |
+# |  3|  <body>            |  <body>            |
+# |  4|    <h1>            |    <h1>            |
+# |  5|      <table>       |      <table>       |
+# |  6|        <tbody>     |        <tbody>     |
+# |  7|          <tr>      |          <tr>      |
+# |  8|            <td>    |            <td>    |
+# |  9|              <h3>  |              <h3>  |
+# * 10|    <h3>            |      <h3>          *
+# +---+--------------------+--------------------+
 ok 829 - Parse error: qq'<table><colgroup><col><colgroup><col><col><col><colgroup><col><col><thead><tr><td></table>'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE.
 ok 830 - SHOULD-level error: qq'<table><colgroup><col><colgroup><col><col><col><colgroup><col><col><thead><tr><td></table>'; ;
 ok 831 - Document tree: qq'<table><colgroup><col><colgroup><col><col><col><colgroup><col><col><thead><tr><td></table>'
@@ -1386,16 +1271,15 @@ ok 839 - SHOULD-level error: qq'</strong></b></em></i></u></strike></s></blink><
 not ok 840 - Document tree: qq'</strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>'
 #   Failed test 'Document tree: qq'</strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <br>
-#     <p>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-# '
+# +---+----------+---+----------+
+# | Ln|Got       | Ln|Expected  |
+# +---+----------+---+----------+
+# |  1|<html>    |  1|<html>    |
+# |  2|  <head>  |  2|  <head>  |
+# |  3|  <body>  |  3|  <body>  |
+# *  4|    <br>  *   |          |
+# *  5|    <p>   *   |          |
+# +---+----------+---+----------+
 ok 841 - Parse error: qq'<table><tr></strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>'; 1:8:no DOCTYPE, 1:21:in table:/, 1:21:unmatched end tag, 1:25:in table:/, 1:25:unmatched end tag, 1:30:in table:/, 1:30:unmatched end tag, 1:34:in table:/, 1:34:unmatched end tag, 1:38:in table:/, 1:38:unmatched end tag, 1:47:in table:/, 1:47:unmatched end tag, 1:51:in table:/, 1:51:unmatched end tag, 1:59:in table:/, 1:59:unmatched end tag, 1:64:in table:/, 1:64:unmatched end tag, 1:70:in table:/, 1:70:unmatched end tag, 1:76:in table:/, 1:76:unmatched end tag, 1:84:in table:/, 1:84:unmatched end tag, 1:91:in table:/, 1:91:unmatched end tag, 1:100:in table:/, 1:100:unmatched end tag, 1:105:in table:/, 1:105:unmatched end tag, 1:110:in table:/, 1:110:unmatched end tag, 1:115:in table:/, 1:115:unmatched end tag, 1:120:in table:/, 1:120:unmatched end tag, 1:125:in table:/, 1:125:unmatched end tag, 1:130:in table:/, 1:130:unmatched end tag, 1:137:unmatched end tag, 1:142:in table:/, 1:142:unmatched end tag, 1:146:in table:/, 1:146:unmatched end tag, 1:152:in table:/, 1:152:unmatched end tag, 1:160:in table:/, 1:160:unmatched end tag, 1:167:in table:/, 1:167:unmatched end tag, 1:175:in table:/, 1:175:unmatched end tag, 1:184:in table:/, 1:184:unmatched end tag, 1:197:unmatched end tag, 1:202:unmatched end tag, 1:207:unmatched end tag, 1:215:unmatched end tag, 1:222:unmatched end tag, 1:229:unmatched end tag, 1:237:unmatched end tag, 1:242:unmatched end tag, 1:250:unmatched end tag, 1:256:unmatched end tag, 1:263:unmatched end tag, 1:270:unmatched end tag, 1:281:unmatched end tag, 1:291:unmatched end tag, 1:299:unmatched end tag, 1:308:unmatched end tag, 1:312:unmatched end tag, 1:317:unmatched end tag, 1:322:unmatched end tag, 1:332:unmatched end tag, 1:343:unmatched end tag, 1:351:unmatched end tag, 1:359:unmatched end tag, 1:367:unmatched end tag, 1:377:unmatched end tag, 1:390:unmatched end tag, 1:399:unmatched end tag, 1:405:unmatched end tag, 1:411:unmatched end tag, 1:416:unmatched end tag, 1:427:unmatched end tag, 1:437:unmatched end tag, 1:444:unmatched end tag, 1:449:unmatched end tag, 1:454:unmatched end tag, 1:459:unmatched end tag, 1:466:unmatched end tag, 1:472:unmatched end tag, 1:479:unmatched end tag, 1:488:unmatched end tag, 1:498:unmatched end tag, 1:507:unmatched end tag, 1:525:after html:/, 1:525:unmatched end tag, 1:532:unmatched end tag, 1:541:unmatched end tag, 1:549:unmatched end tag, 1:559:unmatched end tag, 1:569:unmatched end tag, 1:580:unmatched end tag, 1:591:unmatched end tag, 1:602:unmatched end tag, 1:611:unmatched end tag, 1:623:unmatched end tag, 1:633:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE., Line: 1 Col: 20 Unexpected end tag (strong) in table context caused voodoo mode., Line: 1 Col: 20 End tag (strong) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 24 Unexpected end tag (b) in table context caused voodoo mode., Line: 1 Col: 24 End tag (b) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 29 Unexpected end tag (em) in table context caused voodoo mode., Line: 1 Col: 29 End tag (em) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 33 Unexpected end tag (i) in table context caused voodoo mode., Line: 1 Col: 33 End tag (i) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 37 Unexpected end tag (u) in table context caused voodoo mode., Line: 1 Col: 37 End tag (u) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 46 Unexpected end tag (strike) in table context caused voodoo mode., Line: 1 Col: 46 End tag (strike) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 50 Unexpected end tag (s) in table context caused voodoo mode., Line: 1 Col: 50 End tag (s) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 58 Unexpected end tag (blink) in table context caused voodoo mode., Line: 1 Col: 58 Unexpected end tag (blink). Ignored., Line: 1 Col: 63 Unexpected end tag (tt) in table context caused voodoo mode., Line: 1 Col: 63 End tag (tt) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 69 Unexpected end tag (pre) in table context caused voodoo mode., Line: 1 Col: 69 End tag (pre) seen too early. Expected other end tag., Line: 1 Col: 75 Unexpected end tag (big) in table context caused voodoo mode., Line: 1 Col: 75 End tag (big) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 83 Unexpected end tag (small) in table context caused voodoo mode., Line: 1 Col: 83 End tag (small) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 90 Unexpected end tag (font) in table context caused voodoo mode., Line: 1 Col: 90 End tag (font) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 99 Unexpected end tag (select) in table context caused voodoo mode., Line: 1 Col: 99 Unexpected end tag (select). Ignored., Line: 1 Col: 104 Unexpected end tag (h1) in table context caused voodoo mode., Line: 1 Col: 104 End tag (h1) seen too early. Expected other end tag., Line: 1 Col: 109 Unexpected end tag (h2) in table context caused voodoo mode., Line: 1 Col: 109 End tag (h2) seen too early. Expected other end tag., Line: 1 Col: 114 Unexpected end tag (h3) in table context caused voodoo mode., Line: 1 Col: 114 End tag (h3) seen too early. Expected other end tag., Line: 1 Col: 119 Unexpected end tag (h4) in table context caused voodoo mode., Line: 1 Col: 119 End tag (h4) seen too early. Expected other end tag., Line: 1 Col: 124 Unexpected end tag (h5) in table context caused voodoo mode., Line: 1 Col: 124 End tag (h5) seen too early. Expected other end tag., Line: 1 Col: 129 Unexpected end tag (h6) in table context caused voodoo mode., Line: 1 Col: 129 End tag (h6) seen too early. Expected other end tag., Line: 1 Col: 136 Unexpected end tag (body) in the table row phase. Ignored., Line: 1 Col: 141 Unexpected end tag (br) in table context caused voodoo mode., Line: 1 Col: 141 Unexpected end tag (br). Treated as br element., Line: 1 Col: 145 Unexpected end tag (a) in table context caused voodoo mode., Line: 1 Col: 145 End tag (a) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 151 Unexpected end tag (img) in table context caused voodoo mode., Line: 1 Col: 151 This element (img) has no end tag., Line: 1 Col: 159 Unexpected end tag (title) in table context caused voodoo mode., Line: 1 Col: 159 Unexpected end tag (title). Ignored., Line: 1 Col: 166 Unexpected end tag (span) in table context caused voodoo mode., Line: 1 Col: 166 Unexpected end tag (span). Ignored., Line: 1 Col: 174 Unexpected end tag (style) in table context caused voodoo mode., Line: 1 Col: 174 Unexpected end tag (style). Ignored., Line: 1 Col: 183 Unexpected end tag (script) in table context caused voodoo mode., Line: 1 Col: 183 Unexpected end tag (script). Ignored., Line: 1 Col: 196 Unexpected end tag (th). Ignored., Line: 1 Col: 201 Unexpected end tag (td). Ignored., Line: 1 Col: 206 Unexpected end tag (tr). Ignored., Line: 1 Col: 214 This element (frame) has no end tag., Line: 1 Col: 221 This element (area) has no end tag., Line: 1 Col: 228 Unexpected end tag (link). Ignored., Line: 1 Col: 236 This element (param) has no end tag., Line: 1 Col: 241 This element (hr) has no end tag., Line: 1 Col: 249 This element (input) has no end tag., Line: 1 Col: 255 Unexpected end tag (col). Ignored., Line: 1 Col: 262 Unexpected end tag (base). Ignored., Line: 1 Col: 269 Unexpected end tag (meta). Ignored., Line: 1 Col: 280 This element (basefont) has no end tag., Line: 1 Col: 290 This element (bgsound) has no end tag., Line: 1 Col: 298 This element (embed) has no end tag., Line: 1 Col: 307 This element (spacer) has no end tag., Line: 1 Col: 311 Unexpected end tag (p). Ignored., Line: 1 Col: 316 End tag (dd) seen too early. Expected other end tag., Line: 1 Col: 321 End tag (dt) seen too early. Expected other end tag., Line: 1 Col: 331 Unexpected end tag (caption). Ignored., Line: 1 Col: 342 Unexpected end tag (colgroup). Ignored., Line: 1 Col: 350 Unexpected end tag (tbody). Ignored., Line: 1 Col: 358 Unexpected end tag (tfoot). Ignored., Line: 1 Col: 366 Unexpected end tag (thead). Ignored., Line: 1 Col: 376 End tag (address) seen too early. Expected other end tag., Line: 1 Col: 389 End tag (blockquote) seen too early. Expected other end tag., Line: 1 Col: 398 End tag (center) seen too early. Expected other end tag., Line: 1 Col: 404 Unexpected end tag (dir). Ignored., Line: 1 Col: 410 End tag (div) seen too early. Expected other end tag., Line: 1 Col: 415 End tag (dl) seen too early. Expected other end tag., Line: 1 Col: 426 End tag (fieldset) seen too early. Expected other end tag., Line: 1 Col: 436 End tag (listing) seen too early. Expected other end tag., Line: 1 Col: 443 End tag (menu) seen too early. Expected other end tag., Line: 1 Col: 448 End tag (ol) seen too early. Expected other end tag., Line: 1 Col: 453 End tag (ul) seen too early. Expected other end tag., Line: 1 Col: 458 End tag (li) seen too early. Expected other end tag., Line: 1 Col: 465 End tag (nobr) violates step 1, paragraph 1 of the adoption agency algorithm., Line: 1 Col: 471 This element (wbr) has no end tag., Line: 1 Col: 478 End tag (form) seen too early. Ignored., Line: 1 Col: 487 End tag (button) seen too early. Expected other end tag., Line: 1 Col: 497 End tag (marquee) seen too early. Expected other end tag., Line: 1 Col: 506 End tag (object) seen too early. Expected other end tag., Line: 1 Col: 524 Unexpected end tag (). Ignored., Line: 1 Col: 524 Unexpected end tag (frameset). Ignored., Line: 1 Col: 531 Unexpected end tag (head). Ignored., Line: 1 Col: 540 Unexpected end tag (iframe). Ignored., Line: 1 Col: 548 This element (image) has no end tag., Line: 1 Col: 558 This element (isindex) has no end tag., Line: 1 Col: 568 Unexpected end tag (noembed). Ignored., Line: 1 Col: 579 Unexpected end tag (noframes). Ignored., Line: 1 Col: 590 Unexpected end tag (noscript). Ignored., Line: 1 Col: 601 Unexpected end tag (optgroup). Ignored., Line: 1 Col: 610 Unexpected end tag (option). Ignored., Line: 1 Col: 622 Unexpected end tag (plaintext). Ignored., Line: 1 Col: 633 Unexpected end tag (textarea). Ignored.
 ok 842 - SHOULD-level error: qq'<table><tr></strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>'; ;
 ok 843 - Document tree: qq'<table><tr></strong></b></em></i></u></strike></s></blink></tt></pre></big></small></font></select></h1></h2></h3></h4></h5></h6></body></br></a></img></title></span></style></script></table></th></td></tr></frame></area></link></param></hr></input></col></base></meta></basefont></bgsound></embed></spacer></p></dd></dt></caption></colgroup></tbody></tfoot></thead></address></blockquote></center></dir></div></dl></fieldset></listing></menu></ol></ul></li></nobr></wbr></form></button></marquee></object></html></frameset></head></iframe></image></isindex></noembed></noframes></noscript></optgroup></option></plaintext></textarea>'
@@ -1470,22 +1354,17 @@ ok 896 - SHOULD-level error: qq'<!doctypehtml><scrIPt type=text/x-foobar;baz>X</
 not ok 897 - Document tree: qq'<!doctypehtml><scrIPt type=text/x-foobar;baz>X</SCRipt'
 #   Failed test 'Document tree: qq'<!doctypehtml><scrIPt type=text/x-foobar;baz>X</SCRipt''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <script>
-#       type="text/x-foobar;baz"
-#       "X</SCRipt"
-#   <body>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <script>
-#       type="text/x-foobar;baz"
-#       "X"
-#   <body>
-# '
+# +---+--------------------------------+--------------------------------+
+# | Ln|Got                             |Expected                        |
+# +---+--------------------------------+--------------------------------+
+# |  1|<!DOCTYPE html>                 |<!DOCTYPE html>                 |
+# |  2|<html>                          |<html>                          |
+# |  3|  <head>                        |  <head>                        |
+# |  4|    <script>                    |    <script>                    |
+# |  5|      type="text/x-foobar;baz"  |      type="text/x-foobar;baz"  |
+# *  6|      "X</SCRipt"               |      "X"                       *
+# |  7|  <body>                        |  <body>                        |
+# +---+--------------------------------+--------------------------------+
 ok 898 - Parse error: qq'&'; 1:1:no DOCTYPE;Line: 1 Col: 1 Unexpected non-space characters. Expected DOCTYPE.
 ok 899 - SHOULD-level error: qq'&'; ;
 ok 900 - Document tree: qq'&'
@@ -1566,31 +1445,22 @@ ok 974 - SHOULD-level error: qq'<isindex test=x name=x>'; ;
 not ok 975 - Document tree: qq'<isindex test=x name=x>'
 #   Failed test 'Document tree: qq'<isindex test=x name=x>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <form>
-#       <hr>
-#       <label>
-#         "This is a searchable index. Enter search keywords: "
-#         <input>
-#           name="isindex"
-#           test="x"
-#       <hr>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <form>
-#       <hr>
-#       <p>
-#         <label>
-#           "This is a searchable index. Insert your search keywords here: "
-#           <input>
-#             name="isindex"
-#             test="x"
-#       <hr>
-# '
+# +---+---------------------------------------------------------------+---+----------------------------------------------------------------------------+
+# | Ln|Got                                                            | Ln|Expected                                                                    |
+# +---+---------------------------------------------------------------+---+----------------------------------------------------------------------------+
+# |  1|<html>                                                         |  1|<html>                                                                      |
+# |  2|  <head>                                                       |  2|  <head>                                                                    |
+# |  3|  <body>                                                       |  3|  <body>                                                                    |
+# |  4|    <form>                                                     |  4|    <form>                                                                  |
+# |  5|      <hr>                                                     |  5|      <hr>                                                                  |
+# *  6|      <label>                                                  *  6|      <p>                                                                   *
+# *  7|        "This is a searchable index. Enter search keywords: "  *  7|        <label>                                                             *
+# *  8|        <input>                                                *  8|          "This is a searchable index. Insert your search keywords here: "  *
+# *  9|          name="isindex"                                       *  9|          <input>                                                           *
+# * 10|          test="x"                                             * 10|            name="isindex"                                                  *
+# |   |                                                               * 11|            test="x"                                                        *
+# | 11|      <hr>                                                     | 12|      <hr>                                                                  |
+# +---+---------------------------------------------------------------+---+----------------------------------------------------------------------------+
 ok 976 - Parse error: qq'test\x{0A}test'; 2:0:no DOCTYPE;Line: 2 Col: 4 Unexpected non-space characters. Expected DOCTYPE.
 ok 977 - SHOULD-level error: qq'test\x{0A}test'; ;
 ok 978 - Document tree: qq'test\x{0A}test'
@@ -1655,22 +1525,17 @@ ok 1028 - SHOULD-level error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; ;
 not ok 1029 - Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'
 #   Failed test 'Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE <!doctype>
-# <html>
-#   <head>
-#   <body>
-#     ">"
-#     <!-- <!--x -->
-#     "-->"
-# '
-#     expected: '<!DOCTYPE <!DOCTYPE>
-# <html>
-#   <head>
-#   <body>
-#     ">"
-#     <!-- <!--x -->
-#     "-->"
-# '
+# +---+----------------------+----------------------+
+# | Ln|Got                   |Expected              |
+# +---+----------------------+----------------------+
+# *  1|<!DOCTYPE <!doctype>  |<!DOCTYPE <!DOCTYPE>  *
+# |  2|<html>                |<html>                |
+# |  3|  <head>              |  <head>              |
+# |  4|  <body>              |  <body>              |
+# |  5|    ">"               |    ">"               |
+# |  6|    <!-- <!--x -->    |    <!-- <!--x -->    |
+# |  7|    "-->"             |    "-->"             |
+# +---+----------------------+----------------------+
 # t/tree-construction/tests3.dat
 ok 1030 - Parse error: qq'<head></head><style></style>'; 1:7:no DOCTYPE, 1:21:after head;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE., Line: 1 Col: 20 Unexpected start tag (style) that can be in head. Moved.
 ok 1031 - SHOULD-level error: qq'<head></head><style></style>'; ;
@@ -1775,19 +1640,16 @@ ok 1115 - SHOULD-level error: qq'<style> <!-- </style>x'; ;
 not ok 1116 - Document tree: qq'<style> <!-- </style>x'
 #   Failed test 'Document tree: qq'<style> <!-- </style>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <style>
-#       " <!-- "
-#   <body>
-#     "x"
-# '
-#     expected: '<html>
-#   <head>
-#     <style>
-#       " <!-- </style>x"
-#   <body>
-# '
+# +---+----------------+---+-------------------------+
+# | Ln|Got             | Ln|Expected                 |
+# +---+----------------+---+-------------------------+
+# |  1|<html>          |  1|<html>                   |
+# |  2|  <head>        |  2|  <head>                 |
+# |  3|    <style>     |  3|    <style>              |
+# *  4|      " <!-- "  *  4|      " <!-- </style>x"  *
+# |  5|  <body>        |  5|  <body>                 |
+# *  6|    "x"         *   |                         |
+# +---+----------------+---+-------------------------+
 not ok 1117 - Parse error: qq'<style> <!-- </style> --> </style>x'; 1:8:no DOCTYPE, 1:35:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.
 #   Failed test 'Parse error: qq'<style> <!-- </style> --> </style>x'; 1:8:no DOCTYPE, 1:35:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.'
 #   at HTML-tree.t test () ok line 3.
@@ -1797,21 +1659,17 @@ ok 1118 - SHOULD-level error: qq'<style> <!-- </style> --> </style>x'; ;
 not ok 1119 - Document tree: qq'<style> <!-- </style> --> </style>x'
 #   Failed test 'Document tree: qq'<style> <!-- </style> --> </style>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <style>
-#       " <!-- "
-#     " "
-#   <body>
-#     "--> x"
-# '
-#     expected: '<html>
-#   <head>
-#     <style>
-#       " <!-- </style> --> "
-#   <body>
-#     "x"
-# '
+# +---+----------------+---+-----------------------------+
+# | Ln|Got             | Ln|Expected                     |
+# +---+----------------+---+-----------------------------+
+# |  1|<html>          |  1|<html>                       |
+# |  2|  <head>        |  2|  <head>                     |
+# |  3|    <style>     |  3|    <style>                  |
+# *  4|      " <!-- "  *  4|      " <!-- </style> --> "  *
+# *  5|    " "         *   |                             |
+# |  6|  <body>        |  5|  <body>                     |
+# *  7|    "--> x"     *  6|    "x"                      *
+# +---+----------------+---+-----------------------------+
 ok 1120 - Parse error: qq'<style> <!--> </style>x'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.
 ok 1121 - SHOULD-level error: qq'<style> <!--> </style>x'; ;
 ok 1122 - Document tree: qq'<style> <!--> </style>x'
@@ -1830,20 +1688,16 @@ ok 1130 - SHOULD-level error: qq'<iframe> <!--- </iframe>->x</iframe> --> </ifra
 not ok 1131 - Document tree: qq'<iframe> <!--- </iframe>->x</iframe> --> </iframe>x'
 #   Failed test 'Document tree: qq'<iframe> <!--- </iframe>->x</iframe> --> </iframe>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <iframe>
-#       " <!--- "
-#     "->x --> x"
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <iframe>
-#       " <!--- </iframe>->x</iframe> --> "
-#     "x"
-# '
+# +---+-----------------+-------------------------------------------+
+# | Ln|Got              |Expected                                   |
+# +---+-----------------+-------------------------------------------+
+# |  1|<html>           |<html>                                     |
+# |  2|  <head>         |  <head>                                   |
+# |  3|  <body>         |  <body>                                   |
+# |  4|    <iframe>     |    <iframe>                               |
+# *  5|      " <!--- "  |      " <!--- </iframe>->x</iframe> --> "  *
+# *  6|    "->x --> x"  |    "x"                                    *
+# +---+-----------------+-------------------------------------------+
 not ok 1132 - Parse error: qq'<script> <!-- </script> --> </script>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag;Line: 1 Col: 8 Unexpected start tag (script). Expected DOCTYPE.
 #   Failed test 'Parse error: qq'<script> <!-- </script> --> </script>x'; 1:9:no DOCTYPE, 1:38:unmatched end tag;Line: 1 Col: 8 Unexpected start tag (script). Expected DOCTYPE.'
 #   at HTML-tree.t test () ok line 3.
@@ -1853,21 +1707,17 @@ ok 1133 - SHOULD-level error: qq'<script> <!-- </script> --> </script>x'; ;
 not ok 1134 - Document tree: qq'<script> <!-- </script> --> </script>x'
 #   Failed test 'Document tree: qq'<script> <!-- </script> --> </script>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <script>
-#       " <!-- "
-#     " "
-#   <body>
-#     "--> x"
-# '
-#     expected: '<html>
-#   <head>
-#     <script>
-#       " <!-- </script> --> "
-#   <body>
-#     "x"
-# '
+# +---+----------------+---+------------------------------+
+# | Ln|Got             | Ln|Expected                      |
+# +---+----------------+---+------------------------------+
+# |  1|<html>          |  1|<html>                        |
+# |  2|  <head>        |  2|  <head>                      |
+# |  3|    <script>    |  3|    <script>                  |
+# *  4|      " <!-- "  *  4|      " <!-- </script> --> "  *
+# *  5|    " "         *   |                              |
+# |  6|  <body>        |  5|  <body>                      |
+# *  7|    "--> x"     *  6|    "x"                       *
+# +---+----------------+---+------------------------------+
 not ok 1135 - Parse error: qq'<title> <!-- </title> --> </title>x'; 1:8:no DOCTYPE, 1:35:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE.
 #   Failed test 'Parse error: qq'<title> <!-- </title> --> </title>x'; 1:8:no DOCTYPE, 1:35:unmatched end tag;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE.'
 #   at HTML-tree.t test () ok line 3.
@@ -1877,21 +1727,17 @@ ok 1136 - SHOULD-level error: qq'<title> <!-- </title> --> </title>x'; ;
 not ok 1137 - Document tree: qq'<title> <!-- </title> --> </title>x'
 #   Failed test 'Document tree: qq'<title> <!-- </title> --> </title>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <title>
-#       " <!-- "
-#     " "
-#   <body>
-#     "--> x"
-# '
-#     expected: '<html>
-#   <head>
-#     <title>
-#       " <!-- </title> --> "
-#   <body>
-#     "x"
-# '
+# +---+----------------+---+-----------------------------+
+# | Ln|Got             | Ln|Expected                     |
+# +---+----------------+---+-----------------------------+
+# |  1|<html>          |  1|<html>                       |
+# |  2|  <head>        |  2|  <head>                     |
+# |  3|    <title>     |  3|    <title>                  |
+# *  4|      " <!-- "  *  4|      " <!-- </title> --> "  *
+# *  5|    " "         *   |                             |
+# |  6|  <body>        |  5|  <body>                     |
+# *  7|    "--> x"     *  6|    "x"                      *
+# +---+----------------+---+-----------------------------+
 not ok 1138 - Parse error: qq'<textarea> <!--- </textarea>->x</textarea> --> </textarea>x'; 1:11:no DOCTYPE, 1:43:unmatched end tag, 1:59:unmatched end tag;Line: 1 Col: 10 Unexpected start tag (textarea). Expected DOCTYPE.
 #   Failed test 'Parse error: qq'<textarea> <!--- </textarea>->x</textarea> --> </textarea>x'; 1:11:no DOCTYPE, 1:43:unmatched end tag, 1:59:unmatched end tag;Line: 1 Col: 10 Unexpected start tag (textarea). Expected DOCTYPE.'
 #   at HTML-tree.t test () ok line 3.
@@ -1901,20 +1747,16 @@ ok 1139 - SHOULD-level error: qq'<textarea> <!--- </textarea>->x</textarea> --> 
 not ok 1140 - Document tree: qq'<textarea> <!--- </textarea>->x</textarea> --> </textarea>x'
 #   Failed test 'Document tree: qq'<textarea> <!--- </textarea>->x</textarea> --> </textarea>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <textarea>
-#       " <!--- "
-#     "->x --> x"
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     <textarea>
-#       " <!--- </textarea>->x</textarea> --> "
-#     "x"
-# '
+# +---+-----------------+-----------------------------------------------+
+# | Ln|Got              |Expected                                       |
+# +---+-----------------+-----------------------------------------------+
+# |  1|<html>           |<html>                                         |
+# |  2|  <head>         |  <head>                                       |
+# |  3|  <body>         |  <body>                                       |
+# |  4|    <textarea>   |    <textarea>                                 |
+# *  5|      " <!--- "  |      " <!--- </textarea>->x</textarea> --> "  *
+# *  6|    "->x --> x"  |    "x"                                        *
+# +---+-----------------+-----------------------------------------------+
 ok 1141 - Parse error: qq'<style> <!</-- </style>x'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (style). Expected DOCTYPE.
 ok 1142 - SHOULD-level error: qq'<style> <!</-- </style>x'; ;
 ok 1143 - Document tree: qq'<style> <!</-- </style>x'
@@ -1929,18 +1771,15 @@ ok 1151 - SHOULD-level error: qq'<title><!--&amp;--></title>'; ;
 not ok 1152 - Document tree: qq'<title><!--&amp;--></title>'
 #   Failed test 'Document tree: qq'<title><!--&amp;--></title>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <title>
-#       "<!--&-->"
-#   <body>
-# '
-#     expected: '<html>
-#   <head>
-#     <title>
-#       "<!--&amp;-->"
-#   <body>
-# '
+# +---+------------------+----------------------+
+# | Ln|Got               |Expected              |
+# +---+------------------+----------------------+
+# |  1|<html>            |<html>                |
+# |  2|  <head>          |  <head>              |
+# |  3|    <title>       |    <title>           |
+# *  4|      "<!--&-->"  |      "<!--&amp;-->"  *
+# |  5|  <body>          |  <body>              |
+# +---+------------------+----------------------+
 not ok 1153 - Parse error: qq'<title><!--</title>'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE., Line: 1 Col: 19 Unexpected end of file. Expected end tag (title).
 #   Failed test 'Parse error: qq'<title><!--</title>'; 1:8:no DOCTYPE;Line: 1 Col: 7 Unexpected start tag (title). Expected DOCTYPE., Line: 1 Col: 19 Unexpected end of file. Expected end tag (title).'
 #   at HTML-tree.t test () ok line 3.
@@ -1950,35 +1789,29 @@ ok 1154 - SHOULD-level error: qq'<title><!--</title>'; ;
 not ok 1155 - Document tree: qq'<title><!--</title>'
 #   Failed test 'Document tree: qq'<title><!--</title>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <title>
-#       "<!--"
-#   <body>
-# '
-#     expected: '<html>
-#   <head>
-#     <title>
-#       "<!--</title>"
-#   <body>
-# '
+# +---+--------------+----------------------+
+# | Ln|Got           |Expected              |
+# +---+--------------+----------------------+
+# |  1|<html>        |<html>                |
+# |  2|  <head>      |  <head>              |
+# |  3|    <title>   |    <title>           |
+# *  4|      "<!--"  |      "<!--</title>"  *
+# |  5|  <body>      |  <body>              |
+# +---+--------------+----------------------+
 ok 1156 - Parse error: qq'<noscript><!--</noscript>--></noscript>'; 1:11:no DOCTYPE;Line: 1 Col: 10 Unexpected start tag (noscript). Expected DOCTYPE.
 ok 1157 - SHOULD-level error: qq'<noscript><!--</noscript>--></noscript>'; ;
 not ok 1158 - Document tree: qq'<noscript><!--</noscript>--></noscript>'
 #   Failed test 'Document tree: qq'<noscript><!--</noscript>--></noscript>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#     <noscript>
-#       <!-- </noscript> -->
-#   <body>
-# '
-#     expected: '<html>
-#   <head>
-#     <noscript>
-#       "<!--</noscript>-->"
-#   <body>
-# '
+# +---+----------------------------+----------------------------+
+# | Ln|Got                         |Expected                    |
+# +---+----------------------------+----------------------------+
+# |  1|<html>                      |<html>                      |
+# |  2|  <head>                    |  <head>                    |
+# |  3|    <noscript>              |    <noscript>              |
+# *  4|      <!-- </noscript> -->  |      "<!--</noscript>-->"  *
+# |  5|  <body>                    |  <body>                    |
+# +---+----------------------------+----------------------------+
 # t/tree-construction/tests6.dat
 utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
 utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
@@ -2002,17 +1835,15 @@ ok 1163 - SHOULD-level error: qq'<!doctype html></html> <head>'; ;
 not ok 1164 - Document tree: qq'<!doctype html></html> <head>'
 #   Failed test 'Document tree: qq'<!doctype html></html> <head>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     " "
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# |  4|  <body>         |  4|  <body>         |
+# *  5|    " "          *   |                 |
+# +---+-----------------+---+-----------------+
 not ok 1165 - Parse error: qq'<!doctype html></body><meta>'; 1:28:after body;22: Stray end tag \x93body\x94., 28: \x93meta\x94 element outside \x93head\x94.
 #   Failed test 'Parse error: qq'<!doctype html></body><meta>'; 1:28:after body;22: Stray end tag \x93body\x94., 28: \x93meta\x94 element outside \x93head\x94.'
 #   at HTML-tree.t test () ok line 3.
@@ -2022,18 +1853,16 @@ ok 1166 - SHOULD-level error: qq'<!doctype html></body><meta>'; ;
 not ok 1167 - Document tree: qq'<!doctype html></body><meta>'
 #   Failed test 'Document tree: qq'<!doctype html></body><meta>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <meta>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <meta>
-#   <body>
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# *  4|  <body>         *   |                 |
+# |  5|    <meta>       |  4|    <meta>       |
+# |   |                 *  5|  <body>         *
+# +---+-----------------+---+-----------------+
 ok 1168 - Parse error: qq'<!doctype html><form><div></form><div>'; 1:34:not closed, 1:38:in body:\#eof;Line: 1 Col: 33 End tag (form) seen too early. Ignored., Line: 1 Col: 38 Expected closing tag. Unexpected end of file.
 ok 1169 - SHOULD-level error: qq'<!doctype html><form><div></form><div>'; ;
 ok 1170 - Document tree: qq'<!doctype html><form><div></form><div>'
@@ -2045,20 +1874,16 @@ ok 1175 - SHOULD-level error: qq'<!doctype html><title><!--&amp;--></title>'; ;
 not ok 1176 - Document tree: qq'<!doctype html><title><!--&amp;--></title>'
 #   Failed test 'Document tree: qq'<!doctype html><title><!--&amp;--></title>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <title>
-#       "<!--&-->"
-#   <body>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <title>
-#       "<!--&amp;-->"
-#   <body>
-# '
+# +---+------------------+----------------------+
+# | Ln|Got               |Expected              |
+# +---+------------------+----------------------+
+# |  1|<!DOCTYPE html>   |<!DOCTYPE html>       |
+# |  2|<html>            |<html>                |
+# |  3|  <head>          |  <head>              |
+# |  4|    <title>       |    <title>           |
+# *  5|      "<!--&-->"  |      "<!--&amp;-->"  *
+# |  6|  <body>          |  <body>              |
+# +---+------------------+----------------------+
 ok 1177 - Parse error: qq'<!doctype>'; 1:10:no space before DOCTYPE name, 1:10:no DOCTYPE name, 1:10:not HTML5;Line: 1 Col: 9 No space after literal string 'DOCTYPE'., Line: 1 Col: 10 Unexpected > character. Expected DOCTYPE name., Line: 1 Col: 10 Erroneous DOCTYPE.
 ok 1178 - SHOULD-level error: qq'<!doctype>'; ;
 ok 1179 - Document tree: qq'<!doctype>'
@@ -2196,16 +2021,15 @@ ok 1298 - SHOULD-level error: qq'<html></html><!-- foo -->'; ;
 not ok 1299 - Document tree: qq'<html></html><!-- foo -->'
 #   Failed test 'Document tree: qq'<html></html><!-- foo -->''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-# <!--  foo  -->
-# '
-#     expected: '<html>
-#   <!--  foo  -->
-#   <head>
-#   <body>
-# '
+# +---+----------------+---+------------------+
+# | Ln|Got             | Ln|Expected          |
+# +---+----------------+---+------------------+
+# |  1|<html>          |  1|<html>            |
+# |   |                *  2|  <!--  foo  -->  *
+# |  2|  <head>        |  3|  <head>          |
+# |  3|  <body>        |  4|  <body>          |
+# *  4|<!--  foo  -->  *   |                  |
+# +---+----------------+---+------------------+
 not ok 1300 - Parse error: qq'<body></body></html>'; 1:20:unmatched end tag;Line: 1 Col: 20 Unexpected html end tag in inner html mode., Line: 1 Col: 20 Unexpected EOF in inner html mode.
 #   Failed test 'Parse error: qq'<body></body></html>'; 1:20:unmatched end tag;Line: 1 Col: 20 Unexpected html end tag in inner html mode., Line: 1 Col: 20 Unexpected EOF in inner html mode.'
 #   at HTML-tree.t test () ok line 3.
@@ -2233,20 +2057,17 @@ ok 1310 - SHOULD-level error: qq'<!doctype html><body><title>X</title>'; ;
 not ok 1311 - Document tree: qq'<!doctype html><body><title>X</title>'
 #   Failed test 'Document tree: qq'<!doctype html><body><title>X</title>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <title>
-#       "X"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <title>
-#       "X"
-#   <body>
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# *  4|  <body>         *   |                 |
+# |  5|    <title>      |  4|    <title>      |
+# |  6|      "X"        |  5|      "X"        |
+# |   |                 *  6|  <body>         *
+# +---+-----------------+---+-----------------+
 not ok 1312 - Parse error: qq'<!doctype html><table><title>X</title></table>'; 1:30:in table;Line: 1 Col: 29 Unexpected start tag (title) in table context caused voodoo mode., Line: 1 Col: 38 Unexpected end tag (title) in table context caused voodoo mode.
 #   Failed test 'Parse error: qq'<!doctype html><table><title>X</title></table>'; 1:30:in table;Line: 1 Col: 29 Unexpected start tag (title) in table context caused voodoo mode., Line: 1 Col: 38 Unexpected end tag (title) in table context caused voodoo mode.'
 #   at HTML-tree.t test () ok line 3.
@@ -2256,22 +2077,18 @@ ok 1313 - SHOULD-level error: qq'<!doctype html><table><title>X</title></table>'
 not ok 1314 - Document tree: qq'<!doctype html><table><title>X</title></table>'
 #   Failed test 'Document tree: qq'<!doctype html><table><title>X</title></table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <title>
-#       "X"
-#     <table>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <title>
-#       "X"
-#   <body>
-#     <table>
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# *  4|  <body>         *   |                 |
+# |  5|    <title>      |  4|    <title>      |
+# |  6|      "X"        |  5|      "X"        |
+# |   |                 *  6|  <body>         *
+# |  7|    <table>      |  7|    <table>      |
+# +---+-----------------+---+-----------------+
 ok 1315 - Parse error: qq'<!doctype html><head></head><title>X</title>'; 1:36:after head;Line: 1 Col: 35 Unexpected start tag (title) that can be in head. Moved.
 ok 1316 - SHOULD-level error: qq'<!doctype html><head></head><title>X</title>'; ;
 ok 1317 - Document tree: qq'<!doctype html><head></head><title>X</title>'
@@ -2283,20 +2100,17 @@ ok 1322 - SHOULD-level error: qq'<!doctype html></body><title>X</title>'; ;
 not ok 1323 - Document tree: qq'<!doctype html></body><title>X</title>'
 #   Failed test 'Document tree: qq'<!doctype html></body><title>X</title>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <title>
-#       "X"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <title>
-#       "X"
-#   <body>
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# *  4|  <body>         *   |                 |
+# |  5|    <title>      |  4|    <title>      |
+# |  6|      "X"        |  5|      "X"        |
+# |   |                 *  6|  <body>         *
+# +---+-----------------+---+-----------------+
 ok 1324 - Parse error: qq'<!doctype html><table><meta></table>'; 1:29:in table;Line: 1 Col: 28 Unexpected start tag (meta) in table context caused voodoo mode.
 ok 1325 - SHOULD-level error: qq'<!doctype html><table><meta></table>'; ;
 ok 1326 - Document tree: qq'<!doctype html><table><meta></table>'
@@ -2309,23 +2123,18 @@ ok 1328 - SHOULD-level error: qq'<!doctype html><table> X<meta></table>'; ;
 not ok 1329 - Document tree: qq'<!doctype html><table> X<meta></table>'
 #   Failed test 'Document tree: qq'<!doctype html><table> X<meta></table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     " X"
-#     <meta>
-#     <table>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "X"
-#     <meta>
-#     <table>
-#       " "
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# |  4|  <body>         |  4|  <body>         |
+# *  5|    " X"         *  5|    "X"          *
+# |  6|    <meta>       |  6|    <meta>       |
+# |  7|    <table>      |  7|    <table>      |
+# |   |                 *  8|      " "        *
+# +---+-----------------+---+-----------------+
 ok 1330 - Parse error: qq'<!doctype html><table>X<tr><td><table> <meta></table></table>'; 1:28:in table:\#text, 1:46:in table;Line: 1 Col: 23 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 45 Unexpected start tag (meta) in table context caused voodoo mode.
 ok 1331 - SHOULD-level error: qq'<!doctype html><table>X<tr><td><table> <meta></table></table>'; ;
 ok 1332 - Document tree: qq'<!doctype html><table>X<tr><td><table> <meta></table></table>'
@@ -2340,65 +2149,51 @@ ok 1340 - SHOULD-level error: qq'<!doctype html><table> x</table>'; ;
 not ok 1341 - Document tree: qq'<!doctype html><table> x</table>'
 #   Failed test 'Document tree: qq'<!doctype html><table> x</table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     " x"
-#     <table>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "x"
-#     <table>
-#       " "
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# |  4|  <body>         |  4|  <body>         |
+# *  5|    " x"         *  5|    "x"          *
+# |  6|    <table>      |  6|    <table>      |
+# |   |                 *  7|      " "        *
+# +---+-----------------+---+-----------------+
 ok 1342 - Parse error: qq'<!doctype html><table> x </table>'; 1:33:in table:\#text;Line: 1 Col: 25 Unexpected non-space characters in table context caused voodoo mode.
 ok 1343 - SHOULD-level error: qq'<!doctype html><table> x </table>'; ;
 not ok 1344 - Document tree: qq'<!doctype html><table> x </table>'
 #   Failed test 'Document tree: qq'<!doctype html><table> x </table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     " x "
-#     <table>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "x "
-#     <table>
-#       " "
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# |  4|  <body>         |  4|  <body>         |
+# *  5|    " x "        *  5|    "x "         *
+# |  6|    <table>      |  6|    <table>      |
+# |   |                 *  7|      " "        *
+# +---+-----------------+---+-----------------+
 ok 1345 - Parse error: qq'<!doctype html><table><tr> x</table>'; 1:36:in table:\#text;Line: 1 Col: 28 Unexpected non-space characters in table context caused voodoo mode.
 ok 1346 - SHOULD-level error: qq'<!doctype html><table><tr> x</table>'; ;
 not ok 1347 - Document tree: qq'<!doctype html><table><tr> x</table>'
 #   Failed test 'Document tree: qq'<!doctype html><table><tr> x</table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     " x"
-#     <table>
-#       <tbody>
-#         <tr>
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "x"
-#     <table>
-#       <tbody>
-#         <tr>
-#           " "
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# |  4|  <body>         |  4|  <body>         |
+# *  5|    " x"         *  5|    "x"          *
+# |  6|    <table>      |  6|    <table>      |
+# |  7|      <tbody>    |  7|      <tbody>    |
+# |  8|        <tr>     |  8|        <tr>     |
+# |   |                 *  9|          " "    *
+# +---+-----------------+---+-----------------+
 not ok 1348 - Parse error: qq'<!doctype html><table><style> <tr>x </style> </table>'; ;Line: 1 Col: 44 Unexpected end tag (style) in table context caused voodoo mode.
 #   Failed test 'Parse error: qq'<!doctype html><table><style> <tr>x </style> </table>'; ;Line: 1 Col: 44 Unexpected end tag (style) in table context caused voodoo mode.'
 #   at HTML-tree.t test () ok line 3.
@@ -2422,26 +2217,22 @@ ok 1355 - SHOULD-level error: qq'<!doctype html><table>X<style> <tr>x </style> <
 not ok 1356 - Document tree: qq'<!doctype html><table>X<style> <tr>x </style> </table>'
 #   Failed test 'Document tree: qq'<!doctype html><table>X<style> <tr>x </style> </table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "X"
-#     <table>
-#       <style>
-#         " <tr>x "
-#       " "
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "X"
-#     <style>
-#       " <tr>x "
-#     " "
-#     <table>
-# '
+# +---+-------------------+---+-----------------+
+# | Ln|Got                | Ln|Expected         |
+# +---+-------------------+---+-----------------+
+# |  1|<!DOCTYPE html>    |  1|<!DOCTYPE html>  |
+# |  2|<html>             |  2|<html>           |
+# |  3|  <head>           |  3|  <head>         |
+# |  4|  <body>           |  4|  <body>         |
+# |  5|    "X"            |  5|    "X"          |
+# |   |                   *  6|    <style>      *
+# |   |                   *  7|      " <tr>x "  *
+# |   |                   *  8|    " "          *
+# |  6|    <table>        |  9|    <table>      |
+# *  7|      <style>      *   |                 |
+# *  8|        " <tr>x "  *   |                 |
+# *  9|      " "          *   |                 |
+# +---+-------------------+---+-----------------+
 ok 1357 - Parse error: qq'<!doctype html><p><applet><p>X</p></applet>'; ;
 ok 1358 - SHOULD-level error: qq'<!doctype html><p><applet><p>X</p></applet>'; ;
 ok 1359 - Document tree: qq'<!doctype html><p><applet><p>X</p></applet>'
@@ -2466,24 +2257,20 @@ ok 1373 - SHOULD-level error: qq'<!doctype html><table>X<input type=hidDEN></tab
 not ok 1374 - Document tree: qq'<!doctype html><table>X<input type=hidDEN></table>'
 #   Failed test 'Document tree: qq'<!doctype html><table>X<input type=hidDEN></table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "X"
-#     <table>
-#       <input>
-#         type="hidDEN"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     "X"
-#     <input>
-#       type="hidDEN"
-#     <table>
-# '
+# +---+-----------------------+---+---------------------+
+# | Ln|Got                    | Ln|Expected             |
+# +---+-----------------------+---+---------------------+
+# |  1|<!DOCTYPE html>        |  1|<!DOCTYPE html>      |
+# |  2|<html>                 |  2|<html>               |
+# |  3|  <head>               |  3|  <head>             |
+# |  4|  <body>               |  4|  <body>             |
+# |  5|    "X"                |  5|    "X"              |
+# |   |                       *  6|    <input>          *
+# |   |                       *  7|      type="hidDEN"  *
+# |  6|    <table>            |  8|    <table>          |
+# *  7|      <input>          *   |                     |
+# *  8|        type="hidDEN"  *   |                     |
+# +---+-----------------------+---+---------------------+
 ok 1375 - Parse error: qq'<!doctype html><table>  <input type=hidDEN></table>'; 1:44:in table;Line: 1 Col: 43 Unexpected input with type hidden in table context.
 ok 1376 - SHOULD-level error: qq'<!doctype html><table>  <input type=hidDEN></table>'; ;
 ok 1377 - Document tree: qq'<!doctype html><table>  <input type=hidDEN></table>'
@@ -2499,26 +2286,21 @@ ok 1382 - SHOULD-level error: qq'<!doctype html><table><input type=" hidden"><in
 not ok 1383 - Document tree: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>'
 #   Failed test 'Document tree: qq'<!doctype html><table><input type=" hidden"><input type=hidDEN></table>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <input>
-#       type=" hidden"
-#     <table>
-#       <input>
-#         type="hidDEN"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <input>
-#       type=" hidden"
-#     <input>
-#       type="hidDEN"
-#     <table>
-# '
+# +---+-----------------------+---+----------------------+
+# | Ln|Got                    | Ln|Expected              |
+# +---+-----------------------+---+----------------------+
+# |  1|<!DOCTYPE html>        |  1|<!DOCTYPE html>       |
+# |  2|<html>                 |  2|<html>                |
+# |  3|  <head>               |  3|  <head>              |
+# |  4|  <body>               |  4|  <body>              |
+# |  5|    <input>            |  5|    <input>           |
+# |  6|      type=" hidden"   |  6|      type=" hidden"  |
+# |   |                       *  7|    <input>           *
+# |   |                       *  8|      type="hidDEN"   *
+# |  7|    <table>            |  9|    <table>           |
+# *  8|      <input>          *   |                      |
+# *  9|        type="hidDEN"  *   |                      |
+# +---+-----------------------+---+----------------------+
 ok 1384 - Parse error: qq'<!doctype html><table><select>X<tr>'; 1:31:in table, 1:35:not closed, 1:35:in body:\#eof;Line: 1 Col: 30 Unexpected start tag (select) in table context caused voodoo mode., Line: 1 Col: 35 Unexpected table element start tag (trs) in the select in table phase., Line: 1 Col: 35 Expected closing tag. Unexpected end of file.
 ok 1385 - SHOULD-level error: qq'<!doctype html><table><select>X<tr>'; ;
 ok 1386 - Document tree: qq'<!doctype html><table><select>X<tr>'
@@ -2530,31 +2312,27 @@ ok 1391 - SHOULD-level error: qq'<!DOCTYPE hTmL><html></html>'; ;
 not ok 1392 - Document tree: qq'<!DOCTYPE hTmL><html></html>'
 #   Failed test 'Document tree: qq'<!DOCTYPE hTmL><html></html>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-# '
-#     expected: '<!DOCTYPE hTmL>
-# <html>
-#   <head>
-#   <body>
-# '
+# +---+-----------------+-----------------+
+# | Ln|Got              |Expected         |
+# +---+-----------------+-----------------+
+# *  1|<!DOCTYPE html>  |<!DOCTYPE hTmL>  *
+# |  2|<html>           |<html>           |
+# |  3|  <head>         |  <head>         |
+# |  4|  <body>         |  <body>         |
+# +---+-----------------+-----------------+
 ok 1393 - Parse error: qq'<!DOCTYPE HTML><html></html>'; ;
 ok 1394 - SHOULD-level error: qq'<!DOCTYPE HTML><html></html>'; ;
 not ok 1395 - Document tree: qq'<!DOCTYPE HTML><html></html>'
 #   Failed test 'Document tree: qq'<!DOCTYPE HTML><html></html>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-# '
-#     expected: '<!DOCTYPE HTML>
-# <html>
-#   <head>
-#   <body>
-# '
+# +---+-----------------+-----------------+
+# | Ln|Got              |Expected         |
+# +---+-----------------+-----------------+
+# *  1|<!DOCTYPE html>  |<!DOCTYPE HTML>  *
+# |  2|<html>           |<html>           |
+# |  3|  <head>         |  <head>         |
+# |  4|  <body>         |  <body>         |
+# +---+-----------------+-----------------+
 not ok 1396 - Parse error: qq'<body>X</body></body>'; 1:21:after body:/;Line: 1 Col: 21 Unexpected end tag token (body) in the after body phase., Line: 1 Col: 21 Unexpected EOF in inner html mode.
 #   Failed test 'Parse error: qq'<body>X</body></body>'; 1:21:after body:/;Line: 1 Col: 21 Unexpected end tag token (body) in the after body phase., Line: 1 Col: 21 Unexpected EOF in inner html mode.'
 #   at HTML-tree.t test () ok line 3.
@@ -2571,35 +2349,25 @@ ok 1400 - SHOULD-level error: qq'<!doctype html><div><table><a>foo</a> <tr><td>b
 not ok 1401 - Document tree: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>'
 #   Failed test 'Document tree: qq'<!doctype html><div><table><a>foo</a> <tr><td>bar</td> </tr></table></div>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <div>
-#       <a>
-#         "foo"
-#       <table>
-#         " "
-#         <tbody>
-#           <tr>
-#             <td>
-#               "bar"
-#             " "
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <div>
-#       <a>
-#         "foo"
-#       "  "
-#       <table>
-#         <tbody>
-#           <tr>
-#             <td>
-#               "bar"
-# '
+# +---+---------------------+---+---------------------+
+# | Ln|Got                  | Ln|Expected             |
+# +---+---------------------+---+---------------------+
+# |  1|<!DOCTYPE html>      |  1|<!DOCTYPE html>      |
+# |  2|<html>               |  2|<html>               |
+# |  3|  <head>             |  3|  <head>             |
+# |  4|  <body>             |  4|  <body>             |
+# |  5|    <div>            |  5|    <div>            |
+# |  6|      <a>            |  6|      <a>            |
+# |  7|        "foo"        |  7|        "foo"        |
+# |   |                     *  8|      "  "           *
+# |  8|      <table>        |  9|      <table>        |
+# *  9|        " "          *   |                     |
+# | 10|        <tbody>      | 10|        <tbody>      |
+# | 11|          <tr>       | 11|          <tr>       |
+# | 12|            <td>     | 12|            <td>     |
+# | 13|              "bar"  | 13|              "bar"  |
+# * 14|            " "      *   |                     |
+# +---+---------------------+---+---------------------+
 ok 1402 - Parse error: qq'<div><p>a</x> b'; 1:6:no DOCTYPE, 1:14:unmatched end tag, 1:15:in body:\#eof;Line: 1 Col: 5 Unexpected start tag (div). Expected DOCTYPE., Line: 1 Col: 13 Unexpected end tag (x). Ignored., Line: 1 Col: 15 Expected closing tag. Unexpected end of file.
 ok 1403 - SHOULD-level error: qq'<div><p>a</x> b'; ;
 ok 1404 - Document tree: qq'<div><p>a</x> b'
@@ -2628,19 +2396,16 @@ ok 1421 - SHOULD-level error: qq'x<table>x'; ;
 not ok 1422 - Document tree: qq'x<table>x'
 #   Failed test 'Document tree: qq'x<table>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     "x"
-#     "x"
-#     <table>
-# '
-#     expected: '<html>
-#   <head>
-#   <body>
-#     "xx"
-#     <table>
-# '
+# +---+-------------+---+-------------+
+# | Ln|Got          | Ln|Expected     |
+# +---+-------------+---+-------------+
+# |  1|<html>       |  1|<html>       |
+# |  2|  <head>     |  2|  <head>     |
+# |  3|  <body>     |  3|  <body>     |
+# *  4|    "x"      *  4|    "xx"     *
+# *  5|    "x"      *   |             |
+# |  6|    <table>  |  5|    <table>  |
+# +---+-------------+---+-------------+
 ok 1423 - Parse error: qq'x<table><table>x'; 1:2:no DOCTYPE, 1:16:not closed, 1:16:in table:\#text, 1:16:in body:\#eof;Line: 1 Col: 1 Unexpected non-space characters. Expected DOCTYPE., Line: 1 Col: 15 Unexpected start tag (table) implies end tag (table)., Line: 1 Col: 16 Unexpected non-space characters in table context caused voodoo mode., Line: 1 Col: 16 Expected closing tag. Unexpected end of file.
 ok 1424 - SHOULD-level error: qq'x<table><table>x'; ;
 ok 1425 - Document tree: qq'x<table><table>x'
@@ -3163,35 +2928,31 @@ ok 1928 - SHOULD-level error: qq'<!DOCTYPE HTML><head></body><link>x'; ;
 not ok 1929 - Document tree: qq'<!DOCTYPE HTML><head></body><link>x'
 #   Failed test 'Document tree: qq'<!DOCTYPE HTML><head></body><link>x''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<!DOCTYPE html>
-# <html>
-#   <head>
-#   <body>
-#     <link>
-#     "x"
-# '
-#     expected: '<!DOCTYPE html>
-# <html>
-#   <head>
-#     <link>
-#   <body>
-#     "x"
-# '
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# *  4|  <body>         *   |                 |
+# |  5|    <link>       |  4|    <link>       |
+# |   |                 *  5|  <body>         *
+# |  6|    "x"          |  6|    "x"          |
+# +---+-----------------+---+-----------------+
 ok 1930 - Parse error: qq'<head></html><link>'; 1:7:no DOCTYPE, 1:19:after html;no <!DOCTYPE>, </html> in <head>
 ok 1931 - SHOULD-level error: qq'<head></html><link>'; ;
 not ok 1932 - Document tree: qq'<head></html><link>'
 #   Failed test 'Document tree: qq'<head></html><link>''
 #   at HTML-tree.t test () ok line 9.
-#          got: '<html>
-#   <head>
-#   <body>
-#     <link>
-# '
-#     expected: '<html>
-#   <head>
-#     <link>
-#   <body>
-# '
+# +---+------------+---+------------+
+# | Ln|Got         | Ln|Expected    |
+# +---+------------+---+------------+
+# |  1|<html>      |  1|<html>      |
+# |  2|  <head>    |  2|  <head>    |
+# *  3|  <body>    *   |            |
+# |  4|    <link>  |  3|    <link>  |
+# |   |            *  4|  <body>    *
+# +---+------------+---+------------+
 ok 1933 - Parse error: qq'<head></p><link>'; 1:7:no DOCTYPE, 1:11:unmatched end tag;no <!DOCTYPE>, </p> in head
 ok 1934 - SHOULD-level error: qq'<head></p><link>'; ;
 ok 1935 - Document tree: qq'<head></p><link>'

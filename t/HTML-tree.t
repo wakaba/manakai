@@ -4,9 +4,9 @@ use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use Test::More;
+use Test::Differences;
 use Encode;
 sub bytes ($) { encode 'utf8', $_[0] }
-
 my $DEBUG = $ENV{DEBUG};
 
 my $test_dir_name = 't/';
@@ -120,7 +120,7 @@ sub test ($) {
     join (', ', @shoulds) . ';' . join (', ', @{$test->{shoulds}->[0] or []});
 
   $test->{document}->[0] .= "\x0A" if length $test->{document}->[0];
-  is $result, $test->{document}->[0], bytes
+  eq_or_diff $result, $test->{document}->[0], bytes
       'Document tree: ' . Data::Dumper::qquote ($test->{data}->[0]);
 } # test
 
