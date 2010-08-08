@@ -1,16 +1,16 @@
-#!/usr/bin/perl
+package test::Whatpm::HTML::Parser::tree;
 use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use Test::More;
+use Encode;
+sub bytes ($) { encode 'utf8', $_[0] }
 
 my $DEBUG = $ENV{DEBUG};
 
 my $test_dir_name = 't/';
 my $dir_name = 't/tree-construction/';
-
-use Test;
-BEGIN { plan tests => 5376 }
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -54,7 +54,9 @@ sub test ($) {
 
   if ($test->{skip}->[1]->[0]) {
 #line 1 "HTML-tree.t test () skip"
-    skip 1;
+    SKIP: {
+      skip "", 1;
+    }
     return;
   }
 
@@ -110,15 +112,15 @@ sub test ($) {
   warn "No #errors section ($test->{data}->[0])" unless $test->{errors};
     
 #line 1 "HTML-tree.t test () ok"
-  ok scalar @errors, scalar @{$test->{errors}->[0] or []},
+  is scalar @errors, scalar @{$test->{errors}->[0] or []}, bytes
     'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' . 
     join (', ', @errors) . ';' . join (', ', @{$test->{errors}->[0] or []});
-  ok scalar @shoulds, scalar @{$test->{shoulds}->[0] or []},
+  is scalar @shoulds, scalar @{$test->{shoulds}->[0] or []}, bytes
     'SHOULD-level error: ' . Data::Dumper::qquote ($test->{data}->[0]) . '; ' .
     join (', ', @shoulds) . ';' . join (', ', @{$test->{shoulds}->[0] or []});
 
   $test->{document}->[0] .= "\x0A" if length $test->{document}->[0];
-  ok $result, $test->{document}->[0],
+  is $result, $test->{document}->[0], bytes
       'Document tree: ' . Data::Dumper::qquote ($test->{data}->[0]);
 } # test
 
@@ -160,4 +162,5 @@ execute_test ($_, {
   'document-fragment' => {is_prefixed => 1},
 }, \&test) for @FILES;
 
+done_testing;
 ## License: Public Domain.
