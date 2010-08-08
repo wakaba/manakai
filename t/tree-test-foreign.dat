@@ -2091,3 +2091,39 @@ elements not closed before EOF
 |             <svg svg>
 |               <svg td>
 |     "a"
+
+#data
+<!DOCTYPE html><table><tr><td><svg><tbody></tbody>
+#errors
+EOF in foreign content
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg tbody>
+
+#data
+<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a
+#errors
+text in table
+EOF in foreign content
+elements not closed before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     "a"
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg tbody>

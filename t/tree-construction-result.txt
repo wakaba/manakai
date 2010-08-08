@@ -7026,5 +7026,11 @@ ok 5808 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'
 ok 5809 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
 ok 5810 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
 ok 5811 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'
-1..5811
-# Looks like you failed 147 tests of 5811.
+ok 5812 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; 1:50:not closed, 1:50:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5813 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; ;
+ok 5814 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'
+ok 5815 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; 1:51:not closed, 1:51:in table:\#text, 1:51:in body:\#eof;text in table, EOF in foreign content, elements not closed before EOF
+ok 5816 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; ;
+ok 5817 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'
+1..5817
+# Looks like you failed 147 tests of 5817.
