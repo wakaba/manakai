@@ -668,13 +668,14 @@ sub check_element ($$$;$) {
 next unless $code;## TODO: temp.
       $code->(@$item);
     } elsif ($item->{type} eq 'element') {
-      my $el_nsuri = $item->{node}->namespace_uri;
+      my $el = $item->{node};
+      my $el_nsuri = $el->namespace_uri;
       if (defined $el_nsuri) {
         load_ns_module ($el_nsuri);
       } else {
         $el_nsuri = '';
       }
-      my $el_ln = $item->{node}->manakai_local_name;
+      my $el_ln = $el->manakai_local_name;
       
       my $element_state = {};
       my $eldef = $Element->{$el_nsuri}->{$el_ln} ||
@@ -687,24 +688,31 @@ next unless $code;## TODO: temp.
               ? $item->{parent_state} || $element_state : $element_state
           : $element_state;
 
+      my $prefix = $el->prefix;
+      if (defined $prefix and $prefix eq 'xmlns') {
+        $self->{onerror}->(node => $el, 
+                           type => 'Reserved Prefixes and Namespace Names:<xmlns:>',
+                           level => $self->{level}->{nc});
+      }
+
       unless ($eldef->{status} & FEATURE_STATUS_REC) {
         my $status = $eldef->{status} & FEATURE_STATUS_CR ? 'cr' :
             $eldef->{status} & FEATURE_STATUS_LC ? 'lc' :
             $eldef->{status} & FEATURE_STATUS_WD ? 'wd' : 'non-standard';
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'status:'.$status.':element',
                            level => $self->{level}->{info});
       }
       if (not ($eldef->{status} & FEATURE_ALLOWED)) {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'element not defined',
                            level => $self->{level}->{must});
       } elsif ($eldef->{status} & FEATURE_DEPRECATED_SHOULD) {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'deprecated:element',
                            level => $self->{level}->{should});
       } elsif ($eldef->{status} & FEATURE_DEPRECATED_INFO) {
-        $self->{onerror}->(node => $item->{node},
+        $self->{onerror}->(node => $el,
                            type => 'deprecated:element',
                            level => $self->{level}->{info});
       }
@@ -714,7 +722,7 @@ next unless $code;## TODO: temp.
       push @new_item, [$eldef->{check_attrs}, $self, $item, $element_state];
       push @new_item, [$eldef->{check_attrs2}, $self, $item, $element_state];
       
-      my @child = @{$item->{node}->child_nodes};
+      my @child = @{$el->child_nodes};
       while (@child) {
         my $child = shift @child;
         my $child_nt = $child->node_type;

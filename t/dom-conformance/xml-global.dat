@@ -46,8 +46,17 @@
 #data
 <xmlns:a/>
 #errors
-/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC
+/a;Reserved Prefixes and Namespace Names:<xmlns:>;m
 /a;unknown element;u
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">foo
+  <xmlns:a/>
+</p>
+#errors
+/p/a;Reserved Prefixes and Namespace Names:<xmlns:>;m
+/p/a;unknown element;u
+/p/a;element not allowed:phrasing;m
 
 #data
 <xmlns/>
