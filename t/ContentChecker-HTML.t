@@ -7,7 +7,6 @@ use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 
 BEGIN {
   require 'content-checker.pl';
-  plan (tests => 7891);
 }
 
 test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
@@ -39,5 +38,7 @@ test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/dom-conformance/html-datatemplate.dat
   t/dom-conformance/html-frames.dat
 ]);
+
+done_testing;
 
 ## License: Public Domain.
