@@ -9409,8 +9409,8 @@ $Element->{+HTML_NS}->{noframes} = {
 ## command/@default, dl/@type, font/@pointsize, layer/@*,
 ## menu/@autosubmit, multicol/@baseline, multicol/@height,
 ## multicol/@width, multicol/@gutter, multicol/@cols, nextid/@n,
-## object/@content-length, script/@implements, section/@cite,
-## style/@disabled
+## object/@content-length, option/@name, script/@implements,
+## section/@cite, style/@disabled
 
 $Whatpm::ContentChecker::Namespace->{+HTML_NS}->{loaded} = 1;
 
