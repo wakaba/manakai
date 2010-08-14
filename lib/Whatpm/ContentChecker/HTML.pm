@@ -4723,11 +4723,15 @@ $Element->{+HTML_NS}->{i} = {
     my ($self, $item, $element_state) = @_;
     my $el = $item->{node}; # <i> or <b>
 
+    if ($el->manakai_local_name eq 'b') {
+      $self->{onerror}->(type => 'last resort', # XXXtype
+                         node => $el,
+                         level => $self->{level}->{should});
+    }
+
     if ($el->has_attribute_ns (undef, 'class')) {
       if ($el->manakai_local_name eq 'b') {
-        $self->{onerror}->(type => 'last resort', # XXXtype
-                           node => $el,
-                           level => $self->{level}->{should});
+        #
       } else {
         $self->{onerror}->(type => 'last resort', # XXXtype
                            node => $el,
