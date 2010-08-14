@@ -4,10 +4,10 @@ require Whatpm::ContentChecker;
 
 require Whatpm::URIChecker;
 
-my $ATOM_NS = q<http://www.w3.org/2005/Atom>;
-my $THR_NS = q<http://purl.org/syndication/thread/1.0>;
-my $FH_NS = q<http://purl.org/syndication/history/1.0>;
-my $LINK_REL = q<http://www.iana.org/assignments/relation/>;
+sub ATOM_NS () { q<http://www.w3.org/2005/Atom> }
+sub THR_NS () { q<http://purl.org/syndication/thread/1.0> }
+sub FH_NS () { q<http://purl.org/syndication/history/1.0> }
+sub LINK_REL () { q<http://www.iana.org/assignments/relation/> }
 
 sub FEATURE_RFC4287 () {
   Whatpm::ContentChecker::FEATURE_STATUS_CR |
@@ -201,7 +201,7 @@ my %AtomPersonConstruct = (
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $ATOM_NS) {
+    } elsif ($child_nsuri eq ATOM_NS) {
       if ($child_ln eq 'name') {
         if ($element_state->{has_name}) {
           $self->{onerror}
@@ -267,12 +267,12 @@ my %AtomPersonConstruct = (
 
 our $Element;
 
-$Element->{$ATOM_NS}->{''} = {
+$Element->{+ATOM_NS}->{''} = {
   %AtomChecker,
   status => 0,
 };
 
-$Element->{$ATOM_NS}->{name} = {
+$Element->{+ATOM_NS}->{name} = {
   %AtomChecker,
 
   ## NOTE: Strictly speaking, structure and semantics for atom:name
@@ -281,7 +281,7 @@ $Element->{$ATOM_NS}->{name} = {
   ## NOTE: No constraint.
 };
 
-$Element->{$ATOM_NS}->{uri} = {
+$Element->{+ATOM_NS}->{uri} = {
   %AtomChecker,
 
   ## NOTE: Strictly speaking, structure and semantics for atom:uri
@@ -309,7 +309,7 @@ $Element->{$ATOM_NS}->{uri} = {
   },
 };
 
-$Element->{$ATOM_NS}->{email} = {
+$Element->{+ATOM_NS}->{email} = {
   %AtomChecker,
 
   ## NOTE: Strictly speaking, structure and semantics for atom:email
@@ -389,7 +389,7 @@ my %AtomDateConstruct = (
   },
 ); # %AtomDateConstruct
 
-$Element->{$ATOM_NS}->{entry} = {
+$Element->{+ATOM_NS}->{entry} = {
   %AtomChecker,
   is_root => 1,
   check_child_element => sub {
@@ -405,7 +405,7 @@ $Element->{$ATOM_NS}->{entry} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $ATOM_NS) {
+    } elsif ($child_nsuri eq ATOM_NS) {
       my $not_allowed;
       if ({ # MUST (0, 1)
            content => 1,
@@ -424,7 +424,7 @@ $Element->{$ATOM_NS}->{entry} = {
           $not_allowed = 1;
         }
       } elsif ($child_ln eq 'link') { # MAY
-        if ($child_el->rel eq $LINK_REL . 'alternate') {
+        if ($child_el->rel eq LINK_REL . 'alternate') {
           my $type = $child_el->get_attribute_ns (undef, 'type');
           $type = '' unless defined $type;
           my $hreflang = $child_el->get_attribute_ns (undef, 'hreflang');
@@ -457,11 +457,11 @@ $Element->{$ATOM_NS}->{entry} = {
         $self->{onerror}->(node => $child_el, type => 'element not allowed',
                            level => $self->{level}->{must});
       }
-    } elsif ($child_nsuri eq $THR_NS and $child_ln eq 'in-reply-to') {
+    } elsif ($child_nsuri eq THR_NS and $child_ln eq 'in-reply-to') {
       ## ISSUE: Where |thr:in-reply-to| is allowed is not explicit;y
       ## defined in RFC 4685.
       #
-    } elsif ($child_nsuri eq $THR_NS and $child_ln eq 'total') {
+    } elsif ($child_nsuri eq THR_NS and $child_ln eq 'total') {
       #
     } else {
       ## TODO: extension element
@@ -489,7 +489,7 @@ $Element->{$ATOM_NS}->{entry} = {
         my $root = $item->{node}->owner_document->document_element;
         if ($root and $root->manakai_local_name eq 'feed') {
           my $nsuri = $root->namespace_uri;
-          if (defined $nsuri and $nsuri eq $ATOM_NS) {
+          if (defined $nsuri and $nsuri eq ATOM_NS) {
             ## NOTE: An Atom Feed Document.
             for my $root_child (@{$root->child_nodes}) {
               ## NOTE: Entity references are not supported.
@@ -497,7 +497,7 @@ $Element->{$ATOM_NS}->{entry} = {
               next unless $root_child->manakai_local_name eq 'author';
               my $root_child_nsuri = $root_child->namespace_uri;
               next unless defined $root_child_nsuri;
-              next unless $root_child_nsuri eq $ATOM_NS;
+              next unless $root_child_nsuri eq ATOM_NS;
               last A;
             }
           }
@@ -551,7 +551,7 @@ $Element->{$ATOM_NS}->{entry} = {
   },
 };
 
-$Element->{$ATOM_NS}->{feed} = {
+$Element->{+ATOM_NS}->{feed} = {
   %AtomChecker,
   is_root => 1,
   check_child_element => sub {
@@ -567,7 +567,7 @@ $Element->{$ATOM_NS}->{feed} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $ATOM_NS) {
+    } elsif ($child_nsuri eq ATOM_NS) {
       my $not_allowed;
       if ($child_ln eq 'entry') {
         $element_state->{has_element}->{entry} = 1;
@@ -589,7 +589,7 @@ $Element->{$ATOM_NS}->{feed} = {
         }
       } elsif ($child_ln eq 'link') {
         my $rel = $child_el->rel;
-        if ($rel eq $LINK_REL . 'alternate') {
+        if ($rel eq LINK_REL . 'alternate') {
           my $type = $child_el->get_attribute_ns (undef, 'type');
           $type = '' unless defined $type;
           my $hreflang = $child_el->get_attribute_ns (undef, 'hreflang');
@@ -601,7 +601,7 @@ $Element->{$ATOM_NS}->{feed} = {
           } else {
             $not_allowed = 1;
           }
-        } elsif ($rel eq $LINK_REL . 'self') {
+        } elsif ($rel eq LINK_REL . 'self') {
           $element_state->{has_element}->{'link.self'} = 1;
         }
         
@@ -677,7 +677,7 @@ $Element->{$ATOM_NS}->{feed} = {
   },
 };
 
-$Element->{$ATOM_NS}->{content} = {
+$Element->{+ATOM_NS}->{content} = {
   %AtomChecker,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -857,9 +857,9 @@ $Element->{$ATOM_NS}->{content} = {
   },
 }; # atom:content
 
-$Element->{$ATOM_NS}->{author} = \%AtomPersonConstruct;
+$Element->{+ATOM_NS}->{author} = \%AtomPersonConstruct;
 
-$Element->{$ATOM_NS}->{category} = {
+$Element->{+ATOM_NS}->{category} = {
   %AtomChecker,
   check_attrs => $GetAtomAttrsChecker->({
     label => sub { 1 }, # no value constraint
@@ -896,11 +896,11 @@ $Element->{$ATOM_NS}->{category} = {
   ## NOTE: Meaning of content is not defined.
 };
 
-$Element->{$ATOM_NS}->{contributor} = \%AtomPersonConstruct;
+$Element->{+ATOM_NS}->{contributor} = \%AtomPersonConstruct;
 
 ## TODO: Anything below does not support <html:nest/> yet.
 
-$Element->{$ATOM_NS}->{generator} = {
+$Element->{+ATOM_NS}->{generator} = {
   %AtomChecker,
   check_attrs => $GetAtomAttrsChecker->({
     uri => sub { # MUST
@@ -924,7 +924,7 @@ $Element->{$ATOM_NS}->{generator} = {
   ## the generating agent.
 };
 
-$Element->{$ATOM_NS}->{icon} = {
+$Element->{+ATOM_NS}->{icon} = {
   %AtomChecker,
   check_start =>  sub {
     my ($self, $item, $element_state) = @_;
@@ -950,7 +950,7 @@ $Element->{$ATOM_NS}->{icon} = {
   },
 };
 
-$Element->{$ATOM_NS}->{id} = {
+$Element->{+ATOM_NS}->{id} = {
   %AtomChecker,
   check_start =>  sub {
     my ($self, $item, $element_state) = @_;
@@ -982,7 +982,7 @@ my $AtomIRIReferenceAttrChecker = sub {
   }, $self->{level});
 }; # $AtomIRIReferenceAttrChecker
 
-$Element->{$ATOM_NS}->{link} = {
+$Element->{+ATOM_NS}->{link} = {
   %AtomChecker,
   check_attrs => $GetAtomAttrsChecker->({
     href => $AtomIRIReferenceAttrChecker,
@@ -992,7 +992,7 @@ $Element->{$ATOM_NS}->{link} = {
       my ($self, $attr) = @_;
       my $value = $attr->value;
       if ($value =~ /\A(?>[0-9A-Za-z._~!\$&'()*+,;=\x{A0}-\x{D7FF}\x{F900}-\x{FDCF}\x{FDF0}-\x{FFEF}\x{10000}-\x{1FFFD}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}\x{40000}-\x{4FFFD}\x{50000}-\x{5FFFD}\x{60000}-\x{6FFFD}\x{70000}-\x{7FFFD}\x{80000}-\x{8FFFD}\x{90000}-\x{9FFFD}\x{A0000}-\x{AFFFD}\x{B0000}-\x{BFFFD}\x{C0000}-\x{CFFFD}\x{D0000}-\x{DFFFD}\x{E1000}-\x{EFFFD}-]|%[0-9A-Fa-f][0-9A-Fa-f]|\@)+\z/) {
-        $value = $LINK_REL . $value;
+        $value = LINK_REL . $value;
       }
 
       ## NOTE: There MUST NOT be any white space.
@@ -1031,7 +1031,7 @@ $Element->{$ATOM_NS}->{link} = {
                          level => $self->{level}->{must});
     }
 
-    if ($item->{node}->rel eq $LINK_REL . 'enclosure' and
+    if ($item->{node}->rel eq LINK_REL . 'enclosure' and
         not $item->{node}->has_attribute_ns (undef, 'length')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing',
@@ -1041,7 +1041,7 @@ $Element->{$ATOM_NS}->{link} = {
   },
 };
 
-$Element->{$ATOM_NS}->{logo} = {
+$Element->{+ATOM_NS}->{logo} = {
   %AtomChecker,
   ## NOTE: Child elements are not explicitly disallowed
   check_start =>  sub {
@@ -1067,12 +1067,12 @@ $Element->{$ATOM_NS}->{logo} = {
   },
 };
 
-$Element->{$ATOM_NS}->{published} = \%AtomDateConstruct;
+$Element->{+ATOM_NS}->{published} = \%AtomDateConstruct;
 
-$Element->{$ATOM_NS}->{rights} = \%AtomTextConstruct;
+$Element->{+ATOM_NS}->{rights} = \%AtomTextConstruct;
 ## NOTE: SHOULD NOT be used to convey machine-readable information.
 
-$Element->{$ATOM_NS}->{source} = {
+$Element->{+ATOM_NS}->{source} = {
   %AtomChecker,
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -1085,7 +1085,7 @@ $Element->{$ATOM_NS}->{source} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $ATOM_NS) {
+    } elsif ($child_nsuri eq ATOM_NS) {
       my $not_allowed;
       if ($child_ln eq 'entry') {
         $element_state->{has_element}->{entry} = 1;
@@ -1106,7 +1106,7 @@ $Element->{$ATOM_NS}->{source} = {
           $not_allowed = 1;
         }
       } elsif ($child_ln eq 'link') {
-        if ($child_el->rel eq $LINK_REL . 'alternate') {
+        if ($child_el->rel eq LINK_REL . 'alternate') {
           my $type = $child_el->get_attribute_ns (undef, 'type');
           $type = '' unless defined $type;
           my $hreflang = $child_el->get_attribute_ns (undef, 'hreflang');
@@ -1150,13 +1150,13 @@ $Element->{$ATOM_NS}->{source} = {
   },
 };
 
-$Element->{$ATOM_NS}->{subtitle} = \%AtomTextConstruct;
+$Element->{+ATOM_NS}->{subtitle} = \%AtomTextConstruct;
 
-$Element->{$ATOM_NS}->{summary} = \%AtomTextConstruct;
+$Element->{+ATOM_NS}->{summary} = \%AtomTextConstruct;
 
-$Element->{$ATOM_NS}->{title} = \%AtomTextConstruct;
+$Element->{+ATOM_NS}->{title} = \%AtomTextConstruct;
 
-$Element->{$ATOM_NS}->{updated} = \%AtomDateConstruct;
+$Element->{+ATOM_NS}->{updated} = \%AtomDateConstruct;
 
 ## TODO: signature element
 
@@ -1164,7 +1164,7 @@ $Element->{$ATOM_NS}->{updated} = \%AtomDateConstruct;
 
 ## -- Atom Threading 1.0 [RFC 4685]
 
-$Element->{$THR_NS}->{''} = {
+$Element->{+THR_NS}->{''} = {
   %AtomChecker,
   status => 0,
 };
@@ -1172,7 +1172,7 @@ $Element->{$THR_NS}->{''} = {
 ## ISSUE: Strictly speaking, thr:* element/attribute,
 ## where * is an undefined local name, is not disallowed.
 
-$Element->{$THR_NS}->{'in-reply-to'} = {
+$Element->{+THR_NS}->{'in-reply-to'} = {
   %AtomChecker,
   status => FEATURE_RFC4685,
   check_attrs => $GetAtomAttrsChecker->({
@@ -1216,7 +1216,7 @@ $Element->{$THR_NS}->{'in-reply-to'} = {
   ## NOTE: Content model has no constraint.
 };
 
-$Element->{$THR_NS}->{total} = {
+$Element->{+THR_NS}->{total} = {
   %AtomChecker,
   check_start =>  sub {
     my ($self, $item, $element_state) = @_;
@@ -1265,7 +1265,7 @@ $Element->{$THR_NS}->{total} = {
 
 ## TODO: APP [RFC 5023]
 
-$Whatpm::ContentChecker::Namespace->{$ATOM_NS}->{loaded} = 1;
-$Whatpm::ContentChecker::Namespace->{$THR_NS}->{loaded} = 1;
+$Whatpm::ContentChecker::Namespace->{+ATOM_NS}->{loaded} = 1;
+$Whatpm::ContentChecker::Namespace->{+THR_NS}->{loaded} = 1;
 
 1;

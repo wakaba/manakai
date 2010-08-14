@@ -8,7 +8,8 @@ require Whatpm::ContentChecker;
 
 use Char::Class::XML qw/InXML_NCNameStartChar10 InXMLNCNameChar10/;
 
-my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
+sub HTML_NS ();
+#sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
 
 ## --- Feature Status ---
 
@@ -176,7 +177,7 @@ sub FEATURE_HTML20_RFC () { ## Proposed Standard, obsolete
 ## December 2007 HTML5 Classification
 
 my $HTMLMetadataContent = {
-  $HTML_NS => {
+  (HTML_NS) => {
     title => 1, base => 1, link => 1, style => 1, script => 1, noscript => 1,
     command => 1,
     ## NOTE: A |meta| with no |name| element is not allowed as
@@ -189,7 +190,7 @@ my $HTMLMetadataContent = {
 };
 
 my $HTMLFlowContent = {
-  $HTML_NS => {
+  (HTML_NS) => {
     section => 1, nav => 1, article => 1, blockquote => 1, aside => 1,
     h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, hgroup => 1,
     header => 1,
@@ -231,26 +232,26 @@ my $HTMLFlowContent = {
 }; # $HTMLFlowContent
 
 my $HTMLSectioningContent = {
-  $HTML_NS => {
+  (HTML_NS) => {
     section => 1, nav => 1, article => 1, aside => 1,
   },
 }; # $HTMLSectioningContent
 
 my $HTMLSectioningRoot = {
-  $HTML_NS => {
+  (HTML_NS) => {
     blockquote => 1, figure => 1, td => 1,
   },
 };
 
 my $HTMLHeadingContent = {
-  $HTML_NS => {
+  (HTML_NS) => {
     h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, hgroup => 1,
   },
 };
 
 my $HTMLPhrasingContent = {
   ## NOTE: All phrasing content is also flow content.
-  $HTML_NS => {
+  (HTML_NS) => {
     br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
@@ -280,7 +281,7 @@ my $HTMLPhrasingContent = {
 ## $HTMLEmbeddedContent: See Whatpm::ContentChecker.
 
 my $HTMLInteractiveContent = {
-  $HTML_NS => {
+  (HTML_NS) => {
     a => 1,
     label => 1, button => 1, select => 1, textarea => 1,
     keygen => 1, details => 1,
@@ -302,7 +303,7 @@ my $HTMLInteractiveContent = {
 
 ## NOTE: Labelable form-associated element.
 my $LabelableFAE = {
-  $HTML_NS => {
+  (HTML_NS) => {
     input => 1, button => 1, select => 1, textarea => 1, keygen => 1,
   },
 };
@@ -1124,7 +1125,7 @@ my $HTMLRepeatIndexAttrChecker = sub {
   if (defined $attr->namespace_uri) {
     my $oe = $attr->owner_element;
     my $oe_nsuri = $oe->namespace_uri;
-    if (defined $oe_nsuri and $oe_nsuri eq $HTML_NS) {
+    if (defined $oe_nsuri and $oe_nsuri eq HTML_NS) {
       $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                          level => $self->{level}->{must});
     }
@@ -1132,9 +1133,9 @@ my $HTMLRepeatIndexAttrChecker = sub {
 
   my $oe = $attr->owner_element;
   my $oens = $oe->namespace_uri;
-  my $repeat = (defined $oens and $oens eq $HTML_NS)
+  my $repeat = (defined $oens and $oens eq HTML_NS)
       ? $oe->get_attribute_ns (undef, 'repeat')
-      : $oe->get_attribute_ns ($HTML_NS, 'repeat');
+      : $oe->get_attribute_ns (HTML_NS, 'repeat');
   if (defined $repeat and $repeat eq 'template') {
     #
   } else {
@@ -1365,7 +1366,7 @@ my $HTMLAttrChecker = {
     if (defined $attr->namespace_uri) {
       my $oe = $attr->owner_element;
       my $oe_nsuri = $oe->namespace_uri;
-      if (defined $oe_nsuri and $oe_nsuri eq $HTML_NS) {
+      if (defined $oe_nsuri and $oe_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                            level => $self->{level}->{must});
       }
@@ -1392,7 +1393,7 @@ my $HTMLAttrChecker = {
     if (defined $attr->namespace_uri) {
       my $oe = $attr->owner_element;
       my $oe_nsuri = $oe->namespace_uri;
-      if (defined $oe_nsuri and $oe_nsuri eq $HTML_NS) {
+      if (defined $oe_nsuri and $oe_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $attr, type => 'attribute not allowed',
                            level => $self->{level}->{must});
       }
@@ -1463,7 +1464,7 @@ my $HTMLAttrChecker = {
   xmlns => sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
-    unless ($value eq $HTML_NS) {
+    unless ($value eq HTML_NS) {
       $self->{onerror}->(node => $attr, type => 'invalid attribute value',
                          level => $self->{level}->{must});
       ## TODO: Should be new "bad namespace" error?
@@ -1618,8 +1619,8 @@ for (qw(
 ## i.e. <http://www.w3.org/1999/xhtml>, e.g. |html:class|.  They are
 ## all non-conforming.
 
-$AttrChecker->{$HTML_NS}->{''} = sub {}; # no syntactical checks
-$AttrStatus->{$HTML_NS}->{''} = 0;
+$AttrChecker->{+HTML_NS}->{''} = sub {}; # no syntactical checks
+$AttrStatus->{+HTML_NS}->{''} = 0;
 
 for (qw(
   class dir id title
@@ -1629,8 +1630,8 @@ for (qw(
   about content datatype property rel resource rev typeof
   role
 )) {
-  $AttrChecker->{$HTML_NS}->{$_} = $HTMLAttrChecker->{$_};
-  $AttrStatus->{$HTML_NS}->{$_} = FEATURE_OBSVOCAB;
+  $AttrChecker->{+HTML_NS}->{$_} = $HTMLAttrChecker->{$_};
+  $AttrStatus->{+HTML_NS}->{$_} = FEATURE_OBSVOCAB;
 }
 
 ## ------ ------
@@ -1960,7 +1961,7 @@ my %HTMLFlowContentChecker = (
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'style') {
       if ($element_state->{has_non_style} or
           not $child_el->has_attribute_ns (undef, 'scoped')) {
         $self->{onerror}->(node => $child_el,
@@ -2034,14 +2035,14 @@ our $ElementDefault;
 
 # ---- Default HTML elements ----
 
-$Element->{$HTML_NS}->{''} = {
+$Element->{+HTML_NS}->{''} = {
   status => 0,
   %HTMLChecker,
 };
 
 # ---- The root element ----
 
-$Element->{$HTML_NS}->{html} = {
+$Element->{+HTML_NS}->{html} = {
   status => FEATURE_HTML5_REC,
   is_root => 1,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -2077,9 +2078,9 @@ $Element->{$HTML_NS}->{html} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($element_state->{phase} eq 'before head') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'head') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'head') {
         $element_state->{phase} = 'after head';            
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'body') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'body') {
         $self->{onerror}->(node => $child_el,
                            type => 'ps element missing',
                            text => 'head',
@@ -2091,7 +2092,7 @@ $Element->{$HTML_NS}->{html} = {
                            level => $self->{level}->{must});      
       }
     } elsif ($element_state->{phase} eq 'after head') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'body') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'body') {
         $element_state->{phase} = 'after body';
       } else {
         $self->{onerror}->(node => $child_el,
@@ -2142,7 +2143,7 @@ $Element->{$HTML_NS}->{html} = {
 
 # ---- Document metadata ----
 
-$Element->{$HTML_NS}->{head} = {
+$Element->{+HTML_NS}->{head} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     profile => $HTMLSpaceURIsAttrChecker,
@@ -2161,7 +2162,7 @@ $Element->{$HTML_NS}->{head} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'title') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'title') {
       unless ($element_state->{has_title}) {
         $element_state->{has_title} = 1;
       } else {
@@ -2169,7 +2170,7 @@ $Element->{$HTML_NS}->{head} = {
                            type => 'element not allowed:head title',
                            level => $self->{level}->{must});
       }
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'style') {
       if ($child_el->has_attribute_ns (undef, 'scoped')) {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:head style',
@@ -2213,12 +2214,12 @@ $Element->{$HTML_NS}->{head} = {
   },
 };
 
-$Element->{$HTML_NS}->{title} = {
+$Element->{+HTML_NS}->{title} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_REC,
 }; # title
 
-$Element->{$HTML_NS}->{base} = {
+$Element->{+HTML_NS}->{base} = {
   status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
   %HTMLEmptyChecker,
   check_attrs => sub {
@@ -2282,7 +2283,7 @@ $Element->{$HTML_NS}->{base} = {
   }, # check_attrs
 }; # base
 
-$Element->{$HTML_NS}->{basefont} = {
+$Element->{+HTML_NS}->{basefont} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -2297,12 +2298,12 @@ $Element->{$HTML_NS}->{basefont} = {
   }), # check_attrs
 }; # basefont
 
-$Element->{$HTML_NS}->{nextid} = {
+$Element->{+HTML_NS}->{nextid} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # nextid
 
-$Element->{$HTML_NS}->{link} = {
+$Element->{+HTML_NS}->{link} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLEmptyChecker,
   check_attrs => sub {
@@ -2402,7 +2403,7 @@ $Element->{$HTML_NS}->{link} = {
   },
 }; # link
 
-$Element->{$HTML_NS}->{meta} = {
+$Element->{+HTML_NS}->{meta} = {
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLEmptyChecker,
   check_attrs => sub {
@@ -2718,7 +2719,7 @@ $Element->{$HTML_NS}->{meta} = {
   }, # check_attrs
 }; # meta
 
-$Element->{$HTML_NS}->{style} = {
+$Element->{+HTML_NS}->{style} = {
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLChecker,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -2853,7 +2854,7 @@ $Element->{$HTML_NS}->{style} = {
 
 # ---- Scripting ----
 
-$Element->{$HTML_NS}->{script} = {
+$Element->{+HTML_NS}->{script} = {
   %HTMLChecker,
   status => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3049,7 +3050,7 @@ $Element->{$HTML_NS}->{script} = {
 ## ISSUE: Significant check and text child node
 
 ## NOTE: When script is disabled.
-$Element->{$HTML_NS}->{noscript} = {
+$Element->{+HTML_NS}->{noscript} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -3066,7 +3067,7 @@ $Element->{$HTML_NS}->{noscript} = {
 
     unless ($self->{flag}->{in_head}) {
       $self->_add_minus_elements ($element_state,
-                                  {$HTML_NS => {noscript => 1}});
+                                  {(HTML_NS) => {noscript => 1}});
     }
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
@@ -3084,15 +3085,15 @@ $Element->{$HTML_NS}->{noscript} = {
                            level => $self->{level}->{must});
       } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
         #
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'link') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'link') {
         #
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'style') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'style') {
         if ($child_el->has_attribute_ns (undef, 'scoped')) {
           $self->{onerror}->(node => $child_el,
                              type => 'element not allowed:head noscript',
                              level => $self->{level}->{must});
         }
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'meta') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'meta') {
         my $http_equiv_attr
             = $child_el->get_attribute_node_ns (undef, 'http-equiv');
         if ($http_equiv_attr) {
@@ -3143,7 +3144,7 @@ $Element->{$HTML_NS}->{noscript} = {
 };
 ## ISSUE: Scripting is disabled: <head><noscript><html a></noscript></head>
 
-$Element->{$HTML_NS}->{'event-source'} = {
+$Element->{+HTML_NS}->{'event-source'} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_LC_DROPPED,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3164,7 +3165,7 @@ $Element->{$HTML_NS}->{'event-source'} = {
 
 # ---- Sections ----
 
-$Element->{$HTML_NS}->{body} = {
+$Element->{+HTML_NS}->{body} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3250,7 +3251,7 @@ $Element->{$HTML_NS}->{body} = {
   }, # check_start
 }; # body
 
-$Element->{$HTML_NS}->{section} = {
+$Element->{+HTML_NS}->{section} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3261,12 +3262,12 @@ $Element->{$HTML_NS}->{section} = {
   }), # check_attrs
 }; # section
 
-$Element->{$HTML_NS}->{nav} = {
+$Element->{+HTML_NS}->{nav} = {
   status => FEATURE_HTML5_LC,
   %HTMLFlowContentChecker,
 };
 
-$Element->{$HTML_NS}->{article} = {
+$Element->{+HTML_NS}->{article} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC,
   check_start => sub {
@@ -3288,12 +3289,12 @@ $Element->{$HTML_NS}->{article} = {
   }, # check_end
 }; # article
 
-$Element->{$HTML_NS}->{aside} = {
+$Element->{+HTML_NS}->{aside} = {
   status => FEATURE_HTML5_LC,
   %HTMLFlowContentChecker,
 };
 
-$Element->{$HTML_NS}->{h1} = {
+$Element->{+HTML_NS}->{h1} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3319,19 +3320,19 @@ $Element->{$HTML_NS}->{h1} = {
   }, # check_start
 }; # h1
 
-$Element->{$HTML_NS}->{h2} = {%{$Element->{$HTML_NS}->{h1}}};
+$Element->{+HTML_NS}->{h2} = {%{$Element->{+HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h3} = {%{$Element->{$HTML_NS}->{h1}}};
+$Element->{+HTML_NS}->{h3} = {%{$Element->{+HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h4} = {%{$Element->{$HTML_NS}->{h1}}};
+$Element->{+HTML_NS}->{h4} = {%{$Element->{+HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h5} = {%{$Element->{$HTML_NS}->{h1}}};
+$Element->{+HTML_NS}->{h5} = {%{$Element->{+HTML_NS}->{h1}}};
 
-$Element->{$HTML_NS}->{h6} = {%{$Element->{$HTML_NS}->{h1}}};
+$Element->{+HTML_NS}->{h6} = {%{$Element->{+HTML_NS}->{h1}}};
 
 ## TODO: Explicit sectioning is "encouraged".
 
-$Element->{$HTML_NS}->{hgroup} = {
+$Element->{+HTML_NS}->{hgroup} = {
   %HTMLChecker,
   status => FEATURE_HTML5_LC,
   check_child_element => sub {
@@ -3342,12 +3343,12 @@ $Element->{$HTML_NS}->{hgroup} = {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
-      if ($child_nsuri eq $HTML_NS and $child_ln =~ /\Ah[1-6]\z/) {
+      if ($child_nsuri eq HTML_NS and $child_ln =~ /\Ah[1-6]\z/) {
         $element_state2->{has_hn} = 1;
       }
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln =~ /\Ah[1-6]\z/) {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln =~ /\Ah[1-6]\z/) {
       ## NOTE: Use $element_state2 instead of $element_state here so
       ## that the |h2| element in |<hgroup><ins><h2>| is not counted
       ## as an |h2| of the |hgroup| element.
@@ -3376,13 +3377,13 @@ $Element->{$HTML_NS}->{hgroup} = {
   }, # check_end
 }; # hgroup
 
-$Element->{$HTML_NS}->{header} = {
+$Element->{+HTML_NS}->{header} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
-                                {$HTML_NS => {qw/header 1 footer 1/}});
+                                {(HTML_NS) => {qw/header 1 footer 1/}});
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
 
@@ -3404,13 +3405,13 @@ $Element->{$HTML_NS}->{header} = {
   }, # check_end
 }; # header
 
-$Element->{$HTML_NS}->{footer} = {
+$Element->{+HTML_NS}->{footer} = {
   status => FEATURE_HTML5_LC,
   %HTMLFlowContentChecker,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
-                                {$HTML_NS => {header => 1, footer => 1}});
+                                {(HTML_NS) => {header => 1, footer => 1}});
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
@@ -3424,7 +3425,7 @@ $Element->{$HTML_NS}->{footer} = {
   }, # check_end
 }; # footer
 
-$Element->{$HTML_NS}->{address} = {
+$Element->{+HTML_NS}->{address} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3444,7 +3445,7 @@ $Element->{$HTML_NS}->{address} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements
         ($element_state,
-         {$HTML_NS => {header => 1, footer => 1, address => 1}},
+         {(HTML_NS) => {header => 1, footer => 1, address => 1}},
          $HTMLSectioningContent, $HTMLHeadingContent);
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
@@ -3461,7 +3462,7 @@ $Element->{$HTML_NS}->{address} = {
 
 # ---- Grouping content ----
 
-$Element->{$HTML_NS}->{p} = {
+$Element->{+HTML_NS}->{p} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3479,7 +3480,7 @@ $Element->{$HTML_NS}->{p} = {
   }), # check_attrs
 }; # p
 
-$Element->{$HTML_NS}->{hr} = {
+$Element->{+HTML_NS}->{hr} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3501,7 +3502,7 @@ $Element->{$HTML_NS}->{hr} = {
   }), # check_attrs
 }; # hr
 
-$Element->{$HTML_NS}->{spacer} = {
+$Element->{+HTML_NS}->{spacer} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3538,7 +3539,7 @@ $Element->{$HTML_NS}->{spacer} = {
   }, # check_attrs2
 }; # spacer
 
-$Element->{$HTML_NS}->{br} = {
+$Element->{+HTML_NS}->{br} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3551,7 +3552,7 @@ $Element->{$HTML_NS}->{br} = {
   }), # check_attrs
 }; # br
 
-$Element->{$HTML_NS}->{pre} = {
+$Element->{+HTML_NS}->{pre} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3589,7 +3590,7 @@ $Element->{$HTML_NS}->{pre} = {
   },
 }; # pre
 
-$Element->{$HTML_NS}->{xmp} = {
+$Element->{+HTML_NS}->{xmp} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3602,9 +3603,9 @@ $Element->{$HTML_NS}->{xmp} = {
   }), # check_attrs
 }; # xmp
 
-$Element->{$HTML_NS}->{listing} = $Element->{$HTML_NS}->{xmp};
+$Element->{+HTML_NS}->{listing} = $Element->{+HTML_NS}->{xmp};
 
-$Element->{$HTML_NS}->{plaintext} = {
+$Element->{+HTML_NS}->{plaintext} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3617,7 +3618,7 @@ $Element->{$HTML_NS}->{plaintext} = {
   }), # check_attrs
 }; # plaintext
 
-$Element->{$HTML_NS}->{xml} = {
+$Element->{+HTML_NS}->{xml} = {
   %HTMLTextChecker,
   status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3628,7 +3629,7 @@ $Element->{$HTML_NS}->{xml} = {
   }), # check_attrs
 }; # xml
 
-$Element->{$HTML_NS}->{blockquote} = {
+$Element->{+HTML_NS}->{blockquote} = {
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLFlowContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3656,7 +3657,7 @@ $Element->{$HTML_NS}->{blockquote} = {
   },
 };
 
-$Element->{$HTML_NS}->{ol} = {
+$Element->{+HTML_NS}->{ol} = {
   %HTMLChecker,
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3697,7 +3698,7 @@ $Element->{$HTML_NS}->{ol} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'li') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'li') {
       #
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',
@@ -3713,8 +3714,8 @@ $Element->{$HTML_NS}->{ol} = {
   },
 };
 
-$Element->{$HTML_NS}->{ul} = {
-  %{$Element->{$HTML_NS}->{ol}},
+$Element->{+HTML_NS}->{ul} = {
+  %{$Element->{+HTML_NS}->{ol}},
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $GetHTMLEnumeratedAttrChecker->({
@@ -3733,8 +3734,8 @@ $Element->{$HTML_NS}->{ul} = {
   }), # check_attrs
 }; # ul
 
-$Element->{$HTML_NS}->{dir} = {
-  %{$Element->{$HTML_NS}->{ul}},
+$Element->{+HTML_NS}->{dir} = {
+  %{$Element->{+HTML_NS}->{ul}},
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $GetHTMLEnumeratedAttrChecker->({
@@ -3751,7 +3752,7 @@ $Element->{$HTML_NS}->{dir} = {
   }), # check_attrs
 }; # dir
 
-$Element->{$HTML_NS}->{li} = {
+$Element->{+HTML_NS}->{li} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3768,7 +3769,7 @@ $Element->{$HTML_NS}->{li} = {
         my $parent_ns = $parent->namespace_uri;
         $parent_ns = '' unless defined $parent_ns;
         my $parent_ln = $parent->manakai_local_name;
-        $parent_is_ol = ($parent_ns eq $HTML_NS and $parent_ln eq 'ol');
+        $parent_is_ol = ($parent_ns eq HTML_NS and $parent_ln eq 'ol');
       }
 
       unless ($parent_is_ol) {
@@ -3800,7 +3801,7 @@ $Element->{$HTML_NS}->{li} = {
   }, # check_child_text
 }; # li
 
-$Element->{$HTML_NS}->{dl} = {
+$Element->{+HTML_NS}->{dl} = {
   %HTMLChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3829,27 +3830,27 @@ $Element->{$HTML_NS}->{dl} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($element_state->{phase} eq 'in dds') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'dd') {
         #$element_state->{phase} = 'in dds';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'dt') {
         $element_state->{phase} = 'in dts';
       } else {
         $self->{onerror}->(node => $child_el, type => 'element not allowed',
                            level => $self->{level}->{must});
       }
     } elsif ($element_state->{phase} eq 'in dts') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'dt') {
         #$element_state->{phase} = 'in dts';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'dd') {
         $element_state->{phase} = 'in dds';
       } else {
         $self->{onerror}->(node => $child_el, type => 'element not allowed',
                            level => $self->{level}->{must});
       }
     } elsif ($element_state->{phase} eq 'before dt') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'dt') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'dt') {
         $element_state->{phase} = 'in dts';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'dd') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'dd') {
         $self->{onerror}
              ->(node => $child_el, type => 'ps element missing',
                 text => 'dt',
@@ -3886,7 +3887,7 @@ $Element->{$HTML_NS}->{dl} = {
 ## more than one <code>dt</code> element for each name.</p> (HTML5
 ## revision 3859)
 
-$Element->{$HTML_NS}->{dt} = {
+$Element->{+HTML_NS}->{dt} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3898,7 +3899,7 @@ $Element->{$HTML_NS}->{dt} = {
   }), # check_attrs
 }; # dt
 
-$Element->{$HTML_NS}->{dd} = {
+$Element->{+HTML_NS}->{dd} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3910,7 +3911,7 @@ $Element->{$HTML_NS}->{dd} = {
   }), # check_attrs
 }; # dd
 
-$Element->{$HTML_NS}->{div} = {
+$Element->{+HTML_NS}->{div} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3933,7 +3934,7 @@ $Element->{$HTML_NS}->{div} = {
   }, # check_start
 }; # div
 
-$Element->{$HTML_NS}->{center} = {
+$Element->{+HTML_NS}->{center} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3947,7 +3948,7 @@ $Element->{$HTML_NS}->{center} = {
   }), # check_attrs
 }; # center
 
-$Element->{$HTML_NS}->{marquee} = {
+$Element->{+HTML_NS}->{marquee} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -3990,12 +3991,12 @@ $Element->{$HTML_NS}->{marquee} = {
   }), # check_attrs
 }; # marquee
 
-$Element->{$HTML_NS}->{multicol} = {
+$Element->{+HTML_NS}->{multicol} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # multicol
 
-$Element->{$HTML_NS}->{font} = {
+$Element->{+HTML_NS}->{font} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4019,19 +4020,19 @@ $Element->{$HTML_NS}->{font} = {
   }), # check_attrs
 }; # font
 
-$Element->{$HTML_NS}->{layer} = {
+$Element->{+HTML_NS}->{layer} = {
   %HTMLFlowContentChecker,
   status => FEATURE_OBSVOCAB,
 }; # layer
 
-$Element->{$HTML_NS}->{nolayer} = {
+$Element->{+HTML_NS}->{nolayer} = {
   %HTMLFlowContentChecker,
   status => FEATURE_OBSVOCAB,
 }; # nolayer
 
 # ---- Text-level semantics ----
 
-$Element->{$HTML_NS}->{a} = {
+$Element->{+HTML_NS}->{a} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => sub {
@@ -4277,7 +4278,7 @@ $Element->{$HTML_NS}->{a} = {
   },
 }; # a
 
-$Element->{$HTML_NS}->{em} = {
+$Element->{+HTML_NS}->{em} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4288,7 +4289,7 @@ $Element->{$HTML_NS}->{em} = {
   }), # check_attrs
 }; # em
 
-$Element->{$HTML_NS}->{strong} = {
+$Element->{+HTML_NS}->{strong} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4299,7 +4300,7 @@ $Element->{$HTML_NS}->{strong} = {
   }), # check_attrs
 }; # strong
 
-$Element->{$HTML_NS}->{small} = {
+$Element->{+HTML_NS}->{small} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -4308,7 +4309,7 @@ $Element->{$HTML_NS}->{small} = {
   }), # check_attrs
 }; # small
 
-$Element->{$HTML_NS}->{big} = {
+$Element->{+HTML_NS}->{big} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -4317,7 +4318,7 @@ $Element->{$HTML_NS}->{big} = {
   }), # check_attrs
 }; # big
 
-$Element->{$HTML_NS}->{cite} = {
+$Element->{+HTML_NS}->{cite} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4328,7 +4329,7 @@ $Element->{$HTML_NS}->{cite} = {
   }), # check_attrs
 }; # cite
 
-$Element->{$HTML_NS}->{q} = {
+$Element->{+HTML_NS}->{q} = {
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   %HTMLPhrasingContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4353,7 +4354,7 @@ $Element->{$HTML_NS}->{q} = {
 ## it might be possible to inform of the existence of quotation marks OUTSIDE
 ## the |q| element.
 
-$Element->{$HTML_NS}->{dfn} = {
+$Element->{+HTML_NS}->{dfn} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -4362,7 +4363,7 @@ $Element->{$HTML_NS}->{dfn} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {dfn => 1}});
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {dfn => 1}});
 
     my $node = $item->{node};
     my $term = $node->get_attribute_ns (undef, 'title');
@@ -4374,7 +4375,7 @@ $Element->{$HTML_NS}->{dfn} = {
             last;
           } elsif ($child->manakai_local_name eq 'abbr') {
             my $nsuri = $child->namespace_uri;
-            if (defined $nsuri and $nsuri eq $HTML_NS) {
+            if (defined $nsuri and $nsuri eq HTML_NS) {
               my $attr = $child->get_attribute_node_ns (undef, 'title');
               if ($attr) {
                 $term = $attr->value;
@@ -4414,7 +4415,7 @@ $Element->{$HTML_NS}->{dfn} = {
   }, # check_end
 }; # dfn
 
-$Element->{$HTML_NS}->{abbr} = {
+$Element->{+HTML_NS}->{abbr} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -4429,7 +4430,7 @@ $Element->{$HTML_NS}->{abbr} = {
   ## ISSUE: Is <abbr title="Cascading Style Sheets">CSS</abbr> conforming?
 }; # abbr
 
-$Element->{$HTML_NS}->{acronym} = {
+$Element->{+HTML_NS}->{acronym} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -4438,7 +4439,7 @@ $Element->{$HTML_NS}->{acronym} = {
   }), # check_attrs
 }; # acronym
 
-$Element->{$HTML_NS}->{time} = {
+$Element->{+HTML_NS}->{time} = {
   status => FEATURE_HTML5_WD,
   %HTMLPhrasingContentChecker,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4452,7 +4453,7 @@ $Element->{$HTML_NS}->{time} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {time => 1}});
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {time => 1}});
 
     $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
@@ -4647,7 +4648,7 @@ $Element->{$HTML_NS}->{time} = {
   }, # check_end
 }; # time
 
-$Element->{$HTML_NS}->{code} = {
+$Element->{+HTML_NS}->{code} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4658,7 +4659,7 @@ $Element->{$HTML_NS}->{code} = {
   }), # check_attrs
 }; # code
 
-$Element->{$HTML_NS}->{var} = {
+$Element->{+HTML_NS}->{var} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4669,7 +4670,7 @@ $Element->{$HTML_NS}->{var} = {
   }), # check_attrs
 }; # var
 
-$Element->{$HTML_NS}->{samp} = {
+$Element->{+HTML_NS}->{samp} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4680,7 +4681,7 @@ $Element->{$HTML_NS}->{samp} = {
   }), # check_attrs
 }; # samp
 
-$Element->{$HTML_NS}->{kbd} = {
+$Element->{+HTML_NS}->{kbd} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4691,7 +4692,7 @@ $Element->{$HTML_NS}->{kbd} = {
   }), # check_attrs
 }; # kbd
 
-$Element->{$HTML_NS}->{sub} = {
+$Element->{+HTML_NS}->{sub} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4702,11 +4703,11 @@ $Element->{$HTML_NS}->{sub} = {
   }), # check_attrs
 }; # sub
 
-$Element->{$HTML_NS}->{sup} = $Element->{$HTML_NS}->{sub};
+$Element->{+HTML_NS}->{sup} = $Element->{+HTML_NS}->{sub};
 
 # XXX Warning for "authors are encouraged to consider whether other
 # elements might be more applicable"
-$Element->{$HTML_NS}->{i} = {
+$Element->{+HTML_NS}->{i} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4717,9 +4718,9 @@ $Element->{$HTML_NS}->{i} = {
   }), # check_attrs
 }; # i
 
-$Element->{$HTML_NS}->{b} = $Element->{$HTML_NS}->{i};
+$Element->{+HTML_NS}->{b} = $Element->{+HTML_NS}->{i};
 
-$Element->{$HTML_NS}->{tt} = {
+$Element->{+HTML_NS}->{tt} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -4730,7 +4731,7 @@ $Element->{$HTML_NS}->{tt} = {
   }), # check_attrs
 }; # tt
 
-$Element->{$HTML_NS}->{s} = {
+$Element->{+HTML_NS}->{s} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -4739,31 +4740,31 @@ $Element->{$HTML_NS}->{s} = {
   }), # check_attrs
 }; # s
 
-$Element->{$HTML_NS}->{strike} = $Element->{$HTML_NS}->{s};
+$Element->{+HTML_NS}->{strike} = $Element->{+HTML_NS}->{s};
 
-$Element->{$HTML_NS}->{u} = $Element->{$HTML_NS}->{s};
+$Element->{+HTML_NS}->{u} = $Element->{+HTML_NS}->{s};
 
-$Element->{$HTML_NS}->{blink} = {
+$Element->{+HTML_NS}->{blink} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # blink
 
-$Element->{$HTML_NS}->{mark} = {
+$Element->{+HTML_NS}->{mark} = {
   status => FEATURE_HTML5_WD,
   %HTMLPhrasingContentChecker,
 };
 
-$Element->{$HTML_NS}->{nobr} = {
+$Element->{+HTML_NS}->{nobr} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # nobr
 
-$Element->{$HTML_NS}->{wbr} = {
+$Element->{+HTML_NS}->{wbr} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # wbr
 
-$Element->{$HTML_NS}->{ruby} = {
+$Element->{+HTML_NS}->{ruby} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_RUBY_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -4794,12 +4795,12 @@ $Element->{$HTML_NS}->{ruby} = {
     } elsif ($element_state->{phase} eq 'before-rb') {
       if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
         $element_state->{phase} = 'in-rb';
-      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el,
                            level => $self->{level}->{should},
                            type => 'no significant content before');
         $element_state->{phase} = 'after-rt';
-      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el,
                            level => $self->{level}->{should},
                            type => 'no significant content before');
@@ -4813,14 +4814,14 @@ $Element->{$HTML_NS}->{ruby} = {
     } elsif ($element_state->{phase} eq 'in-rb') {
       if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
         #$element_state->{phase} = 'in-rb';
-      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq HTML_NS) {
         unless ($element_state->{has_significant}) {
           $self->{onerror}->(node => $child_el,
                              level => $self->{level}->{should},
                              type => 'no significant content before');
         }
         $element_state->{phase} = 'after-rt';
-      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq HTML_NS) {
         unless ($element_state->{has_significant}) {
           $self->{onerror}->(node => $child_el,
                              level => $self->{level}->{should},
@@ -4840,12 +4841,12 @@ $Element->{$HTML_NS}->{ruby} = {
           delete $element_state->{has_significant};
         }
         $element_state->{phase} = 'in-rb';
-      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el,
                            level => $self->{level}->{should},
                            type => 'no significant content before');
         $element_state->{phase} = 'after-rp1';
-      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el,
                            level => $self->{level}->{should},
                            type => 'no significant content before');
@@ -4861,9 +4862,9 @@ $Element->{$HTML_NS}->{ruby} = {
         $element_state->{phase} = 'in-rb';
       }
     } elsif ($element_state->{phase} eq 'after-rp1') {
-      if ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+      if ($child_ln eq 'rt' and $child_nsuri eq HTML_NS) {
         $element_state->{phase} = 'after-rp-rt';
-      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el, 
                            type => 'ps element missing',
                            text => 'rt',
@@ -4890,9 +4891,9 @@ $Element->{$HTML_NS}->{ruby} = {
         $element_state->{phase} = 'in-rb';
       }
     } elsif ($element_state->{phase} eq 'after-rp-rt') {
-      if ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+      if ($child_ln eq 'rp' and $child_nsuri eq HTML_NS) {
         $element_state->{phase} = 'after-rp2';
-      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el, 
                            type => 'ps element missing',
                            text => 'rp',
@@ -4924,12 +4925,12 @@ $Element->{$HTML_NS}->{ruby} = {
           delete $element_state->{has_significant};
         }
         $element_state->{phase} = 'in-rb';
-      } elsif ($child_ln eq 'rt' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rt' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el,
                            level => $self->{level}->{should},
                            type => 'no significant content before');
         $element_state->{phase} = 'after-rt';
-      } elsif ($child_ln eq 'rp' and $child_nsuri eq $HTML_NS) {
+      } elsif ($child_ln eq 'rp' and $child_nsuri eq HTML_NS) {
         $self->{onerror}->(node => $child_el,
                            level => $self->{level}->{should},
                            type => 'no significant content before');
@@ -5029,7 +5030,7 @@ $Element->{$HTML_NS}->{ruby} = {
   },
 }; # ruby
 
-$Element->{$HTML_NS}->{rb} = {
+$Element->{+HTML_NS}->{rb} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -5038,7 +5039,7 @@ $Element->{$HTML_NS}->{rb} = {
   }), # check_attrs
 }; # rb
 
-$Element->{$HTML_NS}->{rt} = {
+$Element->{+HTML_NS}->{rt} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_RUBY_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5050,7 +5051,7 @@ $Element->{$HTML_NS}->{rt} = {
   }), # check_attrs
 }; # rt
 
-$Element->{$HTML_NS}->{rp} = {
+$Element->{+HTML_NS}->{rp} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_RUBY_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -5059,7 +5060,7 @@ $Element->{$HTML_NS}->{rp} = {
   }), # check_attrs
 }; # rp
 
-$Element->{$HTML_NS}->{rbc} = {
+$Element->{+HTML_NS}->{rbc} = {
   %HTMLChecker,
   status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -5076,7 +5077,7 @@ $Element->{$HTML_NS}->{rbc} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'rb') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'rb') {
       $element_state->{has_rb} = 1;
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',
@@ -5104,7 +5105,7 @@ $Element->{$HTML_NS}->{rbc} = {
   }, # check_end
 }; # rbc
 
-$Element->{$HTML_NS}->{rtc} = {
+$Element->{+HTML_NS}->{rtc} = {
   %HTMLChecker,
   status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
@@ -5121,7 +5122,7 @@ $Element->{$HTML_NS}->{rtc} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'rt') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'rt') {
       $element_state->{has_rt} = 1;
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',
@@ -5149,7 +5150,7 @@ $Element->{$HTML_NS}->{rtc} = {
   }, # check_end
 }; # rtc
 
-$Element->{$HTML_NS}->{bdo} = {
+$Element->{+HTML_NS}->{bdo} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs2 => sub {
@@ -5163,7 +5164,7 @@ $Element->{$HTML_NS}->{bdo} = {
   },
 }; # bdo
 
-$Element->{$HTML_NS}->{span} = {
+$Element->{+HTML_NS}->{span} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5174,7 +5175,7 @@ $Element->{$HTML_NS}->{span} = {
   }), # check_attrs
 }; # span
 
-$Element->{$HTML_NS}->{comment} = {
+$Element->{+HTML_NS}->{comment} = {
   %HTMLTextChecker,
   status => FEATURE_OBSVOCAB,
 }; # comment
@@ -5204,7 +5205,7 @@ $Element->{$HTML_NS}->{comment} = {
 
 =cut
 
-$Element->{$HTML_NS}->{ins} = {
+$Element->{+HTML_NS}->{ins} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5226,7 +5227,7 @@ $Element->{$HTML_NS}->{ins} = {
   },
 }; # ins
 
-$Element->{$HTML_NS}->{del} = {
+$Element->{+HTML_NS}->{del} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5262,7 +5263,7 @@ $Element->{$HTML_NS}->{del} = {
 
 # ---- Embedded content ----
 
-$Element->{$HTML_NS}->{figure} = {
+$Element->{+HTML_NS}->{figure} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD,
   check_start => sub {
@@ -5286,7 +5287,7 @@ $Element->{$HTML_NS}->{figure} = {
     } elsif ($element_state->{phase} eq 'flow') {
       if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
         #
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'figcaption') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'figcaption') {
         $element_state->{phase} = 'flow-figcaption';
       } else {
         $self->{onerror}->(node => $child_el,
@@ -5312,7 +5313,7 @@ $Element->{$HTML_NS}->{figure} = {
     } elsif ($element_state->{phase} eq 'initial') {
       if ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
         $element_state->{phase} = 'flow';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'figcaption') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'figcaption') {
         $element_state->{phase} = 'figcaption';
       } else {
         $self->{onerror}->(node => $child_el,
@@ -5346,12 +5347,12 @@ $Element->{$HTML_NS}->{figure} = {
   }, # check_child_text
 }; # figure
 
-$Element->{$HTML_NS}->{figcaption} = {
+$Element->{+HTML_NS}->{figcaption} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT,
 }; # figcaption
 
-$Element->{$HTML_NS}->{img} = {
+$Element->{+HTML_NS}->{img} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => sub {
@@ -5506,7 +5507,7 @@ $Element->{$HTML_NS}->{img} = {
   }, # check_end
 }; # img
 
-$Element->{$HTML_NS}->{iframe} = {
+$Element->{+HTML_NS}->{iframe} = {
   %HTMLTextChecker, # XXX content model restriction
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5591,7 +5592,7 @@ $Element->{$HTML_NS}->{iframe} = {
   }, # check_start
 }; # iframe
 
-$Element->{$HTML_NS}->{embed} = {
+$Element->{+HTML_NS}->{embed} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_WD,
   check_attrs => sub {
@@ -5715,12 +5716,12 @@ $Element->{$HTML_NS}->{embed} = {
   }, # check_end
 }; # embed
 
-$Element->{$HTML_NS}->{noembed} = {
+$Element->{+HTML_NS}->{noembed} = {
   %HTMLTextChecker, # XXX content model restriction (same as iframe)
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
 }; # noembed
 
-$Element->{$HTML_NS}->{object} = {
+$Element->{+HTML_NS}->{object} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5826,7 +5827,7 @@ $Element->{$HTML_NS}->{object} = {
       $element_state->{has_non_legend} = 1;
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'param') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'param') {
       if ($element_state->{has_non_param}) {
         $self->{onerror}->(node => $child_el, 
                            type => 'element not allowed:flow',
@@ -5860,8 +5861,8 @@ $Element->{$HTML_NS}->{object} = {
 ## What about |<section><object data><style scoped></style>x</object></section>|?
 ## |<section><ins></ins><object data><style scoped></style>x</object></section>|?
 
-$Element->{$HTML_NS}->{applet} = {
-  %{$Element->{$HTML_NS}->{object}},
+$Element->{+HTML_NS}->{applet} = {
+  %{$Element->{+HTML_NS}->{object}},
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $EmbeddedAlignChecker,
@@ -5952,12 +5953,12 @@ $Element->{$HTML_NS}->{applet} = {
   }, # check_attrs2
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    $Element->{$HTML_NS}->{object}->{check_end}->(@_);
+    $Element->{+HTML_NS}->{object}->{check_end}->(@_);
     $NameAttrCheckEnd->(@_); # for <img name>
   }, # check_end
 }; # applet
 
-$Element->{$HTML_NS}->{param} = {
+$Element->{+HTML_NS}->{param} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -5991,7 +5992,7 @@ $Element->{$HTML_NS}->{param} = {
   }, # check_attrs2
 }; # param
 
-$Element->{$HTML_NS}->{video} = {
+$Element->{+HTML_NS}->{video} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6043,7 +6044,7 @@ $Element->{$HTML_NS}->{video} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {
       video => 1, audio => 1,
     }});
 
@@ -6069,7 +6070,7 @@ $Element->{$HTML_NS}->{video} = {
       delete $element_state->{allow_source};
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'source') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'source') {
       unless ($element_state->{allow_source}) {
         $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:flow',
@@ -6099,12 +6100,12 @@ $Element->{$HTML_NS}->{video} = {
                          level => $self->{level}->{must});
     }
 
-    $Element->{$HTML_NS}->{object}->{check_end}->(@_);
+    $Element->{+HTML_NS}->{object}->{check_end}->(@_);
   },
 }; # video
 
-$Element->{$HTML_NS}->{audio} = {
-  %{$Element->{$HTML_NS}->{video}},
+$Element->{+HTML_NS}->{audio} = {
+  %{$Element->{+HTML_NS}->{video}},
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
     autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
@@ -6149,7 +6150,7 @@ $Element->{$HTML_NS}->{audio} = {
   }), # check_attrs
 }; # audio
 
-$Element->{$HTML_NS}->{source} = {
+$Element->{+HTML_NS}->{source} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => sub {
@@ -6182,7 +6183,7 @@ $Element->{$HTML_NS}->{source} = {
   }, # check_attrs
 }; # source
 
-$Element->{$HTML_NS}->{bgsound} = {
+$Element->{+HTML_NS}->{bgsound} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6233,7 +6234,7 @@ $Element->{$HTML_NS}->{bgsound} = {
   }, # check_attrs2
 }; # bgsound
 
-$Element->{$HTML_NS}->{canvas} = {
+$Element->{+HTML_NS}->{canvas} = {
   %HTMLTransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6250,7 +6251,7 @@ $Element->{$HTML_NS}->{canvas} = {
   # might be placed outside of the element.
 }; # canvas
 
-$Element->{$HTML_NS}->{map} = {
+$Element->{+HTML_NS}->{map} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => sub {
@@ -6345,7 +6346,7 @@ $Element->{$HTML_NS}->{map} = {
   },
 }; # map
 
-$Element->{$HTML_NS}->{area} = {
+$Element->{+HTML_NS}->{area} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => sub {
@@ -6478,7 +6479,7 @@ $Element->{$HTML_NS}->{area} = {
 
 # ---- Tabular data ----
 
-$Element->{$HTML_NS}->{table} = {
+$Element->{+HTML_NS}->{table} = {
   %HTMLChecker,
   status => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6567,10 +6568,10 @@ $Element->{$HTML_NS}->{table} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($element_state->{phase} eq 'in tbodys') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'tbody') {
         #$element_state->{phase} = 'in tbodys';
       } elsif (not $element_state->{has_tfoot} and
-               $child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+               $child_nsuri eq HTML_NS and $child_ln eq 'tfoot') {
         $element_state->{phase} = 'after tfoot';
         $element_state->{has_tfoot} = 1;
       } else {
@@ -6578,10 +6579,10 @@ $Element->{$HTML_NS}->{table} = {
                            level => $self->{level}->{must});
       }
     } elsif ($element_state->{phase} eq 'in trs') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'tr') {
         #$element_state->{phase} = 'in trs';
       } elsif (not $element_state->{has_tfoot} and
-               $child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+               $child_nsuri eq HTML_NS and $child_ln eq 'tfoot') {
         $element_state->{phase} = 'after tfoot';
         $element_state->{has_tfoot} = 1;
       } else {
@@ -6589,11 +6590,11 @@ $Element->{$HTML_NS}->{table} = {
                            level => $self->{level}->{must});
       }
     } elsif ($element_state->{phase} eq 'after thead') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'tbody') {
         $element_state->{phase} = 'in tbodys';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tr') {
         $element_state->{phase} = 'in trs';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tfoot') {
         $element_state->{phase} = 'in tbodys';
         $element_state->{has_tfoot} = 1;
       } else {
@@ -6601,15 +6602,15 @@ $Element->{$HTML_NS}->{table} = {
                            level => $self->{level}->{must});
       }
     } elsif ($element_state->{phase} eq 'in colgroup') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'colgroup') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'colgroup') {
         $element_state->{phase} = 'in colgroup';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'thead') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'thead') {
         $element_state->{phase} = 'after thead';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tbody') {
         $element_state->{phase} = 'in tbodys';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tr') {
         $element_state->{phase} = 'in trs';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tfoot') {
         $element_state->{phase} = 'in tbodys';
         $element_state->{has_tfoot} = 1;
       } else {
@@ -6617,18 +6618,18 @@ $Element->{$HTML_NS}->{table} = {
                            level => $self->{level}->{must});
       }
     } elsif ($element_state->{phase} eq 'before caption') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'caption') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'caption') {
         $item->{parent_state}->{table_caption_element} = $child_el;
         $element_state->{phase} = 'in colgroup';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'colgroup') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'colgroup') {
         $element_state->{phase} = 'in colgroup';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'thead') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'thead') {
         $element_state->{phase} = 'after thead';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tbody') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tbody') {
         $element_state->{phase} = 'in tbodys';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tr') {
         $element_state->{phase} = 'in trs';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tfoot') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tfoot') {
         $element_state->{phase} = 'in tbodys';
         $element_state->{has_tfoot} = 1;
       } else {
@@ -6725,7 +6726,7 @@ $Element->{$HTML_NS}->{table} = {
   }, # check_end
 }; # table
 
-$Element->{$HTML_NS}->{caption} = {
+$Element->{+HTML_NS}->{caption} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6743,7 +6744,7 @@ $Element->{$HTML_NS}->{caption} = {
   }),
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {table => 1}});
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {table => 1}});
 
     $HTMLFlowContentChecker{check_start}->(@_);
   },
@@ -6757,19 +6758,19 @@ $Element->{$HTML_NS}->{caption} = {
       my $table = $caption->parent_node or last FIGURE;
       last FIGURE if $table->node_type != 1;
       my $nsurl = $table->namespace_uri;
-      last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+      last FIGURE if not defined $nsurl or $nsurl ne HTML_NS;
       last FIGURE if $table->manakai_local_name ne 'table';
 
       my $dd = $table->parent_node or last FIGURE;
       last FIGURE if $dd->node_type != 1;
       $nsurl = $dd->namespace_uri;
-      last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+      last FIGURE if not defined $nsurl or $nsurl ne HTML_NS;
       last FIGURE if $dd->manakai_local_name ne 'dd';
 
       my $figure = $dd->parent_node or last FIGURE;
       last FIGURE if $figure->node_type != 1;
       $nsurl = $figure->namespace_uri;
-      last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+      last FIGURE if not defined $nsurl or $nsurl ne HTML_NS;
       last FIGURE if $figure->manakai_local_name ne 'figure';
 
       my @table;
@@ -6777,7 +6778,7 @@ $Element->{$HTML_NS}->{caption} = {
         my $nt = $node->node_type;
         if ($nt == 1) { # Element
           $nsurl = $node->namespace_uri;
-          last FIGURE if not defined $nsurl or $nsurl ne $HTML_NS;
+          last FIGURE if not defined $nsurl or $nsurl ne HTML_NS;
           last FIGURE if $node->manakai_local_name ne 'table';
 
           push @table, $node;
@@ -6810,7 +6811,7 @@ my %cellalign = (
   }),
 ); # %cellalign
 
-$Element->{$HTML_NS}->{colgroup} = {
+$Element->{+HTML_NS}->{colgroup} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6839,7 +6840,7 @@ $Element->{$HTML_NS}->{colgroup} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'col') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'col') {
       if ($item->{node}->has_attribute_ns (undef, 'span')) {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:colgroup', # XXXdocumentation
@@ -6861,7 +6862,7 @@ $Element->{$HTML_NS}->{colgroup} = {
   },
 }; # colgroup
 
-$Element->{$HTML_NS}->{col} = {
+$Element->{+HTML_NS}->{col} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6882,7 +6883,7 @@ $Element->{$HTML_NS}->{col} = {
   }), # check_attrs
 }; # col
 
-$Element->{$HTML_NS}->{tbody} = {
+$Element->{+HTML_NS}->{tbody} = {
   %HTMLChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6916,7 +6917,7 @@ $Element->{$HTML_NS}->{tbody} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'tr') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'tr') {
       #
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',
@@ -6932,8 +6933,8 @@ $Element->{$HTML_NS}->{tbody} = {
   },
 }; # tbody
 
-$Element->{$HTML_NS}->{thead} = {
-  %{$Element->{$HTML_NS}->{tbody}},
+$Element->{+HTML_NS}->{thead} = {
+  %{$Element->{+HTML_NS}->{tbody}},
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{in_thead} = 1;
@@ -6942,11 +6943,11 @@ $Element->{$HTML_NS}->{thead} = {
   }, # check_start
 }; # thead
 
-$Element->{$HTML_NS}->{tfoot} = {
-  %{$Element->{$HTML_NS}->{tbody}},
+$Element->{+HTML_NS}->{tfoot} = {
+  %{$Element->{+HTML_NS}->{tbody}},
 }; # tfoot
 
-$Element->{$HTML_NS}->{tr} = {
+$Element->{+HTML_NS}->{tr} = {
   %HTMLChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -6988,13 +6989,13 @@ $Element->{$HTML_NS}->{tr} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'td') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'td') {
       if ($item->{parent_state}->{in_thead}) {
         $self->{onerror}->(node => $child_el, # XXX document the error type
                            type => 'element not allowed:thead td',
                            level => $self->{level}->{must});
       }
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'th') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'th') {
       #
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',
@@ -7010,7 +7011,7 @@ $Element->{$HTML_NS}->{tr} = {
   },
 }; # tr
 
-$Element->{$HTML_NS}->{td} = {
+$Element->{+HTML_NS}->{td} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -7066,7 +7067,7 @@ $Element->{$HTML_NS}->{td} = {
   }, # check_attrs2
 }; # td
 
-$Element->{$HTML_NS}->{th} = {
+$Element->{+HTML_NS}->{th} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -7124,7 +7125,7 @@ $Element->{$HTML_NS}->{th} = {
 
 # ---- Forms ----
 
-$Element->{$HTML_NS}->{form} = {
+$Element->{+HTML_NS}->{form} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -7218,7 +7219,7 @@ $Element->{$HTML_NS}->{form} = {
   }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {form => 1}});
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {form => 1}});
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
@@ -7235,7 +7236,7 @@ $Element->{$HTML_NS}->{form} = {
   },
 }; # form
 
-$Element->{$HTML_NS}->{fieldset} = {
+$Element->{+HTML_NS}->{fieldset} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -7261,7 +7262,7 @@ $Element->{$HTML_NS}->{fieldset} = {
       $element_state->{has_non_legend} = 1;
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'legend') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'legend') {
       if ($element_state->{has_non_legend}) {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:fieldset legend', # XXXdocumentation
@@ -7292,7 +7293,7 @@ $Element->{$HTML_NS}->{fieldset} = {
   }, # check_end
 }; # fieldset
 
-$Element->{$HTML_NS}->{legend} = {
+$Element->{+HTML_NS}->{legend} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -7306,7 +7307,7 @@ $Element->{$HTML_NS}->{legend} = {
   }), # check_attrs
 }; # legend
 
-$Element->{$HTML_NS}->{label} = {
+$Element->{+HTML_NS}->{label} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -7326,7 +7327,7 @@ $Element->{$HTML_NS}->{label} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {label => 1}});
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {label => 1}});
 
     ## If $self->{flag}->{has_label} is true, then there is at least
     ## an ancestor |label| element.
@@ -7369,7 +7370,7 @@ $Element->{$HTML_NS}->{label} = {
   },
 }; # label
 
-$Element->{$HTML_NS}->{input} = {
+$Element->{+HTML_NS}->{input} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_WD | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => sub {
@@ -8103,7 +8104,7 @@ $Element->{$HTML_NS}->{input} = {
 ## XXXresource: Dimension attributes have requirements on width and
 ## height of referenced resource.
 
-$Element->{$HTML_NS}->{button} = {
+$Element->{+HTML_NS}->{button} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8222,7 +8223,7 @@ $Element->{$HTML_NS}->{button} = {
   }, # check_end
 }; # button
 
-$Element->{$HTML_NS}->{select} = {
+$Element->{+HTML_NS}->{select} = {
   %HTMLChecker,
   ## ISSUE: HTML5 has no requirement like these:
     ## TODO: author should SELECTED at least one OPTION in non-MULTIPLE case [HTML4].
@@ -8274,7 +8275,7 @@ $Element->{$HTML_NS}->{select} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and
+    } elsif ($child_nsuri eq HTML_NS and
              {
                option => 1, optgroup => 1,
              }->{$child_ln}) {
@@ -8293,7 +8294,7 @@ $Element->{$HTML_NS}->{select} = {
   },
 };
 
-$Element->{$HTML_NS}->{datalist} = {
+$Element->{+HTML_NS}->{datalist} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8334,7 +8335,7 @@ $Element->{$HTML_NS}->{datalist} = {
                            level => $self->{level}->{must});
       }
     } elsif ($element_state->{phase} eq 'option') {
-      if ($child_nsuri eq $HTML_NS and $child_ln eq 'option') {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'option') {
         #
       } else {
         $self->{onerror}->(node => $child_el,
@@ -8344,7 +8345,7 @@ $Element->{$HTML_NS}->{datalist} = {
     } elsif ($element_state->{phase} eq 'any') {
       if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
         $element_state->{phase} = 'phrasing';
-      } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'option') {
+      } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'option') {
         $element_state->{phase} = 'option';
       } else {
         $self->{onerror}->(node => $child_el,
@@ -8394,7 +8395,7 @@ $Element->{$HTML_NS}->{datalist} = {
   },
 };
 
-$Element->{$HTML_NS}->{optgroup} = {
+$Element->{+HTML_NS}->{optgroup} = {
   %HTMLChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8426,7 +8427,7 @@ $Element->{$HTML_NS}->{optgroup} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'option') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'option') {
       #
     } else {
       $self->{onerror}->(node => $child_el, type => 'element not allowed',
@@ -8442,7 +8443,7 @@ $Element->{$HTML_NS}->{optgroup} = {
   },
 };
 
-$Element->{$HTML_NS}->{option} = {
+$Element->{+HTML_NS}->{option} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8460,7 +8461,7 @@ $Element->{$HTML_NS}->{option} = {
   }),
 };
 
-$Element->{$HTML_NS}->{textarea} = {
+$Element->{+HTML_NS}->{textarea} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8607,7 +8608,7 @@ $Element->{$HTML_NS}->{textarea} = {
   }, # check_attrs2
 }; # textarea
 
-$Element->{$HTML_NS}->{keygen} = {
+$Element->{+HTML_NS}->{keygen} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_FD,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8692,7 +8693,7 @@ $Element->{$HTML_NS}->{keygen} = {
   }, # check_attrs2
 }; # keygen
 
-$Element->{$HTML_NS}->{output} = {
+$Element->{+HTML_NS}->{output} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8725,7 +8726,7 @@ $Element->{$HTML_NS}->{output} = {
 }; # output
 
 # XXX labelable
-$Element->{$HTML_NS}->{progress} = {
+$Element->{+HTML_NS}->{progress} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8769,7 +8770,7 @@ $Element->{$HTML_NS}->{progress} = {
   }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {progress => 1}});
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {progress => 1}});
 
     $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
@@ -8785,7 +8786,7 @@ $Element->{$HTML_NS}->{progress} = {
 }; # progress
 
 ## XXX labelable element
-$Element->{$HTML_NS}->{meter} = {
+$Element->{+HTML_NS}->{meter} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8870,7 +8871,7 @@ $Element->{$HTML_NS}->{meter} = {
  }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-    $self->_add_minus_elements ($element_state, {$HTML_NS => {meter => 1}});
+    $self->_add_minus_elements ($element_state, {(HTML_NS) => {meter => 1}});
 
     $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
@@ -8885,7 +8886,7 @@ $Element->{$HTML_NS}->{meter} = {
   ## note in significant text warning's documentation.
 }; # meter
 
-$Element->{$HTML_NS}->{isindex} = {
+$Element->{+HTML_NS}->{isindex} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8908,7 +8909,7 @@ $Element->{$HTML_NS}->{isindex} = {
 
 # ---- Interactive elements ----
 
-$Element->{$HTML_NS}->{details} = {
+$Element->{+HTML_NS}->{details} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8929,7 +8930,7 @@ $Element->{$HTML_NS}->{details} = {
       $element_state->{has_non_summary} = 1;
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'summary') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'summary') {
       if ($element_state->{has_non_summary}) {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:details summary', ## XXXdocumentation
@@ -8968,12 +8969,12 @@ $Element->{$HTML_NS}->{details} = {
   }, # check_end
 }; # details
 
-$Element->{$HTML_NS}->{summary} = {
+$Element->{+HTML_NS}->{summary} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_DEFAULT,
 }; # summary
 
-$Element->{$HTML_NS}->{datagrid} = {
+$Element->{+HTML_NS}->{datagrid} = {
   %HTMLFlowContentChecker,
   status => FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -8986,7 +8987,7 @@ $Element->{$HTML_NS}->{datagrid} = {
   }), # check_attrs
 }; # datagrid
 
-$Element->{$HTML_NS}->{command} = {
+$Element->{+HTML_NS}->{command} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_WD,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -9072,7 +9073,7 @@ $Element->{$HTML_NS}->{command} = {
   }, # check_end
 }; # command
 
-$Element->{$HTML_NS}->{menu} = {
+$Element->{+HTML_NS}->{menu} = {
   %HTMLPhrasingContentChecker,
   #status => FEATURE_M12N10_REC_DEPRECATED | FEATURE_HTML5_WD,
   status => FEATURE_M12N10_REC | FEATURE_HTML5_WD,
@@ -9113,7 +9114,7 @@ $Element->{$HTML_NS}->{menu} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'li') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'li') {
       if ($element_state->{phase} eq 'li') {
         #
       } elsif ($element_state->{phase} eq 'li or phrasing') {
@@ -9168,7 +9169,7 @@ $Element->{$HTML_NS}->{menu} = {
 
 # ---- Frames ----
 
-$Element->{$HTML_NS}->{frameset} = {
+$Element->{+HTML_NS}->{frameset} = {
   %HTMLChecker,
   status => FEATURE_HTML5_OBSOLETE,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -9238,10 +9239,10 @@ $Element->{$HTML_NS}->{frameset} = {
                          level => $self->{level}->{must});
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
-    } elsif ($child_nsuri eq $HTML_NS and
+    } elsif ($child_nsuri eq HTML_NS and
              ($child_ln eq 'frameset' or $child_ln eq 'frame')) {
       $item->{has_frame_or_frameset} = 1;
-    } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'noframes') {
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'noframes') {
       if ($item->{has_noframes} or
           ($self->{flag}->{in_frameset} || 0) > 1) {
         $self->{onerror}->(node => $child_el,
@@ -9284,7 +9285,7 @@ $Element->{$HTML_NS}->{frameset} = {
   }, # check_end
 }; # frameset
 
-$Element->{$HTML_NS}->{frame} = {
+$Element->{+HTML_NS}->{frame} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -9335,7 +9336,7 @@ $Element->{$HTML_NS}->{frame} = {
   }, # check_start
 }; # frame
 
-$Element->{$HTML_NS}->{noframes} = {
+$Element->{+HTML_NS}->{noframes} = {
   %HTMLTextChecker, # XXX content model restriction (same as iframe)
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
@@ -9380,7 +9381,7 @@ $Element->{$HTML_NS}->{noframes} = {
 ## object/@content-length, script/@implements, section/@cite,
 ## style/@disabled
 
-$Whatpm::ContentChecker::Namespace->{$HTML_NS}->{loaded} = 1;
+$Whatpm::ContentChecker::Namespace->{+HTML_NS}->{loaded} = 1;
 
 1;
 

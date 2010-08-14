@@ -23,9 +23,9 @@ sub FEATURE_DEPRECATED_INFO () { 0b1000000 } ## Does not affect conformance
 ## Conformance
 sub FEATURE_ALLOWED () { 0b10000 }
 
-my $HTML_NS = q<http://www.w3.org/1999/xhtml>;
-my $XML_NS = q<http://www.w3.org/XML/1998/namespace>;
-my $XMLNS_NS = q<http://www.w3.org/2000/xmlns/>;
+sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
+sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
+sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 my $Namespace = {
   '' => {loaded => 1},
@@ -34,9 +34,9 @@ my $Namespace = {
       => {module => 'Whatpm::ContentChecker::Atom'},
   q<http://purl.org/syndication/threading/1.0>
       => {module => 'Whatpm::ContentChecker::Atom'},
-  $HTML_NS => {module => 'Whatpm::ContentChecker::HTML'},
-  $XML_NS => {loaded => 1},
-  $XMLNS_NS => {loaded => 1},
+  (HTML_NS) => {module => 'Whatpm::ContentChecker::HTML'},
+  (XML_NS) => {loaded => 1},
+  (XMLNS_NS) => {loaded => 1},
   q<http://www.w3.org/1999/02/22-rdf-syntax-ns#> => {loaded => 1},
 };
 
@@ -76,7 +76,7 @@ our $MIMETypeChecker = sub {
 }; # $MIMETypeChecker
 
 our $AttrChecker = {
-  $XML_NS => {
+  (XML_NS) => {
     space => sub {
       my ($self, $attr) = @_;
       my $value = $attr->value;
@@ -110,7 +110,7 @@ our $AttrChecker = {
       ## TODO: test data
 
       my $nsuri = $attr->owner_element->namespace_uri;
-      if (defined $nsuri and $nsuri eq $HTML_NS) {
+      if (defined $nsuri and $nsuri eq HTML_NS) {
         my $lang_attr = $attr->owner_element->get_attribute_node_ns
             (undef, 'lang');
         if ($lang_attr) {
@@ -173,25 +173,25 @@ our $AttrChecker = {
       push @{$element_state->{element_ids} ||= []}, $value;
     },
   },
-  $XMLNS_NS => {
+  (XMLNS_NS) => {
     '' => sub {
       my ($self, $attr) = @_;
       my $ln = $attr->manakai_local_name;
       my $value = $attr->value;
-      if ($value eq $XML_NS and $ln ne 'xml') {
+      if ($value eq XML_NS and $ln ne 'xml') {
         $self->{onerror}
           ->(node => $attr,
              type => 'Reserved Prefixes and Namespace Names:Name',
              text => $value,
              level => $self->{level}->{nc});
-      } elsif ($value eq $XMLNS_NS) {
+      } elsif ($value eq XMLNS_NS) {
         $self->{onerror}
           ->(node => $attr,
              type => 'Reserved Prefixes and Namespace Names:Name',
              text => $value,
              level => $self->{level}->{nc});
       }
-      if ($ln eq 'xml' and $value ne $XML_NS) {
+      if ($ln eq 'xml' and $value ne XML_NS) {
         $self->{onerror}
           ->(node => $attr,
              type => 'Reserved Prefixes and Namespace Names:Prefix',
@@ -212,13 +212,13 @@ our $AttrChecker = {
       ## TODO: In XML 1.1, IRI reference [RFC 3987] or an empty string
       ## TODO: relative references are deprecated
       my $value = $attr->value;
-      if ($value eq $XML_NS) {
+      if ($value eq XML_NS) {
         $self->{onerror}
           ->(node => $attr,
              type => 'Reserved Prefixes and Namespace Names:Name',
              text => $value,
              level => $self->{level}->{nc});
-      } elsif ($value eq $XMLNS_NS) {
+      } elsif ($value eq XMLNS_NS) {
         $self->{onerror}
           ->(node => $attr,
              type => 'Reserved Prefixes and Namespace Names:Name',
@@ -230,17 +230,17 @@ our $AttrChecker = {
 };
 
 ## ISSUE: Should we really allow these attributes?
-$AttrChecker->{''}->{'xml:space'} = $AttrChecker->{$XML_NS}->{space};
-$AttrChecker->{''}->{'xml:lang'} = $AttrChecker->{$XML_NS}->{lang};
+$AttrChecker->{''}->{'xml:space'} = $AttrChecker->{+XML_NS}->{space};
+$AttrChecker->{''}->{'xml:lang'} = $AttrChecker->{+XML_NS}->{lang};
     ## NOTE: Checker for (null, "xml:lang") attribute is shadowed for
     ## HTML elements in Whatpm::ContentChecker::HTML.
-$AttrChecker->{''}->{'xml:base'} = $AttrChecker->{$XML_NS}->{base};
-$AttrChecker->{''}->{'xml:id'} = $AttrChecker->{$XML_NS}->{id};
+$AttrChecker->{''}->{'xml:base'} = $AttrChecker->{+XML_NS}->{base};
+$AttrChecker->{''}->{'xml:id'} = $AttrChecker->{+XML_NS}->{id};
 
 our $AttrStatus;
 
 for (qw/space lang base id/) {
-  $AttrStatus->{$XML_NS}->{$_} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
+  $AttrStatus->{+XML_NS}->{$_} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
   $AttrStatus->{''}->{"xml:$_"} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
   ## XML 1.0: FEATURE_STATUS_CR
   ## XML 1.1: FEATURE_STATUS_REC
@@ -250,7 +250,7 @@ for (qw/space lang base id/) {
   ## xml:id: FEATURE_STATUS_REC
 }
 
-$AttrStatus->{$XMLNS_NS}->{''} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
+$AttrStatus->{+XMLNS_NS}->{''} = FEATURE_STATUS_REC | FEATURE_ALLOWED;
 
 our %AnyChecker = (
   ## NOTE: |check_start| is invoked before anything on the element's
@@ -342,7 +342,7 @@ our $ElementDefault = {
 
 our $HTMLEmbeddedContent = {
   ## NOTE: All embedded content is also phrasing content.
-  $HTML_NS => {
+  (HTML_NS) => {
     img => 1, iframe => 1, embed => 1, object => 1, video => 1, audio => 1,
     canvas => 1,
   },
@@ -365,15 +365,15 @@ our $IsInHTMLInteractiveContent = sub {
   ## true for non-interactive content as long as the element cannot be
   ## interactive content.
 
-  if ($nsuri eq $HTML_NS and $ln eq 'input') {
+  if ($nsuri eq HTML_NS and $ln eq 'input') {
     my $value = $el->get_attribute_ns (undef, 'type') || '';
     $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     return ($value ne 'hidden');
-  } elsif ($nsuri eq $HTML_NS and ($ln eq 'img' or $ln eq 'object')) {
+  } elsif ($nsuri eq HTML_NS and ($ln eq 'img' or $ln eq 'object')) {
     return $el->has_attribute_ns (undef, 'usemap');
-  } elsif ($nsuri eq $HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
+  } elsif ($nsuri eq HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
     return $el->has_attribute_ns (undef, 'controls');
-  } elsif ($nsuri eq $HTML_NS and $ln eq 'menu') {
+  } elsif ($nsuri eq HTML_NS and $ln eq 'menu') {
     my $value = $el->get_attribute_ns (undef, 'type') || '';
     $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
     return ($value eq 'toolbar');
@@ -383,7 +383,7 @@ our $IsInHTMLInteractiveContent = sub {
 }; # $IsInHTMLInteractiveContent
 
 my $HTMLTransparentElements = {
-  $HTML_NS => {
+  (HTML_NS) => {
     ins => 1, del => 1,
     font => 1, ## dropped from the spec
     noscript => 1,
@@ -398,7 +398,7 @@ my $HTMLTransparentElements = {
 ## NOTE: Now that the term "semi-transparent content model" is dropped
 ## from the spec, but the concept is not.
 my $HTMLSemiTransparentElements = {
-  $HTML_NS => {object => 1, applet => 1, video => 1, audio => 1},
+  (HTML_NS) => {object => 1, applet => 1, video => 1, audio => 1},
 }; # $HTMLSemiTransparentElements
 
 our $Element = {};
@@ -724,8 +724,8 @@ next unless $code;## TODO: temp.
           my $child_ln = $child->manakai_local_name;
           if ($HTMLTransparentElements->{$child_nsuri}->{$child_ln} and
               not (($self->{flag}->{in_head} or
-                    ($el_nsuri eq $HTML_NS and $el_ln eq 'head')) and
-                   $child_nsuri eq $HTML_NS and $child_ln eq 'noscript')) {
+                    ($el_nsuri eq HTML_NS and $el_ln eq 'head')) and
+                   $child_nsuri eq HTML_NS and $child_ln eq 'noscript')) {
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
                              $child_nsuri, $child_ln, 1,
@@ -737,11 +737,11 @@ next unless $code;## TODO: temp.
                              transparent => 1};
           } else {
             if ($item->{parent_def} and # has parent
-                $el_nsuri eq $HTML_NS) { ## $HTMLSemiTransparentElements
+                $el_nsuri eq HTML_NS) { ## $HTMLSemiTransparentElements
               if ($el_ln eq 'object' or $el_ln eq 'applet') {
                 if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
                   #
-                } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'param') {
+                } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'param') {
                   #
                 } else {
                   $content_def = $item->{parent_def} || $content_def;
@@ -750,7 +750,7 @@ next unless $code;## TODO: temp.
               } elsif ($el_ln eq 'video' or $el_ln eq 'audio') {
                 if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
                   #
-                } elsif ($child_nsuri eq $HTML_NS and $child_ln eq 'source') {
+                } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'source') {
                   $element_state->{has_source} = 1;
                 } else {
                   $content_def = $item->{parent_def} || $content_def;
@@ -810,7 +810,7 @@ next unless $code;## TODO: temp.
         if ($el->node_type == 1 and # ELEMENT_NODE
             $el->manakai_local_name eq 'datatemplate') {
           my $nsuri = $el->namespace_uri;
-          if (defined $nsuri and $nsuri eq $HTML_NS) {
+          if (defined $nsuri and $nsuri eq HTML_NS) {
             if ($el eq $_->[1]->owner_element) {
               $self->{onerror}->(node => $_->[1],
                                  type => 'fragment points itself',
@@ -882,9 +882,9 @@ next unless $code;## TODO: temp.
     } elsif ($_->[0] eq 'repeat-template' and $self->{id}->{$_->[1]}) {
       my $re = $self->{id}->{$_->[1]}->[0]->owner_element;
       my $rens = $re->namespace_uri;
-      my $repeat = (defined $rens and $rens eq $HTML_NS)
+      my $repeat = (defined $rens and $rens eq HTML_NS)
           ? $re->get_attribute_ns (undef, 'repeat')
-          : $re->get_attribute_ns ($HTML_NS, 'repeat');
+          : $re->get_attribute_ns (HTML_NS, 'repeat');
       if (defined $repeat and $repeat eq 'template') {
         #
       } else {
@@ -1076,18 +1076,18 @@ sub _check_get_children ($$$) {
     $node_ns = '' unless defined $node_ns;
     my $node_ln = $node->manakai_local_name;
     if ($HTMLTransparentElements->{$node_ns}->{$node_ln}) {
-      if ($node_ns eq $HTML_NS and $node_ln eq 'noscript') {
+      if ($node_ns eq HTML_NS and $node_ln eq 'noscript') {
         if ($parent_todo->{flag}->{in_head}) {
           #
         } else {
-          my $end = $self->_add_minuses ({$HTML_NS, {noscript => 1}});
+          my $end = $self->_add_minuses ({HTML_NS, {noscript => 1}});
           push @$sib, $end;
           
           unshift @$sib, @{$node->child_nodes};
           push @$new_todos, {type => 'element-attributes', node => $node};
           last TP;
         }
-      } elsif ($node_ns eq $HTML_NS and $node_ln eq 'del') {
+      } elsif ($node_ns eq HTML_NS and $node_ln eq 'del') {
         my $sig_flag = $parent_todo->{flag}->{has_descendant}->{significant};
         unshift @$sib, @{$node->child_nodes};
         push @$new_todos, {type => 'element-attributes', node => $node};
@@ -1104,7 +1104,7 @@ sub _check_get_children ($$$) {
         last TP;
       }
     }
-    if ($node_ns eq $HTML_NS and ($node_ln eq 'video' or $node_ln eq 'audio')) {
+    if ($node_ns eq HTML_NS and ($node_ln eq 'video' or $node_ln eq 'audio')) {
       if ($node->has_attribute_ns (undef, 'src')) {
         unshift @$sib, @{$node->child_nodes};
         push @$new_todos, {type => 'element-attributes', node => $node};
@@ -1117,7 +1117,7 @@ sub _check_get_children ($$$) {
           if ($cnt == 1) {
             my $cn_nsuri = $cn->namespace_uri;
             $cn_nsuri = '' unless defined $cn_nsuri;
-            if ($cn_nsuri eq $HTML_NS and $cn->manakai_local_name eq 'source') {
+            if ($cn_nsuri eq HTML_NS and $cn->manakai_local_name eq 'source') {
               #
             } else {
               last CN;
@@ -1130,7 +1130,7 @@ sub _check_get_children ($$$) {
         } # CN
         unshift @$sib, @cn;
       }
-    } elsif ($node_ns eq $HTML_NS and $node_ln eq 'object') {
+    } elsif ($node_ns eq HTML_NS and $node_ln eq 'object') {
       my @cn = @{$node->child_nodes};
       CN: while (@cn) {
         my $cn = shift @cn;
@@ -1138,7 +1138,7 @@ sub _check_get_children ($$$) {
         if ($cnt == 1) {
           my $cn_nsuri = $cn->namespace_uri;
           $cn_nsuri = '' unless defined $cn_nsuri;
-          if ($cn_nsuri eq $HTML_NS and $cn->manakai_local_name eq 'param') {
+          if ($cn_nsuri eq HTML_NS and $cn->manakai_local_name eq 'param') {
             #
           } else {
             last CN;

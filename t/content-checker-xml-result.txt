@@ -1,8 +1,4 @@
 1..29
-# Running under perl version 5.010001 for linux
-# Current time local: Sun Jan 24 22:45:40 2010
-# Current time GMT:   Sun Jan 24 13:45:40 2010
-# Using Test.pm version 1.25_02
 # ../t/dom-conformance/xml-1.dat
 ok 1
 ok 2
@@ -23,9 +19,15 @@ ok 15
 ok 16
 ok 17
 ok 18
-not ok 19
-# Test 19 got: "/a;unknown element;u" (content-checker.pl at line 69 fail #19)
-#    Expected: "/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC\n/a;unknown element;u" (<xmlns:a/>)
+not ok 19 - <xmlns:a/>
+#   Failed test '<xmlns:a/>'
+#   at content-checker-test-ok line 1.
+# +---+----------------------+---+------------------------------------------------------+
+# | Ln|Got                   | Ln|Expected                                              |
+# +---+----------------------+---+------------------------------------------------------+
+# |   |                      *  1|/a;Reserved Prefixes and Namespace Names:<xmlns:>;NC  *
+# |  1|/a;unknown element;u  |  2|/a;unknown element;u                                  |
+# +---+----------------------+---+------------------------------------------------------+
 ok 20
 ok 21
 ok 22
@@ -37,3 +39,5 @@ ok 27
 ok 28
 ok 29
 ok 30
+# Looks like you planned 29 tests but ran 30.
+# Looks like you failed 1 test of 30 run.
