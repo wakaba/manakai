@@ -5538,6 +5538,7 @@ $Element->{+HTML_NS}->{iframe} = {
     noresize => $GetHTMLBooleanAttrChecker->('noresize'),
     sandbox => $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker->({
       'allow-same-origin' => 1, 'allow-forms' => 1, 'allow-scripts' => 1,
+      'allow-top-navigation' => 1,
     }),
     scrolling => $GetHTMLEnumeratedAttrChecker->({
       yes => 1, no => 1, auto => 1,
