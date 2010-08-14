@@ -2958,6 +2958,12 @@ a</th>
 /tfoot/@align;attribute not defined;m
 
 #data
+<tfoot align="middle" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
+#errors
+/tfoot/@align;attribute not defined;m
+/tfoot/@align;enumerated:non-conforming;m
+
+#data
 <col align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /col/@align;attribute not defined;m
@@ -2990,6 +2996,12 @@ a</th>
 #errors
 /th/@align;attribute not defined;m
 /th/@align;enumerated:invalid;m
+
+#data
+<th align="middle" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@align;attribute not defined;m
+/th/@align;enumerated:non-conforming;m
 
 #data
 <td align="bottom" xmlns="http://www.w3.org/1999/xhtml">x</td>
