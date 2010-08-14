@@ -44,6 +44,7 @@
 #errors
 /body;no significant content;s
 /body/b;no significant content;s
+/body/b;attribute missing;class;w
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -265,6 +266,7 @@ para
 #errors
 /section;no significant content;s
 /section/b;no significant content;s
+/section/b;attribute missing;class;w
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -304,6 +306,7 @@ para
 /section/style;SUBDOC;text/css
 /section;no significant content;s
 /section/b;no significant content;s
+/section/b;attribute missing;class;w
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -315,6 +318,7 @@ para
 /section/style;SUBDOC;text/css
 /section;no significant content;s
 /section/b;no significant content;s
+/section/b;attribute missing;class;w
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml">
@@ -3177,6 +3181,7 @@ aaa
 #errors
 /b/center;element not defined;m
 /b/center;element not allowed:phrasing;m
+/b;attribute missing;class;w
 
 #data
 <center clear="" xmlns="http://www.w3.org/1999/xhtml">a</center>
@@ -3254,6 +3259,7 @@ aaa
 #errors
 /b/marquee;element not defined;m
 /b/marquee;element not allowed:phrasing;m
+/b;attribute missing;class;w
 
 #data
 <marquee xmlns="http://www.w3.org/1999/xhtml"
@@ -3806,6 +3812,7 @@ aaa
 #errors
 /b/multicol;element not defined;m
 /b/multicol;element not allowed:phrasing;m
+/b;attribute missing;class;w
 
 #data
 <multicol cols="" xmlns="http://www.w3.org/1999/xhtml">a</multicol>
@@ -3936,6 +3943,7 @@ aaa
 /i/dir;element not defined;m
 /i/dir;element not allowed:phrasing;m
 /i/dir/li;no significant content;s
+/i;attribute missing;class;w
 
 #data
 <body background="" xmlns="http://www.w3.org/1999/xhtml">x</body>
@@ -7618,6 +7626,7 @@ a
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><i>a</i></p>
 #errors
+/p/i;attribute missing;class;w
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><?a?>b</p>

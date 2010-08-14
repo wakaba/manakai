@@ -51,20 +51,21 @@
 
 #data
 <code xmlns="http://www.w3.org/1999/xhtml">
-  <em>XXX</em>
+  <em>XX</em>
 </code>
 #errors
 
 #data
 <code xmlns="http://www.w3.org/1999/xhtml">
-  <em>XXX<b/></em>
+  <em>XX<b/></em>
 </code>
 #errors
 /code/em/b;no significant content;s
+/code/em/b;attribute missing;class;w
 
 #data
 <code xmlns="http://www.w3.org/1999/xhtml">
-  <em>XXX<blockquote/></em>
+  <em>XX<blockquote/></em>
 </code>
 #errors
 /code/em/blockquote;element not allowed:phrasing;m
@@ -88,19 +89,20 @@
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-  <em>XXX</em>
+  <em>XX</em>
 </p>
 #errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-  <em>XXX<b>YYY</b></em>
+  <em>XX<b>YYY</b></em>
 </p>
 #errors
+/p/em/b;attribute missing;class;w
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-  <em>XXX<blockquote/></em>
+  <em>XX<blockquote/></em>
 </p>
 #errors
 /p/em/blockquote;no significant content;s
@@ -203,13 +205,13 @@
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-<dfn>XXX</dfn>
+<dfn>XX</dfn>
 </p>
 #errors
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
-<dfn><em>XXX</em></dfn>
+<dfn><em>XX</em></dfn>
 </p>
 #errors
 
@@ -474,6 +476,50 @@
 </p>
 #errors
 /p/dfn;no significant content;s
+
+#data
+<i xmlns="http://www.w3.org/1999/xhtml"></i>
+#errors
+/i;no significant content;s
+/i;attribute missing;class;w
+
+#data
+<i xmlns="http://www.w3.org/1999/xhtml">  </i>
+#errors
+/i;no significant content;s
+/i;attribute missing;class;w
+
+#data
+<i xmlns="http://www.w3.org/1999/xhtml">abc</i>
+#errors
+/i;attribute missing;class;w
+
+#data
+<i xmlns="http://www.w3.org/1999/xhtml" class="">abc</i>
+#errors
+/i;last resort;w
+
+#data
+<b xmlns="http://www.w3.org/1999/xhtml"></b>
+#errors
+/b;no significant content;s
+/b;attribute missing;class;w
+
+#data
+<b xmlns="http://www.w3.org/1999/xhtml">  </b>
+#errors
+/b;no significant content;s
+/b;attribute missing;class;w
+
+#data
+<b xmlns="http://www.w3.org/1999/xhtml">abc</b>
+#errors
+/b;attribute missing;class;w
+
+#data
+<b xmlns="http://www.w3.org/1999/xhtml" class="">abc</b>
+#errors
+/b;last resort;s
 
 #data
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23</time>

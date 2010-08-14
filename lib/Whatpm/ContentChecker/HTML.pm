@@ -4710,8 +4710,6 @@ $Element->{+HTML_NS}->{sub} = {
 
 $Element->{+HTML_NS}->{sup} = $Element->{+HTML_NS}->{sub};
 
-# XXX Warning for "authors are encouraged to consider whether other
-# elements might be more applicable"
 $Element->{+HTML_NS}->{i} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
@@ -4721,6 +4719,29 @@ $Element->{+HTML_NS}->{i} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
   }), # check_attrs
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+    my $el = $item->{node}; # <i> or <b>
+
+    if ($el->has_attribute_ns (undef, 'class')) {
+      if ($el->manakai_local_name eq 'b') {
+        $self->{onerror}->(type => 'last resort', # XXXtype
+                           node => $el,
+                           level => $self->{level}->{should});
+      } else {
+        $self->{onerror}->(type => 'last resort', # XXXtype
+                           node => $el,
+                           level => $self->{level}->{good}); # encouraged
+      }
+    } else {
+      $self->{onerror}->(type => 'attribute missing',
+                         text => 'class',
+                         node => $el,
+                         level => $self->{level}->{good}); # encouraged
+    }
+
+    $HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
 }; # i
 
 $Element->{+HTML_NS}->{b} = $Element->{+HTML_NS}->{i};
