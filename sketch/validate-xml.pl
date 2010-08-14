@@ -11,9 +11,12 @@ use Message::DOM::DOMImplementation;
 my $dom = Message::DOM::DOMImplementation->new;
 my $doc = $dom->create_document;
 
+print STDERR "Parsing...";
 $doc->inner_html ($input);
+print STDERR "\n";
 
 use Whatpm::ContentChecker;
+print STDERR "Checking...\n";
 Whatpm::ContentChecker->check_document ($doc, sub {
   my %err = @_;
   my $line = delete $err{line} || 0;
