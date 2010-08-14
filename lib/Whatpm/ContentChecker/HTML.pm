@@ -1096,17 +1096,22 @@ my $HTMLCharsetsAttrChecker = sub {
 
 my $HTMLColorAttrChecker = sub {
   my ($self, $attr) = @_;
-  
-  ## NOTE: HTML4 "color" or |%Color;|
-
   my $value = $attr->value;
 
-  if ($value !~ /\A(?>#[0-9A-F]+|black|silver|gray|white|maroon|red|purple|fuchsia|green|lime|olive|yellow|navy|blue|teal|aqua)\z/i) {
-    $self->{onerror}->(node => $attr, type => 'color:syntax error',
-                       level => $self->{level}->{html4_fact});
-  }
+  if ($attr->value =~ /\A\x23[0-9A-Fa-f]{6}\z/) {
+    #
+  } else {
+    require Whatpm::CSS::Colors;
 
-  ## TODO: HTML4 has some guideline on usage of color.
+    $value =~ tr/A-Z/a-z/;
+    if ($Whatpm::CSS::Colors::X11Colors->{$value}) {
+      #
+    } else {
+      $self->{onerror}->(node => $attr,
+                         type => 'color:syntax error',
+                         level => $self->{level}->{must});
+    }
+  }
 }; # $HTMLColorAttrChecker
 
 my $FontSizeChecker = sub {

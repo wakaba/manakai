@@ -2716,6 +2716,45 @@
 
 #data
 <font xmlns="http://www.w3.org/1999/xhtml"
+    color="#c0c0c0">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="C0C0C0">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="#CCC">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="#red">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="#00000000">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
     color="RED">a</font>
 #errors
 /font;element not defined;m
@@ -2723,7 +2762,43 @@
 
 #data
 <font xmlns="http://www.w3.org/1999/xhtml"
+    color="gray">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="grey">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="SkyBlue">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="tan">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
     color="color">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="HoneydewTad">a</font>
 #errors
 /font;element not defined;m
 /font/@color;attribute not defined;m
@@ -2740,6 +2815,22 @@
 #data
 <font xmlns="http://www.w3.org/1999/xhtml"
     color="rgb(1,2,3)">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="activeborder">a</font>
+#errors
+/font;element not defined;m
+/font/@color;attribute not defined;m
+/font/@color;color:syntax error;m
+
+#data
+<font xmlns="http://www.w3.org/1999/xhtml"
+    color="ActiveBorder">a</font>
 #errors
 /font;element not defined;m
 /font/@color;attribute not defined;m
