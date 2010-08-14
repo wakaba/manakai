@@ -6832,7 +6832,7 @@ $Element->{+HTML_NS}->{caption} = {
 my %cellalign = (
   align => $GetHTMLEnumeratedAttrChecker->({
     left => 1, center => 1, right => 1, justify => 1, char => 1,
-    middle => -1,
+    middle => -1, absmiddle => -1,
   }),
   ch => $CharChecker,
   char => $CharChecker,

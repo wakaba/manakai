@@ -2953,12 +2953,32 @@ a</th>
 /thead/tr/td;element not allowed:thead td;m
 
 #data
+<thead align="middle" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
+#errors
+/thead/@align;attribute not defined;m
+/thead/@align;enumerated:non-conforming;m
+/thead/tr/td;element not allowed:thead td;m
+
+#data
+<thead align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></thead>
+#errors
+/thead/@align;attribute not defined;m
+/thead/@align;enumerated:non-conforming;m
+/thead/tr/td;element not allowed:thead td;m
+
+#data
 <tfoot align="center" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
 #errors
 /tfoot/@align;attribute not defined;m
 
 #data
 <tfoot align="middle" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
+#errors
+/tfoot/@align;attribute not defined;m
+/tfoot/@align;enumerated:non-conforming;m
+
+#data
+<tfoot align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tfoot>
 #errors
 /tfoot/@align;attribute not defined;m
 /tfoot/@align;enumerated:non-conforming;m
@@ -3004,10 +3024,28 @@ a</th>
 /th/@align;enumerated:non-conforming;m
 
 #data
+<th align="absmiddle" xmlns="http://www.w3.org/1999/xhtml">x</th>
+#errors
+/th/@align;attribute not defined;m
+/th/@align;enumerated:non-conforming;m
+
+#data
 <td align="bottom" xmlns="http://www.w3.org/1999/xhtml">x</td>
 #errors
 /td/@align;attribute not defined;m
 /td/@align;enumerated:invalid;m
+
+#data
+<td align="middle" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@align;attribute not defined;m
+/td/@align;enumerated:non-conforming;m
+
+#data
+<td align="absmiddle" xmlns="http://www.w3.org/1999/xhtml">x</td>
+#errors
+/td/@align;attribute not defined;m
+/td/@align;enumerated:non-conforming;m
 
 #data
 <tbody valign="" xmlns="http://www.w3.org/1999/xhtml"><tr><td>x</td></tr></tbody>
