@@ -4,13 +4,12 @@ WGET = wget
 RM = rm
 RMALL = $(RM) -fr
 
-all: SelectorsParser.html
+all: SelectorsParser.html Colors.html
 
 %.html: %.pod
 	$(POD2HTML) $< > $@
 
 clean:
-	$(RMALL) *~ *.bak *.tmp
+	$(RMALL) *~ *.bak *.tmp pod*.tmp
 
 ## License: Public Domain.
-## $Date: 2007/10/17 09:47:36 $

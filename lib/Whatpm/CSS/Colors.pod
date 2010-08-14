@@ -1,0 +1,52 @@
+=head1 NAME
+
+Whatpm::CSS::Colors - CSS Color Definitions
+
+=head1 SYNOPSIS
+
+  require Whatpm::CSS::Colors;
+  
+  my $rgb = $Whatpm::CSS::Colors::X11Colors->{yellow};
+  my $found = $Whatpm::CSS::Colors::SystemColors->{activeborder};
+
+=head1 DESCRIPTION
+
+The C<Whatpm::CSS::Colors> module contains definition of CSS colors.
+
+=head1 VARIABLES
+
+=over 4
+
+=item $Whatpm::CSS::Colors::X11Colors
+
+A hash reference, which contains so-called X11 color keywords and
+their RGB definitions.  Color keywords and RGBs are represented as
+hash keys and values, where values are array references representing
+red-, green-, and blue-component of the RGB.  Keywords are in
+lowercase.
+
+=item $Whatpm::CSS::Colors::SystemColors
+
+A hash reference, which contains CSS system color keywords.  Color
+keywords are represented as hash keys; whoes values are always true.
+Keywords are in lowercase.
+
+=back
+
+=head1 SEE ALSO
+
+CSS Color Module Level 3 <http://dev.w3.org/csswg/css3-color/>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.  List of color keywords and their definitions
+are taken from the CSS Color Module Level 3 specification.
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

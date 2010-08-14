@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::CSS::Colors - CSS Color Definitions</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#variables">VARIABLES</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::CSS::Colors - CSS Color Definitions</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  require Whatpm::CSS::Colors;
+  
+  my $rgb = $Whatpm::CSS::Colors::X11Colors-&gt;{yellow};
+  my $found = $Whatpm::CSS::Colors::SystemColors-&gt;{activeborder};</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::CSS::Colors</code> module contains definition of CSS colors.</p>
+<p>
+</p>
+<hr />
+<h1><a name="variables">VARIABLES</a></h1>
+<dl>
+<dt><strong><a name="_whatpm__css__colors__x11colors" class="item">$Whatpm::CSS::Colors::X11Colors</a></strong></dt>
+
+<dd>
+<p>A hash reference, which contains so-called X11 color keywords and
+their RGB definitions.  Color keywords and RGBs are represented as
+hash keys and values, where values are array references representing
+red-, green-, and blue-component of the RGB.  Keywords are in
+lowercase.</p>
+</dd>
+<dt><strong><a name="_whatpm__css__colors__systemcolors" class="item">$Whatpm::CSS::Colors::SystemColors</a></strong></dt>
+
+<dd>
+<p>A hash reference, which contains CSS system color keywords.  Color
+keywords are represented as hash keys; whoes values are always true.
+Keywords are in lowercase.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>CSS Color Module Level 3 &lt;http://dev.w3.org/csswg/css3-color/&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.  List of color keywords and their definitions
+are taken from the CSS Color Module Level 3 specification.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007-2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>
