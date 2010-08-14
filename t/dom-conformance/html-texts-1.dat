@@ -486,6 +486,11 @@
 #errors
 
 #data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T</time>
+#errors
+/time;dateortime:syntax error;m
+
+#data
 <time xmlns="http://www.w3.org/1999/xhtml">14:44:44</time>
 #errors
 
@@ -601,6 +606,11 @@
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-2314:44:44Z</time>
 #errors
 /time;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml" datetime="1990-10-10T">Z</time>
+#errors
+/time/@datetime;dateortime:syntax error;m
 
 #data
 <time datetime="2008-12-23&#x3000;14:44:44Z" xmlns="http://www.w3.org/1999/xhtml">today</time>
