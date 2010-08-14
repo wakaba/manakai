@@ -2359,14 +2359,14 @@ $Element->{+HTML_NS}->{link} = {
           FEATURE_M12N10_REC,
       hreflang => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
       media => FEATURE_HTML5_LC | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
-      methods => FEATURE_OBSVOCAB,
+      methods => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       rel => FEATURE_HTML5_LC | FEATURE_RDFA_REC | FEATURE_XHTML2_ED |
           FEATURE_M12N10_REC,
       sizes => FEATURE_HTML5_LC,
       src => FEATURE_OBSVOCAB,
       target => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-      urn => FEATURE_OBSVOCAB,
+      urn => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     })->($self, $item, $element_state);
 
     if ($item->{node}->has_attribute_ns (undef, 'href')) {
