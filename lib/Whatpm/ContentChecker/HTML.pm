@@ -5590,13 +5590,13 @@ $Element->{+HTML_NS}->{iframe} = {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    allowtransparency => FEATURE_OBSVOCAB,
+    allowtransparency => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     application => FEATURE_OBSVOCAB,
     border => FEATURE_OBSVOCAB,
     frameborder => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     framespacing => FEATURE_OBSVOCAB,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    hspace => FEATURE_OBSVOCAB,
+    hspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     longdesc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     marginheight => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     marginwidth => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
@@ -5609,7 +5609,7 @@ $Element->{+HTML_NS}->{iframe} = {
     seemless => FEATURE_HTML5_LC,
     src => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     srcdoc => FEATURE_HTML5_FD,
-    vspace => FEATURE_OBSVOCAB,
+    vspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }), # check_attrs
   check_start => sub {
@@ -5641,7 +5641,7 @@ $Element->{+HTML_NS}->{embed} = {
         border => FEATURE_OBSVOCAB,
         code => FEATURE_OBSVOCAB,
         height => FEATURE_HTML5_LC,
-        hspace => FEATURE_OBSVOCAB,
+        hspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
         name => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
         palette => FEATURE_OBSVOCAB,
         pluginpage => FEATURE_OBSVOCAB,
@@ -5650,7 +5650,7 @@ $Element->{+HTML_NS}->{embed} = {
         src => FEATURE_HTML5_WD,
         type => FEATURE_HTML5_WD,
         units => FEATURE_OBSVOCAB,
-        vspace => FEATURE_OBSVOCAB,
+        vspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
         width => FEATURE_HTML5_LC,
       }->{$attr_ln};
 
@@ -7447,7 +7447,7 @@ $Element->{+HTML_NS}->{input} = {
          formnovalidate => FEATURE_HTML5_LC,
          formtarget => FEATURE_HTML5_LC,
          height => FEATURE_HTML5_LC,
-         hspace => FEATURE_OBSVOCAB,
+         hspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          incremental => FEATURE_OBSVOCAB,
          inputmode => FEATURE_OBSVOCAB,
          iprof => FEATURE_OBSVOCAB,
@@ -7486,7 +7486,7 @@ $Element->{+HTML_NS}->{input} = {
          vibration => FEATURE_OBSVOCAB,
          volume => FEATURE_OBSVOCAB,
          vrml => FEATURE_OBSVOCAB,
-         vspace => FEATURE_OBSVOCAB,
+         vspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          width => FEATURE_HTML5_LC,
         }->{$attr_ln};
 
