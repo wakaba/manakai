@@ -46,7 +46,7 @@
 <updated>2000-01-02T03:04:05Z</updated>
 </feed>
 #errors
-/feed/title;SUBDOC
+/feed/title;SUBDOC;text/html
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -58,7 +58,7 @@
 #errors
 /feed/title/p;element not allowed:atom|TextConstruct;m
 /feed/title/p;unknown element;u
-/feed/title;SUBDOC
+/feed/title;SUBDOC;text/html
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -69,7 +69,7 @@
 </feed>
 #errors
 /feed/title/div;element not allowed:atom|TextConstruct;m
-/feed/title;SUBDOC
+/feed/title;SUBDOC;text/html
 
 #data
 <feed xmlns="http://www.w3.org/2005/Atom">
@@ -724,8 +724,9 @@
 </entry>
 #errors
 /entry/content/@type;IMT:composite;m
-/entry/content;atom|content not supported;image/png;u
+/entry/content;atom|content not supported;message/rfc822;u
 /entry;child element missing:atom;summary;m
+/entry/content/@type;IMT:unknown subtype;u
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom">
@@ -748,7 +749,7 @@
 <content type="html"/>
 </entry>
 #errors
-/entry/content;SUBDOC
+/entry/content;SUBDOC;text/html
 
 #data
 <entry xmlns="http://www.w3.org/2005/Atom">

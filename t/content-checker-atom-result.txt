@@ -1,67 +1,11 @@
-1..103
 # ../t/content-model-atom-1.dat
 ok 1
 ok 2
 ok 3
 ok 4
-not ok 5 - <feed xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <title type="html">xxx</title>
-# <link rel="self" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# </feed>
-#   Failed test '<feed xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <title type="html">xxx</title>
-# <link rel="self" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# </feed>'
-#   at content-checker-test-ok line 1.
-# +---+------------------------------+--------------------+
-# | Ln|Got                           |Expected            |
-# +---+------------------------------+--------------------+
-# *  1|/feed/title;SUBDOC;text/html  |/feed/title;SUBDOC  *
-# +---+------------------------------+--------------------+
-not ok 6 - <feed xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <title type="html">x<p xmlns="">x</p>x</title>
-# <link rel="self" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# </feed>
-#   Failed test '<feed xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <title type="html">x<p xmlns="">x</p>x</title>
-# <link rel="self" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# </feed>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------------------+--------------------------------------------------------+
-# | Ln|Got                                                     |Expected                                                |
-# +---+--------------------------------------------------------+--------------------------------------------------------+
-# |  1|/feed/title/p;element not allowed:atom|TextConstruct;m  |/feed/title/p;element not allowed:atom|TextConstruct;m  |
-# |  2|/feed/title/p;unknown element;u                         |/feed/title/p;unknown element;u                         |
-# *  3|/feed/title;SUBDOC;text/html                            |/feed/title;SUBDOC                                      *
-# +---+--------------------------------------------------------+--------------------------------------------------------+
-Constant subroutine HTML_NS redefined at ../lib/Whatpm/ContentChecker/HTML.pm line 11.
-not ok 7 - <feed xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <title type="html"><div xmlns="http://www.w3.org/1999/xhtml">x</div></title>
-# <link rel="self" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# </feed>
-#   Failed test '<feed xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <title type="html"><div xmlns="http://www.w3.org/1999/xhtml">x</div></title>
-# <link rel="self" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# </feed>'
-#   at content-checker-test-ok line 1.
-# +---+----------------------------------------------------------+----------------------------------------------------------+
-# | Ln|Got                                                       |Expected                                                  |
-# +---+----------------------------------------------------------+----------------------------------------------------------+
-# |  1|/feed/title/div;element not allowed:atom|TextConstruct;m  |/feed/title/div;element not allowed:atom|TextConstruct;m  |
-# *  2|/feed/title;SUBDOC;text/html                              |/feed/title;SUBDOC                                        *
-# +---+----------------------------------------------------------+----------------------------------------------------------+
+ok 5
+ok 6
+ok 7
 ok 8
 ok 9
 ok 10
@@ -102,54 +46,9 @@ ok 44
 ok 45
 ok 46
 ok 47
-not ok 48 - <entry xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <author><name>x</name></author>
-# <link rel="alternate" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# <title>x</title>
-# <content type="message/rfc822"/>
-# </entry>
-#   Failed test '<entry xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <author><name>x</name></author>
-# <link rel="alternate" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# <title>x</title>
-# <content type="message/rfc822"/>
-# </entry>'
-#   at content-checker-test-ok line 1.
-# +---+------------------------------------------------------------+---+-------------------------------------------------------+
-# | Ln|Got                                                         | Ln|Expected                                               |
-# +---+------------------------------------------------------------+---+-------------------------------------------------------+
-# |  1|/entry/content/@type;IMT:composite;m                        |  1|/entry/content/@type;IMT:composite;m                   |
-# *  2|/entry/content/@type;IMT:unknown subtype;u                  *  2|/entry/content;atom|content not supported;image/png;u  *
-# *  3|/entry/content;atom|content not supported;message/rfc822;u  *   |                                                       |
-# |  4|/entry;child element missing:atom;summary;m                 |  3|/entry;child element missing:atom;summary;m            |
-# +---+------------------------------------------------------------+---+-------------------------------------------------------+
+ok 48
 ok 49
-not ok 50 - <entry xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <author><name>x</name></author>
-# <link rel="alternate" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# <title>x</title>
-# <content type="html"/>
-# </entry>
-#   Failed test '<entry xmlns="http://www.w3.org/2005/Atom">
-# <id>about:</id>
-# <author><name>x</name></author>
-# <link rel="alternate" href=""/>
-# <updated>2000-01-02T03:04:05Z</updated>
-# <title>x</title>
-# <content type="html"/>
-# </entry>'
-#   at content-checker-test-ok line 1.
-# +---+---------------------------------+-----------------------+
-# | Ln|Got                              |Expected               |
-# +---+---------------------------------+-----------------------+
-# *  1|/entry/content;SUBDOC;text/html  |/entry/content;SUBDOC  *
-# +---+---------------------------------+-----------------------+
+ok 50
 ok 51
 ok 52
 ok 53
@@ -205,4 +104,4 @@ ok 100
 ok 101
 ok 102
 ok 103
-# Looks like you failed 5 tests of 103.
+1..103
