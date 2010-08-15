@@ -1,7 +1,7 @@
 package Whatpm::ContentChecker::HTML;
 use strict;
 use warnings;
-our $VERSION = '3.0';
+our $VERSION = '3.1';
 
 package Whatpm::ContentChecker;
 require Whatpm::ContentChecker;
@@ -212,7 +212,7 @@ my $HTMLFlowContent = {
     script => 1, noscript => 1,
     command => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
-    textarea => 1, keygen => 1, output => 1,
+    textarea => 1, keygen => 1, output => 1, wbr => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
 
@@ -259,7 +259,7 @@ my $HTMLPhrasingContent = {
     script => 1, noscript => 1,
     command => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
-    textarea => 1, keygen => 1, output => 1,
+    textarea => 1, keygen => 1, output => 1, wbr => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
     area => 1,
 
@@ -4742,7 +4742,7 @@ $Element->{+HTML_NS}->{nobr} = {
 
 $Element->{+HTML_NS}->{wbr} = {
   %HTMLEmptyChecker,
-  status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+  status => FEATURE_HTML5_REC,
 }; # wbr
 
 $Element->{+HTML_NS}->{ruby} = {

@@ -2308,44 +2308,34 @@
 #data
 <wbr xmlns="http://www.w3.org/1999/xhtml"></wbr>
 #errors
-/wbr;element not defined;m
 
 #data
 <wbr xmlns="http://www.w3.org/1999/xhtml">   </wbr>
 #errors
-/wbr;element not defined;m
 
 #data
 <wbr xmlns="http://www.w3.org/1999/xhtml">abc</wbr>
 #errors
-/wbr;element not defined;m
 /wbr/"abc";character not allowed:empty;m
 
 #data
 <wbr xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></wbr>
 #errors
-/wbr;element not defined;m
 /wbr/p;element not allowed:empty;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"><wbr/></p>
 #errors
-/p/wbr;element not defined;m
-/p/wbr;element not allowed:phrasing;m
 /p;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><wbr/></div>
 #errors
-/div/wbr;element not defined;m
-/div/wbr;element not allowed:flow;m
 /div;no significant content;s
 
 #data
 <nobr xmlns="http://www.w3.org/1999/xhtml"><wbr/></nobr>
 #errors
-/nobr/wbr;element not defined;m
-/nobr/wbr;element not allowed:phrasing;m
 /nobr;no significant content;s
 /nobr;element not defined;m
 
