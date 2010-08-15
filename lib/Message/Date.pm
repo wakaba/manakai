@@ -101,7 +101,7 @@ sub parse_week_string ($$) {
   
   if ($value =~ /\A([0-9]{4,})-W([0-9]{2})\z/x) {
     my ($y, $w) = ($1, $2);
-    $self->{onerror}->(type => 'week:bad year', ## TODOC: type
+    $self->{onerror}->(type => 'datetime:bad year', ## TODOC: type
                        level => $self->{level}->{must}) if $y == 0;
     $self->{onerror}->(type => 'week:bad week', ## TODOC: type
                        level => $self->{level}->{must})
@@ -134,6 +134,11 @@ sub parse_month_string ($$) {
   
   if ($value =~ /\A([0-9]{4,})-([0-9]{2})\z/) {
     my ($y, $M) = ($1, $2);
+    if ($y == 0) {
+      $self->{onerror}->(type => 'datetime:bad year',
+                         level => $self->{level}->{must});
+    }
+
     if (0 < $M and $M < 13) {
       #
     } else {
