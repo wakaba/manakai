@@ -14038,6 +14038,12 @@
 /input/@value;datetime:bad year;m
 
 #data
+<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+    value="0000-11-22T00:11:22"/>
+#errors
+/input/@value;datetime:bad year;m
+
+#data
 <input type="month" xmlns="http://www.w3.org/1999/xhtml"
     value="0000-11"/>
 #errors

@@ -219,6 +219,8 @@ sub parse_local_date_and_time_string ($$) {
                          level => $self->{level}->{must});
       return undef;
     }
+    $self->{onerror}->(type => 'datetime:bad year',
+                       level => $self->{level}->{must}), return undef if $y == 0;
     $self->{onerror}->(type => 'datetime:bad hour',
                        level => $self->{level}->{must}), return undef if $h > 23;
     $self->{onerror}->(type => 'datetime:bad minute',
@@ -270,6 +272,8 @@ sub parse_global_date_and_time_string ($$) {
                          level => $self->{level}->{must});
       return undef;
     }
+    $self->{onerror}->(type => 'datetime:bad year',
+                       level => $self->{level}->{must}), return undef if $y == 0;
     $self->{onerror}->(type => 'datetime:bad hour',
                        level => $self->{level}->{must}), return undef if $h > 23;
     $self->{onerror}->(type => 'datetime:bad minute',

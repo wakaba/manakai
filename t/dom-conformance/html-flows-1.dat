@@ -7594,6 +7594,12 @@ a
 /del/@datetime;datetime:bad day;m
 
 #data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0000-03-14T14:33Z">x</del>
+#errors
+/del/@datetime;datetime:bad year;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml"></p>
 #errors
 /p;no significant content;s
