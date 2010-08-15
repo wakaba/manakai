@@ -503,3 +503,247 @@
 >x</option>
 #errors
 /option/@selected;boolean:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <option selected="">a</option>
+  <option selected="">b</option>
+</select>
+#errors
+/select/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" multiple="">
+  <option selected="">a</option>
+  <option selected="">b</option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <option selected="">a</option>
+  <option selected="">b</option>
+  <option selected="">c</option>
+</select>
+#errors
+/select/option/@selected;multiple selected in select1;m
+/select/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" multiple="">
+  <option selected="">a</option>
+  <option selected="">b</option>
+  <option selected="">c</option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <option selected="">a</option>
+  <option>b</option>
+  <option>c</option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" multiple="">
+  <option selected="">a</option>
+  <option>b</option>
+  <option>c</option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <optgroup label="x">
+    <option selected="">a</option>
+    <option selected="">b</option>
+  </optgroup>
+</select>
+#errors
+/select/optgroup/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" multiple="">
+  <optgroup label="x">
+    <option selected="">a</option>
+    <option selected="">b</option>
+  </optgroup>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <optgroup label="x">
+    <option selected="">a</option>
+  </optgroup>
+  <option selected="">b</option>
+</select>
+#errors
+/select/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" multiple="">
+  <optgroup label="x">
+    <option selected="">a</option>
+  </optgroup>
+  <option selected="">b</option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <optgroup label="x">
+    <option selected="">a</option>
+  </optgroup>
+  <optgroup label="y">
+    <option selected="">b</option>
+  </optgroup>
+</select>
+#errors
+/select/optgroup/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" multiple="">
+  <optgroup label="x">
+    <option selected="">a</option>
+  </optgroup>
+  <optgroup label="y">
+    <option selected="">b</option>
+  </optgroup>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <optgroup label="x">
+    <option selected="">a</option>
+    <optgroup label="y">
+      <option selected="">b</option>
+    </optgroup>
+  </optgroup>
+</select>
+#errors
+/select/optgroup/optgroup;element not allowed;m
+/select/optgroup/optgroup/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" multiple="">
+  <optgroup label="x">
+    <option selected="">a</option>
+    <optgroup label="y">
+      <option selected="">b</option>
+    </optgroup>
+  </optgroup>
+</select>
+#errors
+/select/optgroup/optgroup;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <optgroup label="x">
+    <option selected="">a</option>
+    <select>
+      <option selected="">b</option>
+    </select>
+  </optgroup>
+</select>
+#errors
+/select/optgroup/select;element not allowed;m
+/select/optgroup/select/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <select>
+    <option selected="">b</option>
+  </select>
+  <select>
+    <option selected="">b</option>
+  </select>
+</select>
+#errors
+/select/select;element not allowed;m
+/select/select;element not allowed;m
+/select/select/option/@selected;multiple selected in select1;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <select>
+    <option>b</option>
+  </select>
+  <select>
+    <option selected="">b</option>
+  </select>
+</select>
+#errors
+/select/select;element not allowed;m
+/select/select;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml">
+  <select>
+    <option>b</option>
+  </select>
+  <select>
+    <option selected="">b</option>
+  </select>
+  <option selected="">b</option>
+</select>
+#errors
+/select/select;element not allowed;m
+/select/select;element not allowed;m
+/select/option/@selected;multiple selected in select1;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <select>
+    <option>b</option>
+  </select>
+  <select>
+    <option selected="">b</option>
+  </select>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <select>
+    <option>b</option>
+  </select>
+  <select>
+    <option selected="">b</option>
+    <option>b</option>
+  </select>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <select>
+    <option>b</option>
+  </select>
+  <select>
+    <option selected="">b</option>
+    <option selected="">b</option>
+  </select>
+</div>
+#errors
+/div/select/option/@selected;multiple selected in select1;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <datalist>
+    <option selected="">b</option>
+    <option selected="">b</option>
+  </datalist>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <option selected="">b</option>
+  <option selected="">b</option>
+</div>
+#errors
+/div/option;element not allowed:flow;m
+/div/option;element not allowed:flow;m

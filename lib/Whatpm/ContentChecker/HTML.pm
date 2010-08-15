@@ -8286,6 +8286,14 @@ $Element->{+HTML_NS}->{select} = {
     my ($self, $item, $element_state) = @_;
     $FAECheckStart->($self, $item, $element_state);
 
+    $element_state->{has_option_selected_orig}
+        = $self->{flag}->{has_option_selected}
+        unless $self->{flag}->{in_select_single};
+    $element_state->{in_select_single_orig}
+        = $self->{flag}->{in_select_single};
+    $self->{flag}->{in_select_single}
+        = not $item->{node}->has_attribute_ns (undef, 'multiple');
+
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{template}->{type}->{resource} = 1;
@@ -8323,8 +8331,18 @@ $Element->{+HTML_NS}->{select} = {
       $self->{onerror}->(node => $child_node, type => 'character not allowed',
                          level => $self->{level}->{must});
     }
-  },
-};
+  }, # check_child_text
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    $self->{flag}->{in_select_single}
+        = $element_state->{in_select_single_orig};
+    delete $self->{flag}->{has_option_selected}
+        unless $self->{flag}->{in_select_single};
+    
+    $HTMLChecker{check_end}->(@_);
+  }, # check_end
+}; # select
 
 $Element->{+HTML_NS}->{datalist} = {
   %HTMLPhrasingContentChecker,
@@ -8490,8 +8508,23 @@ $Element->{+HTML_NS}->{option} = {
     label => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     selected => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     value => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-  }),
-};
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
+
+    my $selected_node = $el->get_attribute_node_ns (undef, 'selected');
+    if ($selected_node) {
+      if ($self->{flag}->{in_select_single} and
+          $self->{flag}->{has_option_selected}) {
+        $self->{onerror}->(type => 'multiple selected in select1', # XXXtype
+                           node => $selected_node,
+                           level => $self->{level}->{must});
+      }
+      $self->{flag}->{has_option_selected} = 1;
+    }
+  }, # check_attrs2
+}; # option
 
 $Element->{+HTML_NS}->{textarea} = {
   %HTMLTextChecker,
