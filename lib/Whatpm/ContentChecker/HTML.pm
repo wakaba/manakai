@@ -1261,12 +1261,6 @@ my $HTMLAttrChecker = {
   about => $HTMLURIAttrChecker,
   accesskey => $AccesskeyChecker,
   atomicselection => $GetHTMLEnumeratedAttrChecker->({true => 1, false => 1}),
-  datasrc => $NonEmptyURLChecker,
-  datafld => sub { },
-  dataformatas => $GetHTMLEnumeratedAttrChecker->({
-    text => 1, html => 1, 'localized-text' => 1,
-    ## See <http://suika.fam.cx/~wakaba/wiki/sw/n/dataformatas>.
-  }),
 
   ## TODO: aria-* ## TODO: svg:*/@aria-* [HTML5ROLE] -> [STATES]
   id => sub {
@@ -1498,9 +1492,6 @@ my %HTMLAttrStatus = (
   content => FEATURE_OBSVOCAB,
   contenteditable => FEATURE_HTML5_REC,
   contextmenu => FEATURE_HTML5_WD,
-  datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-  dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-  datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   datatype => FEATURE_OBSVOCAB,
   dir => FEATURE_HTML5_REC,
   disabled => FEATURE_OBSVOCAB,
@@ -1897,11 +1888,6 @@ my $GetHTMLAttrsChecker = sub {
 
 my %HTMLChecker = (
   %Whatpm::ContentChecker::AnyChecker,
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-  },
   check_attrs => $GetHTMLAttrsChecker->({}, \%HTMLAttrStatus),
 );
 
@@ -2065,7 +2051,6 @@ $Element->{+HTML_NS}->{html} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before head';
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{manifest}->{type}->{resource} = 1;
   },
   check_child_element => sub {
@@ -2786,8 +2771,6 @@ $Element->{+HTML_NS}->{style} = {
     }
     $element_state->{style_type} = $type;
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-
     $element_state->{text} = '';
   },
   check_child_element => sub {
@@ -2974,7 +2957,6 @@ $Element->{+HTML_NS}->{script} = {
       $element_state->{script_type} = $type;
     }
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
 
     $element_state->{text} = '';
@@ -3066,8 +3048,6 @@ $Element->{+HTML_NS}->{noscript} = {
       $self->_add_minus_elements ($element_state,
                                   {(HTML_NS) => {noscript => 1}});
     }
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3151,7 +3131,6 @@ $Element->{+HTML_NS}->{'event-source'} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
   }, # check_start
 }; # event-source
@@ -3237,7 +3216,6 @@ $Element->{+HTML_NS}->{body} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
   }, # check_start
 }; # body
@@ -3304,8 +3282,6 @@ $Element->{+HTML_NS}->{h1} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->{flag}->{has_hn} = 1;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_start
 }; # h1
 
@@ -3375,8 +3351,6 @@ $Element->{+HTML_NS}->{header} = {
                                 {(HTML_NS) => {qw/header 1 footer 1/}});
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3399,8 +3373,6 @@ $Element->{+HTML_NS}->{footer} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
                                 {(HTML_NS) => {header => 1, footer => 1}});
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3432,8 +3404,6 @@ $Element->{+HTML_NS}->{address} = {
         ($element_state,
          {(HTML_NS) => {header => 1, footer => 1, address => 1}},
          $HTMLSectioningContent, $HTMLHeadingContent);
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3632,8 +3602,6 @@ $Element->{+HTML_NS}->{blockquote} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-  
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
   },
 };
@@ -3795,8 +3763,6 @@ $Element->{+HTML_NS}->{dl} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'before dt';
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3897,16 +3863,23 @@ $Element->{+HTML_NS}->{div} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1, justify => 1,
     }),
+    datafld => sub { },
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
+    datasrc => $NonEmptyURLChecker,
     nowrap => $GetHTMLBooleanAttrChecker->('nowrap'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     nowrap => FEATURE_OBSVOCAB,
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_start
 }; # div
@@ -3933,6 +3906,11 @@ $Element->{+HTML_NS}->{marquee} = {
       scroll => -1, slide => -1, alternate => -1,
     }),
     bgcolor => $HTMLColorAttrChecker,
+    datafld => sub { },
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
+    datasrc => $NonEmptyURLChecker,
     direction => $GetHTMLEnumeratedAttrChecker->({
       left => -1, right => -1, up => -1, down => -1,
     }),
@@ -3953,6 +3931,9 @@ $Element->{+HTML_NS}->{marquee} = {
     %HTMLAttrStatus,
     behavior => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_OBSVOCAB,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     direction => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     height => FEATURE_OBSVOCAB,
     hspace => FEATURE_OBSVOCAB,
@@ -3966,6 +3947,10 @@ $Element->{+HTML_NS}->{marquee} = {
     vspace => FEATURE_OBSVOCAB,
     width => FEATURE_OBSVOCAB,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  }, # check_start
 }; # marquee
 
 $Element->{+HTML_NS}->{multicol} = {
@@ -4028,6 +4013,8 @@ $Element->{+HTML_NS}->{a} = {
           charset => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           coords => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           cti => FEATURE_OBSVOCAB,
+          datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+          datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
           directkey => FEATURE_OBSVOCAB,
           email => FEATURE_OBSVOCAB,
           eswf => FEATURE_OBSVOCAB,
@@ -4090,6 +4077,8 @@ $Element->{+HTML_NS}->{a} = {
                                  level => $self->{level}->{must});
             }
           }, # cti
+          datafld => sub { },
+          datasrc => $NonEmptyURLChecker,
           directkey => $AccesskeyChecker,
           email => sub {
             my ($self, $attr) = @_;
@@ -4235,13 +4224,12 @@ $Element->{+HTML_NS}->{a} = {
     # XXX @memoryname -> href=tel:/mailto:
 
     $element_state->{uri_info}->{href}->{type}->{hyperlink} = 1;
-  },
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  }, # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-  },
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
@@ -4317,7 +4305,6 @@ $Element->{+HTML_NS}->{q} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
   },
 };
@@ -4375,8 +4362,6 @@ $Element->{+HTML_NS}->{dfn} = {
     }
     ## ISSUE: The HTML5 definition for the defined term does not work with
     ## |ruby| unless |dfn| has |title|.
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -4772,8 +4757,6 @@ $Element->{+HTML_NS}->{ruby} = {
 
     $element_state->{phase} = 'before-rb';
     #$element_state->{has_sig}
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   ## NOTE: (phrasing, (rt | (rp, rt, rp)))+
   check_child_element => sub {
@@ -5162,11 +5145,22 @@ $Element->{+HTML_NS}->{span} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
-    #
+    datafld => sub { },
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
+    datasrc => $NonEmptyURLChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  }, # check_start
 }; # span
 
 $Element->{+HTML_NS}->{comment} = {
@@ -5213,8 +5207,6 @@ $Element->{+HTML_NS}->{ins} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
   },
 }; # ins
@@ -5245,8 +5237,6 @@ $Element->{+HTML_NS}->{del} = {
   },
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
   },
 }; # del
@@ -5375,6 +5365,8 @@ $Element->{+HTML_NS}->{img} = {
       copyright => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
+      datafld => sub { },
+      datasrc => $NonEmptyURLChecker,
       dynsrc => $NonEmptyURLChecker,
       galleryimg => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1, true => 1, false => 1,
@@ -5433,6 +5425,8 @@ $Element->{+HTML_NS}->{img} = {
       border => FEATURE_HTML5_LC | FEATURE_OBSVOCAB,
       composite => FEATURE_OBSVOCAB,
       copyright => FEATURE_OBSVOCAB,
+      datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+      datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       dynsrc => FEATURE_OBSVOCAB,
       galleryimg => FEATURE_OBSVOCAB,
       height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5509,6 +5503,8 @@ $Element->{+HTML_NS}->{iframe} = {
       yes => 1, no => 1,
     }),
     border => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    datafld => sub { },
+    datasrc => $NonEmptyURLChecker,
     frameborder => $GetHTMLEnumeratedAttrChecker->({
       1 => 1, 0 => 1,
       yes => -1, no => -1,
@@ -5553,6 +5549,8 @@ $Element->{+HTML_NS}->{iframe} = {
     allowtransparency => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     application => FEATURE_OBSVOCAB,
     border => FEATURE_OBSVOCAB,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     frameborder => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     framespacing => FEATURE_OBSVOCAB,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5694,7 +5692,6 @@ $Element->{+HTML_NS}->{embed} = {
     ## TODO: external resource check
 
     $element_state->{uri_info}->{code}->{type}->{embedded} = 1;
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   },
   check_end => sub {
@@ -5726,6 +5723,11 @@ $Element->{+HTML_NS}->{object} = {
       yes => 1, no => 1,
     }),
     data => $HTMLURIAttrChecker,
+    datafld => sub { },
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
+    datasrc => $NonEmptyURLChecker,
     declare => $GetHTMLBooleanAttrChecker->('declare'),
     form => $HTMLFormAttrChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -5758,6 +5760,9 @@ $Element->{+HTML_NS}->{object} = {
     codetype => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     copyright => FEATURE_OBSVOCAB,
     data => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     declare => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC,
     height => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5792,6 +5797,10 @@ $Element->{+HTML_NS}->{object} = {
                            level => $self->{level}->{should});
       }
     }
+  }, # check_attrs2
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{id_type} = 'object';
 
     $element_state->{uri_info}->{data}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{classid}->{type}->{embedded} = 1;
@@ -5799,10 +5808,6 @@ $Element->{+HTML_NS}->{object} = {
     $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-  }, # check_attrs2
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $element_state->{id_type} = 'object';
   }, # check_start
   ## NOTE: param*, transparent (Flow)
   check_child_element => sub {
@@ -5888,6 +5893,8 @@ $Element->{+HTML_NS}->{applet} = {
     }, # archive
     code => $NonEmptyURLChecker,
     codebase => $NonEmptyURLChecker,
+    datafld => sub { },
+    datasrc => $NonEmptyURLChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     hspace => $HTMLLengthAttrChecker,
     mayscript => $GetHTMLBooleanAttrChecker->('mayscript'),
@@ -5902,6 +5909,8 @@ $Element->{+HTML_NS}->{applet} = {
     archive => FEATURE_OBSVOCAB,
     code => FEATURE_OBSVOCAB,
     codebase => FEATURE_OBSVOCAB,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     height => FEATURE_OBSVOCAB,
     hspace => FEATURE_OBSVOCAB,
     mayscript => FEATURE_OBSVOCAB,
@@ -5931,7 +5940,9 @@ $Element->{+HTML_NS}->{applet} = {
                            level => $self->{level}->{must});
       }
     }
-
+  }, # check_attrs2
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{data}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{classid}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{code}->{type}->{embedded} = 1;
@@ -5939,7 +5950,8 @@ $Element->{+HTML_NS}->{applet} = {
     $element_state->{uri_info}->{object}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-  }, # check_attrs2
+    $Element->{+HTML_NS}->{object}->{check_start}->(@_);
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $Element->{+HTML_NS}->{object}->{check_end}->(@_);
@@ -5951,6 +5963,7 @@ $Element->{+HTML_NS}->{param} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    datafld => sub { },
     name => sub { },
     type => $MIMETypeChecker,
     value => sub { },
@@ -5959,6 +5972,7 @@ $Element->{+HTML_NS}->{param} = {
     }),
   }, {
     %HTMLAttrStatus,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     name => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     value => FEATURE_HTML5_WD | FEATURE_XHTML2_ED | FEATURE_M12N10_REC,
@@ -6042,7 +6056,6 @@ $Element->{+HTML_NS}->{video} = {
     $element_state->{has_source} ||= $element_state->{allow_source} * -1;
       ## NOTE: It might be set true by |check_element|.
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{poster}->{type}->{embedded} = 1;
   }, # check_start
@@ -6161,7 +6174,6 @@ $Element->{+HTML_NS}->{source} = {
                          level => $self->{level}->{must});
     }
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
 
     ## NOTE: The |pixelratio| attribute should have been forbidden
@@ -6215,10 +6227,12 @@ $Element->{+HTML_NS}->{bgsound} = {
                          text => 'src',
                          level => $self->{level}->{must});
     }
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
   }, # check_attrs2
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+    $HTMLEmptyChecker{check_start}->(@_);
+  }, # check_start
 }; # bgsound
 
 $Element->{+HTML_NS}->{canvas} = {
@@ -6309,8 +6323,6 @@ $Element->{+HTML_NS}->{map} = {
         ## element but there is any |area| element with the empty
         ## |alt=""| attribute, then the value contains an array
         ## reference that contains all of such |area| elements.
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -6455,8 +6467,6 @@ $Element->{+HTML_NS}->{area} = {
                          type => 'element not allowed:area',
                          level => $self->{level}->{must});
     }
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   },
 }; # area
 
@@ -6488,7 +6498,11 @@ $Element->{+HTML_NS}->{table} = {
     cellpadding => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cellspacing => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
     datapagesize => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
+    datasrc => $NonEmptyURLChecker,
     frame => $GetHTMLEnumeratedAttrChecker->({
       void => 1, above => 1, below => 1, hsides => 1, vsides => 1,
       lhs => 1, rhs => 1, box => 1, border => 1,
@@ -6521,7 +6535,9 @@ $Element->{+HTML_NS}->{table} = {
     cellpadding => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     cellspacing => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     cols => FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     datapagesize => FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     frame => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     height => FEATURE_OBSVOCAB,
     hspace => FEATURE_OBSVOCAB,
@@ -6884,11 +6900,10 @@ $Element->{+HTML_NS}->{tbody} = {
     choff => FEATURE_OBSVOCAB,
     valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
-  check_attrs2 => sub {
+  check_start => sub {
     my ($self, $item, $element_state) = @_;
-
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
-  }, # check_attrs2
+  }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -6920,7 +6935,7 @@ $Element->{+HTML_NS}->{thead} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{in_thead} = 1;
-
+    $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
     $HTMLChecker{check_start}->(@_);
   }, # check_start
 }; # thead
@@ -6956,11 +6971,10 @@ $Element->{+HTML_NS}->{tr} = {
     height => FEATURE_OBSVOCAB,
     valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
-  check_attrs2 => sub {
+  check_start => sub {
     my ($self, $item, $element_state) = @_;
-
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
-  }, # check_attrs2
+  }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -7042,11 +7056,10 @@ $Element->{+HTML_NS}->{td} = {
     valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }),
-  check_attrs2 => sub {
+  check_start => sub {
     my ($self, $item, $element_state) = @_;
-
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
-  }, # check_attrs2
+  }, # check_start
 }; # td
 
 $Element->{+HTML_NS}->{th} = {
@@ -7098,11 +7111,10 @@ $Element->{+HTML_NS}->{th} = {
     valign => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
-  check_attrs2 => sub {
+  check_start => sub {
     my ($self, $item, $element_state) = @_;
-
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
-  }, # check_attrs2
+  }, # check_start
 }; # th
 
 # ---- Forms ----
@@ -7203,7 +7215,6 @@ $Element->{+HTML_NS}->{form} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {(HTML_NS) => {form => 1}});
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{id_type} = 'form';
@@ -7220,12 +7231,14 @@ $Element->{+HTML_NS}->{fieldset} = {
   %HTMLFlowContentChecker,
   status => FEATURE_HTML5_WD | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    datafld => sub { },
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     form => $HTMLFormAttrChecker,
     name => $FormControlNameAttrChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     disabled => FEATURE_HTML5_WD | FEATURE_WF2X,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     name => FEATURE_HTML5_LC,
@@ -7280,17 +7293,34 @@ $Element->{+HTML_NS}->{legend} = {
     align => $GetHTMLEnumeratedAttrChecker->({
       left => 1, center => 1, right => 1,
     }),
+    datafld => sub { },
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
+    datasrc => $NonEmptyURLChecker,
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  }, # check_start
 }; # legend
 
 $Element->{+HTML_NS}->{label} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    datafld => sub { },
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
+    datasrc => $NonEmptyURLChecker,
     for => sub {
       my ($self, $attr) = @_;
       
@@ -7302,6 +7332,9 @@ $Element->{+HTML_NS}->{label} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NXHTML2CommonAttrStatus,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     for => FEATURE_HTML5_REC,
     form => FEATURE_HTML5_LC,
   }), # check_attrs
@@ -7329,7 +7362,7 @@ $Element->{+HTML_NS}->{label} = {
         = $item->{node}->get_attribute_ns (undef, 'for');
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-  },
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
@@ -7381,6 +7414,8 @@ $Element->{+HTML_NS}->{input} = {
          autosave => FEATURE_OBSVOCAB,
          border => FEATURE_OBSVOCAB,
          checked => FEATURE_HTML5_WD | FEATURE_M12N10_REC,
+         datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+         dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          directkey => FEATURE_OBSVOCAB,
          disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
          dynsrc => FEATURE_OBSVOCAB,
@@ -7453,6 +7488,11 @@ $Element->{+HTML_NS}->{input} = {
          autosave => '',
          border => '',
          checked => '',
+         datafld => sub { },
+         dataformatas => $GetHTMLEnumeratedAttrChecker->({
+           text => 1, html => 1, 'localized-text' => 1,
+         }),
+         datasrc => $NonEmptyURLChecker,
          directkey => '',
          disabled => $GetHTMLBooleanAttrChecker->('disabled'),
              ## NOTE: <input type=hidden disabled> is not disallowed.
@@ -8086,6 +8126,12 @@ $Element->{+HTML_NS}->{button} = {
   check_attrs => $GetHTMLAttrsChecker->({
     action => $HTMLURIAttrChecker,
     autofocus => $AutofocusAttrChecker,
+    datafld => sub { },
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+      ## See <http://suika.fam.cx/~wakaba/wiki/sw/n/dataformatas>.
+    }),
+    datasrc => $NonEmptyURLChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     enctype => $GetHTMLEnumeratedAttrChecker->({
       'application/x-www-form-urlencoded' => 1,
@@ -8121,6 +8167,9 @@ $Element->{+HTML_NS}->{button} = {
     %HTMLM12NCommonAttrStatus,
     action => FEATURE_OBSVOCAB,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     enctype => FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -8202,8 +8251,13 @@ $Element->{+HTML_NS}->{select} = {
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     autofocus => $AutofocusAttrChecker,
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     data => $NonEmptyURLChecker, # XXXreference: referenced document MUST ...
+    datafld => sub { },
+    datasrc => $NonEmptyURLChecker,
     form => $HTMLFormAttrChecker,
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
     name => $FormControlNameAttrChecker,
@@ -8214,6 +8268,9 @@ $Element->{+HTML_NS}->{select} = {
     %HTMLM12NCommonAttrStatus,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     data => FEATURE_OBSVOCAB,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     multiple => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -8296,7 +8353,6 @@ $Element->{+HTML_NS}->{datalist} = {
 
     $element_state->{phase} = 'any'; # any | phrasing | option
 
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
 
     $element_state->{id_type} = 'datalist';
@@ -8433,6 +8489,10 @@ $Element->{+HTML_NS}->{option} = {
   %HTMLTextChecker,
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
+    dataformatas => $GetHTMLEnumeratedAttrChecker->({
+      text => 1, html => 1, 'localized-text' => 1,
+    }),
+    datasrc => $NonEmptyURLChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     label => sub { },
     selected => $GetHTMLBooleanAttrChecker->('selected'),
@@ -8440,6 +8500,8 @@ $Element->{+HTML_NS}->{option} = {
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
+    dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X |  FEATURE_M12N10_REC,
     label => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     selected => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -8460,6 +8522,10 @@ $Element->{+HTML_NS}->{option} = {
       $self->{flag}->{has_option_selected} = 1;
     }
   }, # check_attrs2
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+  }, # check_start
 }; # option
 
 $Element->{+HTML_NS}->{textarea} = {
@@ -8487,6 +8553,8 @@ $Element->{+HTML_NS}->{textarea} = {
     }),
     autofocus => $AutofocusAttrChecker,
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
+    datafld => sub { },
+    datasrc => $NonEmptyURLChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     emptyok => $GetHTMLEnumeratedAttrChecker->({
       true => 1, false => 1,
@@ -8554,6 +8622,8 @@ $Element->{+HTML_NS}->{textarea} = {
     autocorrect => FEATURE_OBSVOCAB,
     autofocus => FEATURE_HTML5_LC | FEATURE_WF2X,
     cols => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     disabled => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
     emptyok => FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
@@ -8635,8 +8705,6 @@ $Element->{+HTML_NS}->{keygen} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $FAECheckStart->($self, $item, $element_state);
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
   }, # check_start
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -8896,8 +8964,6 @@ $Element->{+HTML_NS}->{isindex} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
   }, # check_start
 }; # isindex
@@ -9048,8 +9114,6 @@ $Element->{+HTML_NS}->{command} = {
   }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{icon}->{type}->{embedded} = 1;
   }, # check_start
   check_end => sub {
@@ -9091,8 +9155,6 @@ $Element->{+HTML_NS}->{menu} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'li or phrasing';
-
-    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{id_type} = 'menu';
   }, # check_start
   check_child_element => sub {
@@ -9287,6 +9349,8 @@ $Element->{+HTML_NS}->{frame} = {
       yes => 1, no => 1,
     }),
     bordercolor => $HTMLColorAttrChecker,
+    datafld => sub { },
+    datasrc => $NonEmptyURLChecker,
     frameborder => $GetHTMLEnumeratedAttrChecker->({
       1 => 1, 0 => 1,
       yes => -1, no => -1,
@@ -9310,6 +9374,8 @@ $Element->{+HTML_NS}->{frame} = {
     allowtransparency => FEATURE_OBSVOCAB,
     application => FEATURE_OBSVOCAB,
     bordercolor => FEATURE_OBSVOCAB,
+    datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     frameborder => FEATURE_OBSVOCAB,
     framespacing => FEATURE_OBSVOCAB,
     longdesc => FEATURE_OBSVOCAB,
@@ -9323,7 +9389,9 @@ $Element->{+HTML_NS}->{frame} = {
   }), # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{longdesc}->{type}->{cite} = 1;
+    $HTMLEmptyChecker{check_start}->(@_);
   }, # check_start
 }; # frame
 

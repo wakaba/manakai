@@ -1068,7 +1068,6 @@ id=""><span id="">x</span></p>
     datasrc="">a</p>
 #errors
 /p/@datasrc;attribute not defined;m
-/p/@datasrc;url:empty;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1081,7 +1080,26 @@ id=""><span id="">x</span></p>
     datasrc="[]">a</p>
 #errors
 /p/@datasrc;attribute not defined;m
-/p/@datasrc;syntax error:iriref3987;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    datasrc="">a</div>
+#errors
+/div/@datasrc;attribute not defined;m
+/div/@datasrc;url:empty;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    datasrc="abcd">a</div>
+#errors
+/div/@datasrc;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    datasrc="[]">a</div>
+#errors
+/div/@datasrc;attribute not defined;m
+/div/@datasrc;syntax error:iriref3987;m
 
 #data
 <unknown xmlns="http://www.w3.org/1999/xhtml"
@@ -1089,7 +1107,6 @@ id=""><span id="">x</span></p>
 #errors
 /unknown;element not defined;m
 /unknown/@datasrc;attribute not defined;m
-/unknown/@datasrc;url:empty;m
 
 #data
 <p xmlns:html="http://www.w3.org/1999/xhtml"
@@ -1111,6 +1128,18 @@ id=""><span id="">x</span></p>
 /p/@datafld;attribute not defined;m
 
 #data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    datafld="">a</div>
+#errors
+/div/@datafld;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    datafld="abc">a</div>
+#errors
+/div/@datafld;attribute not defined;m
+
+#data
 <unknown xmlns="http://www.w3.org/1999/xhtml"
     datafld="abc">a</unknown>
 #errors
@@ -1129,28 +1158,24 @@ id=""><span id="">x</span></p>
     dataformatas="">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
     dataformatas="abc">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
     dataformatas="dataformatas">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
     dataformatas="plaintext">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1163,7 +1188,6 @@ id=""><span id="">x</span></p>
     dataformatas="PlainText">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1176,7 +1200,6 @@ id=""><span id="">x</span></p>
     dataformatas="html ">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1189,21 +1212,18 @@ id=""><span id="">x</span></p>
     dataformatas="text ">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data escaped
 <p xmlns="http://www.w3.org/1999/xhtml"
     dataformatas="pla\u0130ntext">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data escaped
 <p xmlns="http://www.w3.org/1999/xhtml"
     dataformatas="pla\u0131ntext">a</p>
 #errors
 /p/@dataformatas;attribute not defined;m
-/p/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"
@@ -1218,12 +1238,104 @@ id=""><span id="">x</span></p>
 /p/@dataformatas;attribute not defined;m
 
 #data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="abc">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="dataformatas">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="plaintext">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="html">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="PlainText">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="HTML">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="html ">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="text">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="text ">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data escaped
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="pla\u0130ntext">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data escaped
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="pla\u0131ntext">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+/div/@dataformatas;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="localized-text">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"
+    dataformatas="LOCALIZED-text">a</div>
+#errors
+/div/@dataformatas;attribute not defined;m
+
+#data
 <unknown xmlns="http://www.w3.org/1999/xhtml"
     dataformatas="localized">a</unknown>
 #errors
 /unknown;element not defined;m
 /unknown/@dataformatas;attribute not defined;m
-/unknown/@dataformatas;enumerated:invalid;m
 
 #data
 <p xmlns:html="http://www.w3.org/1999/xhtml"
