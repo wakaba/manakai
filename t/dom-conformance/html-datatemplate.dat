@@ -2667,14 +2667,12 @@
 #data
 <div xmlns="http://www.w3.org/1999/xhtml" ref="x">x</div>
 #errors
-/div/@ref;attribute not allowed;m
 /div/@ref;attribute not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"
     registrationmark="">x</div>
 #errors
-/div/@registrationmark;attribute not allowed;m
 /div/@registrationmark;attribute not defined;m
 
 #data
@@ -2682,7 +2680,6 @@
     registrationmark="">x</rule>
 #errors
 /rule;element not defined;m
-/rule/@registrationmark;attribute not allowed;m
 /rule/@registrationmark;attribute not defined;m
 
 #data
@@ -2748,7 +2745,6 @@
   <div registrationmark="a">x</div>
 </datatemplate>
 #errors
-/datatemplate/div/@registrationmark;attribute not allowed;m
 /datatemplate;element not defined;m
 /datatemplate/rule;element not defined;m
 /datatemplate/div/@registrationmark;attribute not defined;m
@@ -2770,8 +2766,8 @@
   </div>
 </rule>
 #errors
-/rule/div/nest/@registrationmark;attribute not allowed;m
 /rule;element not defined;m
+/rule/div/nest;element not allowed:flow;m
 /rule/div/nest;element not defined;m
 /rule/div/nest/@registrationmark;attribute not defined;m
 
