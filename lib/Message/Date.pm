@@ -1,6 +1,7 @@
 package Message::Date;
 use strict;
 use warnings;
+our $VERSION = '1.0';
 
 my $default_level = {must => 'm', unsupported => 'u'};
 my $default_onerror = sub {
@@ -285,7 +286,7 @@ sub parse_global_date_and_time_string ($$) {
     if (defined $zh) {
       $self->{onerror}->(type => 'datetime:bad timezone hour',
                          level => $self->{level}->{must}), return undef
-          if $zh > 23;
+          if $zh > 23 or $zh < -23;
       $self->{onerror}->(type => 'datetime:bad timezone minute',
                          level => $self->{level}->{must}), return undef
           if $zm > 59;
@@ -592,5 +593,14 @@ push our @ISA, 'Message::Date';
 
 ## TODO: Implement this module.  Use "floating" time_zone such that
 ## leap seconds are not taken into account.
+
+=head1 LICENSE
+
+Copyright 2008-2010 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;

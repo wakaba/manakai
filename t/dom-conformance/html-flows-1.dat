@@ -7248,6 +7248,28 @@ a
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-04-30T03:11:00+23:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-04-30T03:11:00-23:00">x</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-04-30T03:11:00+24:00">x</ins>
+#errors
+/ins/@datetime;datetime:bad timezone hour;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2007-04-30T03:11:00-24:00">x</ins>
+#errors
+/ins/@datetime;datetime:bad timezone hour;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="0037-12-13T00:00Z">x</ins>
 #errors
 

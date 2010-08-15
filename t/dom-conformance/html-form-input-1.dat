@@ -14044,6 +14044,38 @@
 /input/@value;datetime:bad year;m
 
 #data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value="2000-11-22T00:11:22+00:00"/>
+#errors
+
+#data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value="2000-11-22T00:11:22-20:00"/>
+#errors
+
+#data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value="2000-11-22T00:11:22+23:59"/>
+#errors
+
+#data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value="2000-11-22T00:11:22-23:59"/>
+#errors
+
+#data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value="2000-11-22T00:11:22+24:00"/>
+#errors
+/input/@value;datetime:bad timezone hour;m
+
+#data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value="2000-11-22T00:11:22-24:00"/>
+#errors
+/input/@value;datetime:bad timezone hour;m
+
+#data
 <input type="month" xmlns="http://www.w3.org/1999/xhtml"
     value="0000-11"/>
 #errors

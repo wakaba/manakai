@@ -579,6 +579,24 @@
 #errors
 
 #data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44+23:59</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44-23:59</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44+24:00</time>
+#errors
+/time;datetime:bad timezone hour;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:44-24:00</time>
+#errors
+/time;datetime:bad timezone hour;m
+
+#data
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23 14:44:44Z</time>
 #errors
 /time;dateortime:syntax error;m
