@@ -101,8 +101,8 @@ sub parse_week_string ($$) {
   
   if ($value =~ /\A([0-9]{4,})-W([0-9]{2})\z/x) {
     my ($y, $w) = ($1, $2);
-    $self->{onerror}->(type => 'datetime:bad year', ## TODOC: type
-                       level => $self->{level}->{must}) if $y == 0;
+    $self->{onerror}->(type => 'datetime:bad year',
+                       level => $self->{level}->{must}), return undef if $y == 0;
     $self->{onerror}->(type => 'week:bad week', ## TODOC: type
                        level => $self->{level}->{must})
         if $w > _last_week_number ($y);
@@ -137,6 +137,7 @@ sub parse_month_string ($$) {
     if ($y == 0) {
       $self->{onerror}->(type => 'datetime:bad year',
                          level => $self->{level}->{must});
+      return undef;
     }
 
     if (0 < $M and $M < 13) {
@@ -171,6 +172,8 @@ sub parse_date_string ($$) {
   
   if ($value =~ /\A([0-9]{4,})-([0-9]{2})-([0-9]{2})\z/x) {
     my ($y, $M, $d) = ($1, $2, $3);
+    $self->{onerror}->(type => 'datetime:bad year',
+                       level => $self->{level}->{must}), return undef if $y == 0;
     if (0 < $M and $M < 13) {
       $self->{onerror}->(type => 'datetime:bad day',
                          level => $self->{level}->{must}), return undef
@@ -212,6 +215,9 @@ sub parse_local_date_and_time_string ($$) {
   if ($value =~ /\A([0-9]{4,})-([0-9]{2})-([0-9]{2})T
                  ([0-9]{2}):([0-9]{2})(?>:([0-9]{2})(?>(\.[0-9]+))?)?\z/x) {
     my ($y, $M, $d, $h, $m, $s, $sf) = ($1, $2, $3, $4, $5, $6, $7);
+
+    $self->{onerror}->(type => 'datetime:bad year',
+                       level => $self->{level}->{must}), return undef if $y == 0;
     if (0 < $M and $M < 13) {
       $self->{onerror}->(type => 'datetime:bad day',
                          level => $self->{level}->{must}), return undef
@@ -225,8 +231,6 @@ sub parse_local_date_and_time_string ($$) {
                          level => $self->{level}->{must});
       return undef;
     }
-    $self->{onerror}->(type => 'datetime:bad year',
-                       level => $self->{level}->{must}), return undef if $y == 0;
     $self->{onerror}->(type => 'datetime:bad hour',
                        level => $self->{level}->{must}), return undef if $h > 23;
     $self->{onerror}->(type => 'datetime:bad minute',
