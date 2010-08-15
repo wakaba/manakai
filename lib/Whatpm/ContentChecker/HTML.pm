@@ -5378,7 +5378,7 @@ $Element->{+HTML_NS}->{figure} = {
 }; # figure
 
 $Element->{+HTML_NS}->{figcaption} = {
-  %HTMLPhrasingContentChecker,
+  %HTMLFlowContentChecker,
   status => FEATURE_HTML5_DEFAULT,
 }; # figcaption
 
