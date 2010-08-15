@@ -8199,11 +8199,7 @@ $Element->{+HTML_NS}->{button} = {
 
 $Element->{+HTML_NS}->{select} = {
   %HTMLChecker,
-  ## ISSUE: HTML5 has no requirement like these:
-    ## TODO: author should SELECTED at least one OPTION in non-MULTIPLE case [HTML4].
-    ## TODO: more than one OPTION with SELECTED in non-MULTIPLE case is "error" [HTML4]
   status => FEATURE_HTML5_LC | FEATURE_WF2X | FEATURE_M12N10_REC,
-  is_root => 1, ## TODO: SHOULD NOT in application/xhtml+xml [WF2]
   check_attrs => $GetHTMLAttrsChecker->({
     autofocus => $AutofocusAttrChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -8211,6 +8207,7 @@ $Element->{+HTML_NS}->{select} = {
     form => $HTMLFormAttrChecker,
     multiple => $GetHTMLBooleanAttrChecker->('multiple'),
     name => $FormControlNameAttrChecker,
+    required => $GetHTMLBooleanAttrChecker->('required'),
     size => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
   }, {
     %HTMLAttrStatus,
@@ -8221,6 +8218,7 @@ $Element->{+HTML_NS}->{select} = {
     form => FEATURE_HTML5_LC | FEATURE_WF2X,
     multiple => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    required => FEATURE_HTML5_LC,
     size => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
   }), # check_attrs

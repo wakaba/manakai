@@ -269,6 +269,33 @@
 /select/@data;syntax error:iriref3987;m
 
 #data
+<select xmlns="http://www.w3.org/1999/xhtml" required=""/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="required"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="REQUIRED"/>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="true"/>
+#errors
+/select/@required;boolean:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="yes"/>
+#errors
+/select/@required;boolean:invalid;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="no"/>
+#errors
+/select/@required;boolean:invalid;m
+
+#data
 <optgroup xmlns="http://www.w3.org/1999/xhtml"></optgroup>
 #errors
 /optgroup;attribute missing;label;m
