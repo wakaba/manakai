@@ -1901,8 +1901,6 @@ my %HTMLChecker = (
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_attrs => $GetHTMLAttrsChecker->({}, \%HTMLAttrStatus),
 );
@@ -2069,8 +2067,6 @@ $Element->{+HTML_NS}->{html} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{manifest}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -2791,8 +2787,6 @@ $Element->{+HTML_NS}->{style} = {
     $element_state->{style_type} = $type;
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
 
     $element_state->{text} = '';
   },
@@ -2982,8 +2976,6 @@ $Element->{+HTML_NS}->{script} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
 
     $element_state->{text} = '';
   },
@@ -3076,8 +3068,6 @@ $Element->{+HTML_NS}->{noscript} = {
     }
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3163,8 +3153,6 @@ $Element->{+HTML_NS}->{'event-source'} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
 }; # event-source
 
@@ -3251,8 +3239,6 @@ $Element->{+HTML_NS}->{body} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
 }; # body
 
@@ -3320,8 +3306,6 @@ $Element->{+HTML_NS}->{h1} = {
     $self->{flag}->{has_hn} = 1;
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
 }; # h1
 
@@ -3393,8 +3377,6 @@ $Element->{+HTML_NS}->{header} = {
     $self->{flag}->{has_hn} = 0;
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3419,8 +3401,6 @@ $Element->{+HTML_NS}->{footer} = {
                                 {(HTML_NS) => {header => 1, footer => 1}});
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3454,8 +3434,6 @@ $Element->{+HTML_NS}->{address} = {
          $HTMLSectioningContent, $HTMLHeadingContent);
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3657,8 +3635,6 @@ $Element->{+HTML_NS}->{blockquote} = {
   
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 
@@ -3821,8 +3797,6 @@ $Element->{+HTML_NS}->{dl} = {
     $element_state->{phase} = 'before dt';
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -3934,8 +3908,6 @@ $Element->{+HTML_NS}->{div} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
 }; # div
 
@@ -4269,8 +4241,6 @@ $Element->{+HTML_NS}->{a} = {
     $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -4349,8 +4319,6 @@ $Element->{+HTML_NS}->{q} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 };
 ## TODO: "Quotation punctuation (such as quotation marks), if any, must be
@@ -4409,8 +4377,6 @@ $Element->{+HTML_NS}->{dfn} = {
     ## |ruby| unless |dfn| has |title|.
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -4808,8 +4774,6 @@ $Element->{+HTML_NS}->{ruby} = {
     #$element_state->{has_sig}
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   ## NOTE: (phrasing, (rt | (rp, rt, rp)))+
   check_child_element => sub {
@@ -5252,8 +5216,6 @@ $Element->{+HTML_NS}->{ins} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 }; # ins
 
@@ -5286,8 +5248,6 @@ $Element->{+HTML_NS}->{del} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 }; # del
 
@@ -5617,8 +5577,6 @@ $Element->{+HTML_NS}->{iframe} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
     $element_state->{uri_info}->{longdesc}->{type}->{cite} = 1;
   }, # check_start
 }; # iframe
@@ -6087,8 +6045,6 @@ $Element->{+HTML_NS}->{video} = {
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{poster}->{type}->{embedded} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -6355,8 +6311,6 @@ $Element->{+HTML_NS}->{map} = {
         ## reference that contains all of such |area| elements.
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -6503,8 +6457,6 @@ $Element->{+HTML_NS}->{area} = {
     }
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
 }; # area
 
@@ -6585,8 +6537,6 @@ $Element->{+HTML_NS}->{table} = {
 
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -7256,8 +7206,6 @@ $Element->{+HTML_NS}->{form} = {
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
     $element_state->{id_type} = 'form';
   },
   check_end => sub {
@@ -7381,8 +7329,6 @@ $Element->{+HTML_NS}->{label} = {
         = $item->{node}->get_attribute_ns (undef, 'for');
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -8120,8 +8066,6 @@ $Element->{+HTML_NS}->{input} = {
     $element_state->{uri_info}->{formaction}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_attrs
   check_start => sub {
     my ($self, $item, $element_state) = @_;
@@ -8204,8 +8148,6 @@ $Element->{+HTML_NS}->{button} = {
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{formaction}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -8296,8 +8238,6 @@ $Element->{+HTML_NS}->{select} = {
 
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -8360,8 +8300,6 @@ $Element->{+HTML_NS}->{datalist} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
 
     $element_state->{id_type} = 'datalist';
   },
@@ -8641,8 +8579,6 @@ $Element->{+HTML_NS}->{textarea} = {
     
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   },
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -8703,8 +8639,6 @@ $Element->{+HTML_NS}->{keygen} = {
     $FAECheckStart->($self, $item, $element_state);
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -8967,8 +8901,6 @@ $Element->{+HTML_NS}->{isindex} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
 }; # isindex
 
@@ -9121,8 +9053,6 @@ $Element->{+HTML_NS}->{command} = {
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
     $element_state->{uri_info}->{icon}->{type}->{embedded} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -9165,8 +9095,6 @@ $Element->{+HTML_NS}->{menu} = {
     $element_state->{phase} = 'li or phrasing';
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{template}->{type}->{resource} = 1;
-    $element_state->{uri_info}->{ref}->{type}->{resource} = 1;
     $element_state->{id_type} = 'menu';
   }, # check_start
   check_child_element => sub {

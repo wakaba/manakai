@@ -638,8 +638,6 @@ sub check_element ($$$;$) {
   $self->{idref} = [];
   $self->{term} = {};
   $self->{usemap} = [];
-  $self->{ref} = []; # datetemplate data references
-  $self->{template} = []; # datatemplate template references
   $self->{map_exact} = {}; # |map| elements with their original |name|s
   $self->{map_compat} = {}; # |map| elements with their lowercased |name|s
   $self->{has_link_type} = {};
@@ -808,52 +806,6 @@ next unless $code;## TODO: temp.
     }
   }
 
-  for (@{$self->{template}}) {
-    ## TODO: If the document is an XML document, ...
-    ## NOTE: If the document is an HTML document:
-    ## ISSUE: We need to percent-decode?
-    F: {
-      if ($self->{id}->{$_->[0]}) {
-        my $el = $self->{id}->{$_->[0]}->[0]->owner_element;
-        if ($el->node_type == 1 and # ELEMENT_NODE
-            $el->manakai_local_name eq 'datatemplate') {
-          my $nsuri = $el->namespace_uri;
-          if (defined $nsuri and $nsuri eq HTML_NS) {
-            if ($el eq $_->[1]->owner_element) {
-              $self->{onerror}->(node => $_->[1],
-                                 type => 'fragment points itself',
-                                 level => $self->{level}->{must});
-            }
-            
-            last F;
-          }
-        }
-      }
-      ## TODO: Should we raise a "fragment points nothing" error instead
-      ## if the fragment identifier identifies no element?
-
-      $self->{onerror}->(node => $_->[1], type => 'template:not template',
-                         level => $self->{level}->{must});
-    } # F
-  }
-  
-  for (@{$self->{ref}}) {
-    ## TOOD: If XML
-    ## NOTE: If it is an HTML document:
-    if ($_->[0] eq '') {
-      ## NOTE: It points the top of the document.
-    } elsif ($self->{id}->{$_->[0]}) {
-      if ($self->{id}->{$_->[0]}->[0]->owner_element
-              eq $_->[1]->owner_element) {
-        $self->{onerror}->(node => $_->[1], type => 'fragment points itself',
-                           level => $self->{level}->{must});
-      }
-    } else {
-      $self->{onerror}->(node => $_->[1], type => 'fragment points nothing',
-                         level => $self->{level}->{must});
-    }
-  }
-
   ## TODO: Maybe we should have $document->manakai_get_by_fragment or something
 
   ## |usemap| attribute values MUST be valid hash-name references
@@ -927,8 +879,6 @@ next unless $code;## TODO: temp.
   delete $self->{has_autofocus};
   delete $self->{idref};
   delete $self->{usemap};
-  delete $self->{ref};
-  delete $self->{template};
   delete $self->{map_exact};
   delete $self->{map_compat};
   return $self->{return};
