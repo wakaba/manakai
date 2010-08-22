@@ -1933,3 +1933,90 @@
 /div/p/@contextmenu;no referenced menu;m
 /div;no significant content;s
 /div/p;no significant content;s
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml">  </device>
+#errors
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml">abc</device>
+#errors
+/device/"abc";character not allowed:empty;m
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"><div>a</div></device>
+#errors
+/device/div;element not allowed:empty;m
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"><span>a</span></device>
+#errors
+/device/span;element not allowed:empty;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><device/></div>
+#errors
+/div;no significant content;s
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml"><device/></span>
+#errors
+/span;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><ins><device/></ins></div>
+#errors
+/div;no significant content;s
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type=""/>
+#errors
+/device/@type;enumerated:invalid;m
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="fs"/>
+#errors
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="media"/>
+#errors
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="rs232"/>
+#errors
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="usb"/>
+#errors
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="RS232"/>
+#errors
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="rs232c"/>
+#errors
+/device/@type;enumerated:invalid;m
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="filesystem"/>
+#errors
+/device/@type;enumerated:invalid;m
+
+#data
+<device xmlns="http://www.w3.org/1999/xhtml"
+    type="video"/>
+#errors
+/device/@type;enumerated:invalid;m
