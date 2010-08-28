@@ -6317,8 +6317,7 @@ sub _tree_construction_main ($) {
           delete $self->{frameset_ok};
           
           if ($self->{insertion_mode} & TABLE_IMS or
-              $self->{insertion_mode} & BODY_TABLE_IMS or
-              ($self->{insertion_mode} & IM_MASK) == IN_COLUMN_GROUP_IM) {
+              $self->{insertion_mode} & BODY_TABLE_IMS) {
             
             $self->{insertion_mode} = IN_SELECT_IN_TABLE_IM;
           } else {
@@ -7049,3 +7048,14 @@ package Whatpm::HTML::RestartParser;
 push our @ISA, 'Error';
 
 1;
+
+__END__
+
+=head1 LICENSE
+
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
