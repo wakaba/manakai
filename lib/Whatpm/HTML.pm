@@ -907,7 +907,6 @@ sub _construct_tree ($) {
 
   undef $self->{form_element};
   undef $self->{head_element};
-  undef $self->{head_element_inserted};
   $self->{open_elements} = [];
   undef $self->{inner_html_node};
   undef $self->{ignore_newline};
@@ -1861,17 +1860,11 @@ sub _reset_insertion_mode ($) {
   ## node is inserted by the parser, then a new Text node is created
   ## and the character is appended as that Text node.  If I'm not
   ## wrong, for a parser with scripting disabled, there are only two
-  ## cases where this occurs.  One is the case where an element node
-  ## is inserted to the |head| element.  This is covered by using the
-  ## |$self->{head_element_inserted}| flag.  Another is the case where
-  ## an element or comment is inserted into the |table| subtree while
-  ## foster parenting happens.  This is covered by using the [2] flag
-  ## of the |$open_tables| structure.  All other cases are handled
-  ## simply by calling |manakai_append_text| method.
-
-  ## TODO: |<body><script>document.write("a<br>");
-  ## document.body.removeChild (document.body.lastChild);
-  ## document.write ("b")</script>|
+  ## cases where this occurs.  It is the case where an element or
+  ## comment is inserted into the |table| subtree while foster
+  ## parenting happens.  This is covered by using the [2] flag of the
+  ## |$open_tables| structure.  All other cases are handled simply by
+  ## calling |manakai_append_text| method.
 
 sub _tree_construction_main ($) {
   my $self = shift;
@@ -2342,19 +2335,8 @@ sub _tree_construction_main ($) {
       if ($token->{type} == CHARACTER_TOKEN) {
         if ($token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
           unless ($self->{insertion_mode} == BEFORE_HEAD_IM) {
-            if ($self->{head_element_inserted}) {
-              
-              $self->{open_elements}->[-1]->[0]->append_child
-                ($self->{document}->create_text_node ($1));
-              delete $self->{head_element_inserted};
-              ## NOTE: |</head> <link> |
-              #
-            } else {
-              
-              $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
-              ## NOTE: |</head> &#x20;|
-              #
-            }
+            
+            $self->{open_elements}->[-1]->[0]->manakai_append_text ($1);
           } else {
             
             ## Ignore the token.
@@ -2520,7 +2502,6 @@ sub _tree_construction_main ($) {
                             text => $token->{tag_name}, token => $token);
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
-            $self->{head_element_inserted} = 1;
           } else {
             
           }
@@ -2565,7 +2546,6 @@ sub _tree_construction_main ($) {
                             text => $token->{tag_name}, token => $token);
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
-            $self->{head_element_inserted} = 1;
           } else {
             
           }
@@ -2653,7 +2633,6 @@ sub _tree_construction_main ($) {
                             text => $token->{tag_name}, token => $token);
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
-            $self->{head_element_inserted} = 1;
           } else {
             
           }
@@ -2759,7 +2738,6 @@ sub _tree_construction_main ($) {
                             text => $token->{tag_name}, token => $token);
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
-            $self->{head_element_inserted} = 1;
           } else {
             
           }
@@ -2788,7 +2766,6 @@ sub _tree_construction_main ($) {
                             text => $token->{tag_name}, token => $token);
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
-            $self->{head_element_inserted} = 1;
           } else {
             
           }
@@ -2857,7 +2834,6 @@ sub _tree_construction_main ($) {
                             text => $token->{tag_name}, token => $token);
             push @{$self->{open_elements}},
                 [$self->{head_element}, $el_category->{head}];
-            $self->{head_element_inserted} = 1;
           } else {
             
           }
@@ -7051,7 +7027,6 @@ sub set_inner_html ($$$$;$) {
     push @{$p->{open_elements}}, [$root, $el_category->{html}];
 
     undef $p->{head_element};
-    undef $p->{head_element_inserted};
 
     ## F4.5.
     $p->_reset_insertion_mode;
