@@ -665,7 +665,6 @@ EOF in foreign content
 |     <p>
 |       <svg svg>
 |         <svg foreignObject>
-|           <p>
 |           "x"
 
 #data
@@ -1101,14 +1100,13 @@ eof
 | <html>
 |   <head>
 |   <body>
-|     "b"
 |     <table>
 |       <tbody>
 |         <tr>
 |           <td>
 |             <svg svg>
 |               <svg g>
-|                 "a"
+|                 "ab"
 
 #data
 <table><tr><th><svg><g>a</th>b
@@ -1121,14 +1119,13 @@ eof
 | <html>
 |   <head>
 |   <body>
-|     "b"
 |     <table>
 |       <tbody>
 |         <tr>
 |           <th>
 |             <svg svg>
 |               <svg g>
-|                 "a"
+|                 "ab"
 
 #data
 <table><caption><svg><g>a</td>b
@@ -1175,12 +1172,11 @@ eof
 | <html>
 |   <head>
 |   <body>
-|     "b"
 |     <table>
 |       <caption>
 |         <svg svg>
 |           <svg g>
-|             "a"
+|             "ab"
 
 #data
 <table><tr><td><svg><g>a</caption>b
@@ -1224,7 +1220,9 @@ eof
 <table><tr><td><svg><g>a</table>b
 #errors
 no DOCTYPE
-unmatched end tag
+unexpected </table>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
@@ -1235,8 +1233,7 @@ unmatched end tag
 |           <td>
 |             <svg svg>
 |               <svg g>
-|                 "a"
-|     "b"
+|                 "ab"
 
 #data
 <table><tr><td><svg><g>a</tbody>b
@@ -1249,14 +1246,13 @@ no </table>
 | <html>
 |   <head>
 |   <body>
-|     "b"
 |     <table>
 |       <tbody>
 |         <tr>
 |           <td>
 |             <svg svg>
 |               <svg g>
-|                 "a"
+|                 "ab"
 
 #data
 <table><tr><td><svg><g>a</tr>b
@@ -1269,14 +1265,13 @@ no </table>
 | <html>
 |   <head>
 |   <body>
-|     "b"
 |     <table>
 |       <tbody>
 |         <tr>
 |           <td>
 |             <svg svg>
 |               <svg g>
-|                 "a"
+|                 "ab"
 
 #data
 <table><thead><tr><td><svg><g>a</thead>b
@@ -1289,14 +1284,13 @@ no </table>
 | <html>
 |   <head>
 |   <body>
-|     "b"
 |     <table>
 |       <thead>
 |         <tr>
 |           <td>
 |             <svg svg>
 |               <svg g>
-|                 "a"
+|                 "ab"
 
 #data
 <table><tfoot><tr><td><svg><g>a</tfoot>b
@@ -1309,21 +1303,21 @@ no </table>
 | <html>
 |   <head>
 |   <body>
-|     "b"
 |     <table>
 |       <tfoot>
 |         <tr>
 |           <td>
 |             <svg svg>
 |               <svg g>
-|                 "a"
+|                 "ab"
 
 #data
 <table><caption><svg><g>a</table>b
 #errors
 no DOCTYPE
-unmatched end tag (implied </caption>)
-unmatched end tag </table>
+unexpected </table>
+no </svg>
+no </g></svg></caption></table>
 #document
 | <html>
 |   <head>
@@ -1332,8 +1326,7 @@ unmatched end tag </table>
 |       <caption>
 |         <svg svg>
 |           <svg g>
-|             "a"
-|     "b"
+|             "ab"
 
 #data
 <table><caption><svg><g>a</tbody>b
@@ -1407,237 +1400,244 @@ eof
 <table><tr><svg><g>a</tr>b<!---->
 #errors
 no DOCTYPE
-element in <tr>
-unmatched end tag
-eof
+<svg> in tr
+unexpected </tr>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <tbody>
 |         <tr>
-|         <!--  -->
 
 #data
 <table><tbody><svg><g>a</tbody>b<!---->
 #errors
 no DOCTYPE
-element in table
-unmatched end tag
-eof
+<svg> in tbody
+unexpected </tbody>
+no </svg>
+no </g></svg></tbody></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <tbody>
-|       <!--  -->
 
 #data
 <table><thead><svg><g>a</thead>b<!---->
 #errors
 no DOCTYPE
-element in table
-unmatched end tag
-eof
+<svg> in thead
+unexpected </thead>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <thead>
-|       <!--  -->
 
 #data
 <table><tfoot><svg><g>a</tfoot>b<!---->
 #errors
 no DOCTYPE
-element in table
-unmatched end tag
-eof
+<svg> in tfoot
+unexpected </tfoot>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <tfoot>
-|       <!--  -->
 
 #data
 <table><svg><g>a</table>b
 #errors
 no DOCTYPE
-element in table
+<svg> in table
+unexpected </table>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
+|         "ab"
 |     <table>
-|     "b"
 
 #data
 <table><tbody><tr><svg><g>a</tbody>b<!---->
 #errors
 no DOCTYPE
-element in table
-unmatched end tag
-eof
+<svg> in tr
+unexpected </table>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <tbody>
 |         <tr>
-|       <!--  -->
 
 #data
 <table><thead><tr><svg><g>a</thead>b<!---->
 #errors
 no DOCTYPE
-element in table
-unmatched end tag
-eof
+<svg> in tr
+unexpected </thead>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <thead>
 |         <tr>
-|       <!--  -->
 
 #data
 <table><tfoot><tr><svg><g>a</tfoot>b<!---->
 #errors
 no DOCTYPE
-element in table
-unmatched end tag
-eof
+<svg> in tr
+unexpected </tfoot>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <tfoot>
 |         <tr>
-|       <!--  -->
 
 #data
 <table><tbody><tr><svg><g>a</table>b
 #errors
 no DOCTYPE
-element in table
+<svg> in tr
+unexpected </table>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
+|         "ab"
 |     <table>
 |       <tbody>
 |         <tr>
-|     "b"
 
 #data
 <table><tbody><tr><svg><g>a</tbody>b<!---->
 #errors
 no DOCTYPE
-element in table
-char in table
-eof
+<svg> in tr
+unexpected </tbody>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <tbody>
 |         <tr>
-|       <!--  -->
 
 #data
 <table><thead><tr><svg><g>a</thead>b<!---->
 #errors
 no DOCTYPE
-element in table
-char in table
-eof
+<svg> in tr
+unexpected </thead>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <thead>
 |         <tr>
-|       <!--  -->
 
 #data
 <table><tfoot><tr><svg><g>a</tfoot>b<!---->
 #errors
 no DOCTYPE
-element in table
-char in table
-eof
+<svg> in tr
+unexpected </tfoot>
+no </svg>
+no </g></svg></table>
 #document
 | <html>
 |   <head>
 |   <body>
 |     <svg svg>
 |       <svg g>
-|         "a"
-|     "b"
+|         "ab"
+|         <!--  -->
 |     <table>
 |       <tfoot>
 |         <tr>
-|       <!--  -->
 
 #data
 <table><colgroup><svg></colgroup><!----></table>
 #errors
 no DOCTYPE
-element in table
-unmatched end tag
+<svg> in table
+unexpected </colgroup>
+unexpected </table>
+no </svg>
+no </svg></table>
 #document
 | <html>
 |   <head>
@@ -1939,6 +1939,7 @@ elements not closed before EOF
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td></td><td>
 #errors
+no </svg>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -1951,12 +1952,12 @@ elements not closed before EOF
 |           <td>
 |             <svg svg>
 |               <svg td>
-|           <td>
+|               <svg td>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>
 #errors
-"b" in table row
+no </svg>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -1971,7 +1972,7 @@ elements not closed before EOF
 |               <svg td>
 |                 "a"
 |               "b"
-|           <td>
+|               <svg td>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td><tr>
@@ -1994,6 +1995,7 @@ elements not closed before EOF
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td></td><tr>
 #errors
+no </svg>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -2006,12 +2008,13 @@ elements not closed before EOF
 |           <td>
 |             <svg svg>
 |               <svg td>
-|         <tr>
+|               <svg tr>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>
 #errors
-no </tr>
+no </svg>
+unexpected </td>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -2024,14 +2027,15 @@ elements not closed before EOF
 |           <td>
 |             <svg svg>
 |               <svg td>
-|         <tr>
-|           " "
-|           <td>
+|               <svg tr>
+|                 " "
+|                 <svg td>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>
 #errors
 no </tr>
+no </svg>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -2046,11 +2050,13 @@ elements not closed before EOF
 |               <svg td>
 |                 <svg tr>
 |               " "
-|           <td>
+|               <svg td>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>
 #errors
+unexpected </tbody>
+no </svg>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -2063,8 +2069,7 @@ elements not closed before EOF
 |           <td>
 |             <svg svg>
 |               <svg td>
-|       <tbody>
-|         <tr>
+|                 <svg tr>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td><tbody>
@@ -2087,6 +2092,8 @@ elements not closed before EOF
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>
 #errors
+unexpected </tr>
+no </svg>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -2099,11 +2106,12 @@ elements not closed before EOF
 |           <td>
 |             <svg svg>
 |               <svg td>
-|       <tbody>
+|                 <svg tbody>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>
 #errors
+no </svg>
 elements not closed before EOF
 #document
 | <!DOCTYPE html>
@@ -2116,11 +2124,14 @@ elements not closed before EOF
 |           <td>
 |             <svg svg>
 |               <svg td>
-|       <tbody>
+|               <svg tbody>
 
 #data
 <!DOCTYPE HTML><table><tr><td><svg><td></table>a
 #errors
+unexpected </table>
+no </svg>
+no </svg></table>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2132,7 +2143,7 @@ elements not closed before EOF
 |           <td>
 |             <svg svg>
 |               <svg td>
-|     "a"
+|                 "a"
 
 #data
 <!DOCTYPE html><table><tr><td><svg><tbody></tbody>
@@ -2154,7 +2165,6 @@ elements not closed before EOF
 #data
 <!DOCTYPE html><table><tr><td><svg><tbody></tbody>a
 #errors
-text in table
 EOF in foreign content
 elements not closed before EOF
 #document
@@ -2162,10 +2172,10 @@ elements not closed before EOF
 | <html>
 |   <head>
 |   <body>
-|     "a"
 |     <table>
 |       <tbody>
 |         <tr>
 |           <td>
 |             <svg svg>
 |               <svg tbody>
+|               "a"

@@ -2428,19 +2428,39 @@ ok 1440 - Document tree: qq'<!DOCTYPE html><body><select><math></math></select>'
 ok 1441 - Parse error: qq'<!DOCTYPE html><body><select><option><math></math></option></select>'; 1:44:in select, 1:51:in select:/;43: Stray “math” start tag., 50: Stray end tag “math”
 ok 1442 - SHOULD-level error: qq'<!DOCTYPE html><body><select><option><math></math></option></select>'; ;
 ok 1443 - Document tree: qq'<!DOCTYPE html><body><select><option><math></math></option></select>'
-ok 1444 - Parse error: qq'<!DOCTYPE html><body><table><math></math></table>'; 1:35:in table, 1:42:in table:/;34: Start tag “math” seen in “table”., 41: Stray end tag “math”.
+not ok 1444 - Parse error: qq'<!DOCTYPE html><body><table><math></math></table>'; 1:35:in table;34: Start tag “math” seen in “table”., 41: Stray end tag “math”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><math></math></table>'; 1:35:in table;34: Start tag “math” seen in “table”., 41: Stray end tag “math”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
 ok 1445 - SHOULD-level error: qq'<!DOCTYPE html><body><table><math></math></table>'; ;
 ok 1446 - Document tree: qq'<!DOCTYPE html><body><table><math></math></table>'
-ok 1447 - Parse error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi></math></table>'; 1:35:in table, 1:47:in table:/, 1:54:in table:/;34: Start tag “math” seen in “table”., 46: Stray end tag “mi”., 53: Stray end tag “math”.
+not ok 1447 - Parse error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi></math></table>'; 1:35:in table;34: Start tag “math” seen in “table”., 46: Stray end tag “mi”., 53: Stray end tag “math”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi></math></table>'; 1:35:in table;34: Start tag “math” seen in “table”., 46: Stray end tag “mi”., 53: Stray end tag “math”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '3'
 ok 1448 - SHOULD-level error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi></math></table>'; ;
 ok 1449 - Document tree: qq'<!DOCTYPE html><body><table><math><mi>foo</mi></math></table>'
-ok 1450 - Parse error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi><mi>bar</mi></math></table>'; 1:35:in table, 1:47:in table:/, 1:59:in table:/, 1:66:in table:/;34: Start tag “math” seen in “table”., 46: Stray end tag “mi”., 58: Stray end tag “mi”., 65: Stray end tag “math”.
+not ok 1450 - Parse error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi><mi>bar</mi></math></table>'; 1:35:in table;34: Start tag “math” seen in “table”., 46: Stray end tag “mi”., 58: Stray end tag “mi”., 65: Stray end tag “math”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi><mi>bar</mi></math></table>'; 1:35:in table;34: Start tag “math” seen in “table”., 46: Stray end tag “mi”., 58: Stray end tag “mi”., 65: Stray end tag “math”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '4'
 ok 1451 - SHOULD-level error: qq'<!DOCTYPE html><body><table><math><mi>foo</mi><mi>bar</mi></math></table>'; ;
 ok 1452 - Document tree: qq'<!DOCTYPE html><body><table><math><mi>foo</mi><mi>bar</mi></math></table>'
-ok 1453 - Parse error: qq'<!DOCTYPE html><body><table><tbody><math><mi>foo</mi><mi>bar</mi></math></tbody></table>'; 1:42:in table, 1:54:in table:/, 1:66:in table:/, 1:73:in table:/;41: Start tag “math” seen in “table”., 53: Stray end tag “mi”., 65: Stray end tag “mi”., 72: Stray end tag “math”.
+not ok 1453 - Parse error: qq'<!DOCTYPE html><body><table><tbody><math><mi>foo</mi><mi>bar</mi></math></tbody></table>'; 1:42:in table;41: Start tag “math” seen in “table”., 53: Stray end tag “mi”., 65: Stray end tag “mi”., 72: Stray end tag “math”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><tbody><math><mi>foo</mi><mi>bar</mi></math></tbody></table>'; 1:42:in table;41: Start tag “math” seen in “table”., 53: Stray end tag “mi”., 65: Stray end tag “mi”., 72: Stray end tag “math”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '4'
 ok 1454 - SHOULD-level error: qq'<!DOCTYPE html><body><table><tbody><math><mi>foo</mi><mi>bar</mi></math></tbody></table>'; ;
 ok 1455 - Document tree: qq'<!DOCTYPE html><body><table><tbody><math><mi>foo</mi><mi>bar</mi></math></tbody></table>'
-ok 1456 - Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><math><mi>foo</mi><mi>bar</mi></math></tr></tbody></table>'; 1:46:in table, 1:58:in table:/, 1:70:in table:/, 1:77:in table:/;45: Start tag “math” seen in “table”., 57: Stray end tag “mi”., 69: Stray end tag “mi”., 76: Stray end tag “math”.
+not ok 1456 - Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><math><mi>foo</mi><mi>bar</mi></math></tr></tbody></table>'; 1:46:in table;45: Start tag “math” seen in “table”., 57: Stray end tag “mi”., 69: Stray end tag “mi”., 76: Stray end tag “math”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><math><mi>foo</mi><mi>bar</mi></math></tr></tbody></table>'; 1:46:in table;45: Start tag “math” seen in “table”., 57: Stray end tag “mi”., 69: Stray end tag “mi”., 76: Stray end tag “math”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '4'
 ok 1457 - SHOULD-level error: qq'<!DOCTYPE html><body><table><tbody><tr><math><mi>foo</mi><mi>bar</mi></math></tr></tbody></table>'; ;
 ok 1458 - Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><math><mi>foo</mi><mi>bar</mi></math></tr></tbody></table>'
 ok 1459 - Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><td><math><mi>foo</mi><mi>bar</mi></math></td></tr></tbody></table>'; ;
@@ -2455,13 +2475,37 @@ ok 1467 - Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</
 ok 1468 - Parse error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:71:not closed, 1:82:not closed;70: HTML start tag “p” in a foreign namespace context., 81: “table” closed but “caption” was still open.
 ok 1469 - SHOULD-level error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; ;
 ok 1470 - Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'
-ok 1471 - Parse error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'; 1:79:not closed, 1:79:not closed;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.
-ok 1472 - SHOULD-level error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'; ;
-ok 1473 - Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'
-not ok 1474 - Parse error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:45:in table, 1:57:in table:/, 1:69:in table:/, 1:72:not closed, 1:72:in table, 1:83:in table:\#text;44: Start tag “math” seen in “table”., 56: Stray end tag “mi”., 68: Stray end tag “mi”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.
-#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:45:in table, 1:57:in table:/, 1:69:in table:/, 1:72:not closed, 1:72:in table, 1:83:in table:\#text;44: Start tag “math” seen in “table”., 56: Stray end tag “mi”., 68: Stray end tag “mi”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.'
+not ok 1471 - Parse error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'; 1:79:unmatched end tag, 1:82:not closed, 1:85:in body:\#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'; 1:79:unmatched end tag, 1:82:not closed, 1:85:in body:\#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.'
 #   at HTML-tree.t test () ok line 3.
-#          got: '6'
+#          got: '3'
+#     expected: '2'
+ok 1472 - SHOULD-level error: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'; ;
+not ok 1473 - Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><body><table><caption><math><mi>foo</mi><mi>bar</mi>baz</table><p>quux''
+#   at HTML-tree.t test () ok line 9.
+# +---+---------------------+---------------------+
+# | Ln|Got                  |Expected             |
+# +---+---------------------+---------------------+
+# |  1|<!DOCTYPE html>      |<!DOCTYPE html>      |
+# |  2|<html>               |<html>               |
+# |  3|  <head>             |  <head>             |
+# |  4|  <body>             |  <body>             |
+# |  5|    <table>          |    <table>          |
+# |  6|      <caption>      |      <caption>      |
+# |  7|        <math math>  |        <math math>  |
+# |  8|          <math mi>  |          <math mi>  |
+# |  9|            "foo"    |            "foo"    |
+# | 10|          <math mi>  |          <math mi>  |
+# | 11|            "bar"    |            "bar"    |
+# | 12|          "baz"      |          "baz"      |
+# * 13|        <p>          |    <p>              *
+# * 14|          "quux"     |      "quux"         *
+# +---+---------------------+---------------------+
+not ok 1474 - Parse error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:45:in table, 1:72:not closed, 1:72:in table, 1:83:in table:\#text;44: Start tag “math” seen in “table”., 56: Stray end tag “mi”., 68: Stray end tag “mi”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; 1:45:in table, 1:72:not closed, 1:72:in table, 1:83:in table:\#text;44: Start tag “math” seen in “table”., 56: Stray end tag “mi”., 68: Stray end tag “mi”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '4'
 #     expected: '5'
 ok 1475 - SHOULD-level error: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'; ;
 ok 1476 - Document tree: qq'<!DOCTYPE html><body><table><colgroup><math><mi>foo</mi><mi>bar</mi><p>baz</table><p>quux'
@@ -2508,19 +2552,39 @@ ok 1515 - Document tree: qq'<!DOCTYPE html><body><select><svg></svg></select>'
 ok 1516 - Parse error: qq'<!DOCTYPE html><body><select><option><svg></svg></option></select>'; 1:43:in select, 1:49:in select:/;43: Stray “svg” start tag., 50: Stray end tag “svg”
 ok 1517 - SHOULD-level error: qq'<!DOCTYPE html><body><select><option><svg></svg></option></select>'; ;
 ok 1518 - Document tree: qq'<!DOCTYPE html><body><select><option><svg></svg></option></select>'
-ok 1519 - Parse error: qq'<!DOCTYPE html><body><table><svg></svg></table>'; 1:34:in table, 1:40:in table:/;34: Start tag “svg” seen in “table”., 41: Stray end tag “svg”.
+not ok 1519 - Parse error: qq'<!DOCTYPE html><body><table><svg></svg></table>'; 1:34:in table;34: Start tag “svg” seen in “table”., 41: Stray end tag “svg”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><svg></svg></table>'; 1:34:in table;34: Start tag “svg” seen in “table”., 41: Stray end tag “svg”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
 ok 1520 - SHOULD-level error: qq'<!DOCTYPE html><body><table><svg></svg></table>'; ;
 ok 1521 - Document tree: qq'<!DOCTYPE html><body><table><svg></svg></table>'
-ok 1522 - Parse error: qq'<!DOCTYPE html><body><table><svg><g>foo</g></svg></table>'; 1:34:in table, 1:44:in table:/, 1:50:in table:/;34: Start tag “svg” seen in “table”., 46: Stray end tag “g”., 53: Stray end tag “svg”.
+not ok 1522 - Parse error: qq'<!DOCTYPE html><body><table><svg><g>foo</g></svg></table>'; 1:34:in table;34: Start tag “svg” seen in “table”., 46: Stray end tag “g”., 53: Stray end tag “svg”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><svg><g>foo</g></svg></table>'; 1:34:in table;34: Start tag “svg” seen in “table”., 46: Stray end tag “g”., 53: Stray end tag “svg”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '3'
 ok 1523 - SHOULD-level error: qq'<!DOCTYPE html><body><table><svg><g>foo</g></svg></table>'; ;
 ok 1524 - Document tree: qq'<!DOCTYPE html><body><table><svg><g>foo</g></svg></table>'
-ok 1525 - Parse error: qq'<!DOCTYPE html><body><table><svg><g>foo</g><g>bar</g></svg></table>'; 1:34:in table, 1:44:in table:/, 1:54:in table:/, 1:60:in table:/;34: Start tag “svg” seen in “table”., 46: Stray end tag “g”., 58: Stray end tag “g”., 65: Stray end tag “svg”.
+not ok 1525 - Parse error: qq'<!DOCTYPE html><body><table><svg><g>foo</g><g>bar</g></svg></table>'; 1:34:in table;34: Start tag “svg” seen in “table”., 46: Stray end tag “g”., 58: Stray end tag “g”., 65: Stray end tag “svg”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><svg><g>foo</g><g>bar</g></svg></table>'; 1:34:in table;34: Start tag “svg” seen in “table”., 46: Stray end tag “g”., 58: Stray end tag “g”., 65: Stray end tag “svg”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '4'
 ok 1526 - SHOULD-level error: qq'<!DOCTYPE html><body><table><svg><g>foo</g><g>bar</g></svg></table>'; ;
 ok 1527 - Document tree: qq'<!DOCTYPE html><body><table><svg><g>foo</g><g>bar</g></svg></table>'
-ok 1528 - Parse error: qq'<!DOCTYPE html><body><table><tbody><svg><g>foo</g><g>bar</g></svg></tbody></table>'; 1:41:in table, 1:51:in table:/, 1:61:in table:/, 1:67:in table:/;41: Start tag “svg” seen in “table”., 53: Stray end tag “g”., 65: Stray end tag “g”., 72: Stray end tag “svg”.
+not ok 1528 - Parse error: qq'<!DOCTYPE html><body><table><tbody><svg><g>foo</g><g>bar</g></svg></tbody></table>'; 1:41:in table;41: Start tag “svg” seen in “table”., 53: Stray end tag “g”., 65: Stray end tag “g”., 72: Stray end tag “svg”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><tbody><svg><g>foo</g><g>bar</g></svg></tbody></table>'; 1:41:in table;41: Start tag “svg” seen in “table”., 53: Stray end tag “g”., 65: Stray end tag “g”., 72: Stray end tag “svg”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '4'
 ok 1529 - SHOULD-level error: qq'<!DOCTYPE html><body><table><tbody><svg><g>foo</g><g>bar</g></svg></tbody></table>'; ;
 ok 1530 - Document tree: qq'<!DOCTYPE html><body><table><tbody><svg><g>foo</g><g>bar</g></svg></tbody></table>'
-ok 1531 - Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><svg><g>foo</g><g>bar</g></svg></tr></tbody></table>'; 1:45:in table, 1:55:in table:/, 1:65:in table:/, 1:71:in table:/;45: Start tag “svg” seen in “table”., 57: Stray end tag “g”., 69: Stray end tag “g”., 76: Stray end tag “svg”.
+not ok 1531 - Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><svg><g>foo</g><g>bar</g></svg></tr></tbody></table>'; 1:45:in table;45: Start tag “svg” seen in “table”., 57: Stray end tag “g”., 69: Stray end tag “g”., 76: Stray end tag “svg”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><svg><g>foo</g><g>bar</g></svg></tr></tbody></table>'; 1:45:in table;45: Start tag “svg” seen in “table”., 57: Stray end tag “g”., 69: Stray end tag “g”., 76: Stray end tag “svg”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '4'
 ok 1532 - SHOULD-level error: qq'<!DOCTYPE html><body><table><tbody><tr><svg><g>foo</g><g>bar</g></svg></tr></tbody></table>'; ;
 ok 1533 - Document tree: qq'<!DOCTYPE html><body><table><tbody><tr><svg><g>foo</g><g>bar</g></svg></tr></tbody></table>'
 ok 1534 - Parse error: qq'<!DOCTYPE html><body><table><tbody><tr><td><svg><g>foo</g><g>bar</g></svg></td></tr></tbody></table>'; ;
@@ -2535,13 +2599,37 @@ ok 1542 - Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g>
 ok 1543 - Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:66:not closed, 1:77:not closed;70: HTML start tag “p” in a foreign namespace context., 81: “table” closed but “caption” was still open.
 ok 1544 - SHOULD-level error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; ;
 ok 1545 - Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'
-ok 1546 - Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; 1:74:not closed, 1:74:not closed;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.
-ok 1547 - SHOULD-level error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; ;
-ok 1548 - Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'
-not ok 1549 - Parse error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:44:in table, 1:54:in table:/, 1:64:in table:/, 1:67:not closed, 1:67:in table, 1:78:in table:\#text;44: Start tag “svg” seen in “table”., 56: Stray end tag “g”., 68: Stray end tag “g”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.
-#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:44:in table, 1:54:in table:/, 1:64:in table:/, 1:67:not closed, 1:67:in table, 1:78:in table:\#text;44: Start tag “svg” seen in “table”., 56: Stray end tag “g”., 68: Stray end tag “g”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.'
+not ok 1546 - Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; 1:74:unmatched end tag, 1:77:not closed, 1:80:in body:\#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; 1:74:unmatched end tag, 1:77:not closed, 1:80:in body:\#eof;78: “table” closed but “caption” was still open., 78: Unclosed elements on stack.'
 #   at HTML-tree.t test () ok line 3.
-#          got: '6'
+#          got: '3'
+#     expected: '2'
+ok 1547 - SHOULD-level error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; ;
+not ok 1548 - Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux''
+#   at HTML-tree.t test () ok line 9.
+# +---+-------------------+-------------------+
+# | Ln|Got                |Expected           |
+# +---+-------------------+-------------------+
+# |  1|<!DOCTYPE html>    |<!DOCTYPE html>    |
+# |  2|<html>             |<html>             |
+# |  3|  <head>           |  <head>           |
+# |  4|  <body>           |  <body>           |
+# |  5|    <table>        |    <table>        |
+# |  6|      <caption>    |      <caption>    |
+# |  7|        <svg svg>  |        <svg svg>  |
+# |  8|          <svg g>  |          <svg g>  |
+# |  9|            "foo"  |            "foo"  |
+# | 10|          <svg g>  |          <svg g>  |
+# | 11|            "bar"  |            "bar"  |
+# | 12|          "baz"    |          "baz"    |
+# * 13|        <p>        |    <p>            *
+# * 14|          "quux"   |      "quux"       *
+# +---+-------------------+-------------------+
+not ok 1549 - Parse error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:44:in table, 1:67:not closed, 1:67:in table, 1:78:in table:\#text;44: Start tag “svg” seen in “table”., 56: Stray end tag “g”., 68: Stray end tag “g”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; 1:44:in table, 1:67:not closed, 1:67:in table, 1:78:in table:\#text;44: Start tag “svg” seen in “table”., 56: Stray end tag “g”., 68: Stray end tag “g”., 71: HTML start tag “p” in a foreign namespace context., 71: Start tag “p” seen in “table”.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '4'
 #     expected: '5'
 ok 1550 - SHOULD-level error: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'; ;
 ok 1551 - Document tree: qq'<!DOCTYPE html><body><table><colgroup><svg><g>foo</g><g>bar</g><p>baz</table><p>quux'
@@ -6891,10 +6979,10 @@ ok 5685 - Document tree: qq'<table><caption><svg><tr>a'
 ok 5686 - Parse error: qq'<table><caption><svg><td>a'; 1:8:no DOCTYPE, 1:26:not closed, 1:26:in body:\#eof;no DOCTYPE, eof in foreign, table not closed
 ok 5687 - SHOULD-level error: qq'<table><caption><svg><td>a'; ;
 ok 5688 - Document tree: qq'<table><caption><svg><td>a'
-ok 5689 - Parse error: qq'<table><tr><td><svg><g>a</td>b'; 1:8:no DOCTYPE, 1:30:not closed, 1:30:in table:\#text, 1:30:in body:\#eof;no DOCTYPE, not closed, char in table, eof
+ok 5689 - Parse error: qq'<table><tr><td><svg><g>a</td>b'; 1:8:no DOCTYPE, 1:30:unmatched end tag, 1:30:not closed, 1:30:in body:\#eof;no DOCTYPE, not closed, char in table, eof
 ok 5690 - SHOULD-level error: qq'<table><tr><td><svg><g>a</td>b'; ;
 ok 5691 - Document tree: qq'<table><tr><td><svg><g>a</td>b'
-ok 5692 - Parse error: qq'<table><tr><th><svg><g>a</th>b'; 1:8:no DOCTYPE, 1:30:not closed, 1:30:in table:\#text, 1:30:in body:\#eof;no DOCTYPE, not closed, char in table, eof
+ok 5692 - Parse error: qq'<table><tr><th><svg><g>a</th>b'; 1:8:no DOCTYPE, 1:30:unmatched end tag, 1:30:not closed, 1:30:in body:\#eof;no DOCTYPE, not closed, char in table, eof
 ok 5693 - SHOULD-level error: qq'<table><tr><th><svg><g>a</th>b'; ;
 ok 5694 - Document tree: qq'<table><tr><th><svg><g>a</th>b'
 ok 5695 - Parse error: qq'<table><caption><svg><g>a</td>b'; 1:8:no DOCTYPE, 1:31:unmatched end tag, 1:31:not closed, 1:31:in body:\#eof;no DOCTYPE, unmatched end tag, eof in foreign, eof
@@ -6903,7 +6991,7 @@ ok 5697 - Document tree: qq'<table><caption><svg><g>a</td>b'
 ok 5698 - Parse error: qq'<table><caption><svg><g>a</th>b'; 1:8:no DOCTYPE, 1:31:unmatched end tag, 1:31:not closed, 1:31:in body:\#eof;no DOCTYPE, unmatched end tag, eof in foreign, eof
 ok 5699 - SHOULD-level error: qq'<table><caption><svg><g>a</th>b'; ;
 ok 5700 - Document tree: qq'<table><caption><svg><g>a</th>b'
-ok 5701 - Parse error: qq'<table><caption><svg><g>a</caption>b'; 1:8:no DOCTYPE, 1:36:not closed, 1:36:in table:\#text, 1:36:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, eof
+ok 5701 - Parse error: qq'<table><caption><svg><g>a</caption>b'; 1:8:no DOCTYPE, 1:36:unmatched end tag, 1:36:not closed, 1:36:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, eof
 ok 5702 - SHOULD-level error: qq'<table><caption><svg><g>a</caption>b'; ;
 ok 5703 - Document tree: qq'<table><caption><svg><g>a</caption>b'
 ok 5704 - Parse error: qq'<table><tr><td><svg><g>a</caption>b'; 1:8:no DOCTYPE, 1:35:unmatched end tag, 1:35:not closed, 1:35:in body:\#eof;no DOCTYPE, unmatched end tag, eof in foreign, eof
@@ -6912,22 +7000,22 @@ ok 5706 - Document tree: qq'<table><tr><td><svg><g>a</caption>b'
 ok 5707 - Parse error: qq'<table><tr><th><svg><g>a</caption>b'; 1:8:no DOCTYPE, 1:35:unmatched end tag, 1:35:not closed, 1:35:in body:\#eof;no DOCTYPE, unmatched end tag, eof in foreign, eof
 ok 5708 - SHOULD-level error: qq'<table><tr><th><svg><g>a</caption>b'; ;
 ok 5709 - Document tree: qq'<table><tr><th><svg><g>a</caption>b'
-ok 5710 - Parse error: qq'<table><tr><td><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:33:not closed;no DOCTYPE, unmatched end tag
+ok 5710 - Parse error: qq'<table><tr><td><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:33:unmatched end tag, 1:33:not closed, 1:33:in body:\#eof;no DOCTYPE, unexpected </table>, no </svg>, no </g></svg></table>
 ok 5711 - SHOULD-level error: qq'<table><tr><td><svg><g>a</table>b'; ;
 ok 5712 - Document tree: qq'<table><tr><td><svg><g>a</table>b'
-ok 5713 - Parse error: qq'<table><tr><td><svg><g>a</tbody>b'; 1:8:no DOCTYPE, 1:33:not closed, 1:33:in table:\#text, 1:33:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
+ok 5713 - Parse error: qq'<table><tr><td><svg><g>a</tbody>b'; 1:8:no DOCTYPE, 1:33:unmatched end tag, 1:33:not closed, 1:33:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
 ok 5714 - SHOULD-level error: qq'<table><tr><td><svg><g>a</tbody>b'; ;
 ok 5715 - Document tree: qq'<table><tr><td><svg><g>a</tbody>b'
-ok 5716 - Parse error: qq'<table><tr><td><svg><g>a</tr>b'; 1:8:no DOCTYPE, 1:30:not closed, 1:30:in table:\#text, 1:30:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
+ok 5716 - Parse error: qq'<table><tr><td><svg><g>a</tr>b'; 1:8:no DOCTYPE, 1:30:unmatched end tag, 1:30:not closed, 1:30:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
 ok 5717 - SHOULD-level error: qq'<table><tr><td><svg><g>a</tr>b'; ;
 ok 5718 - Document tree: qq'<table><tr><td><svg><g>a</tr>b'
-ok 5719 - Parse error: qq'<table><thead><tr><td><svg><g>a</thead>b'; 1:8:no DOCTYPE, 1:40:not closed, 1:40:in table:\#text, 1:40:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
+ok 5719 - Parse error: qq'<table><thead><tr><td><svg><g>a</thead>b'; 1:8:no DOCTYPE, 1:40:unmatched end tag, 1:40:not closed, 1:40:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
 ok 5720 - SHOULD-level error: qq'<table><thead><tr><td><svg><g>a</thead>b'; ;
 ok 5721 - Document tree: qq'<table><thead><tr><td><svg><g>a</thead>b'
-ok 5722 - Parse error: qq'<table><tfoot><tr><td><svg><g>a</tfoot>b'; 1:8:no DOCTYPE, 1:40:not closed, 1:40:in table:\#text, 1:40:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
+ok 5722 - Parse error: qq'<table><tfoot><tr><td><svg><g>a</tfoot>b'; 1:8:no DOCTYPE, 1:40:unmatched end tag, 1:40:not closed, 1:40:in body:\#eof;no DOCTYPE, unmatched end tag, char in table, no </table>
 ok 5723 - SHOULD-level error: qq'<table><tfoot><tr><td><svg><g>a</tfoot>b'; ;
 ok 5724 - Document tree: qq'<table><tfoot><tr><td><svg><g>a</tfoot>b'
-ok 5725 - Parse error: qq'<table><caption><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:34:not closed, 1:34:not closed;no DOCTYPE, unmatched end tag (implied </caption>), unmatched end tag </table>
+ok 5725 - Parse error: qq'<table><caption><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:34:unmatched end tag, 1:34:not closed, 1:34:in body:\#eof;no DOCTYPE, unexpected </table>, no </svg>, no </g></svg></caption></table>
 ok 5726 - SHOULD-level error: qq'<table><caption><svg><g>a</table>b'; ;
 ok 5727 - Document tree: qq'<table><caption><svg><g>a</table>b'
 ok 5728 - Parse error: qq'<table><caption><svg><g>a</tbody>b'; 1:8:no DOCTYPE, 1:34:unmatched end tag, 1:34:not closed, 1:34:in body:\#eof;no DOCTYPE, unmatched end tag, eof in foreign, eof
@@ -6942,43 +7030,43 @@ ok 5736 - Document tree: qq'<table><caption><svg><g>a</tfoot>b'
 ok 5737 - Parse error: qq'<table><caption><svg><g>a</tr>b'; 1:8:no DOCTYPE, 1:31:unmatched end tag, 1:31:not closed, 1:31:in body:\#eof;no DOCTYPE, unmatched end tag, eof in foreign, eof
 ok 5738 - SHOULD-level error: qq'<table><caption><svg><g>a</tr>b'; ;
 ok 5739 - Document tree: qq'<table><caption><svg><g>a</tr>b'
-ok 5740 - Parse error: qq'<table><tr><svg><g>a</tr>b<!---->'; 1:8:no DOCTYPE, 1:17:in table, 1:33:in table:\#text, 1:33:in body:\#eof;no DOCTYPE, element in <tr>, unmatched end tag, eof
+ok 5740 - Parse error: qq'<table><tr><svg><g>a</tr>b<!---->'; 1:8:no DOCTYPE, 1:17:in table, 1:26:unmatched end tag, 1:33:not closed, 1:33:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </tr>, no </svg>, no </g></svg></table>
 ok 5741 - SHOULD-level error: qq'<table><tr><svg><g>a</tr>b<!---->'; ;
 ok 5742 - Document tree: qq'<table><tr><svg><g>a</tr>b<!---->'
-ok 5743 - Parse error: qq'<table><tbody><svg><g>a</tbody>b<!---->'; 1:8:no DOCTYPE, 1:20:in table, 1:39:in table:\#text, 1:39:in body:\#eof;no DOCTYPE, element in table, unmatched end tag, eof
+ok 5743 - Parse error: qq'<table><tbody><svg><g>a</tbody>b<!---->'; 1:8:no DOCTYPE, 1:20:in table, 1:32:unmatched end tag, 1:39:not closed, 1:39:in body:\#eof;no DOCTYPE, <svg> in tbody, unexpected </tbody>, no </svg>, no </g></svg></tbody></table>
 ok 5744 - SHOULD-level error: qq'<table><tbody><svg><g>a</tbody>b<!---->'; ;
 ok 5745 - Document tree: qq'<table><tbody><svg><g>a</tbody>b<!---->'
-ok 5746 - Parse error: qq'<table><thead><svg><g>a</thead>b<!---->'; 1:8:no DOCTYPE, 1:20:in table, 1:39:in table:\#text, 1:39:in body:\#eof;no DOCTYPE, element in table, unmatched end tag, eof
+ok 5746 - Parse error: qq'<table><thead><svg><g>a</thead>b<!---->'; 1:8:no DOCTYPE, 1:20:in table, 1:32:unmatched end tag, 1:39:not closed, 1:39:in body:\#eof;no DOCTYPE, <svg> in thead, unexpected </thead>, no </svg>, no </g></svg></table>
 ok 5747 - SHOULD-level error: qq'<table><thead><svg><g>a</thead>b<!---->'; ;
 ok 5748 - Document tree: qq'<table><thead><svg><g>a</thead>b<!---->'
-ok 5749 - Parse error: qq'<table><tfoot><svg><g>a</tfoot>b<!---->'; 1:8:no DOCTYPE, 1:20:in table, 1:39:in table:\#text, 1:39:in body:\#eof;no DOCTYPE, element in table, unmatched end tag, eof
+ok 5749 - Parse error: qq'<table><tfoot><svg><g>a</tfoot>b<!---->'; 1:8:no DOCTYPE, 1:20:in table, 1:32:unmatched end tag, 1:39:not closed, 1:39:in body:\#eof;no DOCTYPE, <svg> in tfoot, unexpected </tfoot>, no </svg>, no </g></svg></table>
 ok 5750 - SHOULD-level error: qq'<table><tfoot><svg><g>a</tfoot>b<!---->'; ;
 ok 5751 - Document tree: qq'<table><tfoot><svg><g>a</tfoot>b<!---->'
-ok 5752 - Parse error: qq'<table><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:13:in table;no DOCTYPE, element in table
+ok 5752 - Parse error: qq'<table><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:13:in table, 1:25:unmatched end tag, 1:25:not closed, 1:25:in body:\#eof;no DOCTYPE, <svg> in table, unexpected </table>, no </svg>, no </g></svg></table>
 ok 5753 - SHOULD-level error: qq'<table><svg><g>a</table>b'; ;
 ok 5754 - Document tree: qq'<table><svg><g>a</table>b'
-ok 5755 - Parse error: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:43:in table:\#text, 1:43:in body:\#eof;no DOCTYPE, element in table, unmatched end tag, eof
+ok 5755 - Parse error: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:36:unmatched end tag, 1:43:not closed, 1:43:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </table>, no </svg>, no </g></svg></table>
 ok 5756 - SHOULD-level error: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'; ;
 ok 5757 - Document tree: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'
-ok 5758 - Parse error: qq'<table><thead><tr><svg><g>a</thead>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:43:in table:\#text, 1:43:in body:\#eof;no DOCTYPE, element in table, unmatched end tag, eof
+ok 5758 - Parse error: qq'<table><thead><tr><svg><g>a</thead>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:36:unmatched end tag, 1:43:not closed, 1:43:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </thead>, no </svg>, no </g></svg></table>
 ok 5759 - SHOULD-level error: qq'<table><thead><tr><svg><g>a</thead>b<!---->'; ;
 ok 5760 - Document tree: qq'<table><thead><tr><svg><g>a</thead>b<!---->'
-ok 5761 - Parse error: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:43:in table:\#text, 1:43:in body:\#eof;no DOCTYPE, element in table, unmatched end tag, eof
+ok 5761 - Parse error: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:36:unmatched end tag, 1:43:not closed, 1:43:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </tfoot>, no </svg>, no </g></svg></table>
 ok 5762 - SHOULD-level error: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'; ;
 ok 5763 - Document tree: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'
-ok 5764 - Parse error: qq'<table><tbody><tr><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:24:in table;no DOCTYPE, element in table
+ok 5764 - Parse error: qq'<table><tbody><tr><svg><g>a</table>b'; 1:8:no DOCTYPE, 1:24:in table, 1:36:unmatched end tag, 1:36:not closed, 1:36:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </table>, no </svg>, no </g></svg></table>
 ok 5765 - SHOULD-level error: qq'<table><tbody><tr><svg><g>a</table>b'; ;
 ok 5766 - Document tree: qq'<table><tbody><tr><svg><g>a</table>b'
-ok 5767 - Parse error: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:43:in table:\#text, 1:43:in body:\#eof;no DOCTYPE, element in table, char in table, eof
+ok 5767 - Parse error: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:36:unmatched end tag, 1:43:not closed, 1:43:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </tbody>, no </svg>, no </g></svg></table>
 ok 5768 - SHOULD-level error: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'; ;
 ok 5769 - Document tree: qq'<table><tbody><tr><svg><g>a</tbody>b<!---->'
-ok 5770 - Parse error: qq'<table><thead><tr><svg><g>a</thead>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:43:in table:\#text, 1:43:in body:\#eof;no DOCTYPE, element in table, char in table, eof
+ok 5770 - Parse error: qq'<table><thead><tr><svg><g>a</thead>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:36:unmatched end tag, 1:43:not closed, 1:43:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </thead>, no </svg>, no </g></svg></table>
 ok 5771 - SHOULD-level error: qq'<table><thead><tr><svg><g>a</thead>b<!---->'; ;
 ok 5772 - Document tree: qq'<table><thead><tr><svg><g>a</thead>b<!---->'
-ok 5773 - Parse error: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:43:in table:\#text, 1:43:in body:\#eof;no DOCTYPE, element in table, char in table, eof
+ok 5773 - Parse error: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'; 1:8:no DOCTYPE, 1:24:in table, 1:36:unmatched end tag, 1:43:not closed, 1:43:in body:\#eof;no DOCTYPE, <svg> in tr, unexpected </tfoot>, no </svg>, no </g></svg></table>
 ok 5774 - SHOULD-level error: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'; ;
 ok 5775 - Document tree: qq'<table><tfoot><tr><svg><g>a</tfoot>b<!---->'
-ok 5776 - Parse error: qq'<table><colgroup><svg></colgroup><!----></table>'; 1:8:no DOCTYPE, 1:23:in table, 1:34:unmatched end tag;no DOCTYPE, element in table, unmatched end tag
+ok 5776 - Parse error: qq'<table><colgroup><svg></colgroup><!----></table>'; 1:8:no DOCTYPE, 1:23:in table, 1:34:unmatched end tag, 1:48:unmatched end tag, 1:48:not closed, 1:48:in body:\#eof;no DOCTYPE, <svg> in table, unexpected </colgroup>, unexpected </table>, no </svg>, no </svg></table>
 ok 5777 - SHOULD-level error: qq'<table><colgroup><svg></colgroup><!----></table>'; ;
 ok 5778 - Document tree: qq'<table><colgroup><svg></colgroup><!----></table>'
 ok 5779 - Parse error: qq'<!DOCTYPE HTML>\x{0A}<p xmlns:xlink="http://www.w3.org/1999/xhtml">x</p>'; ;
@@ -6993,67 +7081,21 @@ ok 5787 - Document tree: qq'<!DOCTYPE HTML>\x{0A}<svg xmlns:xlink="http://www.w3
 ok 5788 - Parse error: qq'<!DOCTYPE HTML>\x{0A}<svg xmlns:xlink="http://www.w3.org/1999/xlink "></svg>'; 2:50:bad namespace;bad namespace
 ok 5789 - SHOULD-level error: qq'<!DOCTYPE HTML>\x{0A}<svg xmlns:xlink="http://www.w3.org/1999/xlink "></svg>'; ;
 ok 5790 - Document tree: qq'<!DOCTYPE HTML>\x{0A}<svg xmlns:xlink="http://www.w3.org/1999/xlink "></svg>'
-not ok 5791 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; 2:19:unmatched end tag, 2:24:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '0'
+ok 5791 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; ;
 ok 5792 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'; ;
 ok 5793 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font></font></svg>'
-not ok 5794 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font>abc</font></svg>'; 2:22:unmatched end tag, 2:27:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font>abc</font></svg>'; 2:22:unmatched end tag, 2:27:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '0'
+ok 5794 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font>abc</font></svg>'; ;
 ok 5795 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font>abc</font></svg>'; ;
 ok 5796 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font>abc</font></svg>'
 ok 5797 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font color=red></font>'; 2:22:not closed;no </svg>
 ok 5798 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font color=red></font>'; ;
 ok 5799 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font color=red></font>'
-not ok 5800 - Parse error: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'; 1:35:unmatched end tag, 1:42:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'; 1:35:unmatched end tag, 1:42:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '0'
+ok 5800 - Parse error: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'; ;
 ok 5801 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'; ;
-not ok 5802 - Document tree: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'
-#   Failed test 'Document tree: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z''
-#   at HTML-tree.t test () ok line 9.
-# +---+------------------+---+------------------+
-# | Ln|Got               | Ln|Expected          |
-# +---+------------------+---+------------------+
-# |  1|<!DOCTYPE html>   |  1|<!DOCTYPE html>   |
-# |  2|<html>            |  2|<html>            |
-# |  3|  <head>          |  3|  <head>          |
-# |  4|  <body>          |  4|  <body>          |
-# |  5|    <svg svg>     |  5|    <svg svg>     |
-# |  6|      <svg font>  |  6|      <svg font>  |
-# *  7|        "xy"      *  7|        "x"       *
-# |   |                  *  8|      "y"         *
-# |  8|    "z"           |  9|    "z"           |
-# +---+------------------+---+------------------+
-not ok 5803 - Parse error: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'; 1:29:unmatched end tag, 1:36:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'; 1:29:unmatched end tag, 1:36:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '0'
+ok 5802 - Document tree: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'
+ok 5803 - Parse error: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'; ;
 ok 5804 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'; ;
-not ok 5805 - Document tree: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'
-#   Failed test 'Document tree: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z''
-#   at HTML-tree.t test () ok line 9.
-# +---+-----------------+---+-----------------+
-# | Ln|Got              | Ln|Expected         |
-# +---+-----------------+---+-----------------+
-# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
-# |  2|<html>           |  2|<html>           |
-# |  3|  <head>         |  3|  <head>         |
-# |  4|  <body>         |  4|  <body>         |
-# |  5|    <svg svg>    |  5|    <svg svg>    |
-# |  6|      <svg a>    |  6|      <svg a>    |
-# *  7|        "xy"     *  7|        "x"      *
-# |   |                 *  8|      "y"        *
-# |  8|    "z"          |  9|    "z"          |
-# +---+-----------------+---+-----------------+
+ok 5805 - Document tree: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'
 ok 5806 - Parse error: qq'<!DOCTYPE HTML><svg><c>x</c>y</svg>z'; ;
 ok 5807 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><c>x</c>y</svg>z'; ;
 ok 5808 - Document tree: qq'<!DOCTYPE HTML><svg><c>x</c>y</svg>z'
@@ -7063,11 +7105,7 @@ ok 5811 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font size=1></font>'
 ok 5812 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'; 2:25:not closed;no </svg>
 ok 5813 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'; ;
 ok 5814 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'
-not ok 5815 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '0'
+ok 5815 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; ;
 ok 5816 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; ;
 ok 5817 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'
 ok 5818 - Parse error: qq'<!DOCTYPE html>\x{0A}<table>\x{0A}  <tr>\x{0A}    <td>\x{0A}      <svg>\x{0A}        <foreignObject>\x{0A}          <table>\x{0A}            <td>\x{0A}          </table>\x{0A}        </foreignObject>\x{0A}      </svg>\x{0A}    <td>\x{0A}      Hi\x{0A}  </tr>\x{0A}</table>\x{0A}there'; 9:0:missing start tag:tr;9:0:missing start tag:tr;
@@ -7079,47 +7117,47 @@ ok 5823 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>'
 ok 5824 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'; 1:40:not closed, 1:40:in body:\#eof;EOF in foreign content, elements not closed before EOF
 ok 5825 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'; ;
 ok 5826 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'
-ok 5827 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'; 1:45:in table:\#text, 1:45:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5827 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'; 1:45:not closed, 1:45:in body:\#eof;EOF in foreign content, elements not closed before EOF
 ok 5828 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'; ;
 ok 5829 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'
-ok 5830 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'; 1:48:in body:\#eof;elements not closed before EOF
+ok 5830 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'; 1:48:not closed, 1:48:in body:\#eof;no </svg>, elements not closed before EOF
 ok 5831 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'; ;
 ok 5832 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'
-ok 5833 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'; 1:50:in table:\#text, 1:50:in body:\#eof;"b" in table row, elements not closed before EOF
+ok 5833 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'; 1:50:not closed, 1:50:in body:\#eof;no </svg>, elements not closed before EOF
 ok 5834 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'; ;
 ok 5835 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'
 ok 5836 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'; 1:43:not closed, 1:43:in body:\#eof;EOF in foreign content, elements not closed before EOF
 ok 5837 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'; ;
 ok 5838 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'
-ok 5839 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'; 1:48:in body:\#eof;elements not closed before EOF
+ok 5839 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'; 1:48:not closed, 1:48:in body:\#eof;no </svg>, elements not closed before EOF
 ok 5840 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'; ;
 ok 5841 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'
-ok 5842 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'; 1:54:unmatched end tag, 1:58:in body:\#eof;no </tr>, elements not closed before EOF
+ok 5842 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'; 1:54:unmatched end tag, 1:58:not closed, 1:58:in body:\#eof;no </svg>, unexpected </td>, elements not closed before EOF
 ok 5843 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'; ;
 ok 5844 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'
-ok 5845 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'; 1:49:not closed, 1:53:in body:\#eof;no </tr>, elements not closed before EOF
+ok 5845 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'; 1:49:unmatched end tag, 1:53:not closed, 1:53:in body:\#eof;no </tr>, no </svg>, elements not closed before EOF
 ok 5846 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'; ;
 ok 5847 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'
-ok 5848 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'; 1:51:in body:\#eof;elements not closed before EOF
+ok 5848 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'; 1:48:unmatched end tag, 1:51:not closed, 1:51:in body:\#eof;unexpected </tbody>, no </svg>, elements not closed before EOF
 ok 5849 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'; ;
 ok 5850 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'
 ok 5851 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'; 1:46:not closed, 1:46:in body:\#eof;EOF in foreign content, elements not closed before EOF
 ok 5852 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'; ;
 ok 5853 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'
-ok 5854 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'; 1:51:in body:\#eof;elements not closed before EOF
+ok 5854 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'; 1:45:unmatched end tag, 1:51:not closed, 1:51:in body:\#eof;unexpected </tr>, no </svg>, elements not closed before EOF
 ok 5855 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'; ;
 ok 5856 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'
-ok 5857 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'; 1:51:in body:\#eof;elements not closed before EOF
+ok 5857 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'; 1:51:not closed, 1:51:in body:\#eof;no </svg>, elements not closed before EOF
 ok 5858 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'; ;
 ok 5859 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'
-ok 5860 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
+ok 5860 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; 1:48:unmatched end tag, 1:48:not closed, 1:48:in body:\#eof;unexpected </table>, no </svg>, no </svg></table>
 ok 5861 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
 ok 5862 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'
 ok 5863 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; 1:50:not closed, 1:50:in body:\#eof;EOF in foreign content, elements not closed before EOF
 ok 5864 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; ;
 ok 5865 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'
-ok 5866 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; 1:51:not closed, 1:51:in table:\#text, 1:51:in body:\#eof;text in table, EOF in foreign content, elements not closed before EOF
+ok 5866 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; 1:51:not closed, 1:51:in body:\#eof;EOF in foreign content, elements not closed before EOF
 ok 5867 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; ;
 ok 5868 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'
 1..5868
-# Looks like you failed 151 tests of 5868.
+# Looks like you failed 158 tests of 5868.

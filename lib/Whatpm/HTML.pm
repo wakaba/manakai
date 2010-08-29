@@ -2248,6 +2248,43 @@ sub _tree_construction_main ($) {
           
           #
           ## XXXscript: Execute script here.
+        } elsif ($self->{open_elements}->[-1]->[1] & FOREIGN_EL) {
+          
+          
+          ## 1.
+          my $i = -1;
+          my $node = $self->{open_elements}->[$i];
+          
+          ## 2.
+          my $tag_name = $node->[0]->manakai_local_name;
+          $tag_name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+          if ($tag_name ne $token->{tag_name}) {
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
+                            text => $token->{tag_name},
+                            level => $self->{level}->{must});
+          }
+
+          ## 3.
+          LOOP: {
+            my $tag_name = $node->[0]->manakai_local_name;
+            $tag_name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+            if ($tag_name eq $token->{tag_name}) {
+              splice @{$self->{open_elements}}, $i, -$i, ();
+            }
+            
+            ## 4.
+            $i--;
+            $node = $self->{open_elements}->[$i];
+
+            ## 5.
+            if ($node->[1] & FOREIGN_EL) {
+              redo LOOP;
+            }
+          } # LOOP
+
+          ## Steps 6. and 7. is done in the |continue| block.
+          $token = $self->_get_next_token;
+          next B;
         } else {
           
           #
