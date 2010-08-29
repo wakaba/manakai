@@ -100,7 +100,7 @@ sub _html_parser_change_the_encoding_fragment : Test(2) {
 
   $parser->set_inner_html ($el, '<meta http-equiv=content-type content="text/html; charset=shift_jis">', sub { });
   ok !$called;
-} # _html_parser_change_the_encoding
+} # _html_parser_change_the_encoding_fragment
 
 sub _html_parser_change_the_encoding_byte_string : Test(20) {
   my $parser = Whatpm::HTML->new;
@@ -130,7 +130,52 @@ sub _html_parser_change_the_encoding_byte_string : Test(20) {
   }
 } # _html_parser_change_the_encoding_byte_string
 
-sub _html_parser_change_the_encoding_byte_string_not_called : Test(12) {
+sub _html_parser_change_the_encoding_byte_string_changed : Test(48) {
+  my $parser = Whatpm::HTML->new;
+  my $called = 0;
+  my $onerror = sub {
+    my %args = @_;
+    $called = 1 if $args{type} eq 'charset label detected';
+  };
+  my $dom = Message::DOM::DOMImplementation->new;
+
+  for (
+    ['<meta charset=shift_jis>' => 'shift_jis'],
+    ['<meta charset=euc-jp>' => 'euc-jp'],
+    ['<meta charset=iso-2022-jp>' => 'iso-2022-jp'],
+    ['<meta charset=utf-8>' => 'utf-8'],
+    ['<meta charset=utf-16>' => 'utf-8'],
+    ['<meta charset=utf-16be>' => 'utf-8'],
+    ['<meta charset=utf-16le>' => 'utf-8'],
+
+    ['<meta http-equiv=content-type content="text/html; charset=euc-jp">' => 'euc-jp'],
+    ['<meta http-equiv=content-type content="text/html; charset=utf-8">' => 'utf-8'],
+    ['<meta http-equiv=content-type content="text/html; charset=utf-16">' => 'utf-8'],
+    ['<meta http-equiv=content-type content="text/html; charset=utf-16be">' => 'utf-8'],
+    ['<meta http-equiv=content-type content="text/html; charset=utf-16le">' => 'utf-8'],
+
+    ['<p><meta charset=shift_jis>' => 'shift_jis'],
+    ['<p><meta charset=euc-jp>' => 'euc-jp'],
+    ['<p><meta charset=iso-2022-jp>' => 'iso-2022-jp'],
+    ['<p><meta charset=utf-8>' => 'utf-8'],
+    ['<p><meta charset=utf-16>' => 'utf-8'],
+    ['<p><meta charset=utf-16be>' => 'utf-8'],
+    ['<p><meta charset=utf-16le>' => 'utf-8'],
+
+    ['<p><meta http-equiv=content-type content="text/html; charset=euc-jp">' => 'euc-jp'],
+    ['<p><meta http-equiv=content-type content="text/html; charset=utf-8">' => 'utf-8'],
+    ['<p><meta http-equiv=content-type content="text/html; charset=utf-16">' => 'utf-8'],
+    ['<p><meta http-equiv=content-type content="text/html; charset=utf-16be">' => 'utf-8'],
+    ['<p><meta http-equiv=content-type content="text/html; charset=utf-16le">' => 'utf-8'],
+  ) {
+    my $doc = $dom->create_document;
+    $parser->parse_byte_string (undef, (' ' x 1024) . $_->[0] => $doc, $onerror);
+    ok $called;
+    is $doc->input_encoding, $_->[1];
+  }
+} # _html_parser_change_the_encoding_byte_string_changed
+
+sub _html_parser_change_the_encoding_byte_string_not_called : Test(28) {
   my $parser = Whatpm::HTML->new;
   my $called = 0;
   my $onerror = sub {
@@ -146,6 +191,15 @@ sub _html_parser_change_the_encoding_byte_string_not_called : Test(12) {
     '<meta name=content-type content="text/html; charset=shift_jis">',
     '<meta http-equiv=content-style-type content="text/html; charset=shift_jis">',
     '<meta http-equiv=content_type content="text/html; charset=shift_jis">',
+
+    '<meta charset=ebcdic>',
+    '<meta http-equiv=content-type content="text/html; charset=ebcdic">',
+    '<meta charset=utf-7>',
+    '<meta http-equiv=content-type content="text/html; charset=utf-7">',
+    '<meta charset=utf-1>',
+    '<meta http-equiv=content-type content="text/html; charset=utf-1">',
+    '<meta charset=unicode>',
+    '<meta http-equiv=content-type content="text/html; charset=unicode">',
   ) {
     my $doc = $dom->create_document;
     $parser->parse_byte_string (undef, (' ' x 1024) . $input => $doc, $onerror);

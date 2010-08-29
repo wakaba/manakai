@@ -517,6 +517,7 @@ sub parse_byte_stream ($$$$;$$) {
     my $self = shift;
     $charset_name = shift;
     my $token = shift;
+    my $orig_char_stream = $char_stream;
 
     $charset = Message::Charset::Info->get_by_html_name ($charset_name);
     ($char_stream, $e_status) = $charset->get_decode_handle
@@ -524,6 +525,13 @@ sub parse_byte_stream ($$$$;$$) {
          byte_buffer => \ $buffer->{buffer});
     
     if ($char_stream) { # if supported
+      if ($charset->{category} & Message::Charset::Info::CHARSET_CATEGORY_ASCII_COMPAT () or
+          $charset->{category} & Message::Charset::Info::CHARSET_CATEGORY_UTF16 ()) {
+        #
+      } else {
+        return;
+      }
+      
       ## "Change the encoding" algorithm:
       
       ## Step 1
@@ -550,6 +558,7 @@ sub parse_byte_stream ($$$$;$$) {
         $charset = Message::Charset::Info->get_by_html_name ('utf-8');
         ($char_stream, $e_status) = $charset->get_decode_handle
             ($byte_stream,
+             allow_error_reporting => 1,
              byte_buffer => \ $buffer->{buffer});
       }
       $charset_name = $charset->get_iana_name;
@@ -569,6 +578,8 @@ sub parse_byte_stream ($$$$;$$) {
       
       ## Step 5
       throw Whatpm::HTML::RestartParser ();
+    } else {
+      $char_stream = $orig_char_stream;
     }
   }; # $self->{change_encoding}
 
@@ -1902,6 +1913,8 @@ sub _tree_construction_main ($) {
           }
         }
 
+        ## "in table" insertion mode, "Anything else".
+
         ## Foster parenting.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in table:#text', token => $token);
 
@@ -2651,8 +2664,9 @@ sub _tree_construction_main ($) {
               unless ($self->{confident}) {
                 if ($token->{attributes}->{charset}) {
                   
-                  ## NOTE: Whether the encoding is supported or not is handled
-                  ## in the {change_encoding} callback.
+                  ## NOTE: Whether the encoding is supported or not,
+                  ## an ASCII-compatible charset is not, is handled in
+                  ## the {change_encoding} callback.
                   $self->{change_encoding}
                       ->($self, $token->{attributes}->{charset}->{value},
                          $token);
@@ -2672,8 +2686,9 @@ sub _tree_construction_main ($) {
                           ([^"'\x09\x0A\x0C\x0D\x20]
                            [^\x09\x0A\x0C\x0D\x20\x3B]*))/x) {
                     
-                    ## NOTE: Whether the encoding is supported or not
-                    ## is handled in the {change_encoding} callback.
+                    ## NOTE: Whether the encoding is supported or not,
+                    ## an ASCII-compatible charset is not, is handled
+                    ## in the {change_encoding} callback.
                     $self->{change_encoding}
                         ->($self, defined $1 ? $1 : defined $2 ? $2 : $3,
                            $token);
@@ -5142,8 +5157,9 @@ sub _tree_construction_main ($) {
         unless ($self->{confident}) {
           if ($token->{attributes}->{charset}) {
             
-            ## NOTE: Whether the encoding is supported or not is
-            ## handled in the {change_encoding} callback.
+            ## NOTE: Whether the encoding is supported or not, an
+            ## ASCII-compatible charset is not, is handled in the
+            ## {change_encoding} callback.
             $self->{change_encoding}
                 ->($self, $token->{attributes}->{charset}->{value}, $token);
             
@@ -5162,8 +5178,9 @@ sub _tree_construction_main ($) {
                     ([^"'\x09\x0A\x0C\x0D\x20][^\x09\x0A\x0C\x0D\x20\x3B]*))
                    /x) {
               
-              ## NOTE: Whether the encoding is supported or not is handled
-              ## in the {change_encoding} callback.
+              ## NOTE: Whether the encoding is supported or not, an
+              ## ASCII-compatible charset is not, is handled in the
+              ## {change_encoding} callback.
               $self->{change_encoding}
                   ->($self, defined $1 ? $1 : defined $2 ? $2 : $3, $token);
               $meta_el->[0]->get_attribute_node_ns (undef, 'content')
