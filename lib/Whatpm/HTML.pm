@@ -2091,6 +2091,7 @@ sub _tree_construction_main ($) {
         die "$0: $token->{type}: In CDATA/RCDATA: Unknown token type";        
       }
     } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
+      my $break_foreign_land;
       if ($token->{type} == CHARACTER_TOKEN) {
         
 
@@ -2126,17 +2127,7 @@ sub _tree_construction_main ($) {
                    $token->{attributes}->{face} or
                    $token->{attributes}->{size}))) {
           
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
-                          text => $self->{open_elements}->[-1]->[0]
-                              ->manakai_local_name,
-                          token => $token);
-
-          pop @{$self->{open_elements}}
-              while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
-
-          $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
-          ## Reprocess.
-          next B;
+          $break_foreign_land = 1;
         } else {
           my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
           my $tag_name = $token->{tag_name};
@@ -2291,6 +2282,12 @@ sub _tree_construction_main ($) {
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         
+        $break_foreign_land = 1;
+      } else {
+        die "$0: $token->{type}: Unknown token type";        
+      }
+
+      if ($break_foreign_land) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
                         text => $self->{open_elements}->[-1]->[0]
                             ->manakai_local_name,
@@ -2299,15 +2296,11 @@ sub _tree_construction_main ($) {
         pop @{$self->{open_elements}}
             while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
 
-        ## NOTE: |<span><svg>| ... two parse errors, |<svg>| ... a parse error.
-
         $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
         ## Reprocess.
         next B;
-      } else {
-        die "$0: $token->{type}: Unknown token type";        
-      }
-    }
+      } # $break_foreign_land
+    } # insertion_mode
 
     if ($self->{insertion_mode} & HEAD_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
