@@ -1738,6 +1738,48 @@ no </svg>
 |       color="red"
 
 #data
+<!DOCTYPE HTML><svg><font>x</font>y</svg>z
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg font>
+|         "x"
+|       "y"
+|     "z"
+
+#data
+<!DOCTYPE HTML><svg><a>x</a>y</svg>z
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg a>
+|         "x"
+|       "y"
+|     "z"
+
+#data
+<!DOCTYPE HTML><svg><c>x</c>y</svg>z
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg c>
+|         "x"
+|       "y"
+|     "z"
+
+#data
 <!DOCTYPE html>
 <svg><font size=1></font>
 #errors

@@ -7010,69 +7010,116 @@ ok 5796 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font>abc</font></svg>'
 ok 5797 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font color=red></font>'; 2:22:not closed;no </svg>
 ok 5798 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font color=red></font>'; ;
 ok 5799 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font color=red></font>'
-ok 5800 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font size=1></font>'; 2:19:not closed;no </svg>
-ok 5801 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font size=1></font>'; ;
-ok 5802 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font size=1></font>'
-ok 5803 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'; 2:25:not closed;no </svg>
-ok 5804 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'; ;
-ok 5805 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'
-not ok 5806 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;
+not ok 5800 - Parse error: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'; 1:35:unmatched end tag, 1:42:not closed;
+#   Failed test 'Parse error: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'; 1:35:unmatched end tag, 1:42:not closed;'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '0'
+ok 5801 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'; ;
+not ok 5802 - Document tree: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z'
+#   Failed test 'Document tree: qq'<!DOCTYPE HTML><svg><font>x</font>y</svg>z''
+#   at HTML-tree.t test () ok line 9.
+# +---+------------------+---+------------------+
+# | Ln|Got               | Ln|Expected          |
+# +---+------------------+---+------------------+
+# |  1|<!DOCTYPE html>   |  1|<!DOCTYPE html>   |
+# |  2|<html>            |  2|<html>            |
+# |  3|  <head>          |  3|  <head>          |
+# |  4|  <body>          |  4|  <body>          |
+# |  5|    <svg svg>     |  5|    <svg svg>     |
+# |  6|      <svg font>  |  6|      <svg font>  |
+# *  7|        "xy"      *  7|        "x"       *
+# |   |                  *  8|      "y"         *
+# |  8|    "z"           |  9|    "z"           |
+# +---+------------------+---+------------------+
+not ok 5803 - Parse error: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'; 1:29:unmatched end tag, 1:36:not closed;
+#   Failed test 'Parse error: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'; 1:29:unmatched end tag, 1:36:not closed;'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '0'
+ok 5804 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'; ;
+not ok 5805 - Document tree: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z'
+#   Failed test 'Document tree: qq'<!DOCTYPE HTML><svg><a>x</a>y</svg>z''
+#   at HTML-tree.t test () ok line 9.
+# +---+-----------------+---+-----------------+
+# | Ln|Got              | Ln|Expected         |
+# +---+-----------------+---+-----------------+
+# |  1|<!DOCTYPE html>  |  1|<!DOCTYPE html>  |
+# |  2|<html>           |  2|<html>           |
+# |  3|  <head>         |  3|  <head>         |
+# |  4|  <body>         |  4|  <body>         |
+# |  5|    <svg svg>    |  5|    <svg svg>    |
+# |  6|      <svg a>    |  6|      <svg a>    |
+# *  7|        "xy"     *  7|        "x"      *
+# |   |                 *  8|      "y"        *
+# |  8|    "z"          |  9|    "z"          |
+# +---+-----------------+---+-----------------+
+ok 5806 - Parse error: qq'<!DOCTYPE HTML><svg><c>x</c>y</svg>z'; ;
+ok 5807 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><c>x</c>y</svg>z'; ;
+ok 5808 - Document tree: qq'<!DOCTYPE HTML><svg><c>x</c>y</svg>z'
+ok 5809 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font size=1></font>'; 2:19:not closed;no </svg>
+ok 5810 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font size=1></font>'; ;
+ok 5811 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font size=1></font>'
+ok 5812 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'; 2:25:not closed;no </svg>
+ok 5813 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'; ;
+ok 5814 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font face="Arial"></font>'
+not ok 5815 - Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;
 #   Failed test 'Parse error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; 2:33:unmatched end tag, 2:38:not closed;'
 #   at HTML-tree.t test () ok line 3.
 #          got: '2'
 #     expected: '0'
-ok 5807 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; ;
-ok 5808 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'
-ok 5809 - Parse error: qq'<!DOCTYPE html>\x{0A}<table>\x{0A}  <tr>\x{0A}    <td>\x{0A}      <svg>\x{0A}        <foreignObject>\x{0A}          <table>\x{0A}            <td>\x{0A}          </table>\x{0A}        </foreignObject>\x{0A}      </svg>\x{0A}    <td>\x{0A}      Hi\x{0A}  </tr>\x{0A}</table>\x{0A}there'; 9:0:missing start tag:tr;9:0:missing start tag:tr;
-ok 5810 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<table>\x{0A}  <tr>\x{0A}    <td>\x{0A}      <svg>\x{0A}        <foreignObject>\x{0A}          <table>\x{0A}            <td>\x{0A}          </table>\x{0A}        </foreignObject>\x{0A}      </svg>\x{0A}    <td>\x{0A}      Hi\x{0A}  </tr>\x{0A}</table>\x{0A}there'; ;
-ok 5811 - Document tree: qq'<!DOCTYPE html>\x{0A}<table>\x{0A}  <tr>\x{0A}    <td>\x{0A}      <svg>\x{0A}        <foreignObject>\x{0A}          <table>\x{0A}            <td>\x{0A}          </table>\x{0A}        </foreignObject>\x{0A}      </svg>\x{0A}    <td>\x{0A}      Hi\x{0A}  </tr>\x{0A}</table>\x{0A}there'
-ok 5812 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>'; 1:39:not closed, 1:39:in body:\#eof;EOF in foreign content, elements not closed before EOF
-ok 5813 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>'; ;
-ok 5814 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>'
-ok 5815 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'; 1:40:not closed, 1:40:in body:\#eof;EOF in foreign content, elements not closed before EOF
-ok 5816 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'; ;
-ok 5817 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'
-ok 5818 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'; 1:45:in table:\#text, 1:45:in body:\#eof;EOF in foreign content, elements not closed before EOF
-ok 5819 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'; ;
-ok 5820 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'
-ok 5821 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'; 1:48:in body:\#eof;elements not closed before EOF
-ok 5822 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'; ;
-ok 5823 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'
-ok 5824 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'; 1:50:in table:\#text, 1:50:in body:\#eof;"b" in table row, elements not closed before EOF
-ok 5825 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'; ;
-ok 5826 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'
-ok 5827 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'; 1:43:not closed, 1:43:in body:\#eof;EOF in foreign content, elements not closed before EOF
-ok 5828 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'; ;
-ok 5829 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'
-ok 5830 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'; 1:48:in body:\#eof;elements not closed before EOF
-ok 5831 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'; ;
-ok 5832 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'
-ok 5833 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'; 1:54:unmatched end tag, 1:58:in body:\#eof;no </tr>, elements not closed before EOF
-ok 5834 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'; ;
-ok 5835 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'
-ok 5836 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'; 1:49:not closed, 1:53:in body:\#eof;no </tr>, elements not closed before EOF
-ok 5837 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'; ;
-ok 5838 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'
-ok 5839 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'; 1:51:in body:\#eof;elements not closed before EOF
-ok 5840 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'; ;
-ok 5841 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'
-ok 5842 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'; 1:46:not closed, 1:46:in body:\#eof;EOF in foreign content, elements not closed before EOF
-ok 5843 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'; ;
-ok 5844 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'
-ok 5845 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'; 1:51:in body:\#eof;elements not closed before EOF
-ok 5846 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'; ;
-ok 5847 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'
-ok 5848 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'; 1:51:in body:\#eof;elements not closed before EOF
-ok 5849 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'; ;
-ok 5850 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'
-ok 5851 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
-ok 5852 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
-ok 5853 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'
-ok 5854 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; 1:50:not closed, 1:50:in body:\#eof;EOF in foreign content, elements not closed before EOF
-ok 5855 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; ;
-ok 5856 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'
-ok 5857 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; 1:51:not closed, 1:51:in table:\#text, 1:51:in body:\#eof;text in table, EOF in foreign content, elements not closed before EOF
-ok 5858 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; ;
-ok 5859 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'
-1..5859
-# Looks like you failed 147 tests of 5859.
+ok 5816 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'; ;
+ok 5817 - Document tree: qq'<!DOCTYPE html>\x{0A}<svg><font point-size=14></font></svg>'
+ok 5818 - Parse error: qq'<!DOCTYPE html>\x{0A}<table>\x{0A}  <tr>\x{0A}    <td>\x{0A}      <svg>\x{0A}        <foreignObject>\x{0A}          <table>\x{0A}            <td>\x{0A}          </table>\x{0A}        </foreignObject>\x{0A}      </svg>\x{0A}    <td>\x{0A}      Hi\x{0A}  </tr>\x{0A}</table>\x{0A}there'; 9:0:missing start tag:tr;9:0:missing start tag:tr;
+ok 5819 - SHOULD-level error: qq'<!DOCTYPE html>\x{0A}<table>\x{0A}  <tr>\x{0A}    <td>\x{0A}      <svg>\x{0A}        <foreignObject>\x{0A}          <table>\x{0A}            <td>\x{0A}          </table>\x{0A}        </foreignObject>\x{0A}      </svg>\x{0A}    <td>\x{0A}      Hi\x{0A}  </tr>\x{0A}</table>\x{0A}there'; ;
+ok 5820 - Document tree: qq'<!DOCTYPE html>\x{0A}<table>\x{0A}  <tr>\x{0A}    <td>\x{0A}      <svg>\x{0A}        <foreignObject>\x{0A}          <table>\x{0A}            <td>\x{0A}          </table>\x{0A}        </foreignObject>\x{0A}      </svg>\x{0A}    <td>\x{0A}      Hi\x{0A}  </tr>\x{0A}</table>\x{0A}there'
+ok 5821 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>'; 1:39:not closed, 1:39:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5822 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>'; ;
+ok 5823 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>'
+ok 5824 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'; 1:40:not closed, 1:40:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5825 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'; ;
+ok 5826 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a'
+ok 5827 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'; 1:45:in table:\#text, 1:45:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5828 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'; ;
+ok 5829 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td>b'
+ok 5830 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'; 1:48:in body:\#eof;elements not closed before EOF
+ok 5831 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'; ;
+ok 5832 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><td>'
+ok 5833 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'; 1:50:in table:\#text, 1:50:in body:\#eof;"b" in table row, elements not closed before EOF
+ok 5834 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'; ;
+ok 5835 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td>a</td>b<td>'
+ok 5836 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'; 1:43:not closed, 1:43:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5837 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'; ;
+ok 5838 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr>'
+ok 5839 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'; 1:48:in body:\#eof;elements not closed before EOF
+ok 5840 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'; ;
+ok 5841 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr>'
+ok 5842 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'; 1:54:unmatched end tag, 1:58:in body:\#eof;no </tr>, elements not closed before EOF
+ok 5843 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'; ;
+ok 5844 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tr></td> <td>'
+ok 5845 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'; 1:49:not closed, 1:53:in body:\#eof;no </tr>, elements not closed before EOF
+ok 5846 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'; ;
+ok 5847 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tr></td> <td>'
+ok 5848 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'; 1:51:in body:\#eof;elements not closed before EOF
+ok 5849 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'; ;
+ok 5850 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tbody><tr>'
+ok 5851 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'; 1:46:not closed, 1:46:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5852 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'; ;
+ok 5853 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td><tbody>'
+ok 5854 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'; 1:51:in body:\#eof;elements not closed before EOF
+ok 5855 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'; ;
+ok 5856 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></tr><tbody>'
+ok 5857 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'; 1:51:in body:\#eof;elements not closed before EOF
+ok 5858 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'; ;
+ok 5859 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></td><tbody>'
+ok 5860 - Parse error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
+ok 5861 - SHOULD-level error: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'; ;
+ok 5862 - Document tree: qq'<!DOCTYPE HTML><table><tr><td><svg><td></table>a'
+ok 5863 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; 1:50:not closed, 1:50:in body:\#eof;EOF in foreign content, elements not closed before EOF
+ok 5864 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'; ;
+ok 5865 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'
+ok 5866 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; 1:51:not closed, 1:51:in table:\#text, 1:51:in body:\#eof;text in table, EOF in foreign content, elements not closed before EOF
+ok 5867 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; ;
+ok 5868 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'
+1..5868
+# Looks like you failed 151 tests of 5868.
