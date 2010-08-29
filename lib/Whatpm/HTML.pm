@@ -1853,19 +1853,6 @@ sub _reset_insertion_mode ($) {
     }
   }; # $insert_to_foster
 
-  ## NOTE: Insert a character (MUST): When a character is inserted, if
-  ## the last node that was inserted by the parser is a Text node and
-  ## the character has to be inserted after that node, then the
-  ## character is appended to the Text node.  However, if any other
-  ## node is inserted by the parser, then a new Text node is created
-  ## and the character is appended as that Text node.  If I'm not
-  ## wrong, for a parser with scripting disabled, there are only two
-  ## cases where this occurs.  It is the case where an element or
-  ## comment is inserted into the |table| subtree while foster
-  ## parenting happens.  This is covered by using the [2] flag of the
-  ## |$open_tables| structure.  All other cases are handled simply by
-  ## calling |manakai_append_text| method.
-
 sub _tree_construction_main ($) {
   my $self = shift;
 
@@ -1906,9 +1893,7 @@ sub _tree_construction_main ($) {
               #
             } else {
               
-              #$self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
-              $self->{open_elements}->[-1]->[0]->append_child
-                  ($self->{document}->create_text_node ($s));
+              $self->{open_elements}->[-1]->[0]->manakai_append_text ($s);
               last C;
             }
           } else {
