@@ -2282,7 +2282,19 @@ sub _tree_construction_main ($) {
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         
-        $break_foreign_land = 1;
+
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
+                        text => $self->{open_elements}->[-1]->[0]
+                            ->manakai_local_name,
+                        token => $token);
+
+        pop @{$self->{open_elements}}
+            while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
+
+        $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
+        
+        ## Reprocess.
+        next B; # goto |continue|
       } else {
         die "$0: $token->{type}: Unknown token type";        
       }
@@ -2293,12 +2305,36 @@ sub _tree_construction_main ($) {
                             ->manakai_local_name,
                         token => $token);
 
-        pop @{$self->{open_elements}}
-            while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
+        {
+          my $current_node = $self->{open_elements}->[-1];
+          if (not $current_node->[1] & FOREIGN_EL) {
+            last;
+          }
+          my $current_node_ns = $current_node->[0]->namespace_uri;
+          if (defined $current_node_ns) {
+            if ($current_node_ns eq SVG_NS) {
+              my $current_ln = $current_node->[0]->manakai_local_name;
+              if ({
+                foreignObject => 1, desc => 1, title => 1,
+              }->{$current_ln}) {
+                last;
+              }
+            } elsif ($current_node_ns eq MML_NS) {
+              my $current_ln = $current_node->[0]->manakai_local_name;
+              if ({
+                mi => 1, mo => 1, mn => 1, ms => 1, mtext => 1,
+              }->{$current_ln}) {
+                last;
+              }
+            }
+          }
 
-        $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
+          pop @{$self->{open_elements}};
+          redo;
+        }
+
         ## Reprocess.
-        next B;
+        next B; # goto |continue|
       } # $break_foreign_land
     } # insertion_mode
 
