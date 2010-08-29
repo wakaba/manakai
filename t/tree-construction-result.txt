@@ -7159,5 +7159,180 @@ ok 5865 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>'
 ok 5866 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; 1:51:not closed, 1:51:in body:\#eof;EOF in foreign content, elements not closed before EOF
 ok 5867 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'; ;
 ok 5868 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><tbody></tbody>a'
-1..5868
-# Looks like you failed 158 tests of 5868.
+not ok 5869 - Parse error: qq'<!DOCTYPE HTML><svg><desc><math><b>'; 1:35:not closed, 1:35:in body:\#eof;no </math>, no </svg>, no </b></desc></svg>
+#   Failed test 'Parse error: qq'<!DOCTYPE HTML><svg><desc><math><b>'; 1:35:not closed, 1:35:in body:\#eof;no </math>, no </svg>, no </b></desc></svg>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5870 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><desc><math><b>'; ;
+not ok 5871 - Document tree: qq'<!DOCTYPE HTML><svg><desc><math><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE HTML><svg><desc><math><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+---------------------+---------------------+
+# | Ln|Got                  |Expected             |
+# +---+---------------------+---------------------+
+# |  1|<!DOCTYPE html>      |<!DOCTYPE html>      |
+# |  2|<html>               |<html>               |
+# |  3|  <head>             |  <head>             |
+# |  4|  <body>             |  <body>             |
+# |  5|    <svg svg>        |    <svg svg>        |
+# |  6|      <svg desc>     |      <svg desc>     |
+# |  7|        <math math>  |        <math math>  |
+# *  8|    <b>              |        <b>          *
+# +---+---------------------+---------------------+
+not ok 5872 - Parse error: qq'<!DOCTYPE HTML><svg><title><math><b>'; 1:36:not closed, 1:36:in body:\#eof;no </math>, no </svg>, no </b></title></svg>
+#   Failed test 'Parse error: qq'<!DOCTYPE HTML><svg><title><math><b>'; 1:36:not closed, 1:36:in body:\#eof;no </math>, no </svg>, no </b></title></svg>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5873 - SHOULD-level error: qq'<!DOCTYPE HTML><svg><title><math><b>'; ;
+not ok 5874 - Document tree: qq'<!DOCTYPE HTML><svg><title><math><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE HTML><svg><title><math><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+---------------------+---------------------+
+# | Ln|Got                  |Expected             |
+# +---+---------------------+---------------------+
+# |  1|<!DOCTYPE html>      |<!DOCTYPE html>      |
+# |  2|<html>               |<html>               |
+# |  3|  <head>             |  <head>             |
+# |  4|  <body>             |  <body>             |
+# |  5|    <svg svg>        |    <svg svg>        |
+# |  6|      <svg title>    |      <svg title>    |
+# |  7|        <math math>  |        <math math>  |
+# *  8|    <b>              |        <b>          *
+# +---+---------------------+---------------------+
+not ok 5875 - Parse error: qq'<!DOCTYPE html><math><mi><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></mi></math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><mi><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></mi></math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5876 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><svg><b>'; ;
+not ok 5877 - Document tree: qq'<!DOCTYPE html><math><mi><svg><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><math><mi><svg><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+-------------------+-------------------+
+# | Ln|Got                |Expected           |
+# +---+-------------------+-------------------+
+# |  1|<!DOCTYPE html>    |<!DOCTYPE html>    |
+# |  2|<html>             |<html>             |
+# |  3|  <head>           |  <head>           |
+# |  4|  <body>           |  <body>           |
+# |  5|    <math math>    |    <math math>    |
+# |  6|      <math mi>    |      <math mi>    |
+# |  7|        <svg svg>  |        <svg svg>  |
+# *  8|    <b>            |        <b>        *
+# +---+-------------------+-------------------+
+not ok 5878 - Parse error: qq'<!DOCTYPE html><math><mo><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></mo></math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><mo><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></mo></math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5879 - SHOULD-level error: qq'<!DOCTYPE html><math><mo><svg><b>'; ;
+not ok 5880 - Document tree: qq'<!DOCTYPE html><math><mo><svg><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><math><mo><svg><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+-------------------+-------------------+
+# | Ln|Got                |Expected           |
+# +---+-------------------+-------------------+
+# |  1|<!DOCTYPE html>    |<!DOCTYPE html>    |
+# |  2|<html>             |<html>             |
+# |  3|  <head>           |  <head>           |
+# |  4|  <body>           |  <body>           |
+# |  5|    <math math>    |    <math math>    |
+# |  6|      <math mo>    |      <math mo>    |
+# |  7|        <svg svg>  |        <svg svg>  |
+# *  8|    <b>            |        <b>        *
+# +---+-------------------+-------------------+
+not ok 5881 - Parse error: qq'<!DOCTYPE html><math><mn><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></mn></math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><mn><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></mn></math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5882 - SHOULD-level error: qq'<!DOCTYPE html><math><mn><svg><b>'; ;
+not ok 5883 - Document tree: qq'<!DOCTYPE html><math><mn><svg><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><math><mn><svg><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+-------------------+-------------------+
+# | Ln|Got                |Expected           |
+# +---+-------------------+-------------------+
+# |  1|<!DOCTYPE html>    |<!DOCTYPE html>    |
+# |  2|<html>             |<html>             |
+# |  3|  <head>           |  <head>           |
+# |  4|  <body>           |  <body>           |
+# |  5|    <math math>    |    <math math>    |
+# |  6|      <math mn>    |      <math mn>    |
+# |  7|        <svg svg>  |        <svg svg>  |
+# *  8|    <b>            |        <b>        *
+# +---+-------------------+-------------------+
+not ok 5884 - Parse error: qq'<!DOCTYPE html><math><ms><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></ms></math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><ms><svg><b>'; 1:33:not closed, 1:33:in body:\#eof;no </svg>, no </math>, no </b></ms></math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5885 - SHOULD-level error: qq'<!DOCTYPE html><math><ms><svg><b>'; ;
+not ok 5886 - Document tree: qq'<!DOCTYPE html><math><ms><svg><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><math><ms><svg><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+-------------------+-------------------+
+# | Ln|Got                |Expected           |
+# +---+-------------------+-------------------+
+# |  1|<!DOCTYPE html>    |<!DOCTYPE html>    |
+# |  2|<html>             |<html>             |
+# |  3|  <head>           |  <head>           |
+# |  4|  <body>           |  <body>           |
+# |  5|    <math math>    |    <math math>    |
+# |  6|      <math ms>    |      <math ms>    |
+# |  7|        <svg svg>  |        <svg svg>  |
+# *  8|    <b>            |        <b>        *
+# +---+-------------------+-------------------+
+not ok 5887 - Parse error: qq'<!DOCTYPE html><math><mtext><svg><b>'; 1:36:not closed, 1:36:in body:\#eof;no </svg>, no </math>, no </b></mtext></math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><mtext><svg><b>'; 1:36:not closed, 1:36:in body:\#eof;no </svg>, no </math>, no </b></mtext></math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5888 - SHOULD-level error: qq'<!DOCTYPE html><math><mtext><svg><b>'; ;
+not ok 5889 - Document tree: qq'<!DOCTYPE html><math><mtext><svg><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><math><mtext><svg><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+--------------------+--------------------+
+# | Ln|Got                 |Expected            |
+# +---+--------------------+--------------------+
+# |  1|<!DOCTYPE html>     |<!DOCTYPE html>     |
+# |  2|<html>              |<html>              |
+# |  3|  <head>            |  <head>            |
+# |  4|  <body>            |  <body>            |
+# |  5|    <math math>     |    <math math>     |
+# |  6|      <math mtext>  |      <math mtext>  |
+# |  7|        <svg svg>   |        <svg svg>   |
+# *  8|    <b>             |        <b>         *
+# +---+--------------------+--------------------+
+not ok 5890 - Parse error: qq'<!DOCTYPE html><svg><foreignobject><math><b>'; 1:44:not closed, 1:44:in body:\#eof;no </math>, no </svg>, no </b></foreignObject></svg>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><svg><foreignobject><math><b>'; 1:44:not closed, 1:44:in body:\#eof;no </math>, no </svg>, no </b></foreignObject></svg>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5891 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignobject><math><b>'; ;
+not ok 5892 - Document tree: qq'<!DOCTYPE html><svg><foreignobject><math><b>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><svg><foreignobject><math><b>''
+#   at HTML-tree.t test () ok line 9.
+# +---+---------------------------+---------------------------+
+# | Ln|Got                        |Expected                   |
+# +---+---------------------------+---------------------------+
+# |  1|<!DOCTYPE html>            |<!DOCTYPE html>            |
+# |  2|<html>                     |<html>                     |
+# |  3|  <head>                   |  <head>                   |
+# |  4|  <body>                   |  <body>                   |
+# |  5|    <svg svg>              |    <svg svg>              |
+# |  6|      <svg foreignObject>  |      <svg foreignObject>  |
+# |  7|        <math math>        |        <math math>        |
+# *  8|    <b>                    |        <b>                *
+# +---+---------------------------+---------------------------+
+not ok 5893 - Parse error: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'; 1:50:not closed, 1:50:in body:\#eof;no </math>, no </svg>, no </b></span></foreignObject></svg>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'; 1:50:not closed, 1:50:in body:\#eof;no </math>, no </svg>, no </b></span></foreignObject></svg>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
+ok 5894 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'; ;
+ok 5895 - Document tree: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'
+1..5895
+# Looks like you failed 175 tests of 5895.
