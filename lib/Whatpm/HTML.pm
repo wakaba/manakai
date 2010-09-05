@@ -73,8 +73,7 @@ sub FRAMESET_EL () { SPECIAL_EL | 0b010 }
 sub HEADING_EL () { SPECIAL_EL | 0b011 }
 sub SELECT_EL () { SPECIAL_EL | 0b100 }
 sub SCRIPT_EL () { SPECIAL_EL | 0b101 }
-#sub BUTTON_EL () { SPECIAL_EL | 0b110 }
-sub BUTTON_EL () { SCOPING_EL | 0b110 }
+sub BUTTON_EL () { PHRASING_EL | 0b110 }
 
 sub ADDRESS_DIV_EL () { SPECIAL_EL | ADDRESS_DIV_P_EL | 0b001 }
 sub BODY_EL () { SPECIAL_EL | ALL_END_TAG_OPTIONAL_EL | 0b001 }
@@ -5899,8 +5898,6 @@ sub _tree_construction_main ($) {
 
         ## TODO: associate with $self->{form_element} if defined
 
-        push @$active_formatting_elements, ['#marker', '', undef];
-
         delete $self->{frameset_ok};
 
         
@@ -6510,7 +6507,7 @@ sub _tree_construction_main ($) {
           ## Step 4.
           $clear_up_to_marker->($active_formatting_elements)
               if {
-                applet => 1, button => 1, marquee => 1, object => 1,
+                applet => 1, marquee => 1, object => 1,
               }->{$token->{tag_name}};
         }
         $token = $self->_get_next_token;

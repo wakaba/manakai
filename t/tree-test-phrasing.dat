@@ -88,3 +88,299 @@ aaa
 |               <b>
 |                 "X"
 |               "TEST"
+
+#data
+<!DOCTYPE html><i><b>a<button>b</i>c</b>d
+#errors
+no </button></b>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <i>
+|       <b>
+|         "a"
+|         <button>
+|           "b"
+|     <b>
+|       "c"
+|     "d"
+
+#data
+<!DOCTYPE html><p>a<button>c<div>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|     <div>
+
+#data
+<!DOCTYPE html><p>a<button>c<li>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|     <li>
+
+#data
+<!DOCTYPE html><p>a<button>c<dt>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|     <dt>
+
+#data
+<!DOCTYPE html><p>a<button>c<dd>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|     <dd>
+
+#data
+<!DOCTYPE html><p>a<button>c<plaintext>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|     <plaintext>
+
+#data
+<!DOCTYPE html><p>a<button>c<nobr>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|     <nobr>
+
+#data
+<!DOCTYPE html><p>a<button>c<button>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|       <button>
+
+#data
+<!DOCTYPE html><p>a<button>c<xmp>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "c"
+|     <xmp>
+
+#data
+<!DOCTYPE html><option>a<button>c<option>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|       "a"
+|       <button>
+|         "c"
+|     <option>
+
+#data
+<!DOCTYPE html><option>a<button>c<optgroup>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <option>
+|       "a"
+|       <button>
+|         "c"
+|     <optgroup>
+
+#data
+<!DOCTYPE html><ruby>a<button>b<rt>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       "a"
+|       <button>
+|         "b"
+|       <rt>
+
+#data
+<!DOCTYPE html><ruby>a<button>b<rp>
+#errors
+no </button>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       "a"
+|       <button>
+|         "b"
+|       <rp>
+
+#data
+<!DOCTYPE html><marquee>a</body><!---->
+#errors
+no </marquee>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <marquee>
+|       "a"
+|       <!--  -->
+
+#data
+<!DOCTYPE html><button>a</body><!---->
+#errors
+no </button>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <button>
+|       "a"
+|   <!--  -->
+
+#data
+<!DOCTYPE html><div>a<button>b</div>c
+#errors
+no </button>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       "a"
+|       <button>
+|         "b"
+|     "c"
+
+#data
+<!DOCTYPE html><form>a<button>b</form>c
+#errors
+no </button>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <form>
+|       "a"
+|       <button>
+|         "b"
+|     "c"
+
+#data
+<!DOCTYPE html><h1>a<button>b</h1>c
+#errors
+no </button>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <h1>
+|       "a"
+|       <button>
+|         "b"
+|     "c"
+
+#data
+<!DOCTYPE html><p>a<button>b</p>c
+#errors
+no </button>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "a"
+|       <button>
+|         "b"
+|     "c"
