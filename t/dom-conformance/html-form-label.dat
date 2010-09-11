@@ -297,13 +297,13 @@
 <input id="a" type="hidden" name="_charset_"/>
 </div>
 #errors
+/div/label/@for;no referenced control;m
 
 #data
 <label xmlns="http://www.w3.org/1999/xhtml">
 x<input type="hidden"/><button>x</button>
 </label>
 #errors
-/label/button;multiple labelable fae;m
 
 #data
 <label xmlns="http://www.w3.org/1999/xhtml">
@@ -498,3 +498,104 @@ x<datalist>x</datalist><input/>
   <keygen id="a"/>a
 </label>
 #errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="hidden" name="x" value="y"/>a
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="text" name="a"/>
+  <input type="hidden" name="x" value="y"/>a
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="hidden" name="x" value="y"/>a
+  <input type="text" name="a"/>
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="text" name="a"/>
+  <input type="text" name="b"/>
+  <input type="hidden" name="x" value="y"/>a
+</label>
+#errors
+/label/input;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="text" name="a"/>
+  <input type="hidden" name="x" value="y"/>a
+  <input type="text" name="b"/>
+</label>
+#errors
+/label/input;multiple labelable fae;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="hidden" name="x" value="y"/>a
+  <input type="hidden" name="y" value="z"/>
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="hidden" name="x" value="y"/>a
+  <input type="text" name="a"/>
+  <input type="hidden" name="y" value="z"/>
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml">
+  <input type="HIDDEN" name="x" value="y"/>a
+  <input type="HIDDEN" name="a" value="b"/>
+</label>
+#errors
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml" for="x">
+  <input type="hidden" name="x" value="y" id="x"/>a
+</label>
+#errors
+/label/@for;no referenced control;m
+
+#data
+<label xmlns="http://www.w3.org/1999/xhtml" for="a">
+  <input type="hidden" name="x" value="y"/>a
+  <input type="text" id="a" name="x"/>
+</label>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <label for="a">b</label>
+  <input type="hidden" name="x" value="y" id="a"/>a
+</div>
+#errors
+/div/label/@for;no referenced control;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <label for="a">aa</label>
+  <input type="hidden" name="x" value="y" id="a"/>a
+  <input type="text" id="a"/>
+</div>
+#errors
+/div/label/@for;no referenced control;m
+/div/input/@id;duplicate ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <input type="text" id="a"/>
+  <input type="hidden" name="x" value="y" id="a"/>a
+  <label for="a">b</label>
+</div>
+#errors
+/div/input/@id;duplicate ID;m

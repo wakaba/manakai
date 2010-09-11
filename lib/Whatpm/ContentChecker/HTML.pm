@@ -220,7 +220,8 @@ my $HTMLInteractiveContent = {
 ## NOTE: Labelable form-associated element.
 my $LabelableFAE = {
   (HTML_NS) => {
-    input => 1, button => 1, select => 1, textarea => 1, keygen => 1,
+    input => 1, ## Except for <input type=hidden>
+    button => 1, select => 1, textarea => 1, keygen => 1,
   },
 };
 
@@ -230,7 +231,20 @@ my $LabelableFAE = {
 my $FAECheckStart = sub {
   my ($self, $item, $element_state) = @_;
 
-  $element_state->{id_type} = 'labelable';
+  A: {
+    my $el = $item->{node};
+    if ($el->manakai_local_name eq 'input') {
+      my $nsurl = $el->namespace_uri;
+      if (defined $nsurl and $nsurl eq HTML_NS) {
+        my $type = $el->get_attribute_ns (undef, 'type') || '';
+        if ($type =~ /\A[Hh][Ii][Dd][Dd][Ee][Nn]\z/) { ## ASCII case-insensitive.
+          # <input type=hidden>
+          last A;
+        }
+      }
+    }
+    $element_state->{id_type} = 'labelable';
+  } # A
 }; # $FAECheckStart
 my $FAECheckAttrs2 = sub {
   my ($self, $item, $element_state) = @_;
@@ -240,6 +254,9 @@ my $FAECheckAttrs2 = sub {
   ## |$self->{id}| hash.
 
   CHK: {
+    # <input type=hidden>
+    last CHK unless ($element_state->{id_type} || '') eq 'labelable';
+
     if ($self->{flag}->{has_label} and $self->{flag}->{has_labelable}) {
       my $for = $self->{flag}->{label_for};
       if (defined $for) {
@@ -7220,7 +7237,6 @@ $Element->{+HTML_NS}->{label} = {
       my ($self, $attr) = @_;
       
       ## NOTE: MUST be an ID of a labelable element.
-      
       push @{$self->{idref}}, ['labelable', $attr->value, $attr];
     },
     form => $HTMLFormAttrChecker,
@@ -7270,7 +7286,7 @@ $Element->{+HTML_NS}->{label} = {
         unless $element_state->{has_label_original};
     $self->{flag}->{label_for} = $element_state->{label_for_original};
 
-    ## TODO: Warn if no labelable descendant?  <input type=hidden>?
+    ## TODO: Warn if no labelable descendant?
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
   },
