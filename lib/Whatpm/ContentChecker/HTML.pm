@@ -6885,11 +6885,7 @@ $Element->{+HTML_NS}->{tr} = {
     } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
       #
     } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'td') {
-      if ($item->{parent_state}->{in_thead}) {
-        $self->{onerror}->(node => $child_el, # XXX document the error type
-                           type => 'element not allowed:thead td',
-                           level => $self->{level}->{must});
-      }
+      #
     } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'th') {
       #
     } else {
