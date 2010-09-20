@@ -180,6 +180,7 @@ my $el_category = {
   em => FORMATTING_EL,
   embed => MISC_SPECIAL_EL,
   fieldset => MISC_SPECIAL_EL,
+  figcaption => MISC_SPECIAL_EL,
   figure => MISC_SPECIAL_EL,
   font => FORMATTING_EL,
   footer => MISC_SPECIAL_EL,
@@ -235,6 +236,7 @@ my $el_category = {
   strike => FORMATTING_EL,
   strong => FORMATTING_EL,
   style => MISC_SPECIAL_EL,
+  summary => MISC_SPECIAL_EL,
   table => TABLE_EL,
   tbody => TABLE_ROW_GROUP_EL,
   td => TABLE_CELL_EL,
@@ -4531,6 +4533,7 @@ sub _tree_construction_main ($) {
                 h6 => 1, header => 1, hgroup => 1,
                 menu => 1, nav => 1, ol => 1, p => 1, 
                 section => 1, ul => 1,
+                figcaption => 1, summary => 1,
                 ## NOTE: As normal, but drops leading newline
                 pre => 1, listing => 1,
                 ## NOTE: As normal, but interacts with the form element pointer
@@ -5297,6 +5300,7 @@ sub _tree_construction_main ($) {
                 footer => 1, header => 1, hgroup => 1,
                 listing => 1, menu => 1, nav => 1,
                 ol => 1, pre => 1, section => 1, ul => 1,
+                figcaption => 1, summary => 1,
 
                 ## NOTE: As normal, but ... optional tags
                 dd => 1, dt => 1, li => 1,

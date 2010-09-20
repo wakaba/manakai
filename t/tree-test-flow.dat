@@ -477,6 +477,202 @@ no </marquee>
 |         "x"
 
 #data
+<!DOCTYPE html><figcaption></figcaption>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <figcaption>
+|     "a"
+
+#data
+<!DOCTYPE html><body><figcaption></figcaption>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <figcaption>
+|     "a"
+
+#data
+<!DOCTYPE html><p><figcaption></figcaption>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <figcaption>
+|     "a"
+
+#data
+<!DOCTYPE html><div><figcaption></figcaption>a</div>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <figcaption>
+|       "a"
+
+#data
+<!DOCTYPE html><rt><figcaption></figcaption>a
+#errors
+no </rt>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <rt>
+|       <figcaption>
+|       "a"
+
+#data
+<!DOCTYPE html><a><figcaption></figcaption>a</a>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       <figcaption>
+|       "a"
+
+#data
+<!DOCTYPE html><pre><figcaption></figcaption>a</pre>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <pre>
+|       <figcaption>
+|       "a"
+
+#data
+<!DOCTYPE html><marquee><figcaption>b</marquee>c</figcaption>a
+#errors
+no </figcaption>
+unmatched </figcaption>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <marquee>
+|       <figcaption>
+|         "b"
+|     "ca"
+
+#data
+<!DOCTYPE html><summary></summary>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <summary>
+|     "a"
+
+#data
+<!DOCTYPE html><body><summary></summary>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <summary>
+|     "a"
+
+#data
+<!DOCTYPE html><p><summary></summary>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|     <summary>
+|     "a"
+
+#data
+<!DOCTYPE html><div><summary></summary>a</div>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <div>
+|       <summary>
+|       "a"
+
+#data
+<!DOCTYPE html><rt><summary></summary>a
+#errors
+no </rt>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <rt>
+|       <summary>
+|       "a"
+
+#data
+<!DOCTYPE html><a><summary></summary>a</a>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       <summary>
+|       "a"
+
+#data
+<!DOCTYPE html><pre><summary></summary>a</pre>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <pre>
+|       <summary>
+|       "a"
+
+#data
+<!DOCTYPE html><marquee><summary>b</marquee>c</summary>a
+#errors
+no </summary>
+unmatched </summary>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <marquee>
+|       <summary>
+|         "b"
+|     "ca"
+
+#data
 <!DOCTYPE HTML><p><rt><address></address>
 #errors
 #document
