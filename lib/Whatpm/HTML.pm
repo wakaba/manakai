@@ -1607,12 +1607,6 @@ sub _reset_insertion_mode ($) {
         last S7 if $node->[0] eq $formatting_element->[0];
         
         ## Step 6.4
-        if ($last_node->[0] eq $furthest_block->[0]) {
-          
-          $bookmark_prev_el = $node->[0];
-        }
-        
-        ## Step 6.5
         my $new_element = [];
         
       $new_element->[0] = $self->{document}->create_element_ns
@@ -1637,6 +1631,12 @@ sub _reset_insertion_mode ($) {
         $active_formatting_elements->[$node_i_in_active] = $new_element;
         $self->{open_elements}->[$node_i_in_open] = $new_element;
         $node = $new_element;
+        
+        ## Step 6.5
+        if ($last_node->[0] eq $furthest_block->[0]) {
+          
+          $bookmark_prev_el = $node->[0];
+        }
         
         ## Step 6.6
         $node->[0]->append_child ($last_node->[0]);
