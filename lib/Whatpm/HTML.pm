@@ -36,10 +36,10 @@ sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 ## Element categories
 
 ## Bits 12-15
-sub SPECIAL_EL () { 0b1_000000000000000 }
-sub SCOPING_EL () { 0b1_00000000000000 }
-sub FORMATTING_EL () { 0b1_0000000000000 }
-sub PHRASING_EL () { 0b1_000000000000 }
+sub SPECIAL_EL () { 0b1_000000000000000 } ## The others from "special" category
+sub SCOPING_EL () { 0b1_00000000000000 } ## Some from "special" category
+sub FORMATTING_EL () { 0b1_0000000000000 } ## "Formatting" category
+sub PHRASING_EL () { 0b1_000000000000 } ## "Ordinary" category
 
 ## Bits 10-11
 #sub FOREIGN_EL () { 0b1_00000000000 } # see Whatpm::HTML::Tokenizer
@@ -73,7 +73,7 @@ sub FRAMESET_EL () { SPECIAL_EL | 0b010 }
 sub HEADING_EL () { SPECIAL_EL | 0b011 }
 sub SELECT_EL () { SPECIAL_EL | 0b100 }
 sub SCRIPT_EL () { SPECIAL_EL | 0b101 }
-sub BUTTON_EL () { PHRASING_EL | 0b110 }
+sub BUTTON_EL () { PHRASING_EL | 0b110 } # Willful violation: In the spec it is a "special" element.
 
 sub ADDRESS_DIV_EL () { SPECIAL_EL | ADDRESS_DIV_P_EL | 0b001 }
 sub BODY_EL () { SPECIAL_EL | ALL_END_TAG_OPTIONAL_EL | 0b001 }
@@ -1550,10 +1550,7 @@ sub _reset_insertion_mode ($) {
       my $furthest_block_i_in_open;
       OE: for (reverse 0..$#{$self->{open_elements}}) {
         my $node = $self->{open_elements}->[$_];
-        if (not ($node->[1] & FORMATTING_EL) and 
-            #not $phrasing_category->{$node->[1]} and
-            ($node->[1] & SPECIAL_EL or
-             $node->[1] & SCOPING_EL)) { ## Scoping is redundant, maybe
+        if ($node->[1] & SPECIAL_EL or $node->[1] & SCOPING_EL) { ## "Special"
           
           $furthest_block = $node;
           $furthest_block_i_in_open = $_;
@@ -5479,7 +5476,7 @@ sub _tree_construction_main ($) {
 
             last; ## 3. (b) goto 5.
           } elsif (
-                   ## NOTE: not "formatting" and not "phrasing"
+                   ## NOTE: "special" category
                    ($node->[1] & SPECIAL_EL or
                     $node->[1] & SCOPING_EL) and
                    ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
@@ -5590,7 +5587,7 @@ sub _tree_construction_main ($) {
 
             last; ## 3. (b) goto 5.
           } elsif (
-                   ## NOTE: not "formatting" and not "phrasing"
+                   ## NOTE: "special" category
                    ($node->[1] & SPECIAL_EL or
                     $node->[1] & SCOPING_EL) and
                    ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
@@ -6754,10 +6751,7 @@ sub _tree_construction_main ($) {
             last S2;
           } else {
             ## Step 3
-            if (not ($node->[1] & FORMATTING_EL) and
-                #not $phrasing_category->{$node->[1]} and
-                ($node->[1] & SPECIAL_EL or
-                 $node->[1] & SCOPING_EL)) {
+            if ($node->[1] & SPECIAL_EL or $node->[1] & SCOPING_EL) { ## "Special"
               
               $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                               text => $token->{tag_name}, token => $token);
