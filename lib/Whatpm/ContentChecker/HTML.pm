@@ -3840,9 +3840,7 @@ $Element->{+HTML_NS}->{marquee} = {
     onstart => $HTMLEventHandlerAttrChecker,
     scrollamount => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     scrolldelay => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
-    truespeed => $GetHTMLEnumeratedAttrChecker->({
-      true => -1, false => -1,
-    }),
+    truespeed => $GetHTMLBooleanAttrChecker->('truespeed'),
     vspace => $HTMLLengthAttrChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
   }, {
