@@ -6714,17 +6714,17 @@ sub _tree_construction_main ($) {
         my $node = $self->{open_elements}->[$node_i];
 
         ## Step 2
-        S2: {
+        LOOP: {
           my $node_tag_name = $node->[0]->manakai_local_name;
           $node_tag_name =~ tr/A-Z/a-z/; # for SVG camelCase tag names
           if ($node_tag_name eq $token->{tag_name}) {
             ## Step 1
             ## generate implied end tags
-            while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL) {
+            while ($self->{open_elements}->[-1]->[1] & END_TAG_OPTIONAL_EL and
+                   $self->{open_elements}->[-1]->[0]->manakai_local_name
+                       ne $token->{tag_name}) {
               
               ## NOTE: |<ruby><rt></ruby>|.
-              ## ISSUE: <ruby><rt></rt> will also take this code path,
-              ## which seems wrong.
               pop @{$self->{open_elements}};
               $node_i++;
             }
@@ -6748,7 +6748,7 @@ sub _tree_construction_main ($) {
             splice @{$self->{open_elements}}, $node_i if $node_i < 0;
 
             $token = $self->_get_next_token;
-            last S2;
+            last LOOP;
           } else {
             ## Step 3
             if ($node->[1] & SPECIAL_EL or $node->[1] & SCOPING_EL) { ## "Special"
@@ -6757,7 +6757,7 @@ sub _tree_construction_main ($) {
                               text => $token->{tag_name}, token => $token);
               ## Ignore the token
               $token = $self->_get_next_token;
-              last S2;
+              last LOOP;
 
               ## NOTE: |<span><dd></span>a|: In Safari 3.1.2 and Opera
               ## 9.27, "a" is a child of <dd> (conforming).  In
@@ -6773,8 +6773,8 @@ sub _tree_construction_main ($) {
           $node = $self->{open_elements}->[$node_i];
           
           ## Step 5;
-          redo S2;
-        } # S2
+          redo LOOP;
+        } # LOOP
 	next B;
       }
     }

@@ -728,11 +728,7 @@ not ok 598 - Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>
 #     expected: '1'
 ok 599 - SHOULD-level error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;
 ok 600 - Document tree: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'
-not ok 601 - Parse error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; 1:36:not closed, 1:55:unmatched end tag, 1:55:in body:\#eof;54: Stray end tag “option”, 55: End of file seen and there were open elements.
-#   Failed test 'Parse error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; 1:36:not closed, 1:55:unmatched end tag, 1:55:in body:\#eof;54: Stray end tag “option”, 55: End of file seen and there were open elements.'
-#   at HTML-tree.t test () ok line 3.
-#          got: '3'
-#     expected: '2'
+ok 601 - Parse error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; 1:55:unmatched end tag, 1:55:in body:\#eof;54: Stray end tag “option”, 55: End of file seen and there were open elements.
 ok 602 - SHOULD-level error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; ;
 not ok 603 - Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'
 #   Failed test 'Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E''
@@ -4422,11 +4418,7 @@ ok 3270 - Document tree: qq'<!DOCTYPE HTML><p><ruby>a<rt>b<p>c'
 ok 3271 - Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</ruby>'; ;
 ok 3272 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby>a<rt>b</ruby>'; ;
 ok 3273 - Document tree: qq'<!DOCTYPE HTML><ruby>a<rt>b</ruby>'
-not ok 3274 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; 1:42:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; 1:42:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '1'
-#     expected: '0'
+ok 3274 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; ;
 ok 3275 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; ;
 ok 3276 - Document tree: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'
 ok 3277 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a<rt>b</ruby>'; 1:31:not closed;no </rb>
@@ -4435,39 +4427,19 @@ ok 3279 - Document tree: qq'<!DOCTYPE HTML><ruby><rb>a<rt>b</ruby>'
 ok 3280 - Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b<rt>c<rp>d</ruby>'; ;
 ok 3281 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby>a<rp>b<rt>c<rp>d</ruby>'; ;
 ok 3282 - Document tree: qq'<!DOCTYPE HTML><ruby>a<rp>b<rt>c<rp>d</ruby>'
-not ok 3283 - Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; 1:33:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; 1:33:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '1'
-#     expected: '0'
+ok 3283 - Parse error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; ;
 ok 3284 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'; ;
 ok 3285 - Document tree: qq'<!DOCTYPE HTML><ruby>a<rt>b</rt></ruby>'
-not ok 3286 - Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:33:not closed, 1:43:not closed, 1:53:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:33:not closed, 1:43:not closed, 1:53:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '3'
-#     expected: '0'
+ok 3286 - Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; ;
 ok 3287 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; ;
 ok 3288 - Document tree: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp></ruby>'
-not ok 3289 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:42:not closed, 1:52:not closed, 1:62:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; 1:42:not closed, 1:52:not closed, 1:62:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '3'
-#     expected: '0'
+ok 3289 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; ;
 ok 3290 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; ;
 ok 3291 - Document tree: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'
-not ok 3292 - Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed, 1:68:not closed, 1:78:not closed, 1:84:unmatched end tag, 1:93:not closed, 1:99:not closed, 1:109:not closed, 1:115:unmatched end tag;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed, 1:68:not closed, 1:78:not closed, 1:84:unmatched end tag, 1:93:not closed, 1:99:not closed, 1:109:not closed, 1:115:unmatched end tag;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>'
-#   at HTML-tree.t test () ok line 3.
-#          got: '8'
-#     expected: '4'
+ok 3292 - Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed, 1:84:unmatched end tag, 1:93:not closed, 1:115:unmatched end tag;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>
 ok 3293 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; ;
 ok 3294 - Document tree: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'
-not ok 3295 - Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; 4:0:not closed, 5:0:not closed, 6:0:not closed, 7:0:not closed;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; 4:0:not closed, 5:0:not closed, 6:0:not closed, 7:0:not closed;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '4'
-#     expected: '0'
+ok 3295 - Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; ;
 ok 3296 - SHOULD-level error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; ;
 ok 3297 - Document tree: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'
 ok 3298 - Parse error: qq'<!DOCTYPE HTML><div><rt></div>'; ;
@@ -6629,11 +6601,7 @@ not ok 5335 - Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:\#eof;no D
 #     expected: '1'
 ok 5336 - SHOULD-level error: qq'<option>x'; ;
 ok 5337 - Document tree: qq'<option>x'
-not ok 5338 - Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE
-#   Failed test 'Parse error: qq'<option></option>x'; 1:9:no DOCTYPE, 1:18:not closed;no DOCTYPE'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '1'
+ok 5338 - Parse error: qq'<option></option>x'; 1:9:no DOCTYPE;no DOCTYPE
 ok 5339 - SHOULD-level error: qq'<option></option>x'; ;
 ok 5340 - Document tree: qq'<option></option>x'
 not ok 5341 - Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:\#eof;no DOCTYPE
@@ -6643,11 +6611,7 @@ not ok 5341 - Parse error: qq'<optgroup>x'; 1:11:no DOCTYPE, 1:11:in body:\#eof;
 #     expected: '1'
 ok 5342 - SHOULD-level error: qq'<optgroup>x'; ;
 ok 5343 - Document tree: qq'<optgroup>x'
-not ok 5344 - Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE
-#   Failed test 'Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE, 1:22:not closed;no DOCTYPE'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '1'
+ok 5344 - Parse error: qq'<optgroup></optgroup>x'; 1:11:no DOCTYPE;no DOCTYPE
 ok 5345 - SHOULD-level error: qq'<optgroup></optgroup>x'; ;
 ok 5346 - Document tree: qq'<optgroup></optgroup>x'
 not ok 5347 - Parse error: qq'<optgroup><option>x'; 1:11:no DOCTYPE, 1:19:in body:\#eof;no DOCTYPE
@@ -6664,17 +6628,17 @@ not ok 5350 - Parse error: qq'<optgroup><optgroup>'; 1:11:no DOCTYPE, 1:20:in bo
 #     expected: '1'
 ok 5351 - SHOULD-level error: qq'<optgroup><optgroup>'; ;
 ok 5352 - Document tree: qq'<optgroup><optgroup>'
-not ok 5353 - Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:\#eof;no DOCTYPE
-#   Failed test 'Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:not closed, 1:16:in body:\#eof;no DOCTYPE'
+not ok 5353 - Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:in body:\#eof;no DOCTYPE
+#   Failed test 'Parse error: qq'<option><option>'; 1:9:no DOCTYPE, 1:16:in body:\#eof;no DOCTYPE'
 #   at HTML-tree.t test () ok line 3.
-#          got: '3'
+#          got: '2'
 #     expected: '1'
 ok 5354 - SHOULD-level error: qq'<option><option>'; ;
 ok 5355 - Document tree: qq'<option><option>'
-not ok 5356 - Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:\#eof;no DOCTYPE
-#   Failed test 'Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:not closed, 1:18:in body:\#eof;no DOCTYPE'
+not ok 5356 - Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:in body:\#eof;no DOCTYPE
+#   Failed test 'Parse error: qq'<option><optgroup>'; 1:9:no DOCTYPE, 1:18:in body:\#eof;no DOCTYPE'
 #   at HTML-tree.t test () ok line 3.
-#          got: '3'
+#          got: '2'
 #     expected: '1'
 ok 5357 - SHOULD-level error: qq'<option><optgroup>'; ;
 ok 5358 - Document tree: qq'<option><optgroup>'
@@ -7290,4 +7254,4 @@ ok 5953 - Parse error: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'; 1
 ok 5954 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'; ;
 ok 5955 - Document tree: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'
 1..5955
-# Looks like you failed 166 tests of 5955.
+# Looks like you failed 157 tests of 5955.
