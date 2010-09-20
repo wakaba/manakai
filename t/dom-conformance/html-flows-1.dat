@@ -7208,43 +7208,42 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-05">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-06">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-08-09">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-09-10T00:12">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-09-23T33:34:23">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-04-31T33:11:00+09">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7277,35 +7276,35 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="0037-12-13 00:00 Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="0037-12-13&#x000b;00:00 Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="0037-12-13T&#x000b;00:00 Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="0037-12-13&#x000b;T00:00 Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <?xml version="1.1"?>
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="0037-12-13 00:00&#x000b;Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7316,7 +7315,7 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="8592-01-01 T 02:09 +02:09">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7343,13 +7342,13 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="-3333-03-14T14:33Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="1999-06-23  T04:44Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7365,13 +7364,13 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="4444-06-22  T  11:22Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="98-02-12T11:22Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7479,13 +7478,13 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00.124444Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00.Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7501,31 +7500,31 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00 +09:00">xm</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00+0900">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00A">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21t23:00Z">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7558,7 +7557,7 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00+00:14.5">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7581,19 +7580,54 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00 00:00">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00Z ">x</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime=" 2007-02-21T23:00Z">s</ins>
 #errors
-/ins/@datetime;datetime:syntax error;m
+/ins/@datetime;dateandopttime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04">s</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-00-04">s</ins>
+#errors
+/ins/@datetime;datetime:bad month;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-03-00">s</ins>
+#errors
+/ins/@datetime;datetime:bad day;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0000-01-04">s</ins>
+#errors
+/ins/@datetime;datetime:bad year;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="99-01-04">s</ins>
+#errors
+/ins/@datetime;dateandopttime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04Z">s</ins>
+#errors
+/ins/@datetime;dateandopttime:syntax error;m
 
 #data
 <del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</del>
@@ -7620,6 +7654,41 @@ a
     datetime="0000-03-14T14:33Z">x</del>
 #errors
 /del/@datetime;datetime:bad year;m
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04">s</del>
+#errors
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-00-04">s</del>
+#errors
+/del/@datetime;datetime:bad month;m
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-03-00">s</del>
+#errors
+/del/@datetime;datetime:bad day;m
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="0000-01-04">s</del>
+#errors
+/del/@datetime;datetime:bad year;m
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="99-01-04">s</del>
+#errors
+/del/@datetime;dateandopttime:syntax error;m
+
+#data
+<del xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04Z">s</del>
+#errors
+/del/@datetime;dateandopttime:syntax error;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml"></p>

@@ -325,6 +325,69 @@ sub to_global_date_and_time_string ($) {
       $self->utc_second, $self->utc_second_fraction_string;
 } # to_global_date_and_time_string
 
+## Date string with optional time [Web Applications 1.0]
+sub parse_date_string_with_optional_time ($$) {
+  my ($self, $value) = @_;
+  $self = $self->new unless ref $self;
+  
+  if ($value =~ /\A([0-9]{4,})-([0-9]{2})-([0-9]{2})(?:T
+                 ([0-9]{2}):([0-9]{2})(?>:([0-9]{2})(?>(\.[0-9]+))?)?
+                 (?>Z|([+-][0-9]{2}):([0-9]{2})))?\z/x) {
+    my ($y, $M, $d, $h, $m, $s, $sf, $zh, $zm)
+        = ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+    if (0 < $M and $M < 13) {
+      $self->{onerror}->(type => 'datetime:bad day',
+                         level => $self->{level}->{must}), return undef
+          if $d < 1 or
+              $d > [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]->[$M];
+      $self->{onerror}->(type => 'datetime:bad day',
+                         level => $self->{level}->{must}), return undef
+          if $M == 2 and $d == 29 and not _is_leap_year ($y);
+    } else {
+      $self->{onerror}->(type => 'datetime:bad month',
+                         level => $self->{level}->{must});
+      return undef;
+    }
+    $self->{onerror}->(type => 'datetime:bad year',
+                       level => $self->{level}->{must}), return undef if $y == 0;
+    
+    if (defined $h) {
+      $self->{onerror}->(type => 'datetime:bad hour',
+                         level => $self->{level}->{must}), return undef if $h > 23;
+      $self->{onerror}->(type => 'datetime:bad minute',
+                         level => $self->{level}->{must}), return undef if $m > 59;
+      $s ||= 0;
+      $self->{onerror}->(type => 'datetime:bad second',
+                         level => $self->{level}->{must}), return undef if $s > 59;
+      $sf = defined $sf ? $sf : '';
+      if (defined $zh) {
+        $self->{onerror}->(type => 'datetime:bad timezone hour',
+                           level => $self->{level}->{must}), return undef
+            if $zh > 23 or $zh < -23;
+        $self->{onerror}->(type => 'datetime:bad timezone minute',
+                           level => $self->{level}->{must}), return undef
+            if $zm > 59;
+      } else {
+        $zh = 0;
+        $zm = 0;
+      }
+      ## ISSUE: Maybe timezone -00:00 should have same semantics as in RFC 3339.
+
+      if (defined wantarray) {
+        return $self->_create_object ($y, $M, $d, $h, $m, $s, $sf, $zh, $zm);
+      }
+    } else {
+      if (defined wantarray) {
+        return $self->_create_object ($y, $M, $d, 0, 0, 0, 0, 0, 0);
+      }
+    }
+  } else {
+    $self->{onerror}->(type => 'dateandopttime:syntax error', ## XXXtype
+                       level => $self->{level}->{must});
+    return undef;
+  }
+} # parse_date_string_with_optional_time
+
 sub timezone_offset_second ($) {
   my $self = shift;
   return $self->timezone_hour * 3600 + $self->timezone_minute * 60;

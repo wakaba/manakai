@@ -5114,7 +5114,7 @@ $Element->{+HTML_NS}->{ins} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
-    datetime => $GetDateTimeAttrChecker->('global_date_and_time_string'),
+    datetime => $GetDateTimeAttrChecker->('date_string_with_optional_time'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
@@ -5132,7 +5132,7 @@ $Element->{+HTML_NS}->{del} = {
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
-    datetime => $GetDateTimeAttrChecker->('global_date_and_time_string'),
+    datetime => $GetDateTimeAttrChecker->('date_string_with_optional_time'),
   }, {
     %HTMLAttrStatus,
     %HTMLM12NCommonAttrStatus,
