@@ -59,6 +59,7 @@ HTML.html ContentChecker.html CacheManifest.html WebIDL.html:: %.html: %.pod
 
 mklinktypelist.html: mklinktypelist.pl
 	$(POD2HTML) $< > $@
+	perl -n -i -e 's/%s/[gmtime]->[5]+1900/ge; print' $@
 
 _NamedEntityList.pm: mkentitylist.pl Entities.html
 	perl $< > $@.tmp
