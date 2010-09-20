@@ -1,0 +1,57 @@
+#data
+<link rel="feed" href="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;unknown link type;u
+
+#data
+<a href="a" rel="feed" xmlns="http://www.w3.org/1999/xhtml">b</a>
+#errors
+/a/@rel;unknown link type;u
+
+#data
+<link rel="nofollow" href="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:bad context;m
+
+#data
+<a href="a" rel="nofollow" xmlns="http://www.w3.org/1999/xhtml">b</a>
+#errors
+
+#data
+<link rel="nofollow author" href="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:bad context;m
+
+#data
+<a href="a" rel="nofollow author" xmlns="http://www.w3.org/1999/xhtml">b</a>
+#errors
+
+#data
+<link rel="nofollow noreferrer" href="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:bad context;m
+/link/@rel;link type:bad context;m
+
+#data
+<a href="a" rel="nofollow noreferrer" xmlns="http://www.w3.org/1999/xhtml">b</a>
+#errors
+
+#data
+<link rel="nofollow stylesheet" href="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:bad context;m
+
+#data
+<a href="a" rel="nofollow stylesheet" xmlns="http://www.w3.org/1999/xhtml">b</a>
+#errors
+/a/@rel;link type:bad context;m
+
+#data
+<link rel="accessibility" href="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:proposed;s
+
+#data
+<a href="a" rel="accessibility" xmlns="http://www.w3.org/1999/xhtml">b</a>
+#errors
+/a/@rel;link type:proposed;s

@@ -427,7 +427,9 @@ my $HTMLLinkTypesAttrChecker = sub {
       }
 
       if (defined $def->{effect}->[$a_or_area] and $word ne 'alternate') {
-        $is_hyperlink = 1 if $def->{effect}->[$a_or_area] eq 'hyperlink';
+        $is_hyperlink = 1
+            if $def->{effect}->[$a_or_area] eq 'hyperlink' or
+               $def->{effect}->[$a_or_area] eq 'annotation';
         $is_resource = 1 if $def->{effect}->[$a_or_area] eq 'external resource';
       }
     } else {
