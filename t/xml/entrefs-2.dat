@@ -67,6 +67,15 @@
 |   q="&copy="
 
 #data
+<p q="&copy&"/>
+#errors
+1;7;bare ero;;;m
+1;12;bare ero;;;m
+#document escaped
+| <{} p>
+|   q="\u00A9&"
+
+#data
 <p q='&copy='/>
 #errors
 1;7;bare ero;;;m

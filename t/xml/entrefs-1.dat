@@ -110,7 +110,6 @@
 #data
 <p>&copy</p>
 #errors
-1;4;entity not declared;;copy;;m
 1;9;no refc;;;m
 #document escaped
 | <{} p>
@@ -119,11 +118,19 @@
 #data
 <p>&copy=</p>
 #errors
-1;4;entity not declared;;copy;;m
 1;9;no refc;;;m
 #document escaped
 | <{} p>
 |   "\u00a9="
+
+#data
+<p>&copy&</p>
+#errors
+1;9;no refc;;;m
+1;9;bare ero;;;m
+#document escaped
+| <{} p>
+|   "\u00a9&"
 
 #data
 <!DOCTYPE p>
