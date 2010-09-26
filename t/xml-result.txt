@@ -2128,15 +2128,7 @@ ok 1965 - Parse error: qq'<p q=&= />'
 ok 1966 - Document tree: qq'<p q=&= />'
 ok 1967 - Parse error: qq'<p q="&copy="/>'
 ok 1968 - Document tree: qq'<p q="&copy="/>'
-not ok 1969 - Parse error: qq'<p q="&copy&"/>'
-#   Failed test 'Parse error: qq'<p q="&copy&"/>''
-#   at HTML-tree.t test () skip line 60.
-# +---+-------------------+-------------------+
-# | Ln|Got                |Expected           |
-# +---+-------------------+-------------------+
-# |  1|1;12;bare ero;;;m  |1;12;bare ero;;;m  |
-# *  2|1;12;no refc;;;m   |1;7;bare ero;;;m   *
-# +---+-------------------+-------------------+
+ok 1969 - Parse error: qq'<p q="&copy&"/>'
 ok 1970 - Document tree: qq'<p q="&copy&"/>'
 ok 1971 - Parse error: qq'<p q=\x{27}&copy=\x{27}/>'
 ok 1972 - Document tree: qq'<p q=\x{27}&copy=\x{27}/>'
@@ -2201,4 +2193,4 @@ ok 2030 - Parse error: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x
 ok 2031 - Entities: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 ok 2032 - Document tree: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 1..2032
-# Looks like you failed 19 tests of 2032.
+# Looks like you failed 18 tests of 2032.
