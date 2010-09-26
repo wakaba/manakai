@@ -34,6 +34,56 @@
 |   q="&&"
 
 #data
+<p q="&="/>
+#errors
+1;7;bare ero;;;m
+#document
+| <{} p>
+|   q="&="
+
+#data
+<p q='&='/>
+#errors
+1;7;bare ero;;;m
+#document
+| <{} p>
+|   q="&="
+
+#data
+<p q=&= />
+#errors
+1;6;bare ero;;;m
+1;7;bad attribute value;;;m
+#document
+| <{} p>
+|   q="&="
+
+#data
+<p q="&copy="/>
+#errors
+1;7;bare ero;;;m
+#document
+| <{} p>
+|   q="&copy="
+
+#data
+<p q='&copy='/>
+#errors
+1;7;bare ero;;;m
+#document
+| <{} p>
+|   q="&copy="
+
+#data
+<p q=&copy= />
+#errors
+1;6;bare ero;;;m
+1;11;bad attribute value;;;m
+#document
+| <{} p>
+|   q="&copy="
+
+#data
 <p>& </p>
 #errors
 1;4;bare ero;;;m

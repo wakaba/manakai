@@ -1789,7 +1789,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($nc);
         $self->{read_until}->($self->{ca}->{value},
-                              qq["'=& \x09\x0C>],
+                              qq["'=& \x09\x0C>], # XXX
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -3280,6 +3280,18 @@ sub _get_next_token ($) {
       if ($is_space->{$nc} or
           {
             0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
+
+            ## Following characters are added here to detect parse
+            ## error for "=" of "&=" in an unquoted attribute value.
+            ## Though this disagree with the Web Applications 1.0
+            ## spec, the result token sequences of both algorithms
+            ## should be same, as these characters cannot form a part
+            ## of character references.
+            0x0022 => 1, 0x0027 => 1, 0x0060 => 1, # ", ', `
+            0x003D => 1, # =
+
+            ## As a result of the addition above, the following clause
+            ## has no effect in fact.
             $self->{entity_add} => 1,
           }->{$nc}) {
         if ($self->{is_xml}) {
@@ -3582,6 +3594,14 @@ sub _get_next_token ($) {
            not ($is_space->{$nc} or
                 {
                   0x003C => 1, 0x0026 => 1, -1 => 1, # <, &
+
+                  ## See comment in the |ENTITY_STATE|'s |if|
+                  ## statement for the rationale of addition of these
+                  ## characters.
+                  0x0022 => 1, 0x0027 => 1, 0x0060 => 1, # ", ', `
+                  0x003D => 1, # =
+
+                  ## This is redundant for the same reason.
                   $self->{entity_add} => 1,
                 }->{$nc}))) {
         our $EntityChar;
