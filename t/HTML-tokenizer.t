@@ -1,9 +1,11 @@
-#!/usr/bin/perl
+package test::Whatpm::HTML::Tokenizer::html_tokenizer;
 use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use base qw(Test::Class);
+use Test::Differences;
 use JSON 1.07;
 $JSON::UnMapping = 1;
 $JSON::UTF8 = 1;
@@ -13,28 +15,30 @@ my $DEBUG = $ENV{DEBUG};
 my $test_dir_name = 't/';
 my $dir_name = 't/tokenizer/';
 
-use Test;
-BEGIN { plan tests => 1154 }
-
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
 $Data::Dumper::Sortkeys = 1;
-sub Data::Dumper::qquote {
-  my $s = shift;
-  eval {
-    ## Perl 5.8.8 in some environment does not handle utf8 string with
-    ## surrogate code points well (it breaks the string when it is
-    ## passed to another subroutine even when it can be accessible
-    ## only via traversing reference chain, very strange...), so
-    ## |eval| this statement.  It would not change the test result as
-    ## long as our parser implementation passes the tests.
-    $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
-    1;
-  } or warn $@;
-  return q<qq'> . $s . q<'>;
-} # Data::Dumper::qquote
+{
+  no warnings 'redefine';
+  sub Data::Dumper::qquote {
+    my $s = shift;
+    eval {
+      ## Perl 5.8.8 in some environment does not handle utf8 string
+      ## with surrogate code points well (it breaks the string when it
+      ## is passed to another subroutine even when it can be
+      ## accessible only via traversing reference chain, very
+      ## strange...), so |eval| this statement.  It would not change
+      ## the test result as long as our parser implementation passes
+      ## the tests.
+      $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
+      1;
+    } or warn $@;
+    return q<qq'> . $s . q<'>;
+  } # Data::Dumper::qquote
+}
 
 if ($DEBUG) {
+  no warnings 'once';
   my $not_found = {%{$Whatpm::HTML::Debug::cp or {}}};
 
   $Whatpm::HTML::Debug::cp_pass = sub {
@@ -52,17 +56,25 @@ if ($DEBUG) {
 
 use Whatpm::HTML;
 
-for my $file_name (grep {$_} split /\s+/, qq[
-                      ${dir_name}test1.test
-                      ${dir_name}test2.test
-                      ${dir_name}test3.test
-                      ${dir_name}test4.test
-                      ${dir_name}contentModelFlags.test
-                      ${dir_name}escapeFlag.test
-                      ${dir_name}entities.test
-                      ${dir_name}xmlViolation.test
-                      ${test_dir_name}tokenizer-test-1.test
-                     ]) {
+sub _tests : Tests {
+  my $self = shift;
+  for my $file_name (grep {$_} split /\s+/, qq[
+      ${dir_name}test1.test
+      ${dir_name}test2.test
+      ${dir_name}test3.test
+      ${dir_name}test4.test
+      ${dir_name}contentModelFlags.test
+      ${dir_name}escapeFlag.test
+      ${dir_name}entities.test
+      ${dir_name}xmlViolation.test
+      ${test_dir_name}tokenizer-test-1.test
+  ]) {
+    $self->_tokenize_test ($file_name);
+  }                     
+} # $file_name
+
+sub _tokenize_test ($$) {
+  my ($self, $file_name) = @_;
   open my $file, '<', $file_name
     or die "$0: $file_name: $!";
   local $/ = undef;
@@ -110,7 +122,10 @@ for my $file_name (grep {$_} split /\s+/, qq[
 #        pop @{$self->{prev_char}};
 #        unshift @{$self->{prev_char}}, $self->{nc};
 
-        $self->{nc} = -1 and return if $i >= length $s;
+        if ($i >= length $s) {
+          $self->{nc} = -1;
+          return;
+        }
         $self->{nc} = ord substr $s, $i++, 1;
 
         # Dummy.
@@ -208,10 +223,14 @@ for my $file_name (grep {$_} split /\s+/, qq[
       my $expected_dump = Dumper ($test->{output});
       my $parser_dump = Dumper (\@token);
 #line 1 "HTML-tokenizer.t ok"
-      ok $parser_dump, $expected_dump,
+      eq_or_diff $parser_dump, $expected_dump,
         $test->{description} . ': ' . Data::Dumper::qquote ($test->{input});
     }
   }
 }
+
+__PACKAGE__->runtests;
+
+1;
 
 ## License: Public Domain.
