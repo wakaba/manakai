@@ -236,7 +236,7 @@ sub FOREIGN_EL () { 0b1_00000000000 }
 
 my $charref_map = {
   0x00 => 0xFFFD, # REPLACEMENT CHARACTER
-  0x0D => 0x000A,
+  0x0D => 0x000D, # CARRIAGE RETURN
   0x80 => 0x20AC,
   0x81 => 0x0081,
   0x82 => 0x201A,
@@ -359,7 +359,7 @@ my $is_space = {
   0x000A => 1, # LINE FEED (LF)
   #0x000B => 0, # LINE TABULATION (VT)
   0x000C => 1, # FORM FEED (FF) ## XML5: Not a space character.
-  #0x000D => 1, # CARRIAGE RETURN (CR)
+  0x000D => 1, # CARRIAGE RETURN (CR)
   0x0020 => 1, # SPACE (SP)
 };
 

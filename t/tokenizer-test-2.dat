@@ -151,6 +151,28 @@ NULL
 #document-fragment p escaped
 | "\u000A\u000A"
 
+#data
+&#x0D;&#x0A;
+#errors
+no DOCTYPE
+U+000D reference
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u000D\u000A"
+
+#data
+&#13;&#10;
+#errors
+no DOCTYPE
+U+000D reference
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\u000D\u000A"
+
 #data escaped
 \u0001
 #errors

@@ -374,19 +374,19 @@
 
 {"description":"character entity &#13;",
 "input":"&#13;",
-"output":["ParseError", ["Character", "\u000A"]]},
+"output":["ParseError", ["Character", "\u000D"]]},
 
 {"description":"character entity &#xd;",
 "input":"&#xd;",
-"output":["ParseError", ["Character", "\u000A"]]},
+"output":["ParseError", ["Character", "\u000D"]]},
 
 {"description":"character entities &#13;&#10;",
 "input":"&#13;&#10;",
-"output":["ParseError", ["Character", "\u000A\u000A"]]},
+"output":["ParseError", ["Character", "\u000D\u000A"]]},
 
 {"description":"character entity &#13; followed by a LF",
 "input":"&#13;\u000A",
-"output":["ParseError", ["Character", "\u000A\u000A"]]},
+"output":["ParseError", ["Character", "\u000D\u000A"]]},
 
 {"description": "U+000B character reference",
 "input": "&#xb;",

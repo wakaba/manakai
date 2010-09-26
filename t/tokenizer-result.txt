@@ -14015,8 +14015,38 @@ not ok 2208 - Bad named entity: zwnj without a semi-colon.: qq'&zwnj'
 # |  6|        ];                  |  7|        ];                  |
 # +---+----------------------------+---+----------------------------+
 # 
-ok 2209 - CR as numeric entity: qq'&\#013;'
-ok 2210 - CR as hexadecimal numeric entity: qq'&\#x00D;'
+not ok 2209 - CR as numeric entity: qq'&\#013;'
+#   Failed test 'CR as numeric entity: qq'&\#013;''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+----------------------------+
+# | Ln|Got                         |Expected                    |
+# +---+----------------------------+----------------------------+
+# |  1|$VAR1 = [                   |$VAR1 = [                   |
+# |  2|          qq'ParseError',   |          qq'ParseError',   |
+# |  3|          [                 |          [                 |
+# |  4|            qq'Character',  |            qq'Character',  |
+# *  5|            qq'\x{0D}'      |            qq'\x{0A}'      *
+# |  6|          ]                 |          ]                 |
+# |  7|        ];                  |        ];                  |
+# +---+----------------------------+----------------------------+
+# 
+not ok 2210 - CR as hexadecimal numeric entity: qq'&\#x00D;'
+#   Failed test 'CR as hexadecimal numeric entity: qq'&\#x00D;''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+----------------------------+
+# | Ln|Got                         |Expected                    |
+# +---+----------------------------+----------------------------+
+# |  1|$VAR1 = [                   |$VAR1 = [                   |
+# |  2|          qq'ParseError',   |          qq'ParseError',   |
+# |  3|          [                 |          [                 |
+# |  4|            qq'Character',  |            qq'Character',  |
+# *  5|            qq'\x{0D}'      |            qq'\x{0A}'      *
+# |  6|          ]                 |          ]                 |
+# |  7|        ];                  |        ];                  |
+# +---+----------------------------+----------------------------+
+# 
 ok 2211 - Windows-1252 EURO SIGN numeric entity.: qq'&\#0128;'
 not ok 2212 - Windows-1252 REPLACEMENT CHAR numeric entity.: qq'&\#0129;'
 #   Failed test 'Windows-1252 REPLACEMENT CHAR numeric entity.: qq'&\#0129;''
@@ -14749,4 +14779,4 @@ ok 2597 - start tag not closed (self-closing start tag): qq'<p class=\x{27}a\x{2
 ok 2598 - end tag not closed (self-closing start tag): qq'</p/'
 ok 2599 - end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/'
 1..2599
-# Looks like you failed 670 tests of 2599.
+# Looks like you failed 672 tests of 2599.

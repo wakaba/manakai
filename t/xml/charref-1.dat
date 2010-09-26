@@ -159,3 +159,17 @@
 #document escaped
 | <{} a>
 |   "\u0001"
+
+#data
+<a>&#x0D;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000D"
+
+#data
+<a>&#13;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000D"
