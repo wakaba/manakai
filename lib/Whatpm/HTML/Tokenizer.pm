@@ -1102,6 +1102,12 @@ $Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0022] = {
   name => 'before attr value "',
   state => ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE,
 };
+$XMLAction->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0026] = {
+  name => 'before attr value &',
+  error => 'unquoted attr value', ## XML5: Not a parse error.
+  state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
+  reconsume => 1,
+};
 $Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0026] = {
   name => 'before attr value &',
   state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
@@ -1127,6 +1133,7 @@ $Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x003D] =
 $Action->[BEFORE_ATTRIBUTE_VALUE_STATE]->[0x0060] = {
   name => 'before attr value <=`',
   error => 'bad attribute value', ## XML5: Not a parse error.
+  #error2(xml) => 'unquoted attr value', ## XML5: Not a parse error.
   ca => {value => 1},
   state => ATTRIBUTE_VALUE_UNQUOTED_STATE,
 };
