@@ -69,10 +69,11 @@ Line: 1 Col: 26 Expected closing tag. Unexpected end of file.
 #errors
 Line: 1 Col: 7 Unexpected start tag (table). Expected DOCTYPE.
 Line: 1 Col: 12 Unexpected start tag (div) in table context caused voodoo mode.
+Line: 1 Col: 18 Unexpected start tag (div) in table context caused voodoo mode.
 Line: 1 Col: 24 Unexpected end tag (div) in table context caused voodoo mode.
 Line: 1 Col: 32 Unexpected end tag (span) in table context caused voodoo mode.
 Line: 1 Col: 32 Unexpected end tag (span). Ignored.
-Line: 1 Col: 33 Expected closing tag. Unexpected end of file.
+Line: 1 Col: 33 Unexpected end of file. Expected table content.
 #document
 | <html>
 |   <head>
@@ -88,7 +89,7 @@ x<table>x
 #errors
 Line: 1 Col: 1 Unexpected non-space characters. Expected DOCTYPE.
 Line: 1 Col: 9 Unexpected non-space characters in table context caused voodoo mode.
-Line: 1 Col: 9 Expected closing tag. Unexpected end of file.
+Line: 1 Col: 9 Unexpected end of file. Expected table content.
 #document
 | <html>
 |   <head>
@@ -102,7 +103,7 @@ x<table><table>x
 Line: 1 Col: 1 Unexpected non-space characters. Expected DOCTYPE.
 Line: 1 Col: 15 Unexpected start tag (table) implies end tag (table).
 Line: 1 Col: 16 Unexpected non-space characters in table context caused voodoo mode.
-Line: 1 Col: 16 Expected closing tag. Unexpected end of file.
+Line: 1 Col: 16 Unexpected end of file. Expected table content.
 #document
 | <html>
 |   <head>
@@ -132,10 +133,10 @@ Line: 1 Col: 25 Expected closing tag. Unexpected end of file.
 #data
 <a><div><p></a>
 #errors
-Line 1 Col 3 Unexpected start tag (a). Expected DOCTYPE.
-Line 1 Col 15 End tag (a) violates step 1, paragraph 3 of the adoption agency algorithm.
-Line 1 Col 15 End tag (a) violates step 1, paragraph 3 of the adoption agency algorithm.
-Line 1 Col 15 Expected closing tag. Unexpected end of file.
+Line: 1 Col: 3 Unexpected start tag (a). Expected DOCTYPE.
+Line: 1 Col: 15 End tag (a) violates step 1, paragraph 3 of the adoption agency algorithm.
+Line: 1 Col: 15 End tag (a) violates step 1, paragraph 3 of the adoption agency algorithm.
+Line: 1 Col: 15 Expected closing tag. Unexpected end of file.
 #document
 | <html>
 |   <head>
