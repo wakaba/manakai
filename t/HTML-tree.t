@@ -17,12 +17,13 @@ $Data::Dumper::Useqq = 1;
 sub Data::Dumper::qquote {
   my $s = shift;
   eval {
-    ## Perl 5.8.8 in some environment does not handle utf8 string with
-    ## surrogate code points well (it breaks the string when it is
-    ## passed to another subroutine even when it can be accessible
-    ## only via traversing reference chain, very strange...), so
-    ## |eval| this statement.  It would not change the test result as
-    ## long as our parser implementation passes the tests.
+    ## Perl 5.8.8/5.10.1 in some environment does not handle utf8
+    ## string with surrogate code points well (it breaks the string
+    ## when it is passed to another subroutine even when it can be
+    ## accessible only via traversing reference chain, very
+    ## strange...), so |eval| this statement.  It would not change the
+    ## test result as long as our parser implementation passes the
+    ## tests.
     $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
     1;
   } or warn $@;
