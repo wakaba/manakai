@@ -131,6 +131,8 @@ sub _tokenize_test ($$) {
         # Dummy.
         $self->{line_prev} = 1;
         $self->{column_prev} = 1;
+        $self->{line} = 0;
+        $self->{column} = 0;
 
         if ($self->{nc} == 0x000D) { # CR
           $i++ if substr ($s, $i, 1) eq "\x0A";
