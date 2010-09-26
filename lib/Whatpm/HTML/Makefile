@@ -1,7 +1,7 @@
 POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
   --htmlroot "../.."
 
-HTML_FILES = Serializer.html
+HTML_FILES = Serializer.html Tokenizer.html
 
 all: $(HTML_FILES) Tokenizer.pm
 
