@@ -893,8 +893,9 @@ EOF in foreign content
 <ruby><rt><svg><foreignobject><rp>
 #errors
 no DOCTYPE
-EOF in foreign content
-unexpected EOF
+no </rp> before EOF
+no </foreignObject> before EOF
+no </svg> before EOF
 #document
 | <html>
 |   <head>
@@ -909,8 +910,9 @@ unexpected EOF
 <ruby><rt><svg><foreignobject><rt>
 #errors
 no DOCTYPE
-EOF in foreign content
-unexpected EOF
+no </rt> before EOF
+no </foreignObject> before EOF
+no </svg> before EOF
 #document
 | <html>
 |   <head>
@@ -2311,9 +2313,10 @@ no </b></foreignObject></svg>
 #data
 <!DOCTYPE html><svg><foreignobject><span><math><b>
 #errors
-no </math>
-no </svg>
-no </b></span></foreignObject></svg>
+no </math> before <b>
+no </span> before EOF
+no </foreignObject> before EOF
+no </svg> before EOF
 #document
 | <!DOCTYPE html>
 | <html>

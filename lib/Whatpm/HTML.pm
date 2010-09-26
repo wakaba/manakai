@@ -2271,20 +2271,9 @@ sub _tree_construction_main ($) {
           #
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+        ## "In foreign content" insertion mode, an end-of-file token.
         
-
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
-                        text => $self->{open_elements}->[-1]->[0]
-                            ->manakai_local_name,
-                        token => $token);
-
-        pop @{$self->{open_elements}}
-            while $self->{open_elements}->[-1]->[1] & FOREIGN_EL;
-
-        $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
-        
-        ## Reprocess.
-        next B; # goto |continue|
+        $break_foreign_land = 1;
       } else {
         die "$0: $token->{type}: Unknown token type";        
       }
@@ -2295,6 +2284,7 @@ sub _tree_construction_main ($) {
                             ->manakai_local_name,
                         token => $token);
 
+        pop @{$self->{open_elements}};
         {
           my $current_node = $self->{open_elements}->[-1];
           if (not $current_node->[1] & FOREIGN_EL) {
