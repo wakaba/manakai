@@ -35,11 +35,12 @@ sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 ## Element categories
 
-## Bits 12-15
-sub SPECIAL_EL () { 0b1_000000000000000 } ## The others from "special" category
-sub SCOPING_EL () { 0b1_00000000000000 } ## Some from "special" category
-sub FORMATTING_EL () { 0b1_0000000000000 } ## "Formatting" category
-sub PHRASING_EL () { 0b1_000000000000 } ## "Ordinary" category
+## Bits 12-16
+sub BUTTON_SCOPING_EL () { 0b1_0000000000000000 } ## Special
+sub SPECIAL_EL () { 0b1_000000000000000 }         ## Special
+sub SCOPING_EL () { 0b1_00000000000000 }          ## Special
+sub FORMATTING_EL () { 0b1_0000000000000 }        ## Formatting
+sub PHRASING_EL () { 0b1_000000000000 }           ## Ordinary
 
 ## Bits 10-11
 #sub FOREIGN_EL () { 0b1_00000000000 } # see Whatpm::HTML::Tokenizer
@@ -73,7 +74,7 @@ sub FRAMESET_EL () { SPECIAL_EL | 0b010 }
 sub HEADING_EL () { SPECIAL_EL | 0b011 }
 sub SELECT_EL () { SPECIAL_EL | 0b100 }
 sub SCRIPT_EL () { SPECIAL_EL | 0b101 }
-sub BUTTON_EL () { PHRASING_EL | 0b110 } # Willful violation: In the spec it is a "special" element.
+sub BUTTON_EL () { SPECIAL_EL | BUTTON_SCOPING_EL | 0b110 }
 
 sub ADDRESS_DIV_EL () { SPECIAL_EL | ADDRESS_DIV_P_EL | 0b001 }
 sub BODY_EL () { SPECIAL_EL | ALL_END_TAG_OPTIONAL_EL | 0b001 }
@@ -113,10 +114,11 @@ sub TABLE_ROW_GROUP_EL () {
   0b001
 }
 
-sub MISC_SCOPING_EL () { SCOPING_EL | 0b000 }
-sub CAPTION_EL () { SCOPING_EL | 0b010 }
+sub MISC_SCOPING_EL () { SCOPING_EL | BUTTON_SCOPING_EL | 0b000 }
+sub CAPTION_EL () { SCOPING_EL | BUTTON_SCOPING_EL | 0b010 }
 sub HTML_EL () {
   SCOPING_EL |
+  BUTTON_SCOPING_EL |
   TABLE_SCOPING_EL |
   TABLE_ROWS_SCOPING_EL |
   TABLE_ROW_SCOPING_EL |
@@ -125,12 +127,14 @@ sub HTML_EL () {
 }
 sub TABLE_EL () {
   SCOPING_EL |
+  BUTTON_SCOPING_EL |
   TABLE_ROWS_EL |
   TABLE_SCOPING_EL |
   0b001
 }
 sub TABLE_CELL_EL () {
   SCOPING_EL |
+  BUTTON_SCOPING_EL |
   ALL_END_TAG_OPTIONAL_EL |
   0b001
 }
@@ -146,6 +150,7 @@ sub OPTGROUP_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b001 }
 sub OPTION_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b010 }
 sub RUBY_COMPONENT_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b100 }
 
+# XXX scoping
 sub MML_AXML_EL () { PHRASING_EL | FOREIGN_EL | 0b001 }
 
 my $el_category = {
@@ -263,7 +268,8 @@ my $el_category_f = {
     mtext => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
   (SVG_NS) => {
-    foreignObject => SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    foreignObject => SCOPING_EL | BUTTON_SCOPING_EL |
+        FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     desc => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
     title => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
@@ -5280,28 +5286,33 @@ sub _tree_construction_main ($) {
         
         $token = $self->_get_next_token;
         next B;
-      } elsif ({
-                ## NOTE: Start tags for non-phrasing flow content elements
 
-                ## NOTE: The normal one
-                address => 1, article => 1, aside => 1, blockquote => 1,
-                center => 1,
-                #datagrid => 1,
-                details => 1,
-                dir => 1, div => 1, dl => 1, fieldset => 1, figure => 1,
-                footer => 1, h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1,
-                h6 => 1, header => 1, hgroup => 1,
-                menu => 1, nav => 1, ol => 1, p => 1, 
-                section => 1, ul => 1,
-                figcaption => 1, summary => 1,
-                ## NOTE: As normal, but drops leading newline
-                pre => 1, listing => 1,
-                ## NOTE: As normal, but interacts with the form element pointer
-                form => 1,
-                
-                table => 1,
-                hr => 1,
-               }->{$token->{tag_name}}) {
+      } elsif ({
+        ## "In body" insertion mode, non-phrasing flow-content
+        ## elements start tags.
+
+        address => 1, article => 1, aside => 1, blockquote => 1,
+        center => 1, details => 1, dir => 1, div => 1, dl => 1,
+        fieldset => 1, figcaption => 1, figure => 1, footer => 1,
+        header => 1, hgroup => 1, menu => 1, nav => 1, ol => 1,
+        p => 1, section => 1, ul => 1, summary => 1,
+        # datagrid => 1,
+
+        ## Closing any heading element
+        h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, 
+
+        ## Ignoring any leading newline in content
+        pre => 1, listing => 1,
+
+        ## Form element pointer
+        form => 1,
+        
+        ## A quirk & switching of insertion mode
+        table => 1,
+
+        ## Void element
+        hr => 1,
+      }->{$token->{tag_name}}) {
 
         ## 1. When there is an opening |form| element:
         if ($token->{tag_name} eq 'form' and defined $self->{form_element}) {
@@ -5316,7 +5327,7 @@ sub _tree_construction_main ($) {
         ## 2. Close the |p| element, if any.
         if ($token->{tag_name} ne 'table' or # The Hixie Quirk
             $self->{document}->manakai_compat_mode ne 'quirks') {
-          ## has a p element in scope
+          ## "have a |p| element in button scope"
           INSCOPE: for (reverse @{$self->{open_elements}}) {
             if ($_->[1] == P_EL) {
               
@@ -5328,7 +5339,7 @@ sub _tree_construction_main ($) {
               $token = {type => END_TAG_TOKEN, tag_name => 'p',
                         line => $token->{line}, column => $token->{column}};
               next B;
-            } elsif ($_->[1] & SCOPING_EL) {
+            } elsif ($_->[1] & BUTTON_SCOPING_EL) {
               
               last INSCOPE;
             }
@@ -5418,8 +5429,10 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
         }
         next B;
+
       } elsif ($token->{tag_name} eq 'li') {
-        ## NOTE: As normal, but imply </li> when there's another <li> ...
+        ## "In body" insertion mode, "li" start tag.  As normal, but
+        ## imply </li> when there's another <li>.
 
         ## NOTE: Special, Scope (<li><foo><li> == <li><foo><li/></foo></li>)::
           ## Interpreted as <li><foo/></li><li/> (non-conforming):
@@ -5491,7 +5504,7 @@ sub _tree_construction_main ($) {
           $i--;
         }
 
-        ## 6. (a) has a |p| element in scope
+        ## 6. (a) "have a |p| element in button scope".
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] == P_EL) {
             
@@ -5506,7 +5519,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
             next B;
-          } elsif ($_->[1] & SCOPING_EL) {
+          } elsif ($_->[1] & BUTTON_SCOPING_EL) {
             
             last INSCOPE;
           }
@@ -5541,9 +5554,11 @@ sub _tree_construction_main ($) {
         
         $token = $self->_get_next_token;
         next B;
-      } elsif ($token->{tag_name} eq 'dt' or
-               $token->{tag_name} eq 'dd') {
-        ## NOTE: As normal, but imply </dt> or </dd> when ...
+
+      } elsif ($token->{tag_name} eq 'dt' or $token->{tag_name} eq 'dd') {
+        ## "In body" insertion mode, "dt" or "dd" start tag.  As
+        ## normal, but imply </dt> or </dd> when there's antoher <dt>
+        ## or <dd>.
 
         ## 1. Frameset-ng
         delete $self->{frameset_ok};
@@ -5581,8 +5596,7 @@ sub _tree_construction_main ($) {
             last; ## 3. (b) goto 5.
           } elsif (
                    ## NOTE: "special" category
-                   ($node->[1] & SPECIAL_EL or
-                    $node->[1] & SCOPING_EL) and
+                   ($node->[1] & SPECIAL_EL or $node->[1] & SCOPING_EL) and
                    ## NOTE: "li", "dt", and "dd" are in |SPECIAL_EL|.
 
                    (not $node->[1] & ADDRESS_DIV_P_EL)
@@ -5603,7 +5617,7 @@ sub _tree_construction_main ($) {
           $i--;
         }
 
-        ## 6. (a) has a |p| element in scope
+        ## 6. (a) "have a |p| element in button scope".
         INSCOPE: for (reverse @{$self->{open_elements}}) {
           if ($_->[1] == P_EL) {
             
@@ -5615,7 +5629,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
             next B;
-          } elsif ($_->[1] & SCOPING_EL) {
+          } elsif ($_->[1] & BUTTON_SCOPING_EL) {
             
             last INSCOPE;
           }
@@ -5650,8 +5664,10 @@ sub _tree_construction_main ($) {
         
         $token = $self->_get_next_token;
         next B;
+
       } elsif ($token->{tag_name} eq 'plaintext') {
-        ## NOTE: As normal, but effectively ends parsing
+        ## "In body" insertion mode, "plaintext" start tag.  As
+        ## normal, but effectively ends parsing.
 
         ## "has a |p| element in scope".
         INSCOPE: for (reverse @{$self->{open_elements}}) {
@@ -5665,7 +5681,7 @@ sub _tree_construction_main ($) {
             $token = {type => END_TAG_TOKEN, tag_name => 'p',
                       line => $token->{line}, column => $token->{column}};
             next B;
-          } elsif ($_->[1] & SCOPING_EL) {
+          } elsif ($_->[1] & BUTTON_SCOPING_EL) {
             
             last INSCOPE;
           }
@@ -5702,6 +5718,7 @@ sub _tree_construction_main ($) {
         
         $token = $self->_get_next_token;
         next B;
+
       } elsif ($token->{tag_name} eq 'a') {
         AFE: for my $i (reverse 0..$#$active_formatting_elements) {
           my $node = $active_formatting_elements->[$i];
@@ -5901,9 +5918,11 @@ sub _tree_construction_main ($) {
                 noscript => 0, ## TODO: 1 if scripting is enabled
                }->{$token->{tag_name}}) {
         if ($token->{tag_name} eq 'xmp') {
+          ## "In body" insertion mode, "xmp" start tag.  As normal
+          ## flow-content element start tag, but CDATA parsing.
           
 
-          ## "has a |p| element in scope".
+          ## "have a |p| element in button scope".
           INSCOPE: for (reverse @{$self->{open_elements}}) {
             if ($_->[1] == P_EL) {
               
@@ -5915,7 +5934,7 @@ sub _tree_construction_main ($) {
               $token = {type => END_TAG_TOKEN, tag_name => 'p',
                         line => $token->{line}, column => $token->{column}};
               next B;
-            } elsif ($_->[1] & SCOPING_EL) {
+            } elsif ($_->[1] & BUTTON_SCOPING_EL) {
               
               last INSCOPE;
             }
@@ -6039,25 +6058,18 @@ sub _tree_construction_main ($) {
         next B;
       } elsif ($token->{tag_name} eq 'optgroup' or
                $token->{tag_name} eq 'option') {
-        ## has an |option| element in scope
-        INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-          my $node = $self->{open_elements}->[$_];
-          if ($node->[1] == OPTION_EL) {
-            
-            ## NOTE: As if </option>
-            
+        if ($self->{open_elements}->[-1]->[1] == OPTION_EL) {
+          
+          ## NOTE: As if </option>
+          
       $token->{self_closing} = $self->{self_closing};
       unshift @{$self->{token}}, $token;
       delete $self->{self_closing};
      # <option> or <optgroup>
-            $token = {type => END_TAG_TOKEN, tag_name => 'option',
-                      line => $token->{line}, column => $token->{column}};
-            next B;
-          } elsif ($node->[1] & SCOPING_EL) {
-            
-            last INSCOPE;
-          }
-        } # INSCOPE
+          $token = {type => END_TAG_TOKEN, tag_name => 'option',
+                    line => $token->{line}, column => $token->{column}};
+          next B;
+        }
 
         $reconstruct_active_formatting_elements
             ->($self, $insert_to_current, $active_formatting_elements,
@@ -6416,10 +6428,11 @@ sub _tree_construction_main ($) {
           ## Reprocess.
         }
         next B;
-      } elsif ({
-                ## NOTE: End tags for non-phrasing flow content elements
 
-                ## NOTE: The normal ones
+      } elsif ({
+        ## "In body" insertion mode, end tags for non-phrasing flow
+        ## content elements.
+
                 address => 1, article => 1, aside => 1, blockquote => 1,
                 center => 1,
                 #datagrid => 1,
@@ -6598,10 +6611,12 @@ sub _tree_construction_main ($) {
         
         $token = $self->_get_next_token;
         next B;
-      } elsif ($token->{tag_name} eq 'p') {
-        ## NOTE: As normal, except </p> implies <p> and ...
 
-        ## has an element in scope
+      } elsif ($token->{tag_name} eq 'p') {
+        ## "In body" insertion mode, "p" start tag. As normal, except
+        ## </p> implies <p> and ...
+
+        ## "have an element in button scope".
         my $non_optional;
         my $i;
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -6610,7 +6625,7 @@ sub _tree_construction_main ($) {
             
             $i = $_;
             last INSCOPE;
-          } elsif ($node->[1] & SCOPING_EL) {
+          } elsif ($node->[1] & BUTTON_SCOPING_EL) {
             
             last INSCOPE;
           } elsif ($node->[1] & END_TAG_OPTIONAL_EL) {

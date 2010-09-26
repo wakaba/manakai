@@ -90,9 +90,10 @@ aaa
 |               "TEST"
 
 #data
-<!DOCTYPE html><i><b>a<button>b</i>c</b>d
+<!DOCTYPE html><i><b>a<button>b</i>c
 #errors
-no </button></b>
+AAA </i>
+no </button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -101,17 +102,38 @@ no </button></b>
 |     <i>
 |       <b>
 |         "a"
-|         <button>
-|           "b"
 |     <b>
-|       "c"
-|     "d"
+|       <button>
+|         <i>
+|           "b"
+|         "c"
+
+#data
+<!DOCTYPE html><i><b>a<button>b</i>c</b>d
+#errors
+AAA </i>
+AAA </b>
+no </button> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <i>
+|       <b>
+|         "a"
+|     <b>
+|     <button>
+|       <b>
+|         <i>
+|           "b"
+|         "c"
+|       "d"
 
 #data
 <!DOCTYPE html><p>a<button>c<div>
 #errors
-no </button>
-EOF
+no </div></button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -121,13 +143,12 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <div>
+|         <div>
 
 #data
 <!DOCTYPE html><p>a<button>c<li>
 #errors
-no </button>
-EOF
+no </button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -137,13 +158,12 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <li>
+|         <li>
 
 #data
 <!DOCTYPE html><p>a<button>c<dt>
 #errors
-no </button>
-EOF
+no </button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -153,13 +173,12 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <dt>
+|         <dt>
 
 #data
 <!DOCTYPE html><p>a<button>c<dd>
 #errors
-no </button>
-EOF
+no </button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -169,13 +188,12 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <dd>
+|         <dd>
 
 #data
 <!DOCTYPE html><p>a<button>c<plaintext>
 #errors
-no </button>
-EOF
+no </plaintext></button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -185,13 +203,12 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <plaintext>
+|         <plaintext>
 
 #data
 <!DOCTYPE html><p>a<button>c<nobr>
 #errors
-no </button>
-EOF
+no </button></nobr> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -201,7 +218,7 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <nobr>
+|         <nobr>
 
 #data
 <!DOCTYPE html><p>a<button>c<button>
@@ -233,13 +250,12 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <xmp>
+|         <xmp>
 
 #data
 <!DOCTYPE html><option>a<button>c<option>
 #errors
-no </button>
-EOF
+no </button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -249,13 +265,12 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <option>
+|         <option>
 
 #data
 <!DOCTYPE html><option>a<button>c<optgroup>
 #errors
-no </button>
-EOF
+no </button> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -265,7 +280,7 @@ EOF
 |       "a"
 |       <button>
 |         "c"
-|     <optgroup>
+|         <optgroup>
 
 #data
 <!DOCTYPE html><ruby>a<button>b<rt>
@@ -302,7 +317,8 @@ EOF
 #data
 <!DOCTYPE html><marquee>a</body><!---->
 #errors
-no </marquee>
+</body> in marquee
+no </marquee> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -373,6 +389,7 @@ no </button>
 #data
 <!DOCTYPE html><p>a<button>b</p>c
 #errors
+no <p> before </p>
 no </button>
 #document
 | <!DOCTYPE html>
@@ -383,4 +400,5 @@ no </button>
 |       "a"
 |       <button>
 |         "b"
-|     "c"
+|         <p>
+|         "c"

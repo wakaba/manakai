@@ -863,8 +863,9 @@ EOF in foreign content
 <option><svg><foreignobject></option>x
 #errors
 no DOCTYPE
-unmatched end tag
-EOF in foreign content
+unmatched end tag </option>
+no </foreignObject> before EOF
+no </svg> before EOF
 #document
 | <html>
 |   <head>
@@ -878,8 +879,9 @@ EOF in foreign content
 <optgroup><svg><foreignobject></optgroup>x
 #errors
 no DOCTYPE
-unmatched end tag
-EOF in foreign content
+unmatched end tag </optgroup>
+no </foreignObject> before EOF
+no </svg> before EOF
 #document
 | <html>
 |   <head>

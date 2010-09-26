@@ -8556,8 +8556,7 @@ eof in body
 #data
 <!DOCTYPE HTML><ul><li><button><li>
 #errors
-no </button>
-no </ul>
+no </button></li></ul>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -8566,18 +8565,32 @@ no </ul>
 |     <ul>
 |       <li>
 |         <button>
-|       <li>
+|           <li>
 
 #data
 <!DOCTYPE HTML><ul><li><marquee><li>
 #errors
-eof in body
+no </marquee></li></ul> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
 |   <head>
 |   <body>
 |     <ul>
+|       <li>
+|         <marquee>
+|           <li>
+
+#data
+<!DOCTYPE HTML><ol><li><marquee><li>
+#errors
+no </marquee></li></ol> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ol>
 |       <li>
 |         <marquee>
 |           <li>
@@ -9370,8 +9383,7 @@ eof in body
 #data
 <!DOCTYPE HTML><dl><dt><button><dt>
 #errors
-no </button>
-no </dl>
+no </button></dt></dl>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -9380,13 +9392,12 @@ no </dl>
 |     <dl>
 |       <dt>
 |         <button>
-|       <dt>
+|           <dt>
 
 #data
 <!DOCTYPE HTML><dl><dd><button><dd>
 #errors
-no </button>
-no </dl>
+no </button></dd></dl>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -9395,7 +9406,7 @@ no </dl>
 |     <dl>
 |       <dd>
 |         <button>
-|       <dd>
+|           <dd>
 
 #data
 <!DOCTYPE HTML><dl><dt><marquee><dt>
@@ -9883,14 +9894,15 @@ unexpected EOF
 <span><button></span>a
 #errors
 no DOCTYPE
-no </button>
+unexpected </span>
+no </button></span> before EOF
 #document
 | <html>
 |   <head>
 |   <body>
 |     <span>
 |       <button>
-|     "a"
+|         "a"
 
 #data
 <span><marquee></span>a

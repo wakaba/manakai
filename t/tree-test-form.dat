@@ -2,6 +2,7 @@
 <option>x
 #errors
 no DOCTYPE
+no </option> before EOF
 #document
 | <html>
 |   <head>
@@ -24,6 +25,7 @@ no DOCTYPE
 <optgroup>x
 #errors
 no DOCTYPE
+no </optgroup> before EOF
 #document
 | <html>
 |   <head>
@@ -46,6 +48,7 @@ no DOCTYPE
 <optgroup><option>x
 #errors
 no DOCTYPE
+no </option></optgroup> before EOF
 #document
 | <html>
 |   <head>
@@ -58,6 +61,7 @@ no DOCTYPE
 <optgroup><optgroup>
 #errors
 no DOCTYPE
+no </optgroup> before EOF
 #document
 | <html>
 |   <head>
@@ -69,6 +73,7 @@ no DOCTYPE
 <option><option>
 #errors
 no DOCTYPE
+no </option> before EOF
 #document
 | <html>
 |   <head>
@@ -80,6 +85,7 @@ no DOCTYPE
 <option><optgroup>
 #errors
 no DOCTYPE
+no </optgroup> before EOF
 #document
 | <html>
 |   <head>
@@ -98,7 +104,7 @@ no </span>
 |   <body>
 |     <option>
 |       <span>
-|     <optgroup>
+|         <optgroup>
 
 #data
 <optgroup><span><option>
