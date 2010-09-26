@@ -775,7 +775,11 @@
 
 {"description":"entity w/o refc href='&COPY=ok'",
 "input":"<a href='&COPY=ok'>",
-"output":["ParseError", ["StartTag", "a", {"href": "\u00A9=ok"}]]},
+"output":["ParseError", ["StartTag", "a", {"href": "&COPY=ok"}]]},
+
+{"description":"entity w/o refc href='&copy=ok'",
+"input":"<a href='&copy=ok'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&copy=ok"}]]},
 
 {"description":"entity w/o refc href='&COPYright'",
 "input":"<a href='&COPYright'>",
@@ -792,6 +796,52 @@
 {"description":"entity w/o refc href='&COPYrightcd'",
 "input":"<a href='&COPYrightcd'>",
 "output":["ParseError", ["StartTag", "a", {"href": "&COPYrightcd"}]]},
+
+{"description":"charref in attrvalue, followed by ;=",
+"input":"<a href='&COPY;=ok'>",
+"output":[["StartTag", "a", {"href": "\u00A9=ok"}]]},
+
+{"description":"entity w/o refc href='&COPYed=ok'",
+"input":"<a href='&COPYed=ok'>",
+"output":["ParseError", ["StartTag", "a", {"href": "&COPYed=ok"}]]},
+
+{"description":"&= in attrvalue",
+"input":"<a href='&='>",
+"output":["ParseError", ["StartTag", "a", {"href": "&="}]]},
+
+{"description":"&#x70= in attrvalue",
+"input":"<a href='&#x70='>",
+"output":["ParseError", ["StartTag", "a", {"href": "p="}]]},
+
+{"description":"&#70= in attrvalue",
+"input":"<a href='&#70='>",
+"output":["ParseError", ["StartTag", "a", {"href": "F="}]]},
+
+{"description":"&amp= in unquoted attrvalue",
+"input":"<a href=&amp=>",
+"output":["ParseError", "ParseError", ["StartTag", "a", {"href": "&amp="}]]},
+
+{"description":"&amp;= in unquoted attrvalue",
+"input":"<a href=&amp;=>",
+"output":["ParseError", ["StartTag", "a", {"href": "&="}]]},
+
+{"description":"entity without refc followed by = in content",
+"input":"&amp=",
+"output":["ParseError", ["Character", "&="]]},
+
+{"description":"entity with refc followed by = in content",
+"input":"&amp;=",
+"output":[["Character", "&="]]},
+
+{"description":"entity without refc followed by = in RCDATA content",
+"contentModelFlags":["RCDATA"],
+"input":"&amp=",
+"output":["ParseError", ["Character", "&="]]},
+
+{"description":"entity with refc followed by = in RCDATA content",
+"contentModelFlags":["RCDATA"],
+"input":"&amp;=",
+"output":[["Character", "&="]]},
 
 {"description":"cdata end tag containing <",
 "contentModelFlags":["RCDATA","CDATA"],

@@ -4521,6 +4521,10 @@ sub _get_next_token ($) {
         #
       }
 
+      ## We implement the "consume a character reference" in a
+      ## slightly different way from the spec's algorithm, though the
+      ## end result should be exactly same.
+
       ## NOTE: No character is consumed by the "consume a character
       ## reference" algorithm.  In other word, there is an "&" character
       ## that does not introduce a character reference, which would be
@@ -4871,9 +4875,9 @@ sub _get_next_token ($) {
                   $self->{entity_add} => 1,
                 }->{$nc}))) {
         our $EntityChar;
-        $self->{kwd} .= chr $nc;
-        if (defined $EntityChar->{$self->{kwd}} or
-            $self->{ge}->{$self->{kwd}}) {
+        $self->{kwd} .= chr $nc; ## Bare entity name.
+        if (defined $EntityChar->{$self->{kwd}} or ## HTML charrefs.
+            $self->{ge}->{$self->{kwd}}) { ## XML general entities.
           if ($nc == 0x003B) { # ;
             if (defined $self->{ge}->{$self->{kwd}}) {
               if ($self->{ge}->{$self->{kwd}}->{only_text}) {
@@ -4907,7 +4911,7 @@ sub _get_next_token ($) {
               }
               $self->{entity__value} = $EntityChar->{$self->{kwd}};
             }
-            $self->{entity__match} = 1;
+            $self->{entity__match} = 1; ## Matched exactly with ";" entity.
             
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -4923,7 +4927,7 @@ sub _get_next_token ($) {
           } else {
             
             $self->{entity__value} = $EntityChar->{$self->{kwd}};
-            $self->{entity__match} = -1;
+            $self->{entity__match} = -1; ## Exactly matched to non-";" entity.
             ## Stay in the state.
             
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -4941,7 +4945,7 @@ sub _get_next_token ($) {
         } else {
           
           $self->{entity__value} .= chr $nc;
-          $self->{entity__match} *= 2;
+          $self->{entity__match} *= 2; ## Matched (positive) or not (zero)
           ## Stay in the state.
           
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -4956,30 +4960,43 @@ sub _get_next_token ($) {
   
           redo A;
         }
+      } elsif ($nc == 0x003D) { # =
+        if ($self->{entity__match} < 0 and
+            $self->{prev_state} != DATA_STATE and # in attribute
+            $self->{prev_state} != RCDATA_STATE) {
+          $self->{entity__match} = 0;
+        }
       }
 
       my $data;
       my $has_ref;
-      if ($self->{entity__match} > 0) {
+      if ($self->{entity__match} > 0) { ## Exactly matched to ";" entity.
         
         $data = $self->{entity__value};
         $has_ref = 1;
         #
-      } elsif ($self->{entity__match} < 0) {
+      } elsif ($self->{entity__match} < 0) { ## Matched to non-";" entity.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc');
         if ($self->{prev_state} != DATA_STATE and # in attribute
             $self->{prev_state} != RCDATA_STATE and
             $self->{entity__match} < -1) {
+          ## In attribute-value contexts, matched non-";" string is
+          ## left as is if there is trailing alphabetical letters.
           
           $data = '&' . $self->{kwd};
           #
         } else {
+          ## In attribute-value contexts, exactly matched non-";"
+          ## string is replaced as a character reference.  In any
+          ## context, matched non-";" string with or without trailing
+          ## alphabetical letters is replaced as a character reference
+          ## (with trailing letters).
           
           $data = $self->{entity__value};
           $has_ref = 1;
           #
         }
-      } else {
+      } else { ## Unmatched string.
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero',
                         line => $self->{line_prev},
