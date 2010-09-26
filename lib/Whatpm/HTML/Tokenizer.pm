@@ -4908,7 +4908,9 @@ sub _get_next_token ($) {
                                           'gt;' => $self->{level}->{warn},
                                           'apos;' => $self->{level}->{warn},
                                          }->{$self->{kwd}} ||
-                                         $self->{level}->{must});
+                                         $self->{level}->{must},
+                                line => $self->{line_prev},
+                                column => $self->{column} - length $self->{kwd});
               } else {
                 
               }
@@ -4947,11 +4949,14 @@ sub _get_next_token ($) {
           }
         } else {
           if ($nc == 0x003B) { # ;
-            ## A reserved HTML character reference.
+            ## A reserved HTML character reference or an undeclared
+            ## XML entity reference.
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'entity not declared', ## XXXtype
                             value => $self->{kwd},
-                            level => $self->{level}->{must});
+                            level => $self->{level}->{must},
+                            line => $self->{line_prev},
+                            column => $self->{column} - length $self->{kwd});
             $self->{entity__value} .= chr $nc;
             $self->{entity__match} *= 2; ## Matched (positive) or not (zero)
             
@@ -5028,7 +5033,14 @@ sub _get_next_token ($) {
           #
         }
       } else { ## Unmatched string.
-        
+        if ($self->{is_xml} and not $self->{kwd} =~ /;$/) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev} - length $self->{kwd});
+        } else {
+          
+        }
         $data = '&' . $self->{kwd};
         #
       }

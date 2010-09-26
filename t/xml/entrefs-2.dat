@@ -222,8 +222,8 @@
   <!ENTITY \u4e00\u4e01 "xxx">
 ]>
 <a>&\u4e00\u4e01yy;</a>
-#errors
-4;4;bare ero;;;m
+#errors escaped
+4;4;entity not declared;;\u4e00\u4e01yy;;m
 #document escaped
 | <!DOCTYPE a>
 | <{} a>

@@ -37,7 +37,7 @@
 <!DOCTYPE p>
 <p>&lt;</p>
 #errors
-2;7;entity not declared;;lt;;w
+2;4;entity not declared;;lt;;w
 #document
 | <!DOCTYPE p>
 | <{} p>
@@ -47,7 +47,7 @@
 <!DOCTYPE p>
 <p>&gt;</p>
 #errors
-2;7;entity not declared;;gt;;w
+2;4;entity not declared;;gt;;w
 #document
 | <!DOCTYPE p>
 | <{} p>
@@ -57,7 +57,7 @@
 <!DOCTYPE p>
 <p>&amp;</p>
 #errors
-2;8;entity not declared;;amp;;w
+2;4;entity not declared;;amp;;w
 #document
 | <!DOCTYPE p>
 | <{} p>
@@ -66,7 +66,7 @@
 #data
 <p>&xx;</p>
 #errors
-1;4;bare ero;;;m
+1;4;entity not declared;;xx;;m
 #document
 | <{} p>
 |   "&xx;"
@@ -75,7 +75,7 @@
 <!DOCTYPE p>
 <p>&xx;</p>
 #errors
-2;4;bare ero;;;m
+2;4;entity not declared;;xx;;m
 #document
 | <!DOCTYPE p>
 | <{} p>
@@ -102,7 +102,7 @@
 #data
 <p>&copy;</p>
 #errors
-1;9;entity not declared;;copy;;m
+1;4;entity not declared;;copy;;m
 #document escaped
 | <{} p>
 |   "\u00a9"
@@ -111,7 +111,7 @@
 <!DOCTYPE p>
 <p>&copy;</p>
 #errors
-2;9;entity not declared;;copy;;m
+2;4;entity not declared;;copy;;m
 #document escaped
 | <!DOCTYPE p>
 | <{} p>
