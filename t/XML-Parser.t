@@ -113,7 +113,7 @@ sub test ($) {
   @errors = sort {$a cmp $b} @errors;
   @{$test->{errors}->[0]} = sort {$a cmp $b} @{$test->{errors}->[0] ||= []};
   
-  is join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
+  eq_or_diff join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
       bytes 'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]);
 
   if ($test->{'xml-version'}) {
