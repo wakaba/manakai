@@ -117,7 +117,22 @@ not ok 35 - Partial entity match at end of file: qq'I\x{27}m &no'
 # |  6|        ];                    | 11|        ];                  |
 # +---+------------------------------+---+----------------------------+
 # 
-ok 36 - Non-ASCII character reference name: qq'&\x{AC};'
+not ok 36 - Non-ASCII character reference name: qq'&\x{AC};'
+#   Failed test 'Non-ASCII character reference name: qq'&\x{AC};''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&\x{AC};'    |  5|            qq'&\x{AC};'    |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
 ok 37 - ASCII decimal entity: qq'&\#0036;'
 ok 38 - ASCII hexadecimal entity: qq'&\#x3f;'
 ok 39 - Hexadecimal entity in attribute: qq'<h a=\x{27}&\#x3f;\x{27}></h>'
@@ -219,7 +234,22 @@ ok 60 - Numeric entity representing a codepoint after 1114111 (U+10FFFF): qq'&\#
 ok 61 - Hexadecimal entity representing a codepoint after 1114111 (U+10FFFF): qq'&\#x1010FFFF;'
 ok 62 - Hexadecimal entity pair representing a surrogate pair: qq'&\#xD869;&\#xDED6;'
 ok 63 - Hexadecimal entity with mixed uppercase and lowercase: qq'&\#xaBcD;'
-ok 64 - Entity without a name: qq'&;'
+not ok 64 - Entity without a name: qq'&;'
+#   Failed test 'Entity without a name: qq'&;''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&;'          |  5|            qq'&;'          |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
 ok 65 - Unescaped ampersand in attribute value: qq'<h a=\x{27}&\x{27}>'
 ok 66 - StartTag containing <: qq'<a<b>'
 ok 67 - Non-void element containing trailing /: qq'<h/>'
@@ -1241,9 +1271,45 @@ not ok 177 - == attribute: qq'<z ==>'
 ok 178 - === attribute: qq'<z ===>'
 ok 179 - ==== attribute: qq'<z ====>'
 ok 180 - Allowed " after ampersand in attribute value: qq'<z z="&">'
-ok 181 - Non-allowed ' after ampersand in attribute value: qq'<z z="&\x{27}">'
+not ok 181 - Non-allowed ' after ampersand in attribute value: qq'<z z="&\x{27}">'
+#   Failed test 'Non-allowed ' after ampersand in attribute value: qq'<z z="&\x{27}">''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+------------------------------------+---+------------------------------------+
+# | Ln|Got                                 | Ln|Expected                            |
+# +---+------------------------------------+---+------------------------------------+
+# |  1|$VAR1 = [                           |  1|$VAR1 = [                           |
+# |   |                                    *  2|          qq'ParseError',           *
+# |  2|          [                         |  3|          [                         |
+# |  3|            qq'StartTag',           |  4|            qq'StartTag',           |
+# |  4|            qq'z',                  |  5|            qq'z',                  |
+# |  5|            {                       |  6|            {                       |
+# |  6|              qq'z' => qq'&\x{27}'  |  7|              qq'z' => qq'&\x{27}'  |
+# |  7|            }                       |  8|            }                       |
+# |  8|          ]                         |  9|          ]                         |
+# |  9|        ];                          | 10|        ];                          |
+# +---+------------------------------------+---+------------------------------------+
+# 
 ok 182 - Allowed ' after ampersand in attribute value: qq'<z z=\x{27}&\x{27}>'
-ok 183 - Non-allowed " after ampersand in attribute value: qq'<z z=\x{27}&"\x{27}>'
+not ok 183 - Non-allowed " after ampersand in attribute value: qq'<z z=\x{27}&"\x{27}>'
+#   Failed test 'Non-allowed " after ampersand in attribute value: qq'<z z=\x{27}&"\x{27}>''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+-------------------------------+---+-------------------------------+
+# | Ln|Got                            | Ln|Expected                       |
+# +---+-------------------------------+---+-------------------------------+
+# |  1|$VAR1 = [                      |  1|$VAR1 = [                      |
+# |   |                               *  2|          qq'ParseError',      *
+# |  2|          [                    |  3|          [                    |
+# |  3|            qq'StartTag',      |  4|            qq'StartTag',      |
+# |  4|            qq'z',             |  5|            qq'z',             |
+# |  5|            {                  |  6|            {                  |
+# |  6|              qq'z' => qq'&"'  |  7|              qq'z' => qq'&"'  |
+# |  7|            }                  |  8|            }                  |
+# |  8|          ]                    |  9|          ]                    |
+# |  9|        ];                     | 10|        ];                     |
+# +---+-------------------------------+---+-------------------------------+
+# 
 not ok 184 - Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>'
 #   Failed test 'Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>''
 #   at HTML-tokenizer.t ok line 1.
@@ -1583,6 +1649,7 @@ not ok 266 - Incorrect comment ending sequences in [R]CDATA: qq'foo<!-- x --x>x-
 # +---+-----------------------------------------------+---+-----------------------------------------------------+
 # 
 # t/tokenizer/entities.test
+Use of uninitialized value in subtraction (-) at lib/Whatpm/HTML/Tokenizer.pm line 4974.
 ok 267 - Undefined named entity in attribute value ending in semicolon and whose name starts with a known entity name.: qq'<h a=\x{27}&noti;\x{27}>'
 ok 268 - Named entity: AElig with a semi-colon.: qq'&AElig;'
 ok 269 - Named entity: AElig without a semi-colon.: qq'&AElig'
@@ -4870,10 +4937,12 @@ ok 1020 - &: qq'&'
 ok 1021 - named character reference w/o refc: qq'&ampabc'
 ok 1022 - named character reference: qq'&amp;abc'
 ok 1023 - named character reference w/o refc: qq'&abc'
+Use of uninitialized value in subtraction (-) at lib/Whatpm/HTML/Tokenizer.pm line 4974.
 ok 1024 - unknown named character reference: qq'&abc;'
 ok 1025 - named character reference w/o refc in attr: qq'<a href=\x{27}&ampabc\x{27}>'
 ok 1026 - named character reference in attr: qq'<a href=\x{27}&amp;abc\x{27}>'
 ok 1027 - named character reference w/o refc in attr: qq'<a href=\x{27}&abc\x{27}>'
+Use of uninitialized value in subtraction (-) at lib/Whatpm/HTML/Tokenizer.pm line 4974.
 ok 1028 - unknown named character reference in attr: qq'<a href=\x{27}&abc;\x{27}>'
 not ok 1029 - entity w/o refc at the end of unterminated attribute value: qq'<a href=\x{27}&COPY'
 #   Failed test 'entity w/o refc at the end of unterminated attribute value: qq'<a href=\x{27}&COPY''
@@ -4901,6 +4970,7 @@ ok 1032 - entity w/o refc href='&COPY!': qq'<a href=\x{27}&COPY!\x{27}>'
 ok 1033 - entity w/o refc href='&COPY=ok': qq'<a href=\x{27}&COPY=ok\x{27}>'
 ok 1034 - entity w/o refc href='&copy=ok': qq'<a href=\x{27}&copy=ok\x{27}>'
 ok 1035 - entity w/o refc href='&COPYright': qq'<a href=\x{27}&COPYright\x{27}>'
+Use of uninitialized value in subtraction (-) at lib/Whatpm/HTML/Tokenizer.pm line 4974.
 ok 1036 - entity w/o refc href='&COPYright;': qq'<a href=\x{27}&COPYright;\x{27}>'
 ok 1037 - entity w/o refc href='&COPYrightc': qq'<a href=\x{27}&COPYrightc\x{27}>'
 ok 1038 - entity w/o refc href='&COPYrightcd': qq'<a href=\x{27}&COPYrightcd\x{27}>'
@@ -5114,4 +5184,4 @@ ok 1172 - start tag not closed (self-closing start tag): qq'<p class=\x{27}a\x{2
 ok 1173 - end tag not closed (self-closing start tag): qq'</p/'
 ok 1174 - end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/'
 1..1174
-# Looks like you failed 243 tests of 1174.
+# Looks like you failed 247 tests of 1174.

@@ -4528,7 +4528,6 @@ sub _get_next_token ($) {
         redo A;
       } else {
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero');
         ## Return nothing.
         #
       }

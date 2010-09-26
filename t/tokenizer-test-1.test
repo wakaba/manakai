@@ -695,7 +695,7 @@
 
 {"description": "&VT",
 "input": "&\u000B",
-"output": ["ParseError", ["Character", "&\u000B"]]},
+"output": [["Character", "&\u000B"]]},
 
 {"description":"&FF",
 "input":"&\u000C",
@@ -807,7 +807,7 @@
 
 {"description":"&= in attrvalue",
 "input":"<a href='&='>",
-"output":["ParseError", ["StartTag", "a", {"href": "&="}]]},
+"output":[["StartTag", "a", {"href": "&="}]]},
 
 {"description":"&#x70= in attrvalue",
 "input":"<a href='&#x70='>",
@@ -1029,11 +1029,11 @@
 
 {"description":"&\"",
 "input": "&\"",
-"output": ["ParseError", ["Character", "&\""]]},
+"output": [["Character", "&\""]]},
 
 {"description":"&'",
 "input": "&'",
-"output": ["ParseError", ["Character", "&'"]]},
+"output": [["Character", "&'"]]},
 
 {"description":"<a href=\"&\">",
 "input": "<a href=\"&\">",
@@ -1041,7 +1041,7 @@
 
 {"description":"<a href=\"&'\">",
 "input": "<a href=\"&'\">",
-"output": ["ParseError", ["StartTag", "a", {"href": "&'"}]]},
+"output": [["StartTag", "a", {"href": "&'"}]]},
 
 {"description":"<a href='&'>",
 "input": "<a href='&'>",
@@ -1049,15 +1049,15 @@
 
 {"description":"<a href='&\"'>",
 "input": "<a href='&\"'>",
-"output": ["ParseError", ["StartTag", "a", {"href": "&\""}]]},
+"output": [["StartTag", "a", {"href": "&\""}]]},
 
 {"description":"<a href=&\">",
 "input": "<a href=&\">",
-"output": ["ParseError", "ParseError", ["StartTag", "a", {"href": "&\""}]]},
+"output": ["ParseError", ["StartTag", "a", {"href": "&\""}]]},
 
 {"description":"<a href=&'>",
 "input": "<a href=&'>",
-"output": ["ParseError", "ParseError", ["StartTag", "a", {"href": "&'"}]]},
+"output": ["ParseError", ["StartTag", "a", {"href": "&'"}]]},
 
 {"description":"<a href=&>",
 "input": "<a href=&>",
