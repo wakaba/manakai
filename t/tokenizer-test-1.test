@@ -1027,6 +1027,18 @@
 "input": "<foo bar= baz=>",
 "output": ["ParseError", ["StartTag", "foo", {"bar": "baz="}]]},
 
+{"description": "Unquoted attribute value containing two =s",
+"input": "<foo bar=a=b=>",
+"output": ["ParseError", "ParseError", ["StartTag", "foo", {"bar": "a=b="}]]},
+
+{"description": "Unquoted attribute value containing two `s",
+"input": "<foo bar=a`b`>",
+"output": ["ParseError", "ParseError", ["StartTag", "foo", {"bar": "a`b`"}]]},
+
+{"description": "Unquoted attribute value containing ` and =",
+"input": "<foo bar=a`b=>",
+"output": ["ParseError", "ParseError", ["StartTag", "foo", {"bar": "a`b="}]]},
+
 {"description":"&\"",
 "input": "&\"",
 "output": [["Character", "&\""]]},

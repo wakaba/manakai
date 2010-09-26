@@ -84,7 +84,7 @@ test-module-dom:
 content-type-files: content-type-result.txt
 
 content-type-result.txt: always
-	cd .. && $(PERL_) t/ContentType.t &> t/$@
+	-cd .. && $(PERL_) t/ContentType.t &> t/$@
 
 tokenizer-files: tokenizer-remote-files tokenizer-result.txt
 
@@ -107,7 +107,7 @@ tokenizer/LICENSE:
 	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/LICENSE
 
 tokenizer-result.txt: always
-	cd .. && $(PERL_) t/HTML-tokenizer.t &> t/$@
+	-cd .. && $(PERL_) t/HTML-tokenizer.t &> t/$@
 
 tree-construction-files: tree-construction-remote-files \
   tree-construction-result.txt
@@ -137,13 +137,13 @@ tree-construction/LICENSE:
 	$(WGET) -O $@ http://html5lib.googlecode.com/svn/trunk/LICENSE
 
 tree-construction-result.txt: always
-	cd .. && $(PERL_) t/HTML-tree.t &> t/$@
+	-cd .. && $(PERL_) t/HTML-tree.t &> t/$@
 
 xml-result.txt: always
-	cd .. && $(PERL_) t/XML-Parser.t &> t/$@
+	-cd .. && $(PERL_) t/XML-Parser.t &> t/$@
 
 swml-result.txt: always
-	cd .. && $(PERL_) t/SWML-Parser.t &> t/$@
+	-cd .. && $(PERL_) t/SWML-Parser.t &> t/$@
 
 content-checker-files: \
   content-checker-html-result.txt \
@@ -151,18 +151,18 @@ content-checker-files: \
   content-checker-xml-result.txt
 
 content-checker-html-result.txt: always
-	$(PERL_) ContentChecker-HTML.t &> $@
+	-$(PERL_) ContentChecker-HTML.t &> $@
 
 content-checker-atom-result.txt: always
-	$(PERL_) ContentChecker-Atom.t &> $@
+	-$(PERL_) ContentChecker-Atom.t &> $@
 
 content-checker-xml-result.txt: always
-	$(PERL_) ContentChecker-XML.t &> $@
+	-$(PERL_) ContentChecker-XML.t &> $@
 
 langtag-files: langtag-result.txt
 
 langtag-result.txt: always
-	cd .. && $(PERL_) t/LangTag.t &> t/$@
+	-cd .. && $(PERL_) t/LangTag.t &> t/$@
 
 clean: clean-dom1core-perl
 

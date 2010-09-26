@@ -490,3 +490,68 @@ no DOCTYPE
 |   <head>
 |   <body>
 |     <hr>
+
+#data
+<hr b=Q`A` >
+#errors
+no DOCTYPE
+1;7;bad attribute value;;;m
+1;9;bad attribute value;;;m
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hr>
+|       b="Q`A`"
+
+#data
+<hr b=Q=A= >
+#errors
+no DOCTYPE
+1;7;bad attribute value;;;m
+1;9;bad attribute value;;;m
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hr>
+|       b="Q=A="
+
+#data
+<hr b=Q`A= >
+#errors
+no DOCTYPE
+1;7;bad attribute value;;;m
+1;9;bad attribute value;;;m
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hr>
+|       b="Q`A="
+
+#data
+<hr b=Q<A< >
+#errors
+no DOCTYPE
+1;7;bad attribute value;;;m
+1;9;bad attribute value;;;m
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hr>
+|       b="Q<A<"
+
+#data
+<hr b=Q<A= >
+#errors
+no DOCTYPE
+1;7;bad attribute value;;;m
+1;9;bad attribute value;;;m
+#document
+| <html>
+|   <head>
+|   <body>
+|     <hr>
+|       b="Q<A="
