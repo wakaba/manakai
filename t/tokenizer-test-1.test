@@ -735,7 +735,7 @@
 
 {"description":"named character reference w/o refc",
 "input":"&abc",
-"output":["ParseError", ["Character", "&abc"]]},
+"output":[["Character", "&abc"]]},
 
 {"description":"unknown named character reference",
 "input":"&abc;",
@@ -743,7 +743,7 @@
 
 {"description":"named character reference w/o refc in attr",
 "input":"<a href='&ampabc'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&ampabc"}]]},
+"output":[["StartTag", "a", {"href": "&ampabc"}]]},
 
 {"description":"named character reference in attr",
 "input":"<a href='&amp;abc'>",
@@ -751,7 +751,7 @@
 
 {"description":"named character reference w/o refc in attr",
 "input":"<a href='&abc'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&abc"}]]},
+"output":[["StartTag", "a", {"href": "&abc"}]]},
 
 {"description":"unknown named character reference in attr",
 "input":"<a href='&abc;'>",
@@ -775,15 +775,15 @@
 
 {"description":"entity w/o refc href='&COPY=ok'",
 "input":"<a href='&COPY=ok'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&COPY=ok"}]]},
+"output":[["StartTag", "a", {"href": "&COPY=ok"}]]},
 
 {"description":"entity w/o refc href='&copy=ok'",
 "input":"<a href='&copy=ok'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&copy=ok"}]]},
+"output":[["StartTag", "a", {"href": "&copy=ok"}]]},
 
 {"description":"entity w/o refc href='&COPYright'",
 "input":"<a href='&COPYright'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&COPYright"}]]},
+"output":[["StartTag", "a", {"href": "&COPYright"}]]},
 
 {"description":"entity w/o refc href='&COPYright;'",
 "input":"<a href='&COPYright;'>",
@@ -791,11 +791,11 @@
 
 {"description":"entity w/o refc href='&COPYrightc'",
 "input":"<a href='&COPYrightc'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&COPYrightc"}]]},
+"output":[["StartTag", "a", {"href": "&COPYrightc"}]]},
 
 {"description":"entity w/o refc href='&COPYrightcd'",
 "input":"<a href='&COPYrightcd'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&COPYrightcd"}]]},
+"output":[["StartTag", "a", {"href": "&COPYrightcd"}]]},
 
 {"description":"charref in attrvalue, followed by ;=",
 "input":"<a href='&COPY;=ok'>",
@@ -803,7 +803,7 @@
 
 {"description":"entity w/o refc href='&COPYed=ok'",
 "input":"<a href='&COPYed=ok'>",
-"output":["ParseError", ["StartTag", "a", {"href": "&COPYed=ok"}]]},
+"output":[["StartTag", "a", {"href": "&COPYed=ok"}]]},
 
 {"description":"&= in attrvalue",
 "input":"<a href='&='>",
@@ -819,7 +819,7 @@
 
 {"description":"&amp= in unquoted attrvalue",
 "input":"<a href=&amp=>",
-"output":["ParseError", "ParseError", ["StartTag", "a", {"href": "&amp="}]]},
+"output":["ParseError", ["StartTag", "a", {"href": "&amp="}]]},
 
 {"description":"&amp;= in unquoted attrvalue",
 "input":"<a href=&amp;=>",

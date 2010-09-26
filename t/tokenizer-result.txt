@@ -75,21 +75,109 @@ ok 24 - Short comment three: qq'<!---->'
 ok 25 - Ampersand EOF: qq'&'
 ok 26 - Ampersand ampersand EOF: qq'&&'
 ok 27 - Ampersand space EOF: qq'& '
-ok 28 - Unfinished entity: qq'&f'
+not ok 28 - Unfinished entity: qq'&f'
+#   Failed test 'Unfinished entity: qq'&f''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&f'          |  5|            qq'&f'          |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
 ok 29 - Ampersand, number sign: qq'&\#'
 ok 30 - Unfinished numeric entity: qq'&\#x'
 ok 31 - Entity with trailing semicolon (1): qq'I\x{27}m &not;it'
 ok 32 - Entity with trailing semicolon (2): qq'I\x{27}m &notin;'
 ok 33 - Entity without trailing semicolon (1): qq'I\x{27}m &notit'
 ok 34 - Entity without trailing semicolon (2): qq'I\x{27}m &notin'
-ok 35 - Partial entity match at end of file: qq'I\x{27}m &no'
+not ok 35 - Partial entity match at end of file: qq'I\x{27}m &no'
+#   Failed test 'Partial entity match at end of file: qq'I\x{27}m &no''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+------------------------------+---+----------------------------+
+# | Ln|Got                           | Ln|Expected                    |
+# +---+------------------------------+---+----------------------------+
+# |  1|$VAR1 = [                     |  1|$VAR1 = [                   |
+# |  2|          [                   |  2|          [                 |
+# |  3|            qq'Character',    |  3|            qq'Character',  |
+# *  4|            qq'I\x{27}m &no'  *  4|            qq'I\x{27}m '   *
+# |   |                              *  5|          ],                *
+# |   |                              *  6|          qq'ParseError',   *
+# |   |                              *  7|          [                 *
+# |   |                              *  8|            qq'Character',  *
+# |   |                              *  9|            qq'&no'         *
+# |  5|          ]                   | 10|          ]                 |
+# |  6|        ];                    | 11|        ];                  |
+# +---+------------------------------+---+----------------------------+
+# 
 ok 36 - Non-ASCII character reference name: qq'&\x{AC};'
 ok 37 - ASCII decimal entity: qq'&\#0036;'
 ok 38 - ASCII hexadecimal entity: qq'&\#x3f;'
 ok 39 - Hexadecimal entity in attribute: qq'<h a=\x{27}&\#x3f;\x{27}></h>'
-ok 40 - Entity in attribute without semicolon ending in x: qq'<h a=\x{27}&notx\x{27}>'
-ok 41 - Entity in attribute without semicolon ending in 1: qq'<h a=\x{27}&not1\x{27}>'
-ok 42 - Entity in attribute without semicolon ending in i: qq'<h a=\x{27}&noti\x{27}>'
+not ok 40 - Entity in attribute without semicolon ending in x: qq'<h a=\x{27}&notx\x{27}>'
+#   Failed test 'Entity in attribute without semicolon ending in x: qq'<h a=\x{27}&notx\x{27}>''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------------+---+----------------------------------+
+# | Ln|Got                               | Ln|Expected                          |
+# +---+----------------------------------+---+----------------------------------+
+# |  1|$VAR1 = [                         |  1|$VAR1 = [                         |
+# |   |                                  *  2|          qq'ParseError',         *
+# |  2|          [                       |  3|          [                       |
+# |  3|            qq'StartTag',         |  4|            qq'StartTag',         |
+# |  4|            qq'h',                |  5|            qq'h',                |
+# |  5|            {                     |  6|            {                     |
+# |  6|              qq'a' => qq'&notx'  |  7|              qq'a' => qq'&notx'  |
+# |  7|            }                     |  8|            }                     |
+# |  8|          ]                       |  9|          ]                       |
+# |  9|        ];                        | 10|        ];                        |
+# +---+----------------------------------+---+----------------------------------+
+# 
+not ok 41 - Entity in attribute without semicolon ending in 1: qq'<h a=\x{27}&not1\x{27}>'
+#   Failed test 'Entity in attribute without semicolon ending in 1: qq'<h a=\x{27}&not1\x{27}>''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------------+---+----------------------------------+
+# | Ln|Got                               | Ln|Expected                          |
+# +---+----------------------------------+---+----------------------------------+
+# |  1|$VAR1 = [                         |  1|$VAR1 = [                         |
+# |   |                                  *  2|          qq'ParseError',         *
+# |  2|          [                       |  3|          [                       |
+# |  3|            qq'StartTag',         |  4|            qq'StartTag',         |
+# |  4|            qq'h',                |  5|            qq'h',                |
+# |  5|            {                     |  6|            {                     |
+# |  6|              qq'a' => qq'&not1'  |  7|              qq'a' => qq'&not1'  |
+# |  7|            }                     |  8|            }                     |
+# |  8|          ]                       |  9|          ]                       |
+# |  9|        ];                        | 10|        ];                        |
+# +---+----------------------------------+---+----------------------------------+
+# 
+not ok 42 - Entity in attribute without semicolon ending in i: qq'<h a=\x{27}&noti\x{27}>'
+#   Failed test 'Entity in attribute without semicolon ending in i: qq'<h a=\x{27}&noti\x{27}>''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------------+---+----------------------------------+
+# | Ln|Got                               | Ln|Expected                          |
+# +---+----------------------------------+---+----------------------------------+
+# |  1|$VAR1 = [                         |  1|$VAR1 = [                         |
+# |   |                                  *  2|          qq'ParseError',         *
+# |  2|          [                       |  3|          [                       |
+# |  3|            qq'StartTag',         |  4|            qq'StartTag',         |
+# |  4|            qq'h',                |  5|            qq'h',                |
+# |  5|            {                     |  6|            {                     |
+# |  6|              qq'a' => qq'&noti'  |  7|              qq'a' => qq'&noti'  |
+# |  7|            }                     |  8|            }                     |
+# |  8|          ]                       |  9|          ]                       |
+# |  9|        ];                        | 10|        ];                        |
+# +---+----------------------------------+---+----------------------------------+
+# 
 ok 43 - Entity in attribute without semicolon: qq'<h a=\x{27}&COPY\x{27}>'
 # t/tokenizer/test2.test
 not ok 44 - DOCTYPE without name: qq'<!DOCTYPE>'
@@ -1156,7 +1244,34 @@ ok 180 - Allowed " after ampersand in attribute value: qq'<z z="&">'
 ok 181 - Non-allowed ' after ampersand in attribute value: qq'<z z="&\x{27}">'
 ok 182 - Allowed ' after ampersand in attribute value: qq'<z z=\x{27}&\x{27}>'
 ok 183 - Non-allowed " after ampersand in attribute value: qq'<z z=\x{27}&"\x{27}>'
-ok 184 - Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>'
+not ok 184 - Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>'
+#   Failed test 'Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+------------------------------------------+---+------------------------------------------+
+# | Ln|Got                                       | Ln|Expected                                  |
+# +---+------------------------------------------+---+------------------------------------------+
+# |  1|$VAR1 = [                                 |  1|$VAR1 = [                                 |
+# |   |                                          *  2|          qq'ParseError',                 *
+# |  2|          [                               |  3|          [                               |
+# |  3|            qq'StartTag',                 |  4|            qq'StartTag',                 |
+# |  4|            qq'z',                        |  5|            qq'z',                        |
+# |  5|            {                             |  6|            {                             |
+# |  6|              qq'z' => qq'&xlink_xmlns;'  |  7|              qq'z' => qq'&xlink_xmlns;'  |
+# |  7|            }                             |  8|            }                             |
+# |  8|          ],                              |  9|          ],                              |
+# |  9|          [                               | 10|          [                               |
+# | 10|            qq'Character',                | 11|            qq'Character',                |
+# | 11|            qq'bar'                       | 12|            qq'bar'                       |
+# | 12|          ],                              | 13|          ],                              |
+# | 13|          [                               | 14|          [                               |
+# | 14|            qq'StartTag',                 | 15|            qq'StartTag',                 |
+# | 15|            qq'z',                        | 16|            qq'z',                        |
+# | 16|            {}                            | 17|            {}                            |
+# | 17|          ]                               | 18|          ]                               |
+# | 18|        ];                                | 19|        ];                                |
+# +---+------------------------------------------+---+------------------------------------------+
+# 
 ok 185 - Text after hex character reference: qq'<z z=\x{27}&\#x0020; foo\x{27}>bar<z>'
 ok 186 - Attribute name starting with ": qq'<foo "=\x{27}bar\x{27}>'
 ok 187 - Attribute name starting with ': qq'<foo \x{27}=\x{27}bar\x{27}>'
@@ -1835,159 +1950,2439 @@ ok 630 - Named entity: yuml without a semi-colon.: qq'&yuml'
 ok 631 - Named entity: zeta with a semi-colon.: qq'&zeta;'
 ok 632 - Named entity: zwj with a semi-colon.: qq'&zwj;'
 ok 633 - Named entity: zwnj with a semi-colon.: qq'&zwnj;'
-ok 634 - Bad named entity: Alpha without a semi-colon.: qq'&Alpha'
-ok 635 - Bad named entity: alpha without a semi-colon.: qq'&alpha'
-ok 636 - Bad named entity: and without a semi-colon.: qq'&and'
-ok 637 - Bad named entity: ang without a semi-colon.: qq'&ang'
-ok 638 - Bad named entity: apos without a semi-colon.: qq'&apos'
-ok 639 - Bad named entity: asymp without a semi-colon.: qq'&asymp'
-ok 640 - Bad named entity: bdquo without a semi-colon.: qq'&bdquo'
-ok 641 - Bad named entity: Beta without a semi-colon.: qq'&Beta'
-ok 642 - Bad named entity: beta without a semi-colon.: qq'&beta'
-ok 643 - Bad named entity: bull without a semi-colon.: qq'&bull'
-ok 644 - Bad named entity: cap without a semi-colon.: qq'&cap'
-ok 645 - Bad named entity: Chi without a semi-colon.: qq'&Chi'
-ok 646 - Bad named entity: chi without a semi-colon.: qq'&chi'
-ok 647 - Bad named entity: circ without a semi-colon.: qq'&circ'
-ok 648 - Bad named entity: clubs without a semi-colon.: qq'&clubs'
-ok 649 - Bad named entity: cong without a semi-colon.: qq'&cong'
-ok 650 - Bad named entity: crarr without a semi-colon.: qq'&crarr'
-ok 651 - Bad named entity: cup without a semi-colon.: qq'&cup'
-ok 652 - Bad named entity: dagger without a semi-colon.: qq'&dagger'
-ok 653 - Bad named entity: dagger without a semi-colon.: qq'&dagger'
-ok 654 - Bad named entity: darr without a semi-colon.: qq'&darr'
-ok 655 - Bad named entity: darr without a semi-colon.: qq'&darr'
-ok 656 - Bad named entity: Delta without a semi-colon.: qq'&Delta'
-ok 657 - Bad named entity: delta without a semi-colon.: qq'&delta'
-ok 658 - Bad named entity: diams without a semi-colon.: qq'&diams'
-ok 659 - Bad named entity: empty without a semi-colon.: qq'&empty'
-ok 660 - Bad named entity: emsp without a semi-colon.: qq'&emsp'
-ok 661 - Bad named entity: ensp without a semi-colon.: qq'&ensp'
-ok 662 - Bad named entity: Epsilon without a semi-colon.: qq'&Epsilon'
-ok 663 - Bad named entity: epsilon without a semi-colon.: qq'&epsilon'
-ok 664 - Bad named entity: equiv without a semi-colon.: qq'&equiv'
-ok 665 - Bad named entity: Eta without a semi-colon.: qq'&Eta'
-ok 666 - Bad named entity: eta without a semi-colon.: qq'&eta'
-ok 667 - Bad named entity: euro without a semi-colon.: qq'&euro'
-ok 668 - Bad named entity: exist without a semi-colon.: qq'&exist'
-ok 669 - Bad named entity: fnof without a semi-colon.: qq'&fnof'
-ok 670 - Bad named entity: forall without a semi-colon.: qq'&forall'
-ok 671 - Bad named entity: frasl without a semi-colon.: qq'&frasl'
-ok 672 - Bad named entity: Gamma without a semi-colon.: qq'&Gamma'
-ok 673 - Bad named entity: gamma without a semi-colon.: qq'&gamma'
-ok 674 - Bad named entity: ge without a semi-colon.: qq'&ge'
-ok 675 - Bad named entity: harr without a semi-colon.: qq'&harr'
-ok 676 - Bad named entity: harr without a semi-colon.: qq'&harr'
-ok 677 - Bad named entity: hearts without a semi-colon.: qq'&hearts'
-ok 678 - Bad named entity: hellip without a semi-colon.: qq'&hellip'
-ok 679 - Bad named entity: image without a semi-colon.: qq'&image'
-ok 680 - Bad named entity: infin without a semi-colon.: qq'&infin'
-ok 681 - Bad named entity: int without a semi-colon.: qq'&int'
-ok 682 - Bad named entity: Iota without a semi-colon.: qq'&Iota'
-ok 683 - Bad named entity: iota without a semi-colon.: qq'&iota'
-ok 684 - Bad named entity: isin without a semi-colon.: qq'&isin'
-ok 685 - Bad named entity: Kappa without a semi-colon.: qq'&Kappa'
-ok 686 - Bad named entity: kappa without a semi-colon.: qq'&kappa'
-ok 687 - Bad named entity: Lambda without a semi-colon.: qq'&Lambda'
-ok 688 - Bad named entity: lambda without a semi-colon.: qq'&lambda'
-ok 689 - Bad named entity: lang without a semi-colon.: qq'&lang'
-ok 690 - Bad named entity: larr without a semi-colon.: qq'&larr'
-ok 691 - Bad named entity: larr without a semi-colon.: qq'&larr'
-ok 692 - Bad named entity: lceil without a semi-colon.: qq'&lceil'
-ok 693 - Bad named entity: ldquo without a semi-colon.: qq'&ldquo'
-ok 694 - Bad named entity: le without a semi-colon.: qq'&le'
-ok 695 - Bad named entity: lfloor without a semi-colon.: qq'&lfloor'
-ok 696 - Bad named entity: lowast without a semi-colon.: qq'&lowast'
-ok 697 - Bad named entity: loz without a semi-colon.: qq'&loz'
-ok 698 - Bad named entity: lrm without a semi-colon.: qq'&lrm'
-ok 699 - Bad named entity: lsaquo without a semi-colon.: qq'&lsaquo'
-ok 700 - Bad named entity: lsquo without a semi-colon.: qq'&lsquo'
-ok 701 - Bad named entity: mdash without a semi-colon.: qq'&mdash'
-ok 702 - Bad named entity: minus without a semi-colon.: qq'&minus'
-ok 703 - Bad named entity: Mu without a semi-colon.: qq'&Mu'
-ok 704 - Bad named entity: mu without a semi-colon.: qq'&mu'
-ok 705 - Bad named entity: nabla without a semi-colon.: qq'&nabla'
-ok 706 - Bad named entity: ndash without a semi-colon.: qq'&ndash'
-ok 707 - Bad named entity: ne without a semi-colon.: qq'&ne'
-ok 708 - Bad named entity: ni without a semi-colon.: qq'&ni'
+not ok 634 - Bad named entity: Alpha without a semi-colon.: qq'&Alpha'
+#   Failed test 'Bad named entity: Alpha without a semi-colon.: qq'&Alpha''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Alpha'      |  5|            qq'&Alpha'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 635 - Bad named entity: alpha without a semi-colon.: qq'&alpha'
+#   Failed test 'Bad named entity: alpha without a semi-colon.: qq'&alpha''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&alpha'      |  5|            qq'&alpha'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 636 - Bad named entity: and without a semi-colon.: qq'&and'
+#   Failed test 'Bad named entity: and without a semi-colon.: qq'&and''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&and'        |  5|            qq'&and'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 637 - Bad named entity: ang without a semi-colon.: qq'&ang'
+#   Failed test 'Bad named entity: ang without a semi-colon.: qq'&ang''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&ang'        |  5|            qq'&ang'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 638 - Bad named entity: apos without a semi-colon.: qq'&apos'
+#   Failed test 'Bad named entity: apos without a semi-colon.: qq'&apos''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&apos'       |  5|            qq'&apos'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 639 - Bad named entity: asymp without a semi-colon.: qq'&asymp'
+#   Failed test 'Bad named entity: asymp without a semi-colon.: qq'&asymp''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&asymp'      |  5|            qq'&asymp'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 640 - Bad named entity: bdquo without a semi-colon.: qq'&bdquo'
+#   Failed test 'Bad named entity: bdquo without a semi-colon.: qq'&bdquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&bdquo'      |  5|            qq'&bdquo'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 641 - Bad named entity: Beta without a semi-colon.: qq'&Beta'
+#   Failed test 'Bad named entity: Beta without a semi-colon.: qq'&Beta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Beta'       |  5|            qq'&Beta'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 642 - Bad named entity: beta without a semi-colon.: qq'&beta'
+#   Failed test 'Bad named entity: beta without a semi-colon.: qq'&beta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&beta'       |  5|            qq'&beta'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 643 - Bad named entity: bull without a semi-colon.: qq'&bull'
+#   Failed test 'Bad named entity: bull without a semi-colon.: qq'&bull''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&bull'       |  5|            qq'&bull'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 644 - Bad named entity: cap without a semi-colon.: qq'&cap'
+#   Failed test 'Bad named entity: cap without a semi-colon.: qq'&cap''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&cap'        |  5|            qq'&cap'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 645 - Bad named entity: Chi without a semi-colon.: qq'&Chi'
+#   Failed test 'Bad named entity: Chi without a semi-colon.: qq'&Chi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Chi'        |  5|            qq'&Chi'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 646 - Bad named entity: chi without a semi-colon.: qq'&chi'
+#   Failed test 'Bad named entity: chi without a semi-colon.: qq'&chi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&chi'        |  5|            qq'&chi'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 647 - Bad named entity: circ without a semi-colon.: qq'&circ'
+#   Failed test 'Bad named entity: circ without a semi-colon.: qq'&circ''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&circ'       |  5|            qq'&circ'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 648 - Bad named entity: clubs without a semi-colon.: qq'&clubs'
+#   Failed test 'Bad named entity: clubs without a semi-colon.: qq'&clubs''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&clubs'      |  5|            qq'&clubs'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 649 - Bad named entity: cong without a semi-colon.: qq'&cong'
+#   Failed test 'Bad named entity: cong without a semi-colon.: qq'&cong''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&cong'       |  5|            qq'&cong'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 650 - Bad named entity: crarr without a semi-colon.: qq'&crarr'
+#   Failed test 'Bad named entity: crarr without a semi-colon.: qq'&crarr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&crarr'      |  5|            qq'&crarr'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 651 - Bad named entity: cup without a semi-colon.: qq'&cup'
+#   Failed test 'Bad named entity: cup without a semi-colon.: qq'&cup''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&cup'        |  5|            qq'&cup'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 652 - Bad named entity: dagger without a semi-colon.: qq'&dagger'
+#   Failed test 'Bad named entity: dagger without a semi-colon.: qq'&dagger''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&dagger'     |  5|            qq'&dagger'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 653 - Bad named entity: dagger without a semi-colon.: qq'&dagger'
+#   Failed test 'Bad named entity: dagger without a semi-colon.: qq'&dagger''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&dagger'     |  5|            qq'&dagger'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 654 - Bad named entity: darr without a semi-colon.: qq'&darr'
+#   Failed test 'Bad named entity: darr without a semi-colon.: qq'&darr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&darr'       |  5|            qq'&darr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 655 - Bad named entity: darr without a semi-colon.: qq'&darr'
+#   Failed test 'Bad named entity: darr without a semi-colon.: qq'&darr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&darr'       |  5|            qq'&darr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 656 - Bad named entity: Delta without a semi-colon.: qq'&Delta'
+#   Failed test 'Bad named entity: Delta without a semi-colon.: qq'&Delta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Delta'      |  5|            qq'&Delta'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 657 - Bad named entity: delta without a semi-colon.: qq'&delta'
+#   Failed test 'Bad named entity: delta without a semi-colon.: qq'&delta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&delta'      |  5|            qq'&delta'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 658 - Bad named entity: diams without a semi-colon.: qq'&diams'
+#   Failed test 'Bad named entity: diams without a semi-colon.: qq'&diams''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&diams'      |  5|            qq'&diams'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 659 - Bad named entity: empty without a semi-colon.: qq'&empty'
+#   Failed test 'Bad named entity: empty without a semi-colon.: qq'&empty''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&empty'      |  5|            qq'&empty'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 660 - Bad named entity: emsp without a semi-colon.: qq'&emsp'
+#   Failed test 'Bad named entity: emsp without a semi-colon.: qq'&emsp''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&emsp'       |  5|            qq'&emsp'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 661 - Bad named entity: ensp without a semi-colon.: qq'&ensp'
+#   Failed test 'Bad named entity: ensp without a semi-colon.: qq'&ensp''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&ensp'       |  5|            qq'&ensp'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 662 - Bad named entity: Epsilon without a semi-colon.: qq'&Epsilon'
+#   Failed test 'Bad named entity: Epsilon without a semi-colon.: qq'&Epsilon''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Epsilon'    |  5|            qq'&Epsilon'    |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 663 - Bad named entity: epsilon without a semi-colon.: qq'&epsilon'
+#   Failed test 'Bad named entity: epsilon without a semi-colon.: qq'&epsilon''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&epsilon'    |  5|            qq'&epsilon'    |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 664 - Bad named entity: equiv without a semi-colon.: qq'&equiv'
+#   Failed test 'Bad named entity: equiv without a semi-colon.: qq'&equiv''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&equiv'      |  5|            qq'&equiv'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 665 - Bad named entity: Eta without a semi-colon.: qq'&Eta'
+#   Failed test 'Bad named entity: Eta without a semi-colon.: qq'&Eta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Eta'        |  5|            qq'&Eta'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 666 - Bad named entity: eta without a semi-colon.: qq'&eta'
+#   Failed test 'Bad named entity: eta without a semi-colon.: qq'&eta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&eta'        |  5|            qq'&eta'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 667 - Bad named entity: euro without a semi-colon.: qq'&euro'
+#   Failed test 'Bad named entity: euro without a semi-colon.: qq'&euro''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&euro'       |  5|            qq'&euro'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 668 - Bad named entity: exist without a semi-colon.: qq'&exist'
+#   Failed test 'Bad named entity: exist without a semi-colon.: qq'&exist''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&exist'      |  5|            qq'&exist'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 669 - Bad named entity: fnof without a semi-colon.: qq'&fnof'
+#   Failed test 'Bad named entity: fnof without a semi-colon.: qq'&fnof''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&fnof'       |  5|            qq'&fnof'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 670 - Bad named entity: forall without a semi-colon.: qq'&forall'
+#   Failed test 'Bad named entity: forall without a semi-colon.: qq'&forall''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&forall'     |  5|            qq'&forall'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 671 - Bad named entity: frasl without a semi-colon.: qq'&frasl'
+#   Failed test 'Bad named entity: frasl without a semi-colon.: qq'&frasl''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&frasl'      |  5|            qq'&frasl'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 672 - Bad named entity: Gamma without a semi-colon.: qq'&Gamma'
+#   Failed test 'Bad named entity: Gamma without a semi-colon.: qq'&Gamma''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Gamma'      |  5|            qq'&Gamma'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 673 - Bad named entity: gamma without a semi-colon.: qq'&gamma'
+#   Failed test 'Bad named entity: gamma without a semi-colon.: qq'&gamma''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&gamma'      |  5|            qq'&gamma'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 674 - Bad named entity: ge without a semi-colon.: qq'&ge'
+#   Failed test 'Bad named entity: ge without a semi-colon.: qq'&ge''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&ge'         |  5|            qq'&ge'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 675 - Bad named entity: harr without a semi-colon.: qq'&harr'
+#   Failed test 'Bad named entity: harr without a semi-colon.: qq'&harr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&harr'       |  5|            qq'&harr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 676 - Bad named entity: harr without a semi-colon.: qq'&harr'
+#   Failed test 'Bad named entity: harr without a semi-colon.: qq'&harr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&harr'       |  5|            qq'&harr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 677 - Bad named entity: hearts without a semi-colon.: qq'&hearts'
+#   Failed test 'Bad named entity: hearts without a semi-colon.: qq'&hearts''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&hearts'     |  5|            qq'&hearts'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 678 - Bad named entity: hellip without a semi-colon.: qq'&hellip'
+#   Failed test 'Bad named entity: hellip without a semi-colon.: qq'&hellip''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&hellip'     |  5|            qq'&hellip'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 679 - Bad named entity: image without a semi-colon.: qq'&image'
+#   Failed test 'Bad named entity: image without a semi-colon.: qq'&image''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&image'      |  5|            qq'&image'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 680 - Bad named entity: infin without a semi-colon.: qq'&infin'
+#   Failed test 'Bad named entity: infin without a semi-colon.: qq'&infin''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&infin'      |  5|            qq'&infin'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 681 - Bad named entity: int without a semi-colon.: qq'&int'
+#   Failed test 'Bad named entity: int without a semi-colon.: qq'&int''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&int'        |  5|            qq'&int'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 682 - Bad named entity: Iota without a semi-colon.: qq'&Iota'
+#   Failed test 'Bad named entity: Iota without a semi-colon.: qq'&Iota''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Iota'       |  5|            qq'&Iota'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 683 - Bad named entity: iota without a semi-colon.: qq'&iota'
+#   Failed test 'Bad named entity: iota without a semi-colon.: qq'&iota''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&iota'       |  5|            qq'&iota'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 684 - Bad named entity: isin without a semi-colon.: qq'&isin'
+#   Failed test 'Bad named entity: isin without a semi-colon.: qq'&isin''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&isin'       |  5|            qq'&isin'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 685 - Bad named entity: Kappa without a semi-colon.: qq'&Kappa'
+#   Failed test 'Bad named entity: Kappa without a semi-colon.: qq'&Kappa''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Kappa'      |  5|            qq'&Kappa'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 686 - Bad named entity: kappa without a semi-colon.: qq'&kappa'
+#   Failed test 'Bad named entity: kappa without a semi-colon.: qq'&kappa''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&kappa'      |  5|            qq'&kappa'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 687 - Bad named entity: Lambda without a semi-colon.: qq'&Lambda'
+#   Failed test 'Bad named entity: Lambda without a semi-colon.: qq'&Lambda''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Lambda'     |  5|            qq'&Lambda'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 688 - Bad named entity: lambda without a semi-colon.: qq'&lambda'
+#   Failed test 'Bad named entity: lambda without a semi-colon.: qq'&lambda''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lambda'     |  5|            qq'&lambda'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 689 - Bad named entity: lang without a semi-colon.: qq'&lang'
+#   Failed test 'Bad named entity: lang without a semi-colon.: qq'&lang''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lang'       |  5|            qq'&lang'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 690 - Bad named entity: larr without a semi-colon.: qq'&larr'
+#   Failed test 'Bad named entity: larr without a semi-colon.: qq'&larr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&larr'       |  5|            qq'&larr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 691 - Bad named entity: larr without a semi-colon.: qq'&larr'
+#   Failed test 'Bad named entity: larr without a semi-colon.: qq'&larr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&larr'       |  5|            qq'&larr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 692 - Bad named entity: lceil without a semi-colon.: qq'&lceil'
+#   Failed test 'Bad named entity: lceil without a semi-colon.: qq'&lceil''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lceil'      |  5|            qq'&lceil'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 693 - Bad named entity: ldquo without a semi-colon.: qq'&ldquo'
+#   Failed test 'Bad named entity: ldquo without a semi-colon.: qq'&ldquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&ldquo'      |  5|            qq'&ldquo'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 694 - Bad named entity: le without a semi-colon.: qq'&le'
+#   Failed test 'Bad named entity: le without a semi-colon.: qq'&le''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&le'         |  5|            qq'&le'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 695 - Bad named entity: lfloor without a semi-colon.: qq'&lfloor'
+#   Failed test 'Bad named entity: lfloor without a semi-colon.: qq'&lfloor''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lfloor'     |  5|            qq'&lfloor'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 696 - Bad named entity: lowast without a semi-colon.: qq'&lowast'
+#   Failed test 'Bad named entity: lowast without a semi-colon.: qq'&lowast''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lowast'     |  5|            qq'&lowast'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 697 - Bad named entity: loz without a semi-colon.: qq'&loz'
+#   Failed test 'Bad named entity: loz without a semi-colon.: qq'&loz''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&loz'        |  5|            qq'&loz'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 698 - Bad named entity: lrm without a semi-colon.: qq'&lrm'
+#   Failed test 'Bad named entity: lrm without a semi-colon.: qq'&lrm''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lrm'        |  5|            qq'&lrm'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 699 - Bad named entity: lsaquo without a semi-colon.: qq'&lsaquo'
+#   Failed test 'Bad named entity: lsaquo without a semi-colon.: qq'&lsaquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lsaquo'     |  5|            qq'&lsaquo'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 700 - Bad named entity: lsquo without a semi-colon.: qq'&lsquo'
+#   Failed test 'Bad named entity: lsquo without a semi-colon.: qq'&lsquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&lsquo'      |  5|            qq'&lsquo'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 701 - Bad named entity: mdash without a semi-colon.: qq'&mdash'
+#   Failed test 'Bad named entity: mdash without a semi-colon.: qq'&mdash''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&mdash'      |  5|            qq'&mdash'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 702 - Bad named entity: minus without a semi-colon.: qq'&minus'
+#   Failed test 'Bad named entity: minus without a semi-colon.: qq'&minus''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&minus'      |  5|            qq'&minus'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 703 - Bad named entity: Mu without a semi-colon.: qq'&Mu'
+#   Failed test 'Bad named entity: Mu without a semi-colon.: qq'&Mu''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Mu'         |  5|            qq'&Mu'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 704 - Bad named entity: mu without a semi-colon.: qq'&mu'
+#   Failed test 'Bad named entity: mu without a semi-colon.: qq'&mu''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&mu'         |  5|            qq'&mu'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 705 - Bad named entity: nabla without a semi-colon.: qq'&nabla'
+#   Failed test 'Bad named entity: nabla without a semi-colon.: qq'&nabla''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&nabla'      |  5|            qq'&nabla'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 706 - Bad named entity: ndash without a semi-colon.: qq'&ndash'
+#   Failed test 'Bad named entity: ndash without a semi-colon.: qq'&ndash''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&ndash'      |  5|            qq'&ndash'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 707 - Bad named entity: ne without a semi-colon.: qq'&ne'
+#   Failed test 'Bad named entity: ne without a semi-colon.: qq'&ne''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&ne'         |  5|            qq'&ne'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 708 - Bad named entity: ni without a semi-colon.: qq'&ni'
+#   Failed test 'Bad named entity: ni without a semi-colon.: qq'&ni''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&ni'         |  5|            qq'&ni'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
 ok 709 - Bad named entity: notin without a semi-colon.: qq'&notin'
-ok 710 - Bad named entity: nsub without a semi-colon.: qq'&nsub'
-ok 711 - Bad named entity: Nu without a semi-colon.: qq'&Nu'
-ok 712 - Bad named entity: nu without a semi-colon.: qq'&nu'
-ok 713 - Bad named entity: OElig without a semi-colon.: qq'&OElig'
-ok 714 - Bad named entity: oelig without a semi-colon.: qq'&oelig'
-ok 715 - Bad named entity: oline without a semi-colon.: qq'&oline'
-ok 716 - Bad named entity: Omega without a semi-colon.: qq'&Omega'
-ok 717 - Bad named entity: omega without a semi-colon.: qq'&omega'
-ok 718 - Bad named entity: Omicron without a semi-colon.: qq'&Omicron'
-ok 719 - Bad named entity: omicron without a semi-colon.: qq'&omicron'
-ok 720 - Bad named entity: oplus without a semi-colon.: qq'&oplus'
-ok 721 - Bad named entity: or without a semi-colon.: qq'&or'
-ok 722 - Bad named entity: otimes without a semi-colon.: qq'&otimes'
-ok 723 - Bad named entity: part without a semi-colon.: qq'&part'
-ok 724 - Bad named entity: permil without a semi-colon.: qq'&permil'
-ok 725 - Bad named entity: perp without a semi-colon.: qq'&perp'
-ok 726 - Bad named entity: Phi without a semi-colon.: qq'&Phi'
-ok 727 - Bad named entity: phi without a semi-colon.: qq'&phi'
-ok 728 - Bad named entity: Pi without a semi-colon.: qq'&Pi'
-ok 729 - Bad named entity: pi without a semi-colon.: qq'&pi'
-ok 730 - Bad named entity: piv without a semi-colon.: qq'&piv'
-ok 731 - Bad named entity: prime without a semi-colon.: qq'&prime'
-ok 732 - Bad named entity: prime without a semi-colon.: qq'&prime'
-ok 733 - Bad named entity: prod without a semi-colon.: qq'&prod'
-ok 734 - Bad named entity: prop without a semi-colon.: qq'&prop'
-ok 735 - Bad named entity: Psi without a semi-colon.: qq'&Psi'
-ok 736 - Bad named entity: psi without a semi-colon.: qq'&psi'
-ok 737 - Bad named entity: radic without a semi-colon.: qq'&radic'
-ok 738 - Bad named entity: rang without a semi-colon.: qq'&rang'
-ok 739 - Bad named entity: rarr without a semi-colon.: qq'&rarr'
-ok 740 - Bad named entity: rarr without a semi-colon.: qq'&rarr'
-ok 741 - Bad named entity: rceil without a semi-colon.: qq'&rceil'
-ok 742 - Bad named entity: rdquo without a semi-colon.: qq'&rdquo'
-ok 743 - Bad named entity: real without a semi-colon.: qq'&real'
-ok 744 - Bad named entity: rfloor without a semi-colon.: qq'&rfloor'
-ok 745 - Bad named entity: Rho without a semi-colon.: qq'&Rho'
-ok 746 - Bad named entity: rho without a semi-colon.: qq'&rho'
-ok 747 - Bad named entity: rlm without a semi-colon.: qq'&rlm'
-ok 748 - Bad named entity: rsaquo without a semi-colon.: qq'&rsaquo'
-ok 749 - Bad named entity: rsquo without a semi-colon.: qq'&rsquo'
-ok 750 - Bad named entity: sbquo without a semi-colon.: qq'&sbquo'
-ok 751 - Bad named entity: Scaron without a semi-colon.: qq'&Scaron'
-ok 752 - Bad named entity: scaron without a semi-colon.: qq'&scaron'
-ok 753 - Bad named entity: sdot without a semi-colon.: qq'&sdot'
-ok 754 - Bad named entity: Sigma without a semi-colon.: qq'&Sigma'
-ok 755 - Bad named entity: sigma without a semi-colon.: qq'&sigma'
-ok 756 - Bad named entity: sigmaf without a semi-colon.: qq'&sigmaf'
-ok 757 - Bad named entity: sim without a semi-colon.: qq'&sim'
-ok 758 - Bad named entity: spades without a semi-colon.: qq'&spades'
-ok 759 - Bad named entity: sub without a semi-colon.: qq'&sub'
-ok 760 - Bad named entity: sube without a semi-colon.: qq'&sube'
-ok 761 - Bad named entity: sum without a semi-colon.: qq'&sum'
-ok 762 - Bad named entity: sup without a semi-colon.: qq'&sup'
-ok 763 - Bad named entity: supe without a semi-colon.: qq'&supe'
-ok 764 - Bad named entity: Tau without a semi-colon.: qq'&Tau'
-ok 765 - Bad named entity: tau without a semi-colon.: qq'&tau'
-ok 766 - Bad named entity: there4 without a semi-colon.: qq'&there4'
-ok 767 - Bad named entity: Theta without a semi-colon.: qq'&Theta'
-ok 768 - Bad named entity: theta without a semi-colon.: qq'&theta'
-ok 769 - Bad named entity: thetasym without a semi-colon.: qq'&thetasym'
-ok 770 - Bad named entity: thinsp without a semi-colon.: qq'&thinsp'
-ok 771 - Bad named entity: tilde without a semi-colon.: qq'&tilde'
-ok 772 - Bad named entity: trade without a semi-colon.: qq'&trade'
-ok 773 - Bad named entity: uarr without a semi-colon.: qq'&uarr'
-ok 774 - Bad named entity: uarr without a semi-colon.: qq'&uarr'
-ok 775 - Bad named entity: upsih without a semi-colon.: qq'&upsih'
-ok 776 - Bad named entity: Upsilon without a semi-colon.: qq'&Upsilon'
-ok 777 - Bad named entity: upsilon without a semi-colon.: qq'&upsilon'
-ok 778 - Bad named entity: weierp without a semi-colon.: qq'&weierp'
-ok 779 - Bad named entity: Xi without a semi-colon.: qq'&Xi'
-ok 780 - Bad named entity: xi without a semi-colon.: qq'&xi'
-ok 781 - Bad named entity: Yuml without a semi-colon.: qq'&Yuml'
-ok 782 - Bad named entity: Zeta without a semi-colon.: qq'&Zeta'
-ok 783 - Bad named entity: zeta without a semi-colon.: qq'&zeta'
-ok 784 - Bad named entity: zwj without a semi-colon.: qq'&zwj'
-ok 785 - Bad named entity: zwnj without a semi-colon.: qq'&zwnj'
-ok 786 - Bad named entity: zwnj without a semi-colon.: qq'&zwnj'
+not ok 710 - Bad named entity: nsub without a semi-colon.: qq'&nsub'
+#   Failed test 'Bad named entity: nsub without a semi-colon.: qq'&nsub''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&nsub'       |  5|            qq'&nsub'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 711 - Bad named entity: Nu without a semi-colon.: qq'&Nu'
+#   Failed test 'Bad named entity: Nu without a semi-colon.: qq'&Nu''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Nu'         |  5|            qq'&Nu'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 712 - Bad named entity: nu without a semi-colon.: qq'&nu'
+#   Failed test 'Bad named entity: nu without a semi-colon.: qq'&nu''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&nu'         |  5|            qq'&nu'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 713 - Bad named entity: OElig without a semi-colon.: qq'&OElig'
+#   Failed test 'Bad named entity: OElig without a semi-colon.: qq'&OElig''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&OElig'      |  5|            qq'&OElig'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 714 - Bad named entity: oelig without a semi-colon.: qq'&oelig'
+#   Failed test 'Bad named entity: oelig without a semi-colon.: qq'&oelig''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&oelig'      |  5|            qq'&oelig'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 715 - Bad named entity: oline without a semi-colon.: qq'&oline'
+#   Failed test 'Bad named entity: oline without a semi-colon.: qq'&oline''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&oline'      |  5|            qq'&oline'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 716 - Bad named entity: Omega without a semi-colon.: qq'&Omega'
+#   Failed test 'Bad named entity: Omega without a semi-colon.: qq'&Omega''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Omega'      |  5|            qq'&Omega'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 717 - Bad named entity: omega without a semi-colon.: qq'&omega'
+#   Failed test 'Bad named entity: omega without a semi-colon.: qq'&omega''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&omega'      |  5|            qq'&omega'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 718 - Bad named entity: Omicron without a semi-colon.: qq'&Omicron'
+#   Failed test 'Bad named entity: Omicron without a semi-colon.: qq'&Omicron''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Omicron'    |  5|            qq'&Omicron'    |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 719 - Bad named entity: omicron without a semi-colon.: qq'&omicron'
+#   Failed test 'Bad named entity: omicron without a semi-colon.: qq'&omicron''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&omicron'    |  5|            qq'&omicron'    |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 720 - Bad named entity: oplus without a semi-colon.: qq'&oplus'
+#   Failed test 'Bad named entity: oplus without a semi-colon.: qq'&oplus''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&oplus'      |  5|            qq'&oplus'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 721 - Bad named entity: or without a semi-colon.: qq'&or'
+#   Failed test 'Bad named entity: or without a semi-colon.: qq'&or''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&or'         |  5|            qq'&or'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 722 - Bad named entity: otimes without a semi-colon.: qq'&otimes'
+#   Failed test 'Bad named entity: otimes without a semi-colon.: qq'&otimes''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&otimes'     |  5|            qq'&otimes'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 723 - Bad named entity: part without a semi-colon.: qq'&part'
+#   Failed test 'Bad named entity: part without a semi-colon.: qq'&part''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&part'       |  5|            qq'&part'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 724 - Bad named entity: permil without a semi-colon.: qq'&permil'
+#   Failed test 'Bad named entity: permil without a semi-colon.: qq'&permil''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&permil'     |  5|            qq'&permil'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 725 - Bad named entity: perp without a semi-colon.: qq'&perp'
+#   Failed test 'Bad named entity: perp without a semi-colon.: qq'&perp''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&perp'       |  5|            qq'&perp'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 726 - Bad named entity: Phi without a semi-colon.: qq'&Phi'
+#   Failed test 'Bad named entity: Phi without a semi-colon.: qq'&Phi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Phi'        |  5|            qq'&Phi'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 727 - Bad named entity: phi without a semi-colon.: qq'&phi'
+#   Failed test 'Bad named entity: phi without a semi-colon.: qq'&phi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&phi'        |  5|            qq'&phi'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 728 - Bad named entity: Pi without a semi-colon.: qq'&Pi'
+#   Failed test 'Bad named entity: Pi without a semi-colon.: qq'&Pi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Pi'         |  5|            qq'&Pi'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 729 - Bad named entity: pi without a semi-colon.: qq'&pi'
+#   Failed test 'Bad named entity: pi without a semi-colon.: qq'&pi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&pi'         |  5|            qq'&pi'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 730 - Bad named entity: piv without a semi-colon.: qq'&piv'
+#   Failed test 'Bad named entity: piv without a semi-colon.: qq'&piv''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&piv'        |  5|            qq'&piv'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 731 - Bad named entity: prime without a semi-colon.: qq'&prime'
+#   Failed test 'Bad named entity: prime without a semi-colon.: qq'&prime''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&prime'      |  5|            qq'&prime'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 732 - Bad named entity: prime without a semi-colon.: qq'&prime'
+#   Failed test 'Bad named entity: prime without a semi-colon.: qq'&prime''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&prime'      |  5|            qq'&prime'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 733 - Bad named entity: prod without a semi-colon.: qq'&prod'
+#   Failed test 'Bad named entity: prod without a semi-colon.: qq'&prod''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&prod'       |  5|            qq'&prod'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 734 - Bad named entity: prop without a semi-colon.: qq'&prop'
+#   Failed test 'Bad named entity: prop without a semi-colon.: qq'&prop''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&prop'       |  5|            qq'&prop'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 735 - Bad named entity: Psi without a semi-colon.: qq'&Psi'
+#   Failed test 'Bad named entity: Psi without a semi-colon.: qq'&Psi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Psi'        |  5|            qq'&Psi'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 736 - Bad named entity: psi without a semi-colon.: qq'&psi'
+#   Failed test 'Bad named entity: psi without a semi-colon.: qq'&psi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&psi'        |  5|            qq'&psi'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 737 - Bad named entity: radic without a semi-colon.: qq'&radic'
+#   Failed test 'Bad named entity: radic without a semi-colon.: qq'&radic''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&radic'      |  5|            qq'&radic'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 738 - Bad named entity: rang without a semi-colon.: qq'&rang'
+#   Failed test 'Bad named entity: rang without a semi-colon.: qq'&rang''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rang'       |  5|            qq'&rang'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 739 - Bad named entity: rarr without a semi-colon.: qq'&rarr'
+#   Failed test 'Bad named entity: rarr without a semi-colon.: qq'&rarr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rarr'       |  5|            qq'&rarr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 740 - Bad named entity: rarr without a semi-colon.: qq'&rarr'
+#   Failed test 'Bad named entity: rarr without a semi-colon.: qq'&rarr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rarr'       |  5|            qq'&rarr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 741 - Bad named entity: rceil without a semi-colon.: qq'&rceil'
+#   Failed test 'Bad named entity: rceil without a semi-colon.: qq'&rceil''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rceil'      |  5|            qq'&rceil'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 742 - Bad named entity: rdquo without a semi-colon.: qq'&rdquo'
+#   Failed test 'Bad named entity: rdquo without a semi-colon.: qq'&rdquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rdquo'      |  5|            qq'&rdquo'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 743 - Bad named entity: real without a semi-colon.: qq'&real'
+#   Failed test 'Bad named entity: real without a semi-colon.: qq'&real''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&real'       |  5|            qq'&real'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 744 - Bad named entity: rfloor without a semi-colon.: qq'&rfloor'
+#   Failed test 'Bad named entity: rfloor without a semi-colon.: qq'&rfloor''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rfloor'     |  5|            qq'&rfloor'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 745 - Bad named entity: Rho without a semi-colon.: qq'&Rho'
+#   Failed test 'Bad named entity: Rho without a semi-colon.: qq'&Rho''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Rho'        |  5|            qq'&Rho'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 746 - Bad named entity: rho without a semi-colon.: qq'&rho'
+#   Failed test 'Bad named entity: rho without a semi-colon.: qq'&rho''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rho'        |  5|            qq'&rho'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 747 - Bad named entity: rlm without a semi-colon.: qq'&rlm'
+#   Failed test 'Bad named entity: rlm without a semi-colon.: qq'&rlm''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rlm'        |  5|            qq'&rlm'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 748 - Bad named entity: rsaquo without a semi-colon.: qq'&rsaquo'
+#   Failed test 'Bad named entity: rsaquo without a semi-colon.: qq'&rsaquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rsaquo'     |  5|            qq'&rsaquo'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 749 - Bad named entity: rsquo without a semi-colon.: qq'&rsquo'
+#   Failed test 'Bad named entity: rsquo without a semi-colon.: qq'&rsquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&rsquo'      |  5|            qq'&rsquo'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 750 - Bad named entity: sbquo without a semi-colon.: qq'&sbquo'
+#   Failed test 'Bad named entity: sbquo without a semi-colon.: qq'&sbquo''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sbquo'      |  5|            qq'&sbquo'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 751 - Bad named entity: Scaron without a semi-colon.: qq'&Scaron'
+#   Failed test 'Bad named entity: Scaron without a semi-colon.: qq'&Scaron''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Scaron'     |  5|            qq'&Scaron'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 752 - Bad named entity: scaron without a semi-colon.: qq'&scaron'
+#   Failed test 'Bad named entity: scaron without a semi-colon.: qq'&scaron''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&scaron'     |  5|            qq'&scaron'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 753 - Bad named entity: sdot without a semi-colon.: qq'&sdot'
+#   Failed test 'Bad named entity: sdot without a semi-colon.: qq'&sdot''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sdot'       |  5|            qq'&sdot'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 754 - Bad named entity: Sigma without a semi-colon.: qq'&Sigma'
+#   Failed test 'Bad named entity: Sigma without a semi-colon.: qq'&Sigma''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Sigma'      |  5|            qq'&Sigma'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 755 - Bad named entity: sigma without a semi-colon.: qq'&sigma'
+#   Failed test 'Bad named entity: sigma without a semi-colon.: qq'&sigma''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sigma'      |  5|            qq'&sigma'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 756 - Bad named entity: sigmaf without a semi-colon.: qq'&sigmaf'
+#   Failed test 'Bad named entity: sigmaf without a semi-colon.: qq'&sigmaf''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sigmaf'     |  5|            qq'&sigmaf'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 757 - Bad named entity: sim without a semi-colon.: qq'&sim'
+#   Failed test 'Bad named entity: sim without a semi-colon.: qq'&sim''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sim'        |  5|            qq'&sim'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 758 - Bad named entity: spades without a semi-colon.: qq'&spades'
+#   Failed test 'Bad named entity: spades without a semi-colon.: qq'&spades''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&spades'     |  5|            qq'&spades'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 759 - Bad named entity: sub without a semi-colon.: qq'&sub'
+#   Failed test 'Bad named entity: sub without a semi-colon.: qq'&sub''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sub'        |  5|            qq'&sub'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 760 - Bad named entity: sube without a semi-colon.: qq'&sube'
+#   Failed test 'Bad named entity: sube without a semi-colon.: qq'&sube''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sube'       |  5|            qq'&sube'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 761 - Bad named entity: sum without a semi-colon.: qq'&sum'
+#   Failed test 'Bad named entity: sum without a semi-colon.: qq'&sum''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sum'        |  5|            qq'&sum'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 762 - Bad named entity: sup without a semi-colon.: qq'&sup'
+#   Failed test 'Bad named entity: sup without a semi-colon.: qq'&sup''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&sup'        |  5|            qq'&sup'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 763 - Bad named entity: supe without a semi-colon.: qq'&supe'
+#   Failed test 'Bad named entity: supe without a semi-colon.: qq'&supe''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&supe'       |  5|            qq'&supe'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 764 - Bad named entity: Tau without a semi-colon.: qq'&Tau'
+#   Failed test 'Bad named entity: Tau without a semi-colon.: qq'&Tau''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Tau'        |  5|            qq'&Tau'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 765 - Bad named entity: tau without a semi-colon.: qq'&tau'
+#   Failed test 'Bad named entity: tau without a semi-colon.: qq'&tau''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&tau'        |  5|            qq'&tau'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 766 - Bad named entity: there4 without a semi-colon.: qq'&there4'
+#   Failed test 'Bad named entity: there4 without a semi-colon.: qq'&there4''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&there4'     |  5|            qq'&there4'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 767 - Bad named entity: Theta without a semi-colon.: qq'&Theta'
+#   Failed test 'Bad named entity: Theta without a semi-colon.: qq'&Theta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Theta'      |  5|            qq'&Theta'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 768 - Bad named entity: theta without a semi-colon.: qq'&theta'
+#   Failed test 'Bad named entity: theta without a semi-colon.: qq'&theta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&theta'      |  5|            qq'&theta'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 769 - Bad named entity: thetasym without a semi-colon.: qq'&thetasym'
+#   Failed test 'Bad named entity: thetasym without a semi-colon.: qq'&thetasym''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&thetasym'   |  5|            qq'&thetasym'   |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 770 - Bad named entity: thinsp without a semi-colon.: qq'&thinsp'
+#   Failed test 'Bad named entity: thinsp without a semi-colon.: qq'&thinsp''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&thinsp'     |  5|            qq'&thinsp'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 771 - Bad named entity: tilde without a semi-colon.: qq'&tilde'
+#   Failed test 'Bad named entity: tilde without a semi-colon.: qq'&tilde''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&tilde'      |  5|            qq'&tilde'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 772 - Bad named entity: trade without a semi-colon.: qq'&trade'
+#   Failed test 'Bad named entity: trade without a semi-colon.: qq'&trade''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&trade'      |  5|            qq'&trade'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 773 - Bad named entity: uarr without a semi-colon.: qq'&uarr'
+#   Failed test 'Bad named entity: uarr without a semi-colon.: qq'&uarr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&uarr'       |  5|            qq'&uarr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 774 - Bad named entity: uarr without a semi-colon.: qq'&uarr'
+#   Failed test 'Bad named entity: uarr without a semi-colon.: qq'&uarr''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&uarr'       |  5|            qq'&uarr'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 775 - Bad named entity: upsih without a semi-colon.: qq'&upsih'
+#   Failed test 'Bad named entity: upsih without a semi-colon.: qq'&upsih''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&upsih'      |  5|            qq'&upsih'      |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 776 - Bad named entity: Upsilon without a semi-colon.: qq'&Upsilon'
+#   Failed test 'Bad named entity: Upsilon without a semi-colon.: qq'&Upsilon''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Upsilon'    |  5|            qq'&Upsilon'    |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 777 - Bad named entity: upsilon without a semi-colon.: qq'&upsilon'
+#   Failed test 'Bad named entity: upsilon without a semi-colon.: qq'&upsilon''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&upsilon'    |  5|            qq'&upsilon'    |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 778 - Bad named entity: weierp without a semi-colon.: qq'&weierp'
+#   Failed test 'Bad named entity: weierp without a semi-colon.: qq'&weierp''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&weierp'     |  5|            qq'&weierp'     |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 779 - Bad named entity: Xi without a semi-colon.: qq'&Xi'
+#   Failed test 'Bad named entity: Xi without a semi-colon.: qq'&Xi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Xi'         |  5|            qq'&Xi'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 780 - Bad named entity: xi without a semi-colon.: qq'&xi'
+#   Failed test 'Bad named entity: xi without a semi-colon.: qq'&xi''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&xi'         |  5|            qq'&xi'         |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 781 - Bad named entity: Yuml without a semi-colon.: qq'&Yuml'
+#   Failed test 'Bad named entity: Yuml without a semi-colon.: qq'&Yuml''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Yuml'       |  5|            qq'&Yuml'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 782 - Bad named entity: Zeta without a semi-colon.: qq'&Zeta'
+#   Failed test 'Bad named entity: Zeta without a semi-colon.: qq'&Zeta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&Zeta'       |  5|            qq'&Zeta'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 783 - Bad named entity: zeta without a semi-colon.: qq'&zeta'
+#   Failed test 'Bad named entity: zeta without a semi-colon.: qq'&zeta''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&zeta'       |  5|            qq'&zeta'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 784 - Bad named entity: zwj without a semi-colon.: qq'&zwj'
+#   Failed test 'Bad named entity: zwj without a semi-colon.: qq'&zwj''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&zwj'        |  5|            qq'&zwj'        |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 785 - Bad named entity: zwnj without a semi-colon.: qq'&zwnj'
+#   Failed test 'Bad named entity: zwnj without a semi-colon.: qq'&zwnj''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&zwnj'       |  5|            qq'&zwnj'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
+not ok 786 - Bad named entity: zwnj without a semi-colon.: qq'&zwnj'
+#   Failed test 'Bad named entity: zwnj without a semi-colon.: qq'&zwnj''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# |  4|            qq'&zwnj'       |  5|            qq'&zwnj'       |
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
+# 
 ok 787 - CR as numeric entity: qq'&\#013;'
 ok 788 - CR as hexadecimal numeric entity: qq'&\#x00D;'
 ok 789 - Windows-1252 EURO SIGN numeric entity.: qq'&\#0128;'
@@ -2719,4 +5114,4 @@ ok 1172 - start tag not closed (self-closing start tag): qq'<p class=\x{27}a\x{2
 ok 1173 - end tag not closed (self-closing start tag): qq'</p/'
 ok 1174 - end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/'
 1..1174
-# Looks like you failed 85 tests of 1174.
+# Looks like you failed 243 tests of 1174.

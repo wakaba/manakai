@@ -4880,6 +4880,7 @@ sub _get_next_token ($) {
             $self->{ge}->{$self->{kwd}}) { ## XML general entities.
           if ($nc == 0x003B) { # ;
             if (defined $self->{ge}->{$self->{kwd}}) {
+              ## A declared XML entity.
               if ($self->{ge}->{$self->{kwd}}->{only_text}) {
                 
                 $self->{entity__value} = $self->{ge}->{$self->{kwd}}->{value};
@@ -4894,7 +4895,9 @@ sub _get_next_token ($) {
                 $self->{entity__value} = '&' . $self->{kwd}; ## TODO: expand
               }
             } else {
+              ## An HTML character reference.
               if ($self->{is_xml}) {
+                ## Not a declared XML entity.
                 
                 $self->{parse_error}->(level => $self->{level}->{must}, type => 'entity not declared', ## TODO: type
                                 value => $self->{kwd},
@@ -4943,11 +4946,15 @@ sub _get_next_token ($) {
             redo A;
           }
         } else {
-          
-          $self->{entity__value} .= chr $nc;
-          $self->{entity__match} *= 2; ## Matched (positive) or not (zero)
-          ## Stay in the state.
-          
+          if ($nc == 0x003B) { # ;
+            ## A reserved HTML character reference.
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'entity not declared', ## XXXtype
+                            value => $self->{kwd},
+                            level => $self->{level}->{must});
+            $self->{entity__value} .= chr $nc;
+            $self->{entity__match} *= 2; ## Matched (positive) or not (zero)
+            
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
@@ -4958,7 +4965,25 @@ sub _get_next_token ($) {
       $self->{set_nc}->($self);
     }
   
-          redo A;
+            #
+          } else {
+            
+            $self->{entity__value} .= chr $nc;
+            $self->{entity__match} *= 2; ## Matched (positive) or not (zero)
+            ## Stay in the state.
+            
+    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      $self->{column}++;
+      $self->{nc}
+          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+    } else {
+      $self->{set_nc}->($self);
+    }
+  
+            redo A;
+          }
         }
       } elsif ($nc == 0x003D) { # =
         if ($self->{entity__match} < 0 and
@@ -4970,13 +4995,17 @@ sub _get_next_token ($) {
 
       my $data;
       my $has_ref;
-      if ($self->{entity__match} > 0) { ## Exactly matched to ";" entity.
+      if ($self->{entity__match} > 0) { ## A ";" entity.
         
         $data = $self->{entity__value};
+        ## Strictly speaking the $has_ref flag should not be set if
+        ## there is no matched entity.  However, this flag is used
+        ## only in contexts where use of an
+        ## unexpanded-entity-reference-like string is in no way
+        ## allowed, so it should not make any difference in theory.
         $has_ref = 1;
         #
       } elsif ($self->{entity__match} < 0) { ## Matched to non-";" entity.
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc');
         if ($self->{prev_state} != DATA_STATE and # in attribute
             $self->{prev_state} != RCDATA_STATE and
             $self->{entity__match} < -1) {
@@ -4990,17 +5019,16 @@ sub _get_next_token ($) {
           ## string is replaced as a character reference.  In any
           ## context, matched non-";" string with or without trailing
           ## alphabetical letters is replaced as a character reference
-          ## (with trailing letters).
+          ## (with trailing letters).  Note that use of a no-";"
+          ## character reference is always non-conforming.
           
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no refc');
           $data = $self->{entity__value};
           $has_ref = 1;
           #
         }
       } else { ## Unmatched string.
         
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bare ero',
-                        line => $self->{line_prev},
-                        column => $self->{column_prev} - length $self->{kwd});
         $data = '&' . $self->{kwd};
         #
       }
