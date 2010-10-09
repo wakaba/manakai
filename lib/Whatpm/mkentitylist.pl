@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
 
 use lib qw[../];
 my $EntitiesFileName = 'Entities.html';
@@ -58,7 +59,9 @@ for my $tr (@row) {
   } @{$tr->child_nodes};
   my $name = $n->($td[0]->text_content);
   my $value = $n->($td[1]->text_content);
-  $Entity->{$name} = chr hex substr $value, 2; # U+HHHH
+  $value =~ tr/U+0-9A-Fa-f//cd;
+  $value =~ s/U\+([0-9A-Fa-f]+)/chr hex $1/ge;
+  $Entity->{$name} = $value;
 }
 
 use Data::Dumper;
@@ -79,31 +82,32 @@ _NamedEntityList.pm - A named entity list for HTML parser
 
 =head1 DESCRIPTION
 
-The C<_NamedEntityList.pm> file contains a list of named entities
-used in HTML documents, both conforming and non-conforming.
-It is referenced by C<ContentHTML.pm>.  For more
-information, see L<Whatpm::HTML>.
+The C<Whatpm/_NamedEntityList.pm> file contains the list of the named
+character references taht can be used in HTML documents, as defined by
+the Web Applications 1.0 specification, both conforming and
+non-conforming.  The file is referenced by the HTML tokenizer
+implementation, L<Whatpm::HTML::Tokenizer>.
 
-The C<mkentitylist.pl> script is used to generate
-the C<_NamedEntityList.pm> file from the table in the HTML5
-specification.
+The C<mkentitylist.pl> script is used to generate the
+C<_NamedEntityList.pm> file from the table of the named character
+references in the Web Applications 1.0 specification.
 
 =head1 SEE ALSO
 
-L<Whatpm::HTML>.
+L<Whatpm::HTML::Tokenizer>.
 
-HTML 5 - Entities
-<http://www.whatwg.org/specs/web-apps/current-work/#entities>
+Web Applications 1.0 - Named character references
+<http://www.whatwg.org/specs/web-apps/current-work/complete.html#named-character-references>.
 
 =head1 LICENSE
 
-(C) Copyright 2004-2007 Apple Computer, Inc., Mozilla Foundation,
-and Opera Software ASA.
+(C) Copyright 2004-2007 Apple Computer, Inc., Mozilla Foundation, and
+Opera Software ASA.
 
-Copyright 2007 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
 
-You are granted a license to use, reproduce and create derivative works 
-of this document.
+You are granted a license to use, reproduce and create derivative
+works of this document.
 
 =cut
 

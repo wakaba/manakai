@@ -26,3 +26,14 @@ no DOCTYPE
 |   <body>
 |     <p>
 |       "aaa\uFFFD\uFFFD\uFFFD\uFFFD"
+
+#data
+<p>...&NotNestedGreaterGreater;?
+#errors
+no DOCTYPE
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "...\u2aa2\u0338?"
