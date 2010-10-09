@@ -124,7 +124,7 @@ my $HTMLFlowContent = {
     br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
-    b => 1, bdo => 1, ruby => 1,
+    b => 1, bdo => 1, ruby => 1, s => 1,
     script => 1, noscript => 1,
     command => 1, device => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
@@ -171,7 +171,7 @@ my $HTMLPhrasingContent = {
     br => 1, q => 1, cite => 1, em => 1, strong => 1, small => 1, mark => 1,
     dfn => 1, abbr => 1, time => 1, progress => 1, meter => 1, code => 1,
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
-    b => 1, bdo => 1, ruby => 1,
+    b => 1, bdo => 1, ruby => 1, s => 1,
     script => 1, noscript => 1,
     command => 1, device => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
@@ -4635,6 +4635,15 @@ $Element->{+HTML_NS}->{tt} = {
 
 $Element->{+HTML_NS}->{s} = {
   %HTMLPhrasingContentChecker,
+  status => FEATURE_HTML5_DEFAULT,
+  check_attrs => $GetHTMLAttrsChecker->({}, {
+    %HTMLAttrStatus,
+    %HTMLM12NCommonAttrStatus,
+  }), # check_attrs
+}; # s
+
+$Element->{+HTML_NS}->{strike} = {
+  %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
@@ -4642,9 +4651,7 @@ $Element->{+HTML_NS}->{s} = {
   }), # check_attrs
 }; # s
 
-$Element->{+HTML_NS}->{strike} = $Element->{+HTML_NS}->{s};
-
-$Element->{+HTML_NS}->{u} = $Element->{+HTML_NS}->{s};
+$Element->{+HTML_NS}->{u} = $Element->{+HTML_NS}->{strike};
 
 $Element->{+HTML_NS}->{blink} = {
   %HTMLPhrasingContentChecker,

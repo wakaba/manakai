@@ -2069,55 +2069,44 @@
 #data
 <s xmlns="http://www.w3.org/1999/xhtml"></s>
 #errors
-/s;element not defined;m
 /s;no significant content;s
 
 #data
 <s xmlns="http://www.w3.org/1999/xhtml">  </s>
 #errors
-/s;element not defined;m
 /s;no significant content;s
 
 #data
 <s xmlns="http://www.w3.org/1999/xhtml">x</s>
 #errors
-/s;element not defined;m
 
 #data
 <s xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></s>
 #errors
-/s;element not defined;m
 
 #data
 <s xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</s>
 #errors
-/s;element not defined;m
 /s/style;element not allowed:phrasing;m
 /s/style;SUBDOC;text/css
 
 #data
 <s xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></s>
 #errors
-/s;element not defined;m
 /s/p;element not allowed:phrasing;m
 
 #data
 <span xmlns="http://www.w3.org/1999/xhtml"><s>xx</s></span>
 #errors
-/span/s;element not allowed:phrasing;m
-/span/s;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><s>xx</s></div>
 #errors
-/div/s;element not allowed:flow;m
-/div/s;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><s>xx</s></rule>
 #errors
 /rule;element not defined;m
-/rule/s;element not defined;m
 
 #data
 <strike xmlns="http://www.w3.org/1999/xhtml"></strike>
