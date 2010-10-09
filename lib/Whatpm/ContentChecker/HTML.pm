@@ -1500,17 +1500,18 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
 );
 
 for (qw(
+
   onabort oncanplay oncanplaythrough onchange onclick oncontextmenu
   ondblclick ondrag ondragend ondragenter ondragleave ondragover
   ondragstart ondrop ondurationchange onemptied onended onformchange
   onforminput oninput oninvalid onkeydown onkeypress onkeyup
   onloadeddata onloadedmetadata onloadstart onmousedown onmousemove
   onmouseout onmouseover onmouseup onmousewheel onpause onplay
-  onplaying onprogress onratechange onreadystatechange onscroll
+  onplaying onprogress onratechange onreadystatechange onreset
   onseeked onseeking onselect onshow onstalled onsubmit onsuspend
   ontimeupdate onvolumechange onwaiting
 
-  onblur onerror onfocus onload
+  onblur onerror onfocus onload onscroll
 )) {
   $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
   $HTMLAttrStatus{$_} = FEATURE_HTML5_LC;
@@ -3088,6 +3089,7 @@ $Element->{+HTML_NS}->{body} = {
     onpopstate => $HTMLEventHandlerAttrChecker,
     onredo => $HTMLEventHandlerAttrChecker,
     onresize => $HTMLEventHandlerAttrChecker,
+    onscroll => $HTMLEventHandlerAttrChecker,
     onstorage => $HTMLEventHandlerAttrChecker,
     onundo => $HTMLEventHandlerAttrChecker,
     onunload => $HTMLEventHandlerAttrChecker,
@@ -3125,6 +3127,7 @@ $Element->{+HTML_NS}->{body} = {
     onpopstate => FEATURE_HTML5_LC,
     onredo => FEATURE_HTML5_LC,
     onresize => FEATURE_HTML5_LC,
+    onscroll => FEATURE_HTML5_LC,
     onstorage => FEATURE_HTML5_LC,
     onundo => FEATURE_HTML5_LC,
     onunload => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -7093,8 +7096,6 @@ $Element->{+HTML_NS}->{form} = {
     name => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     novalidate => FEATURE_HTML5_LC,
     onreceived => FEATURE_OBSVOCAB,
-    onreset => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
-    onsubmit => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     replace => FEATURE_OBSVOCAB,
     target => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     utn => FEATURE_OBSVOCAB,
@@ -9170,6 +9171,7 @@ $Element->{+HTML_NS}->{frameset} = {
     onpopstate => $HTMLEventHandlerAttrChecker,
     onredo => $HTMLEventHandlerAttrChecker,
     onresize => $HTMLEventHandlerAttrChecker,
+    onscroll => $HTMLEventHandlerAttrChecker,
     onstorage => $HTMLEventHandlerAttrChecker,
     onundo => $HTMLEventHandlerAttrChecker,
     onunload => $HTMLEventHandlerAttrChecker,
@@ -9197,6 +9199,7 @@ $Element->{+HTML_NS}->{frameset} = {
     onpopstate => FEATURE_OBSVOCAB,
     onredo => FEATURE_OBSVOCAB,
     onresize => FEATURE_OBSVOCAB,
+    onscroll => FEATURE_OBSVOCAB,
     onstorage => FEATURE_OBSVOCAB,
     onundo => FEATURE_OBSVOCAB,
     onunload => FEATURE_OBSVOCAB,
