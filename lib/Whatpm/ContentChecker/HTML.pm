@@ -4414,15 +4414,15 @@ $Element->{+HTML_NS}->{time} = {
             Z
             $reg_sp*
           |
-            [+-]([0-9]+):([0-9]+) # 7, 8
+            ([+-])([0-9]+):([0-9]+) # 7, 8, 9
             $reg_sp*
           )?
         )?
         \z
       |
-        :([0-9]+) # 9
+        :([0-9]+) # 10
         (?:
-          :([0-9]+(?>\.[0-9]+)?) # 10
+          :([0-9]+(?>\.[0-9]+)?) # 11
         )?
         $reg_sp*
         \z
@@ -4460,8 +4460,8 @@ $Element->{+HTML_NS}->{time} = {
 
         ($hour, $minute, $second) = ($4, $5, $6);
           
-        if (defined $7) { ## [+-]hh:mm
-          if (length $7 != 2 or length $8 != 2) {
+        if (defined $8) { ## [+-]hh:mm
+          if (length $8 != 2 or length $9 != 2) {
             $self->{onerror}->(node => $input_node,
                                type => 'dateortime:syntax error',
                                level => $self->{level}->{must});
@@ -4471,21 +4471,26 @@ $Element->{+HTML_NS}->{time} = {
           $self->{onerror}->(node => $input_node,
                              type => 'datetime:bad timezone hour',
                              level => $self->{level}->{must})
-              if $7 > 23;
+              if $8 > 23;
           $self->{onerror}->(node => $input_node,
                              type => 'datetime:bad timezone minute',
                              level => $self->{level}->{must})
-              if $8 > 59;
+              if $9 > 59;
+          if ($7 eq '-' and $8 == 0 and $9 == 0) {
+            $self->{onerror}->(node => $input_node,
+                               type => 'datetime:-00:00', # XXXtype
+                               level => $self->{level}->{must}); # don't return
+          }
         }
       } else { ## hh:mm
-        if (length $1 != 2 or length $9 != 2) {
+        if (length $1 != 2 or length $10 != 2) {
           $self->{onerror}->(node => $input_node,
                              type => qq'dateortime:syntax error',
                              level => $self->{level}->{must});
           $has_syntax_error = 1;
         }
 
-        ($hour, $minute, $second) = ($1, $9, $10);
+        ($hour, $minute, $second) = ($1, $10, $11);
 
         if ($need_a_date) {
           $self->{onerror}->(node => $input_node,

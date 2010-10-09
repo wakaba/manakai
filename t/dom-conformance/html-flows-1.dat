@@ -7541,6 +7541,7 @@ a
 <ins xmlns="http://www.w3.org/1999/xhtml"
     datetime="2007-02-21T23:00-00:00">x</ins>
 #errors
+/ins/@datetime;datetime:-00:00;m
 
 #data
 <ins xmlns="http://www.w3.org/1999/xhtml"
@@ -7617,6 +7618,27 @@ a
     datetime="2000-01-04Z">s</ins>
 #errors
 /ins/@datetime;dateandopttime:syntax error;m
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04T03:12:12+00:00">s</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04T03:12:12-01:00">s</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04T03:12:12-00:01">s</ins>
+#errors
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"
+    datetime="2000-01-04T03:12:12-00:00">s</ins>
+#errors
+/ins/@datetime;datetime:-00:00;m
 
 #data
 <del cite="http://test/" xmlns="http://www.w3.org/1999/xhtml">x</del>

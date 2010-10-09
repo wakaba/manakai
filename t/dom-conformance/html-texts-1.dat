@@ -616,6 +616,23 @@
 #errors
 
 #data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:40+00:00</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:40-10:00</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:40-00:01</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml">2008-12-23T14:44:40-00:00</time>
+#errors
+/time;datetime:-00:00;m
+
+#data
 <time xmlns="http://www.w3.org/1999/xhtml">2008-12-23&#x3000;14:44:44Z</time>
 #errors
 /time;dateortime:syntax error;m
@@ -721,6 +738,27 @@
 <time datetime="&#x0b;2008-12-23 14:44:44Z" xmlns="http://www.w3.org/1999/xhtml">today</time>
 #errors
 /time/@datetime;dateortime:syntax error;m
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml" datetime="1990-10-10T01:24:13+00:00">Z</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml" datetime="1990-10-10T01:24:13+00:00">Z</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml" datetime="1990-10-10T01:24:13-01:00">Z</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml" datetime="1990-10-10T01:24:13-00:01">Z</time>
+#errors
+
+#data
+<time xmlns="http://www.w3.org/1999/xhtml" datetime="1990-10-10T01:24:13-00:00">Z</time>
+#errors
+/time/@datetime;datetime:-00:00;m
 
 #data
 <time xmlns="http://www.w3.org/1999/xhtml">

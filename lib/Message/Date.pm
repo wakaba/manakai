@@ -303,7 +303,10 @@ sub parse_global_date_and_time_string ($$) {
       $zh = 0;
       $zm = 0;
     }
-    ## ISSUE: Maybe timezone -00:00 should have same semantics as in RFC 3339.
+    if ($zh eq '-00' and $zm eq '00') {
+      $self->{onerror}->(type => 'datetime:-00:00', # XXXtype
+                         level => $self->{level}->{must}); # don't return
+    }
 
     if (defined wantarray) {
       return $self->_create_object ($y, $M, $d, $h, $m, $s, $sf, $zh, $zm);
@@ -371,7 +374,10 @@ sub parse_date_string_with_optional_time ($$) {
         $zh = 0;
         $zm = 0;
       }
-      ## ISSUE: Maybe timezone -00:00 should have same semantics as in RFC 3339.
+      if ($zh eq '-00' and $zm eq '00') {
+        $self->{onerror}->(type => 'datetime:-00:00', # XXXtype
+                           level => $self->{level}->{must}); # don't return
+      }
 
       if (defined wantarray) {
         return $self->_create_object ($y, $M, $d, $h, $m, $s, $sf, $zh, $zm);
