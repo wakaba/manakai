@@ -2596,6 +2596,7 @@ $Element->{+HTML_NS}->{meta} = {
                            level => $self->{level}->{obsconforming});
       } elsif ($keyword eq 'set-cookie') {
         ## WA1 defines no |content| conformance for authors.
+        ## XXX Check |content| XXXobsvocab
         
         $self->{onerror}->(node => $el,
                            type => 'http-equiv:set-cookie', # XXX documentation
@@ -3569,7 +3570,7 @@ $Element->{+HTML_NS}->{ol} = {
     reversed => FEATURE_HTML5_LC,
     #start => FEATURE_HTML5_WD | FEATURE_M12N10_REC_DEPRECATED,
     start => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
-    type => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    type => FEATURE_HTML5_LC,
   }), # check_attrs
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
