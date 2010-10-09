@@ -7868,7 +7868,6 @@ $Element->{+HTML_NS}->{input} = {
         $self->{onerror}->(node => $attr,
                            type => 'unknown attribute',
                            level => $self->{level}->{uncertain});
-        ## ISSUE: No comformance createria for unknown attributes in the spec
       }
 
       $self->_attr_status_info ($attr, $status);
@@ -7878,7 +7877,14 @@ $Element->{+HTML_NS}->{input} = {
 
     my $el = $item->{node};
 
-    if ($state eq 'range') {
+    if ($state eq 'button') {
+      unless ($el->get_attribute_node_ns (undef, 'button')) {
+        $self->{onerror}->(node => $el,
+                           type => 'attribute missing',
+                           text => 'value',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($state eq 'range') {
       $element_state->{number_value}->{min} ||= 0;
       $element_state->{number_value}->{max} = 100
           unless defined $element_state->{number_value}->{max};
