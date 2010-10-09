@@ -7055,7 +7055,7 @@ $Element->{+HTML_NS}->{form} = {
     lcs => $GetHTMLBooleanAttrChecker->('lcs'),
     measure => $GetHTMLEnumeratedAttrChecker->({cid => 1, auto => 1}),
     method => $GetHTMLEnumeratedAttrChecker->({
-      get => 1, post => 1, put => 1, delete => 1,
+      get => 1, post => 1,
     }),
     name => sub {
       my ($self, $attr) = @_;
@@ -7601,12 +7601,12 @@ $Element->{+HTML_NS}->{input} = {
                'text/plain' => 1,
              }),
              formmethod => $GetHTMLEnumeratedAttrChecker->({
-               get => 1, post => 1, put => 1, delete => 1,
+               get => 1, post => 1,
              }),
              formnovalidate => $GetHTMLBooleanAttrChecker->('formnovalidate'),
              formtarget => $HTMLTargetAttrChecker,
              method => $GetHTMLEnumeratedAttrChecker->({
-               get => 1, post => 1, put => 1, delete => 1,
+               get => 1, post => 1,
              }),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
@@ -7648,7 +7648,7 @@ $Element->{+HTML_NS}->{input} = {
                'text/plain' => 1,
              }),
              formmethod => $GetHTMLEnumeratedAttrChecker->({
-               get => 1, post => 1, put => 1, delete => 1,
+               get => 1, post => 1,
              }),
              formnovalidate => $GetHTMLBooleanAttrChecker->('formnovalidate'),
              formtarget => $HTMLTargetAttrChecker,
@@ -7658,7 +7658,7 @@ $Element->{+HTML_NS}->{input} = {
              loop => $LegacyLoopChecker,
              lowsrc => $NonEmptyURLChecker,
              method => $GetHTMLEnumeratedAttrChecker->({
-               get => 1, post => 1, put => 1, delete => 1,
+               get => 1, post => 1,
              }),
              replace => $GetHTMLEnumeratedAttrChecker->({
                document => 1, values => 1,
@@ -8059,12 +8059,12 @@ $Element->{+HTML_NS}->{button} = {
       'text/plain' => 1,
     }),
     formmethod => $GetHTMLEnumeratedAttrChecker->({
-      get => 1, post => 1, put => 1, delete => 1,
+      get => 1, post => 1,
     }),
     formnovalidate => $GetHTMLBooleanAttrChecker->('formnovalidate'),
     formtarget => $HTMLTargetAttrChecker,
     method => $GetHTMLEnumeratedAttrChecker->({
-      get => 1, post => 1, put => 1, delete => 1,
+      get => 1, post => 1,
     }),
     name => $FormControlNameAttrChecker,
     replace => $GetHTMLEnumeratedAttrChecker->({document => 1, values => 1}),
