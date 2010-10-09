@@ -2594,6 +2594,14 @@ $Element->{+HTML_NS}->{meta} = {
         $self->{onerror}->(node => $el,
                            type => 'content-language', # XXX documentation
                            level => $self->{level}->{obsconforming});
+      } elsif ($keyword eq 'set-cookie') {
+        ## WA1 defines no |content| conformance for authors.
+        
+        $self->{onerror}->(node => $el,
+                           type => 'http-equiv:set-cookie', # XXX documentation
+                           level => $self->{level}->{must});
+      } elsif ($keyword eq 'pics-label') { # [WHATWGWiki]
+        ## XXX Check |content|
       } else {
         ## NOTE: |Content-Style-Type| and |Content-Script-Type|
         ## pragmas are listed in the table of the spec in the
