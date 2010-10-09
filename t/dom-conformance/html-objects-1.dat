@@ -5151,7 +5151,6 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 <iframe src="" sandbox="Allow-Forms"
     xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
-/iframe/@sandbox;word not allowed;m
 
 #data
 <iframe src="" sandbox="allow"
@@ -5167,6 +5166,12 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <iframe src="" sandbox="allow-forms allow-forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;duplicate token;m
+
+#data
+<iframe src="" sandbox="allow-forms allow-Forms"
     xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /iframe/@sandbox;duplicate token;m
@@ -5200,6 +5205,21 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 
 #data
 <iframe src="" sandbox="allow-forms allow-top-navigation"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="Allow-TOP-navigation"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="ALLOW-SAME-ORIGIN"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="Allow-Scripts"
     xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 

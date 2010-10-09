@@ -322,7 +322,7 @@ my $GetHTMLBooleanAttrChecker = sub {
   };
 }; # $GetHTMLBooleanAttrChecker
 
-## Unordered set of space-separated tokens
+## Unordered set of space-separated tokens, ASCII case-insensitive.
 my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
   my $allowed_words = shift;
   return sub {
@@ -330,6 +330,7 @@ my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
     my %word;
     for my $word (grep {length $_}
                   split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+      $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
       unless ($word{$word}) {
         $word{$word} = 1;
         if (not defined $allowed_words or
@@ -2235,6 +2236,7 @@ $Element->{+HTML_NS}->{link} = {
         my %word;
         for my $word (grep {length $_}
                       split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+          $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
           unless ($word{$word}) {
             $word{$word} = 1;
             if ($word eq 'any' or $word =~ /\A[1-9][0-9]*x[1-9][0-9]*\z/) {

@@ -1846,13 +1846,11 @@ p {color: green}
 <link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
     sizes="ANY"/>
 #errors
-/link/@sizes;sizes:syntax error;m
 
 #data
 <link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
     sizes="32X32"/>
 #errors
-/link/@sizes;sizes:syntax error;m
 
 #data
 <link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
@@ -1862,7 +1860,19 @@ p {color: green}
 
 #data
 <link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="any AnY"/>
+#errors
+/link/@sizes;duplicate token;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
     sizes="16x16 16x16"/>
+#errors
+/link/@sizes;duplicate token;m
+
+#data
+<link rel="icon" href="" xmlns="http://www.w3.org/1999/xhtml"
+    sizes="16x16 16X16"/>
 #errors
 /link/@sizes;duplicate token;m
 
