@@ -3942,39 +3942,37 @@ sub _tree_construction_main ($) {
           !!!nack ('t277.1');
           !!!next-token;
           next B;
-        } elsif ({
-                   select => 1, input => 1, textarea => 1, keygen => 1,
-                 }->{$token->{tag_name}} or
-                 (($self->{insertion_mode} & IM_MASK)
-                      == IN_SELECT_IN_TABLE_IM and
-                  {
-                   caption => 1, table => 1,
-                   tbody => 1, tfoot => 1, thead => 1,
-                   tr => 1, td => 1, th => 1,
-                  }->{$token->{tag_name}})) {
+
+        } elsif ($token->{tag_name} eq 'select') {
           ## "In select" / "in select in table" insertion mode,
-          ## "select" start tag; "in select" / "in select in table"
-          ## insertion mode, "input", "keygen", "textarea" start tag;
-          ## "in select in table" insertion mode, table-related start
-          ## tags.
+          ## "select" start tag.
+          !!!cp ('t278');
+
+          !!!parse-error (type => 'select in select', ## XXX: documentation
+                          token => $token);
+
+          ## Act as if the token were </select>.
+          $token = {type => END_TAG_TOKEN, tag_name => 'select',
+                    line => $token->{line}, column => $token->{column}};
+          next B;
+
+        } elsif ({
+          input => 1, textarea => 1, keygen => 1,
+        }->{$token->{tag_name}}) {
+          ## "In select" / "in select in table" insertion mode,
+          ## "input", "keygen", "textarea" start tag.
 
           ## Parse error.
-          if ($token->{tag_name} eq 'select') {
-              !!!parse-error (type => 'select in select', ## XXX: documentation
-                              token => $token);
-          } else {
-            !!!parse-error (type => 'not closed', text => 'select',
-                            token => $token);
-          }
+          !!!parse-error (type => 'not closed', text => 'select',
+                          token => $token);
 
           ## If there "have an element in table scope" where element
-          ## is a |select| element, ("input", "keygen", "textarea"
-          ## start tag)
+          ## is a |select| element.
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
             if ($node->[1] == SELECT_EL) {
-              !!!cp ('t278');
+              !!!cp ('t280');
               $i = $_;
               last INSCOPE;
             } elsif ($node->[1] & TABLE_SCOPING_EL) {
@@ -3983,45 +3981,39 @@ sub _tree_construction_main ($) {
             }
           } # INSCOPE
           unless (defined $i) {
-            !!!cp ('t280');
-            if ($token->{tag_name} eq 'select') {
-              ## Act as if there were <select> - parse error.
-              ##
-              ## NOTE: This error would be raised when
-              ## |select.innerHTML = '<select>'| is executed; in this
-              ## case two errors, "select in select" and "unmatched
-              ## end tags" are reported to the user, the latter might
-              ## be confusing but this is what the spec requires.
-              !!!parse-error (type => 'unmatched end tag',
-                              text => 'select',
-                              token => $token);
-            }
             ## Ignore the token.
             !!!nack ('t280.1');
             !!!next-token;
             next B;
           }
 
-          ## Act as if there were <select> - pop elements until a
-          ## |select| element is popped.
-          !!!cp ('t281');
-          splice @{$self->{open_elements}}, $i;
+          ## Otherwise, act as if there were </select>, then reprocess
+          ## the token.
+          !!!back-token;
+          $token = {type => END_TAG_TOKEN, tag_name => 'select',
+                    line => $token->{line}, column => $token->{column}};
+          next B;
 
-          ## Act as if there were <select> - reset the insertion mode
-          ## appropriately.
-          $self->_reset_insertion_mode;
+        } elsif (
+          ($self->{insertion_mode} & IM_MASK) == IN_SELECT_IN_TABLE_IM and
+          {
+            caption => 1, table => 1, tbody => 1, tfoot => 1, thead => 1,
+            tr => 1, td => 1, th => 1,
+          }->{$token->{tag_name}}
+        ) {
+          ## "In select in table" insertion mode, table-related start
+          ## tags.
 
-          if ($token->{tag_name} eq 'select') {
-            !!!nack ('t281.2');
-            ## Ignore the token. (<select> was processed instead.)
-            !!!next-token;
-            next B;
-          } else {
-            !!!cp ('t281.1');
-            !!!ack-later;
-            ## Reprocess the token.
-            next B;
-          }
+          ## Parse error.
+          !!!parse-error (type => 'not closed', text => 'select',
+                          token => $token);
+
+          ## Act as if there were </select>, then reprocess the token.
+          !!!back-token;
+          $token = {type => END_TAG_TOKEN, tag_name => 'select',
+                    line => $token->{line}, column => $token->{column}};
+          next B;
+
         } elsif ($token->{tag_name} eq 'script') {
           !!!cp ('t281.3');
           ## NOTE: This is an "as if in head" code clone
@@ -4036,6 +4028,7 @@ sub _tree_construction_main ($) {
           !!!next-token;
           next B;
         }
+
       } elsif ($token->{type} == END_TAG_TOKEN) {
         if ($token->{tag_name} eq 'optgroup') {
           if ($self->{open_elements}->[-1]->[1] == OPTION_EL and
@@ -4107,12 +4100,13 @@ sub _tree_construction_main ($) {
           !!!next-token;
           next B;
 
-        } elsif (($self->{insertion_mode} & IM_MASK)
-                     == IN_SELECT_IN_TABLE_IM and
-                 {
-                  caption => 1, table => 1, tbody => 1,
-                  tfoot => 1, thead => 1, tr => 1, td => 1, th => 1,
-                 }->{$token->{tag_name}}) {
+        } elsif (
+          ($self->{insertion_mode} & IM_MASK) == IN_SELECT_IN_TABLE_IM and
+          {
+            caption => 1, table => 1, tbody => 1, tfoot => 1, thead => 1,
+            tr => 1, td => 1, th => 1,
+          }->{$token->{tag_name}}
+        ) {
           ## "In select in table" insertion mode, table-related end
           ## tags.
 
@@ -4140,41 +4134,13 @@ sub _tree_construction_main ($) {
             !!!next-token;
             next B;
           }
-              
-          ## As if </select> - there "have an element in table scope"
-          ## where the element is |select|.
-          undef $i;
-          INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
-            my $node = $self->{open_elements}->[$_];
-            if ($node->[1] == SELECT_EL) {
-              !!!cp ('t295');
-              $i = $_;
-              last INSCOPE;
-            } elsif ($node->[1] & TABLE_SCOPING_EL) {
-              ## It might not be possible to reach this state.
-              !!!cp ('t296');
-              last INSCOPE;
-            }
-          } # INSCOPE
-          unless (defined $i) {
-            !!!cp ('t297');
-## TODO: The following error type is correct?
-            !!!parse-error (type => 'unmatched end tag',
-                            text => 'select', token => $token);
-            ## Ignore the </select> token
-            !!!nack ('t297.1');
-            !!!next-token; ## TODO: ok?
-            next B;
-          }
-              
-          !!!cp ('t298');
-          splice @{$self->{open_elements}}, $i;
-
-          $self->_reset_insertion_mode;
-
-          !!!ack-later;
-          ## reprocess
+          
+          ## Act as if there were </select>, then reprocess the token.
+          !!!back-token;
+          $token = {type => END_TAG_TOKEN, tag_name => 'select',
+                    line => $token->{line}, column => $token->{column}};
           next B;
+
         } else {
           !!!cp ('t299');
           !!!parse-error (type => 'in select:/',
