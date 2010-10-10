@@ -35,6 +35,10 @@ sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 ## Element categories
 
+## Bits 17-18
+sub SVG_EL () { 0b1_000000000000000000 }
+sub MML_EL () { 0b1_00000000000000000 }
+
 ## Bits 12-16
 sub BUTTON_SCOPING_EL () { 0b1_0000000000000000 } ## Special
 sub SPECIAL_EL () { 0b1_000000000000000 }         ## Special
@@ -151,7 +155,7 @@ sub OPTION_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b010 }
 sub RUBY_COMPONENT_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b100 }
 
 # XXX scoping
-sub MML_AXML_EL () { PHRASING_EL | FOREIGN_EL | 0b001 }
+sub MML_AXML_EL () { MML_EL | PHRASING_EL | FOREIGN_EL | 0b001 }
 
 my $el_category = {
   a => A_EL,
@@ -261,19 +265,20 @@ my $el_category = {
 my $el_category_f = {
   (MML_NS) => {
     'annotation-xml' => MML_AXML_EL,
-    mi => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    mo => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    mn => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    ms => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    mtext => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mi => MML_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mo => MML_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mn => MML_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    ms => MML_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mtext => MML_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
   (SVG_NS) => {
-    foreignObject => SCOPING_EL | BUTTON_SCOPING_EL |
+    foreignObject => SVG_EL | SCOPING_EL | BUTTON_SCOPING_EL |
         FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    desc => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    title => FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    desc => SVG_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    title => SVG_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
   },
-  ## NOTE: In addition, FOREIGN_EL is set to non-HTML elements.
+  ## NOTE: In addition, FOREIGN_EL is set to non-HTML elements, MML_EL
+  ## is set to MathML elements, and SVG_EL is set to SVG elements.
 };
 
 my $svg_attr_name = {
@@ -2206,7 +2211,7 @@ sub _tree_construction_main ($) {
             if defined $token->{column};
       
       $insert->($self, $el, $open_tables);
-      push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL];
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL | ($nsuri eq SVG_NS ? SVG_EL : $nsuri eq MML_NS ? MML_EL : 0)];
 
       if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($nsuri)) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
@@ -6208,7 +6213,7 @@ sub _tree_construction_main ($) {
             if defined $token->{column};
       
       $insert->($self, $el, $open_tables);
-      push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? MML_NS : SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL];
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? MML_NS : SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL | ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS eq SVG_NS ? SVG_EL : $token->{tag_name} eq 'math' ? MML_NS : SVG_NS eq MML_NS ? MML_EL : 0)];
 
       if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS)) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
