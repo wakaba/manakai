@@ -2732,7 +2732,8 @@ EOF
 #data
 <!DOCTYPE html><ul><li><math><annotation-xml><li>
 #errors
-no </annotation-xml></math>
+no </annotation-xml> before <li>
+no </math> before <li>
 no </ul> before EOF
 #document
 | <!DOCTYPE html>
@@ -3094,3 +3095,192 @@ no </g>
 |     <math math>
 |       <math script>
 |         <math g>
+
+#data
+<!DOCTYPE html><math><annotation-xml><b>
+#errors
+no </annotation-xml> before <b>
+no </math> before <b>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|     <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/xml"><b>
+#errors
+no </annotation-xml> before <b>
+no </math> before <b>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/xml"
+|     <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html "><b>
+#errors
+no </annotation-xml> before <b>
+no </math> before <b>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html "
+|     <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><b>
+#errors
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><b>
+#errors
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="application/xhtml+xml"
+|         <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><x><b>
+#errors
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <x>
+|           <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml><math><b>
+#errors
+no </math>
+no </annotation-xml>
+no </math>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         <math math>
+|     <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="MathML"><math><b>
+#errors
+no </math>
+no </annotation-xml>
+no </math>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="MathML"
+|         <math math>
+|     <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><math><b>
+#errors
+no </math>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <math math>
+|         <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="Text/HTML"><math><b>
+#errors
+no </math>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="Text/HTML"
+|         <math math>
+|         <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><math><b>
+#errors
+no </math>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="application/xhtml+xml"
+|         <math math>
+|         <b>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="Application/xhtml+xml"><math><b>
+#errors
+no </math>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="Application/xhtml+xml"
+|         <math math>
+|         <b>

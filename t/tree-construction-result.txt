@@ -4717,11 +4717,7 @@ ok 3783 - Document tree: qq'<!DOCTYPE HTML><dl><dd><svg><foreignobject><dd>'
 ok 3784 - Parse error: qq'<!DOCTYPE HTML><dl><dt><svg><foreignobject><dt>'; 1:47:in body:\#eof;EOF
 ok 3785 - SHOULD-level error: qq'<!DOCTYPE HTML><dl><dt><svg><foreignobject><dt>'; ;
 ok 3786 - Document tree: qq'<!DOCTYPE HTML><dl><dt><svg><foreignobject><dt>'
-not ok 3787 - Parse error: qq'<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>'; 1:49:not closed, 1:49:in body:\#eof;no </dt> before EOF, no </annotation-xml> before EOF, no </math> before EOF
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>'; 1:49:not closed, 1:49:in body:\#eof;no </dt> before EOF, no </annotation-xml> before EOF, no </math> before EOF'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '3'
+ok 3787 - Parse error: qq'<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>'; 1:49:not closed, 1:49:not closed, 1:49:in body:\#eof;no </dt> before EOF, no </annotation-xml> before EOF, no </math> before EOF
 ok 3788 - SHOULD-level error: qq'<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>'; ;
 not ok 3789 - Document tree: qq'<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>'
 #   Failed test 'Document tree: qq'<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>''
@@ -4739,11 +4735,7 @@ not ok 3789 - Document tree: qq'<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt
 # |  8|          <math annotation-xml>  |          <math annotation-xml>  |
 # *  9|      <dt>                       |            <dt>                 *
 # +---+---------------------------------+---------------------------------+
-not ok 3790 - Parse error: qq'<!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>'; 1:49:not closed, 1:49:in body:\#eof;no </dd> before EOF, no </annotation-xml> before EOF, no </math> before EOF
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>'; 1:49:not closed, 1:49:in body:\#eof;no </dd> before EOF, no </annotation-xml> before EOF, no </math> before EOF'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '3'
+ok 3790 - Parse error: qq'<!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>'; 1:49:not closed, 1:49:not closed, 1:49:in body:\#eof;no </dd> before EOF, no </annotation-xml> before EOF, no </math> before EOF
 ok 3791 - SHOULD-level error: qq'<!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>'; ;
 not ok 3792 - Document tree: qq'<!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>'
 #   Failed test 'Document tree: qq'<!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>''
@@ -7207,7 +7199,7 @@ ok 6153 - Document tree: qq'<!DOCTYPE html><ul><li><svg><desc><li>'
 ok 6154 - Parse error: qq'<!DOCTYPE html><ul><li><svg><title><li>'; 1:39:in body:\#eof;EOF
 ok 6155 - SHOULD-level error: qq'<!DOCTYPE html><ul><li><svg><title><li>'; ;
 ok 6156 - Document tree: qq'<!DOCTYPE html><ul><li><svg><title><li>'
-ok 6157 - Parse error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; 1:49:not closed, 1:49:in body:\#eof;no </annotation-xml></math>, no </ul> before EOF
+ok 6157 - Parse error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; 1:49:not closed, 1:49:not closed, 1:49:in body:\#eof;no </annotation-xml> before <li>, no </math> before <li>, no </ul> before EOF
 ok 6158 - SHOULD-level error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; ;
 ok 6159 - Document tree: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'
 ok 6160 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><wbr><rt><malignmark>'; 1:58:in body:\#eof;EOF
@@ -7282,5 +7274,41 @@ ok 6228 - Document tree: qq'<!DOCTYPE html><svg><script><g></script></svg>'
 ok 6229 - Parse error: qq'<!DOCTYPE html><math><script><g></script></math>'; 1:42:unmatched end tag;no </g>
 ok 6230 - SHOULD-level error: qq'<!DOCTYPE html><math><script><g></script></math>'; ;
 ok 6231 - Document tree: qq'<!DOCTYPE html><math><script><g></script></math>'
-1..6231
-# Looks like you failed 132 tests of 6231.
+ok 6232 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><b>'; 1:40:not closed, 1:40:not closed, 1:40:in body:\#eof;no </annotation-xml> before <b>, no </math> before <b>, EOF
+ok 6233 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><b>'; ;
+ok 6234 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><b>'
+ok 6235 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/xml"><b>'; 1:60:not closed, 1:60:not closed, 1:60:in body:\#eof;no </annotation-xml> before <b>, no </math> before <b>, EOF
+ok 6236 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/xml"><b>'; ;
+ok 6237 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/xml"><b>'
+ok 6238 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html "><b>'; 1:62:not closed, 1:62:not closed, 1:62:in body:\#eof;no </annotation-xml> before <b>, no </math> before <b>, EOF
+ok 6239 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html "><b>'; ;
+ok 6240 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html "><b>'
+ok 6241 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><b>'; 1:61:in body:\#eof;EOF
+ok 6242 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><b>'; ;
+ok 6243 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><b>'
+ok 6244 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><b>'; 1:73:in body:\#eof;EOF
+ok 6245 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><b>'; ;
+ok 6246 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><b>'
+ok 6247 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><x><b>'; 1:64:in body:\#eof;EOF
+ok 6248 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><x><b>'; ;
+ok 6249 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><x><b>'
+ok 6250 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><math><b>'; 1:46:not closed, 1:46:not closed, 1:46:not closed, 1:46:in body:\#eof;no </math>, no </annotation-xml>, no </math>, EOF
+ok 6251 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><math><b>'; ;
+ok 6252 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><math><b>'
+ok 6253 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="MathML"><math><b>'; 1:64:not closed, 1:64:not closed, 1:64:not closed, 1:64:in body:\#eof;no </math>, no </annotation-xml>, no </math>, EOF
+ok 6254 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="MathML"><math><b>'; ;
+ok 6255 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="MathML"><math><b>'
+ok 6256 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><math><b>'; 1:67:not closed, 1:67:in body:\#eof;no </math>, EOF
+ok 6257 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><math><b>'; ;
+ok 6258 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><math><b>'
+ok 6259 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="Text/HTML"><math><b>'; 1:67:not closed, 1:67:in body:\#eof;no </math>, EOF
+ok 6260 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="Text/HTML"><math><b>'; ;
+ok 6261 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="Text/HTML"><math><b>'
+ok 6262 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><math><b>'; 1:79:not closed, 1:79:in body:\#eof;no </math>, EOF
+ok 6263 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><math><b>'; ;
+ok 6264 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><math><b>'
+ok 6265 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="Application/xhtml+xml"><math><b>'; 1:79:not closed, 1:79:in body:\#eof;no </math>, EOF
+ok 6266 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="Application/xhtml+xml"><math><b>'; ;
+ok 6267 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="Application/xhtml+xml"><math><b>'
+1..6267
+# Looks like you failed 130 tests of 6267.

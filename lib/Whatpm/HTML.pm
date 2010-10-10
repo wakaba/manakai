@@ -2200,27 +2200,24 @@ sub _tree_construction_main ($) {
           pop @{$self->{open_elements}};
           {
             my $current_node = $self->{open_elements}->[-1];
-            if (not $current_node->[1] & FOREIGN_EL) {
+            if (
+              ## An HTML element.
+              not $current_node->[1] & FOREIGN_EL or
+
+              ## An MathML text integration point.
+              $current_node->[1] & MML_TEXT_INTEGRATION_EL or
+              
+              ## An HTML integration point.
+              $current_node->[1] & SVG_INTEGRATION_EL or
+              ($current_node->[1] == MML_AXML_EL and
+               do {
+                 my $encoding = $current_node->[0]->get_attribute_ns (undef, 'encoding') || '';
+                 $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+                 return ($encoding eq 'text/html' or
+                         $encoding eq 'application/xhtml+xml');
+               })
+            ) {
               last;
-            }
-            my $current_node_ns = $current_node->[0]->namespace_uri;
-            if (defined $current_node_ns) {
-              if ($current_node_ns eq SVG_NS) {
-                my $current_ln = $current_node->[0]->manakai_local_name;
-                if ({
-                  foreignObject => 1, desc => 1, title => 1,
-                }->{$current_ln}) {
-                  last;
-                }
-              } elsif ($current_node_ns eq MML_NS) {
-                my $current_ln = $current_node->[0]->manakai_local_name;
-                if ({
-                  mi => 1, mo => 1, mn => 1, ms => 1, mtext => 1,
-                  'annotation-xml' => 1,
-                }->{$current_ln}) {
-                  last;
-                }
-              }
             }
             
             pop @{$self->{open_elements}};
