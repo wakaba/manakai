@@ -2105,10 +2105,16 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: In CDATA/RCDATA: Unknown token type";        
       }
+
     } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
       my $break_foreign_land;
+
       if ($token->{type} == CHARACTER_TOKEN) {
+        ## "In foreign content" insertion mode, character token.
         
+
+        # XXX If the current node is an HTML element; If the current
+        # node is an HTML integration point.
 
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
@@ -2123,10 +2129,13 @@ sub _tree_construction_main ($) {
         ## "In foreign content" insertion mode, start tag token.
 
         if (
-          (
+          ( ## Start tag, if the current node is an HTML element.
             not $self->{open_elements}->[-1]->[1] & FOREIGN_EL
           ) or
-          (
+          ( ## Non-"mglyph" non-"malignmark" start tag, if the current
+            ## node is a MathML text integration point; Start tag, if
+            ## the current node is an HTML integration point (other
+            ## than |annotation-xml|).
             $self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL and
             $self->{open_elements}->[-1]->[1] != MML_AXML_EL and
             (
@@ -2134,7 +2143,11 @@ sub _tree_construction_main ($) {
               not {mglyph => 1, malignmark => 1}->{$token->{tag_name}}
             )
           ) or
-          (
+          ( ## "svg" start tag, if the current node is an
+            ## |annotation-xml| element; Start tag, if the current
+            ## node is an |annotation-xml| whose |encoding| is
+            ## |text/html| or |application/xhtml+xml| (HTML
+            ## integration point).
             $self->{open_elements}->[-1]->[1] == MML_AXML_EL and
             (
               $token->{tag_name} eq 'svg' or
@@ -2151,8 +2164,9 @@ sub _tree_construction_main ($) {
             )
           )
         ) {
-          ## NOTE: "using the rules for secondary insertion mode"then"continue"
           
+          ## Process the token "using the rules for" the "in body"
+          ## insertion mode, then goto |continue|.
           #
 
         } elsif ({
@@ -2169,9 +2183,13 @@ sub _tree_construction_main ($) {
                   ($token->{attributes}->{color} or
                    $token->{attributes}->{face} or
                    $token->{attributes}->{size}))) {
+          ## "In foreign content" insertion mode, HTML-only start
+          ## tags.
           
           $break_foreign_land = 1;
+
         } else {
+          ## "In foreign content" insertion mode, foreign start tags.
           my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
           my $tag_name = $token->{tag_name};
           if ($nsuri eq SVG_NS) {
@@ -2276,13 +2294,18 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           next B;
         }
+
       } elsif ($token->{type} == END_TAG_TOKEN) {
-        ## NOTE: "using the rules for secondary insertion mode" then "continue"
-        if ($token->{tag_name} eq 'script') {
+        if ($token->{tag_name} eq 'script') { ## XXX
+          ## "In foreign content" insertion mode, "script" end tag,
+          ## XXX if the current node is an SVG |script| element.
           
-          #
+          ## XXX
+          ##
           ## XXXscript: Execute script here.
+
         } elsif ($self->{open_elements}->[-1]->[1] & FOREIGN_EL) {
+          ## XXX
           
           
           ## 1.
@@ -2319,14 +2342,23 @@ sub _tree_construction_main ($) {
           ## Steps 6. and 7. is done in the |continue| block.
           $token = $self->_get_next_token;
           next B;
+
         } else {
+          ## "In foreign content" insertion mode, an end tag, if the
+          ## current node is an HTML element.
           
+          ## Process the token "using the rules for" the "in body"
+          ## insertion mode, then goto |continue|.
           #
         }
+
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
         ## "In foreign content" insertion mode, an end-of-file token.
         
-        $break_foreign_land = 1;
+        ## Process the token "using the rules for" the "in body"
+        ## insertion mode, then goto |continue|.
+        $break_foreign_land = 1; # XXX
+
       } else {
         die "$0: $token->{type}: Unknown token type";        
       }
