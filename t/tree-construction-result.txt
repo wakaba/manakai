@@ -7186,24 +7186,13 @@ not ok 6109 - Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; 
 #     expected: '3'
 ok 6110 - SHOULD-level error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; ;
 ok 6111 - Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'
-ok 6112 - Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'; 1:68:not closed, 1:68:not closed, 1:68:in body:\#eof;no </rt></annotation-xml> before <rt>, no </math> before EOF, no </ruby> before EOF
+not ok 6112 - Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'; 1:68:not closed, 1:68:in body:\#eof;no </rt></annotation-xml> before <rt>, no </math> before EOF, no </ruby> before EOF
+#   Failed test 'Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'; 1:68:not closed, 1:68:in body:\#eof;no </rt></annotation-xml> before <rt>, no </math> before EOF, no </ruby> before EOF'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
 ok 6113 - SHOULD-level error: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'; ;
-not ok 6114 - Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>''
-#   at HTML-tree.t test () ok line 9.
-# +---+--------------------------------+--------------------------------+
-# | Ln|Got                             |Expected                        |
-# +---+--------------------------------+--------------------------------+
-# |  1|<!DOCTYPE html>                 |<!DOCTYPE html>                 |
-# |  2|<html>                          |<html>                          |
-# |  3|  <head>                        |  <head>                        |
-# |  4|  <body>                        |  <body>                        |
-# |  5|    <ruby>                      |    <ruby>                      |
-# |  6|      <math math>               |      <math math>               |
-# |  7|        <math annotation-xml>   |        <math annotation-xml>   |
-# |  8|          encoding="text/html"  |          encoding="text/html"  |
-# *  9|      <rt>                      |          <rt>                  *
-# +---+--------------------------------+--------------------------------+
+ok 6114 - Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'
 ok 6115 - Parse error: qq'<!DOCTYPE html><ul><li><math><mi><li>'; 1:37:not closed, 1:37:in body:\#eof;no </mi></math> before <li>, no </ul> before EOF
 ok 6116 - SHOULD-level error: qq'<!DOCTYPE html><ul><li><math><mi><li>'; ;
 ok 6117 - Document tree: qq'<!DOCTYPE html><ul><li><math><mi><li>'
