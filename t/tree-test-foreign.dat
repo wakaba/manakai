@@ -2599,3 +2599,67 @@ no </math> before EOF
 |     <math math>
 |       <math mtext>
 |         <math malignmark>
+
+#data
+<!DOCTYPE html><ruby><math><mi><rt>
+#errors
+no </mi></math> before <rt>
+no </ruby> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <math math>
+|         <math mi>
+|       <rt>
+
+#data
+<!DOCTYPE html><ruby><math><annotation-xml><rt>
+#errors
+no </rt></annotation-xml> before <rt>
+no </math> before EOF
+no </ruby> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <math math>
+|         <math annotation-xml>
+|           <rt>
+
+#data
+<!DOCTYPE html><ul><li><math><mi><li>
+#errors
+no </mi></math> before <li>
+no </ul> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <math math>
+|           <math mi>
+|       <li>
+
+#data
+<!DOCTYPE html><ul><li><math><annotation-xml><li>
+#errors
+no </li></annotation-xml> before <li>
+no </math> before EOF
+no </ruby> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <math math>
+|           <math annotation-xml>
+|             <li>
