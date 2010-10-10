@@ -2145,23 +2145,19 @@ sub _tree_construction_main ($) {
           ## I.e., if the current node is an HTML element, or if the
           ## current node is an HTML integration point.
 
-          ## In these cases, the character token is handled "using the
-          ## rules for" the "in body" insertion mode.  The only
-          ## difference of handling of the character token is whethter
-          ## the following action is done:
-          $reconstruct_active_formatting_elements
-              ->($self, $insert_to_current, $active_formatting_elements,
-                 $open_tables);
+          ## Process the token "using the rules for" the "in body"
+          ## insertion mode, then goto |continue|.
+          # ...
+        } else {
+          $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+          
+          if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+            delete $self->{frameset_ok};
+          }
+          
+          $token = $self->_get_next_token;
+          next B;
         }
-
-        $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
-
-        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) { ## XXX
-          delete $self->{frameset_ok};
-        }
-
-        $token = $self->_get_next_token;
-        next B;
 
       } elsif ($token->{type} == START_TAG_TOKEN) {
         ## "In foreign content" insertion mode, start tag token.
@@ -2205,7 +2201,7 @@ sub _tree_construction_main ($) {
           
           ## Process the token "using the rules for" the "in body"
           ## insertion mode, then goto |continue|.
-          #
+          # ...
 
         } elsif ({
                   b => 1, big => 1, blockquote => 1, body => 1, br => 1,
@@ -3291,11 +3287,9 @@ sub _tree_construction_main ($) {
 
     } elsif ($self->{insertion_mode} & BODY_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
-        ## "In body" insertion mode, character token.  Note that a
-        ## character token that is processed "using the rules for" the
-        ## "in body" insertion mode in the "in foreign content"
-        ## insertion mode is handled in the "in foreign content"
-        ## insertion mode's code.
+        ## "In body" insertion mode, character token.  It is also used
+        ## for character tokens in "in foreign content" insertion
+        ## mode, for certain cases.
         
         $reconstruct_active_formatting_elements
             ->($self, $insert_to_current, $active_formatting_elements,

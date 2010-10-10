@@ -3630,3 +3630,120 @@ EOF
 |       <svg foreignObject>
 |         <i>
 |           "x"
+
+#data
+<!DOCTYPE html><math><mi><frameset>
+#errors
+<frameset> in body
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><math><mi>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         "\uFFFD"
+
+#data escaped
+<!DOCTYPE html><math><mi><div>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><math><annotation-xml>\uFFFD<mi><frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         "\uFFFD"
+|         <math mi>
+
+#data escaped
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><div>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><div>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><svg><desc>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><svg><desc><div>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><svg><title>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><svg><foreignobject>\uFFFD<frameset>
+#errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>

@@ -7367,5 +7367,35 @@ ok 6321 - Document tree: qq'<!DOCTYPE html><svg><title><i>a</title><title>x'
 ok 6322 - Parse error: qq'<!DOCTYPE html><svg><title><i>a</title><foreignObJect>x'; 1:40:not closed, 1:55:in body:\#eof;no </i>, EOF
 ok 6323 - SHOULD-level error: qq'<!DOCTYPE html><svg><title><i>a</title><foreignObJect>x'; ;
 ok 6324 - Document tree: qq'<!DOCTYPE html><svg><title><i>a</title><foreignObJect>x'
-1..6324
-# Looks like you failed 130 tests of 6324.
+ok 6325 - Parse error: qq'<!DOCTYPE html><math><mi><frameset>'; 1:35:in body, 1:35:in body:\#eof;<frameset> in body, EOF
+ok 6326 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><frameset>'; ;
+ok 6327 - Document tree: qq'<!DOCTYPE html><math><mi><frameset>'
+ok 6328 - Parse error: qq'<!DOCTYPE html><math><mi>\x{FFFD}<frameset>'; 1:36:in body, 1:36:in body:\#eof;<frameset> in body, EOF
+ok 6329 - SHOULD-level error: qq'<!DOCTYPE html><math><mi>\x{FFFD}<frameset>'; ;
+ok 6330 - Document tree: qq'<!DOCTYPE html><math><mi>\x{FFFD}<frameset>'
+ok 6331 - Parse error: qq'<!DOCTYPE html><math><mi><div>\x{FFFD}<frameset>'; 1:41:in body, 1:41:in body:\#eof;<frameset> in body, EOF
+ok 6332 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><div>\x{FFFD}<frameset>'; ;
+ok 6333 - Document tree: qq'<!DOCTYPE html><math><mi><div>\x{FFFD}<frameset>'
+ok 6334 - Parse error: qq'<!DOCTYPE html><math><annotation-xml>\x{FFFD}<mi><frameset>'; 1:52:in body, 1:52:in body:\#eof;<frameset> in body, EOF
+ok 6335 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml>\x{FFFD}<mi><frameset>'; ;
+ok 6336 - Document tree: qq'<!DOCTYPE html><math><annotation-xml>\x{FFFD}<mi><frameset>'
+ok 6337 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><div>\x{FFFD}<frameset>'; 1:74:in body, 1:74:in body:\#eof;<frameset> in body, EOF
+ok 6338 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><div>\x{FFFD}<frameset>'; ;
+ok 6339 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><div>\x{FFFD}<frameset>'
+ok 6340 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><div>\x{FFFD}<frameset>'; 1:86:in body, 1:86:in body:\#eof;<frameset> in body, EOF
+ok 6341 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><div>\x{FFFD}<frameset>'; ;
+ok 6342 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><div>\x{FFFD}<frameset>'
+ok 6343 - Parse error: qq'<!DOCTYPE html><svg><desc>\x{FFFD}<frameset>'; 1:37:in body, 1:37:in body:\#eof;<frameset> in body, EOF
+ok 6344 - SHOULD-level error: qq'<!DOCTYPE html><svg><desc>\x{FFFD}<frameset>'; ;
+ok 6345 - Document tree: qq'<!DOCTYPE html><svg><desc>\x{FFFD}<frameset>'
+ok 6346 - Parse error: qq'<!DOCTYPE html><svg><desc><div>\x{FFFD}<frameset>'; 1:42:in body, 1:42:in body:\#eof;<frameset> in body, EOF
+ok 6347 - SHOULD-level error: qq'<!DOCTYPE html><svg><desc><div>\x{FFFD}<frameset>'; ;
+ok 6348 - Document tree: qq'<!DOCTYPE html><svg><desc><div>\x{FFFD}<frameset>'
+ok 6349 - Parse error: qq'<!DOCTYPE html><svg><title>\x{FFFD}<frameset>'; 1:38:in body, 1:38:in body:\#eof;<frameset> in body, EOF
+ok 6350 - SHOULD-level error: qq'<!DOCTYPE html><svg><title>\x{FFFD}<frameset>'; ;
+ok 6351 - Document tree: qq'<!DOCTYPE html><svg><title>\x{FFFD}<frameset>'
+ok 6352 - Parse error: qq'<!DOCTYPE html><svg><foreignobject>\x{FFFD}<frameset>'; 1:46:in body, 1:46:in body:\#eof;<frameset> in body, EOF
+ok 6353 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignobject>\x{FFFD}<frameset>'; ;
+ok 6354 - Document tree: qq'<!DOCTYPE html><svg><foreignobject>\x{FFFD}<frameset>'
+1..6354
+# Looks like you failed 130 tests of 6354.
