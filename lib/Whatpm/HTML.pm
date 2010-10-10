@@ -154,8 +154,14 @@ sub OPTGROUP_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b001 }
 sub OPTION_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b010 }
 sub RUBY_COMPONENT_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b100 }
 
-# XXX scoping
 sub MML_AXML_EL () { MML_EL | PHRASING_EL | FOREIGN_EL | 0b001 }
+sub MML_AXML_EL_XXX () {
+  MML_EL |
+  SCOPING_EL |
+  BUTTON_SCOPING_EL |
+  FOREIGN_EL |
+  0b001
+} # MML_AXML_EL
 
 my $el_category = {
   a => A_EL,
@@ -2114,14 +2120,27 @@ sub _tree_construction_main ($) {
           ) or
           (
             $self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL and
+            $self->{open_elements}->[-1]->[1] != MML_AXML_EL and
             (
               $self->{open_elements}->[-1]->[1] & SVG_EL or
               not {mglyph => 1, malignmark => 1}->{$token->{tag_name}}
             )
           ) or
           (
-            $token->{tag_name} eq 'svg' and
-            $self->{open_elements}->[-1]->[1] == MML_AXML_EL
+            $self->{open_elements}->[-1]->[1] == MML_AXML_EL and
+            (
+              $token->{tag_name} eq 'svg' or
+              do {
+                my $encoding = $self->{open_elements}->[-1]->[0]->get_attribute_ns (undef, 'encoding') || '';
+                $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+                if ($encoding eq 'text/html' or 
+                    $encoding eq 'application/xhtml+xml') {
+                  1;
+                } else {
+                  0;
+                }
+              }
+            )
           )
         ) {
           ## NOTE: "using the rules for secondary insertion mode"then"continue"

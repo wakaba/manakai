@@ -2444,6 +2444,21 @@ no </math> before EOF
 |   <body>
 |     <math math>
 |       <math annotation-xml>
+|         <math mglyph>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><mglyph>
+#errors
+no </mglyph></annotation-xml> before EOF
+no </math> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html"
 |         <mglyph>
 
 #data
@@ -2458,6 +2473,21 @@ no </math> before EOF
 |   <body>
 |     <math math>
 |       <math annotation-xml>
+|         <math malignmark>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><malignmark>
+#errors
+no </malignmark></annotation-xml> before EOF
+no </math> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html"
 |         <malignmark>
 
 #data
@@ -2618,6 +2648,22 @@ no </ruby> before EOF
 #data
 <!DOCTYPE html><ruby><math><annotation-xml><rt>
 #errors
+no </annotation-xml> before EOF
+no </math> before EOF
+no </ruby> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ruby>
+|       <math math>
+|         <math annotation-xml>
+|           <math rt>
+
+#data
+<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>
+#errors
 no </rt></annotation-xml> before <rt>
 no </math> before EOF
 no </ruby> before EOF
@@ -2629,6 +2675,7 @@ no </ruby> before EOF
 |     <ruby>
 |       <math math>
 |         <math annotation-xml>
+|           encoding="text/html"
 |           <rt>
 
 #data
@@ -2663,3 +2710,121 @@ no </ruby> before EOF
 |         <math math>
 |           <math annotation-xml>
 |             <li>
+
+#data
+<!DOCTYPE html><math><annotation-xml><wbr><rt><malignmark>
+#errors
+no </annotation-xml>
+no </math>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         <math wbr>
+|           <math rt>
+|             <math malignmark>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/xml"><wbr><rt><malignmark>
+#errors
+no </annotation-xml>
+no </math>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/xml"
+|         <math wbr>
+|           <math rt>
+|             <math malignmark>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html "><wbr><rt><malignmark>
+#errors
+no </annotation-xml>
+no </math>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html "
+|         <math wbr>
+|           <math rt>
+|             <math malignmark>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><wbr><rt><malignmark>
+#errors
+no </annotation-xml>
+no </math>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <wbr>
+|         <rt>
+|           <malignmark>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="TEXT/HTML"><wbr><rt><malignmark>
+#errors
+no </annotation-xml>
+no </math>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="TEXT/HTML"
+|         <wbr>
+|         <rt>
+|           <malignmark>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><wbr><rt><malignmark>
+#errors
+no </annotation-xml>
+no </math>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="application/xhtml+xml"
+|         <wbr>
+|         <rt>
+|           <malignmark>
+
+#data
+<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>
+#errors
+no </annotation-xml>
+no </math>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="application/xhtml+XML"
+|         <wbr>
+|         <rt>
+|           <malignmark>

@@ -7120,108 +7120,100 @@ not ok 6064 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'; 1:
 #          got: '1'
 #     expected: '2'
 ok 6065 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'; ;
-not ok 6066 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><math><annotation-xml><mglyph>''
-#   at HTML-tree.t test () ok line 9.
-# +---+-----------------------------+-----------------------------+
-# | Ln|Got                          |Expected                     |
-# +---+-----------------------------+-----------------------------+
-# |  1|<!DOCTYPE html>              |<!DOCTYPE html>              |
-# |  2|<html>                       |<html>                       |
-# |  3|  <head>                     |  <head>                     |
-# |  4|  <body>                     |  <body>                     |
-# |  5|    <math math>              |    <math math>              |
-# |  6|      <math annotation-xml>  |      <math annotation-xml>  |
-# *  7|        <math mglyph>        |        <mglyph>             *
-# +---+-----------------------------+-----------------------------+
-not ok 6067 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; 1:49:not closed;no </malignmark></annotation-xml> before EOF, no </math> before EOF
+ok 6066 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'
+not ok 6067 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><mglyph>'; 1:66:not closed;no </mglyph></annotation-xml> before EOF, no </math> before EOF
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><mglyph>'; 1:66:not closed;no </mglyph></annotation-xml> before EOF, no </math> before EOF'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
+ok 6068 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><mglyph>'; ;
+ok 6069 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><mglyph>'
+not ok 6070 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; 1:49:not closed;no </malignmark></annotation-xml> before EOF, no </math> before EOF
 #   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; 1:49:not closed;no </malignmark></annotation-xml> before EOF, no </math> before EOF'
 #   at HTML-tree.t test () ok line 3.
 #          got: '1'
 #     expected: '2'
-ok 6068 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; ;
-not ok 6069 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><math><annotation-xml><malignmark>''
-#   at HTML-tree.t test () ok line 9.
-# +---+-----------------------------+-----------------------------+
-# | Ln|Got                          |Expected                     |
-# +---+-----------------------------+-----------------------------+
-# |  1|<!DOCTYPE html>              |<!DOCTYPE html>              |
-# |  2|<html>                       |<html>                       |
-# |  3|  <head>                     |  <head>                     |
-# |  4|  <body>                     |  <body>                     |
-# |  5|    <math math>              |    <math math>              |
-# |  6|      <math annotation-xml>  |      <math annotation-xml>  |
-# *  7|        <math malignmark>    |        <malignmark>         *
-# +---+-----------------------------+-----------------------------+
-ok 6070 - Parse error: qq'<!DOCTYPE html><math><mi><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mi> before EOF, no </math> before EOF
-ok 6071 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><mglyph>'; ;
-ok 6072 - Document tree: qq'<!DOCTYPE html><math><mi><mglyph>'
-ok 6073 - Parse error: qq'<!DOCTYPE html><math><mi><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mi> before EOF, no </math> before EOF
-ok 6074 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><malignmark>'; ;
-ok 6075 - Document tree: qq'<!DOCTYPE html><math><mi><malignmark>'
-ok 6076 - Parse error: qq'<!DOCTYPE html><math><mo><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mo> before EOF, no </math> before EOF
-ok 6077 - SHOULD-level error: qq'<!DOCTYPE html><math><mo><mglyph>'; ;
-ok 6078 - Document tree: qq'<!DOCTYPE html><math><mo><mglyph>'
-ok 6079 - Parse error: qq'<!DOCTYPE html><math><mo><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mo> before EOF, no </math> before EOF
-ok 6080 - SHOULD-level error: qq'<!DOCTYPE html><math><mo><malignmark>'; ;
-ok 6081 - Document tree: qq'<!DOCTYPE html><math><mo><malignmark>'
-ok 6082 - Parse error: qq'<!DOCTYPE html><math><ms><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></ms> before EOF, no </math> before EOF
-ok 6083 - SHOULD-level error: qq'<!DOCTYPE html><math><ms><mglyph>'; ;
-ok 6084 - Document tree: qq'<!DOCTYPE html><math><ms><mglyph>'
-ok 6085 - Parse error: qq'<!DOCTYPE html><math><ms><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></ms> before EOF, no </math> before EOF
-ok 6086 - SHOULD-level error: qq'<!DOCTYPE html><math><ms><malignmark>'; ;
-ok 6087 - Document tree: qq'<!DOCTYPE html><math><ms><malignmark>'
-ok 6088 - Parse error: qq'<!DOCTYPE html><math><mn><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mn> before EOF, no </math> before EOF
-ok 6089 - SHOULD-level error: qq'<!DOCTYPE html><math><mn><mglyph>'; ;
-ok 6090 - Document tree: qq'<!DOCTYPE html><math><mn><mglyph>'
-ok 6091 - Parse error: qq'<!DOCTYPE html><math><mn><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mn> before EOF, no </math> before EOF
-ok 6092 - SHOULD-level error: qq'<!DOCTYPE html><math><mn><malignmark>'; ;
-ok 6093 - Document tree: qq'<!DOCTYPE html><math><mn><malignmark>'
-ok 6094 - Parse error: qq'<!DOCTYPE html><math><mtext><mglyph>'; 1:36:not closed, 1:36:not closed;no </mglyph></mtext> before EOF, no </math> before EOF
-ok 6095 - SHOULD-level error: qq'<!DOCTYPE html><math><mtext><mglyph>'; ;
-ok 6096 - Document tree: qq'<!DOCTYPE html><math><mtext><mglyph>'
-ok 6097 - Parse error: qq'<!DOCTYPE html><math><mtext><malignmark>'; 1:40:not closed, 1:40:not closed;no </malignmark></mtext> before EOF, no </math> before EOF
-ok 6098 - SHOULD-level error: qq'<!DOCTYPE html><math><mtext><malignmark>'; ;
-ok 6099 - Document tree: qq'<!DOCTYPE html><math><mtext><malignmark>'
-not ok 6100 - Parse error: qq'<!DOCTYPE html><ruby><math><mi><rt>'; 1:35:not closed, 1:35:not closed, 1:35:in body:\#eof;no </mi></math> before <rt>, no </ruby> before EOF
+ok 6071 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; ;
+ok 6072 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'
+not ok 6073 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><malignmark>'; 1:70:not closed;no </malignmark></annotation-xml> before EOF, no </math> before EOF
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><malignmark>'; 1:70:not closed;no </malignmark></annotation-xml> before EOF, no </math> before EOF'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
+ok 6074 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><malignmark>'; ;
+ok 6075 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><malignmark>'
+ok 6076 - Parse error: qq'<!DOCTYPE html><math><mi><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mi> before EOF, no </math> before EOF
+ok 6077 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><mglyph>'; ;
+ok 6078 - Document tree: qq'<!DOCTYPE html><math><mi><mglyph>'
+ok 6079 - Parse error: qq'<!DOCTYPE html><math><mi><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mi> before EOF, no </math> before EOF
+ok 6080 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><malignmark>'; ;
+ok 6081 - Document tree: qq'<!DOCTYPE html><math><mi><malignmark>'
+ok 6082 - Parse error: qq'<!DOCTYPE html><math><mo><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mo> before EOF, no </math> before EOF
+ok 6083 - SHOULD-level error: qq'<!DOCTYPE html><math><mo><mglyph>'; ;
+ok 6084 - Document tree: qq'<!DOCTYPE html><math><mo><mglyph>'
+ok 6085 - Parse error: qq'<!DOCTYPE html><math><mo><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mo> before EOF, no </math> before EOF
+ok 6086 - SHOULD-level error: qq'<!DOCTYPE html><math><mo><malignmark>'; ;
+ok 6087 - Document tree: qq'<!DOCTYPE html><math><mo><malignmark>'
+ok 6088 - Parse error: qq'<!DOCTYPE html><math><ms><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></ms> before EOF, no </math> before EOF
+ok 6089 - SHOULD-level error: qq'<!DOCTYPE html><math><ms><mglyph>'; ;
+ok 6090 - Document tree: qq'<!DOCTYPE html><math><ms><mglyph>'
+ok 6091 - Parse error: qq'<!DOCTYPE html><math><ms><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></ms> before EOF, no </math> before EOF
+ok 6092 - SHOULD-level error: qq'<!DOCTYPE html><math><ms><malignmark>'; ;
+ok 6093 - Document tree: qq'<!DOCTYPE html><math><ms><malignmark>'
+ok 6094 - Parse error: qq'<!DOCTYPE html><math><mn><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mn> before EOF, no </math> before EOF
+ok 6095 - SHOULD-level error: qq'<!DOCTYPE html><math><mn><mglyph>'; ;
+ok 6096 - Document tree: qq'<!DOCTYPE html><math><mn><mglyph>'
+ok 6097 - Parse error: qq'<!DOCTYPE html><math><mn><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mn> before EOF, no </math> before EOF
+ok 6098 - SHOULD-level error: qq'<!DOCTYPE html><math><mn><malignmark>'; ;
+ok 6099 - Document tree: qq'<!DOCTYPE html><math><mn><malignmark>'
+ok 6100 - Parse error: qq'<!DOCTYPE html><math><mtext><mglyph>'; 1:36:not closed, 1:36:not closed;no </mglyph></mtext> before EOF, no </math> before EOF
+ok 6101 - SHOULD-level error: qq'<!DOCTYPE html><math><mtext><mglyph>'; ;
+ok 6102 - Document tree: qq'<!DOCTYPE html><math><mtext><mglyph>'
+ok 6103 - Parse error: qq'<!DOCTYPE html><math><mtext><malignmark>'; 1:40:not closed, 1:40:not closed;no </malignmark></mtext> before EOF, no </math> before EOF
+ok 6104 - SHOULD-level error: qq'<!DOCTYPE html><math><mtext><malignmark>'; ;
+ok 6105 - Document tree: qq'<!DOCTYPE html><math><mtext><malignmark>'
+not ok 6106 - Parse error: qq'<!DOCTYPE html><ruby><math><mi><rt>'; 1:35:not closed, 1:35:not closed, 1:35:in body:\#eof;no </mi></math> before <rt>, no </ruby> before EOF
 #   Failed test 'Parse error: qq'<!DOCTYPE html><ruby><math><mi><rt>'; 1:35:not closed, 1:35:not closed, 1:35:in body:\#eof;no </mi></math> before <rt>, no </ruby> before EOF'
 #   at HTML-tree.t test () ok line 3.
 #          got: '3'
 #     expected: '2'
-ok 6101 - SHOULD-level error: qq'<!DOCTYPE html><ruby><math><mi><rt>'; ;
-ok 6102 - Document tree: qq'<!DOCTYPE html><ruby><math><mi><rt>'
-not ok 6103 - Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; 1:47:not closed, 1:47:in body:\#eof;no </rt></annotation-xml> before <rt>, no </math> before EOF, no </ruby> before EOF
-#   Failed test 'Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; 1:47:not closed, 1:47:in body:\#eof;no </rt></annotation-xml> before <rt>, no </math> before EOF, no </ruby> before EOF'
+ok 6107 - SHOULD-level error: qq'<!DOCTYPE html><ruby><math><mi><rt>'; ;
+ok 6108 - Document tree: qq'<!DOCTYPE html><ruby><math><mi><rt>'
+not ok 6109 - Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; 1:47:not closed, 1:47:in body:\#eof;no </annotation-xml> before EOF, no </math> before EOF, no </ruby> before EOF
+#   Failed test 'Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; 1:47:not closed, 1:47:in body:\#eof;no </annotation-xml> before EOF, no </math> before EOF, no </ruby> before EOF'
 #   at HTML-tree.t test () ok line 3.
 #          got: '2'
 #     expected: '3'
-ok 6104 - SHOULD-level error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; ;
-not ok 6105 - Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>''
+ok 6110 - SHOULD-level error: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'; ;
+ok 6111 - Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml><rt>'
+ok 6112 - Parse error: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'; 1:68:not closed, 1:68:not closed, 1:68:in body:\#eof;no </rt></annotation-xml> before <rt>, no </math> before EOF, no </ruby> before EOF
+ok 6113 - SHOULD-level error: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'; ;
+not ok 6114 - Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>''
 #   at HTML-tree.t test () ok line 9.
-# +---+-------------------------------+-------------------------------+
-# | Ln|Got                            |Expected                       |
-# +---+-------------------------------+-------------------------------+
-# |  1|<!DOCTYPE html>                |<!DOCTYPE html>                |
-# |  2|<html>                         |<html>                         |
-# |  3|  <head>                       |  <head>                       |
-# |  4|  <body>                       |  <body>                       |
-# |  5|    <ruby>                     |    <ruby>                     |
-# |  6|      <math math>              |      <math math>              |
-# |  7|        <math annotation-xml>  |        <math annotation-xml>  |
-# *  8|          <math rt>            |          <rt>                 *
-# +---+-------------------------------+-------------------------------+
-ok 6106 - Parse error: qq'<!DOCTYPE html><ul><li><math><mi><li>'; 1:37:not closed, 1:37:in body:\#eof;no </mi></math> before <li>, no </ul> before EOF
-ok 6107 - SHOULD-level error: qq'<!DOCTYPE html><ul><li><math><mi><li>'; ;
-ok 6108 - Document tree: qq'<!DOCTYPE html><ul><li><math><mi><li>'
-not ok 6109 - Parse error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; 1:49:not closed, 1:49:in body:\#eof;no </li></annotation-xml> before <li>, no </math> before EOF, no </ruby> before EOF
+# +---+--------------------------------+--------------------------------+
+# | Ln|Got                             |Expected                        |
+# +---+--------------------------------+--------------------------------+
+# |  1|<!DOCTYPE html>                 |<!DOCTYPE html>                 |
+# |  2|<html>                          |<html>                          |
+# |  3|  <head>                        |  <head>                        |
+# |  4|  <body>                        |  <body>                        |
+# |  5|    <ruby>                      |    <ruby>                      |
+# |  6|      <math math>               |      <math math>               |
+# |  7|        <math annotation-xml>   |        <math annotation-xml>   |
+# |  8|          encoding="text/html"  |          encoding="text/html"  |
+# *  9|      <rt>                      |          <rt>                  *
+# +---+--------------------------------+--------------------------------+
+ok 6115 - Parse error: qq'<!DOCTYPE html><ul><li><math><mi><li>'; 1:37:not closed, 1:37:in body:\#eof;no </mi></math> before <li>, no </ul> before EOF
+ok 6116 - SHOULD-level error: qq'<!DOCTYPE html><ul><li><math><mi><li>'; ;
+ok 6117 - Document tree: qq'<!DOCTYPE html><ul><li><math><mi><li>'
+not ok 6118 - Parse error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; 1:49:not closed, 1:49:in body:\#eof;no </li></annotation-xml> before <li>, no </math> before EOF, no </ruby> before EOF
 #   Failed test 'Parse error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; 1:49:not closed, 1:49:in body:\#eof;no </li></annotation-xml> before <li>, no </math> before EOF, no </ruby> before EOF'
 #   at HTML-tree.t test () ok line 3.
 #          got: '2'
 #     expected: '3'
-ok 6110 - SHOULD-level error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; ;
-not ok 6111 - Document tree: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'
+ok 6119 - SHOULD-level error: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'; ;
+not ok 6120 - Document tree: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>'
 #   Failed test 'Document tree: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li>''
 #   at HTML-tree.t test () ok line 9.
 # +---+---------------------------------+---------------------------------+
@@ -7237,5 +7229,38 @@ not ok 6111 - Document tree: qq'<!DOCTYPE html><ul><li><math><annotation-xml><li
 # |  8|          <math annotation-xml>  |          <math annotation-xml>  |
 # *  9|      <li>                       |            <li>                 *
 # +---+---------------------------------+---------------------------------+
-1..6111
-# Looks like you failed 141 tests of 6111.
+not ok 6121 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><wbr><rt><malignmark>'; 1:58:not closed;no </annotation-xml>, no </math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml><wbr><rt><malignmark>'; 1:58:not closed;no </annotation-xml>, no </math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
+ok 6122 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><wbr><rt><malignmark>'; ;
+ok 6123 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><wbr><rt><malignmark>'
+not ok 6124 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/xml"><wbr><rt><malignmark>'; 1:78:not closed;no </annotation-xml>, no </math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/xml"><wbr><rt><malignmark>'; 1:78:not closed;no </annotation-xml>, no </math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
+ok 6125 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/xml"><wbr><rt><malignmark>'; ;
+ok 6126 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/xml"><wbr><rt><malignmark>'
+not ok 6127 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html "><wbr><rt><malignmark>'; 1:80:not closed;no </annotation-xml>, no </math>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html "><wbr><rt><malignmark>'; 1:80:not closed;no </annotation-xml>, no </math>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
+ok 6128 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html "><wbr><rt><malignmark>'; ;
+ok 6129 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html "><wbr><rt><malignmark>'
+ok 6130 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><wbr><rt><malignmark>'; 1:79:not closed, 1:79:not closed;no </annotation-xml>, no </math>
+ok 6131 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><wbr><rt><malignmark>'; ;
+ok 6132 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="text/html"><wbr><rt><malignmark>'
+ok 6133 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="TEXT/HTML"><wbr><rt><malignmark>'; 1:79:not closed, 1:79:not closed;no </annotation-xml>, no </math>
+ok 6134 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="TEXT/HTML"><wbr><rt><malignmark>'; ;
+ok 6135 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="TEXT/HTML"><wbr><rt><malignmark>'
+ok 6136 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><wbr><rt><malignmark>'; 1:91:not closed, 1:91:not closed;no </annotation-xml>, no </math>
+ok 6137 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><wbr><rt><malignmark>'; ;
+ok 6138 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><wbr><rt><malignmark>'
+ok 6139 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>'; 1:91:not closed, 1:91:not closed;no </annotation-xml>, no </math>
+ok 6140 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>'; ;
+ok 6141 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>'
+1..6141
+# Looks like you failed 144 tests of 6141.
