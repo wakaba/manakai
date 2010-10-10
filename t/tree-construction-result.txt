@@ -7196,5 +7196,8 @@ ok 6138 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="appli
 ok 6139 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>'; 1:91:not closed, 1:91:not closed, 1:91:not closed;no </malignmark>, no </rt>, no </annotation-xml></math>
 ok 6140 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>'; ;
 ok 6141 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>'
-1..6141
-# Looks like you failed 133 tests of 6141.
+ok 6142 - Parse error: qq'<!DOCTYPE html><math><mi><object><span></span></object></mi><mi>'; 1:64:not closed;no </mi></math> before EOF
+ok 6143 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><object><span></span></object></mi><mi>'; ;
+ok 6144 - Document tree: qq'<!DOCTYPE html><math><mi><object><span></span></object></mi><mi>'
+1..6144
+# Looks like you failed 133 tests of 6144.

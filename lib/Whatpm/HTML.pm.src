@@ -5675,22 +5675,7 @@ sub _tree_construction_main ($) {
     next B;
   } continue { # B
     if ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
-      ## NOTE: The code below is executed in cases where it does not have
-      ## to be, but it it is harmless even in those cases.
-      ## has an element in scope
-      INSCOPE: {
-        for (reverse 0..$#{$self->{open_elements}}) {
-          my $node = $self->{open_elements}->[$_];
-          if ($node->[1] & FOREIGN_EL) {
-            last INSCOPE;
-          } elsif ($node->[1] & SCOPING_EL) {
-            last;
-          }
-        }
-        
-        ## NOTE: No foreign element in scope.
-        $self->{insertion_mode} &= ~ IN_FOREIGN_CONTENT_IM;
-      } # INSCOPE
+      $self->_reset_insertion_mode;
     }
   } # B
 
