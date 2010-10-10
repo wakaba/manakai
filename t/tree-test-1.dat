@@ -9486,6 +9486,40 @@ no </svg> before EOF
 |             <dt>
 
 #data
+<!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>
+#errors
+no </dt> before EOF
+no </annotation-xml> before EOF
+no </math> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         <math math>
+|           <math annotation-xml>
+|             <dt>
+
+#data
+<!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>
+#errors
+no </dd> before EOF
+no </annotation-xml> before EOF
+no </math> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dd>
+|         <math math>
+|           <math annotation-xml>
+|             <dd>
+
+#data
 <span><address></span>a
 #errors
 no DOCTYPE
