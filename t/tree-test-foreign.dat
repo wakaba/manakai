@@ -3739,3 +3739,41 @@ EOF
 | <html>
 |   <head>
 |   <frameset>
+
+#data
+<!DOCTYPE html><svg></svg><![CDATA[foo]]>
+#errors
+bad comment
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|     <!-- [CDATA[foo]] -->
+
+#data
+<!DOCTYPE html><svg><foreignObject><![CDATA[foo]]></foreignObject></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg foreignObject>
+|         "foo"
+
+#data
+<!DOCTYPE html><svg><foreignObject><div><![CDATA[foo]]></div></foreignObject></svg>
+#errors
+bad comment
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg foreignObject>
+|         <div>
+|           <!-- [CDATA[foo]] -->

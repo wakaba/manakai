@@ -7376,5 +7376,14 @@ ok 6360 - Document tree: qq'<!DOCTYPE html><svg><title>\x{FFFD}<frameset>'
 ok 6361 - Parse error: qq'<!DOCTYPE html><svg><foreignobject>\x{FFFD}<frameset>'; 1:46:in body, 1:46:in body:\#eof;<frameset> in body, EOF
 ok 6362 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignobject>\x{FFFD}<frameset>'; ;
 ok 6363 - Document tree: qq'<!DOCTYPE html><svg><foreignobject>\x{FFFD}<frameset>'
-1..6363
-# Looks like you failed 128 tests of 6363.
+ok 6364 - Parse error: qq'<!DOCTYPE html><svg></svg><![CDATA[foo]]>'; 1:27:bogus comment;bad comment
+ok 6365 - SHOULD-level error: qq'<!DOCTYPE html><svg></svg><![CDATA[foo]]>'; ;
+ok 6366 - Document tree: qq'<!DOCTYPE html><svg></svg><![CDATA[foo]]>'
+ok 6367 - Parse error: qq'<!DOCTYPE html><svg><foreignObject><![CDATA[foo]]></foreignObject></svg>'; ;
+ok 6368 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignObject><![CDATA[foo]]></foreignObject></svg>'; ;
+ok 6369 - Document tree: qq'<!DOCTYPE html><svg><foreignObject><![CDATA[foo]]></foreignObject></svg>'
+ok 6370 - Parse error: qq'<!DOCTYPE html><svg><foreignObject><div><![CDATA[foo]]></div></foreignObject></svg>'; 1:41:bogus comment;bad comment
+ok 6371 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignObject><div><![CDATA[foo]]></div></foreignObject></svg>'; ;
+ok 6372 - Document tree: qq'<!DOCTYPE html><svg><foreignObject><div><![CDATA[foo]]></div></foreignObject></svg>'
+1..6372
+# Looks like you failed 128 tests of 6372.
