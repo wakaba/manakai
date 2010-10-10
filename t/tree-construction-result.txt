@@ -7049,5 +7049,171 @@ ok 6033 - Document tree: qq'<!DOCTYPE html><svg><foreignobject><math><b>'
 ok 6034 - Parse error: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'; 1:50:not closed, 1:50:not closed, 1:50:not closed, 1:50:not closed;no </math> before <b>, no </span> before EOF, no </foreignObject> before EOF, no </svg> before EOF
 ok 6035 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'; ;
 ok 6036 - Document tree: qq'<!DOCTYPE html><svg><foreignobject><span><math><b>'
-1..6036
-# Looks like you failed 128 tests of 6036.
+ok 6037 - Parse error: qq'<!DOCTYPE html><svg><title><mglyph>'; 1:35:not closed, 1:35:not closed;no </mglyph></title> before EOF, no </svg> before EOF
+ok 6038 - SHOULD-level error: qq'<!DOCTYPE html><svg><title><mglyph>'; ;
+not ok 6039 - Document tree: qq'<!DOCTYPE html><svg><title><mglyph>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><svg><title><mglyph>''
+#   at HTML-tree.t test () ok line 9.
+# +---+----------------------+-------------------+
+# | Ln|Got                   |Expected           |
+# +---+----------------------+-------------------+
+# |  1|<!DOCTYPE html>       |<!DOCTYPE html>    |
+# |  2|<html>                |<html>             |
+# |  3|  <head>              |  <head>           |
+# |  4|  <body>              |  <body>           |
+# |  5|    <svg svg>         |    <svg svg>      |
+# |  6|      <svg title>     |      <svg title>  |
+# *  7|        <svg mglyph>  |        <mglyph>   *
+# +---+----------------------+-------------------+
+ok 6040 - Parse error: qq'<!DOCTYPE html><svg><title><malignmark>'; 1:39:not closed, 1:39:not closed;no </malignmark></title> before EOF, no </svg> before EOF
+ok 6041 - SHOULD-level error: qq'<!DOCTYPE html><svg><title><malignmark>'; ;
+not ok 6042 - Document tree: qq'<!DOCTYPE html><svg><title><malignmark>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><svg><title><malignmark>''
+#   at HTML-tree.t test () ok line 9.
+# +---+--------------------------+----------------------+
+# | Ln|Got                       |Expected              |
+# +---+--------------------------+----------------------+
+# |  1|<!DOCTYPE html>           |<!DOCTYPE html>       |
+# |  2|<html>                    |<html>                |
+# |  3|  <head>                  |  <head>              |
+# |  4|  <body>                  |  <body>              |
+# |  5|    <svg svg>             |    <svg svg>         |
+# |  6|      <svg title>         |      <svg title>     |
+# *  7|        <svg malignmark>  |        <malignmark>  *
+# +---+--------------------------+----------------------+
+ok 6043 - Parse error: qq'<!DOCTYPE html><svg><desc><mglyph>'; 1:34:not closed, 1:34:not closed;no </mglyph></desc> before EOF, no </svg> before EOF
+ok 6044 - SHOULD-level error: qq'<!DOCTYPE html><svg><desc><mglyph>'; ;
+not ok 6045 - Document tree: qq'<!DOCTYPE html><svg><desc><mglyph>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><svg><desc><mglyph>''
+#   at HTML-tree.t test () ok line 9.
+# +---+----------------------+------------------+
+# | Ln|Got                   |Expected          |
+# +---+----------------------+------------------+
+# |  1|<!DOCTYPE html>       |<!DOCTYPE html>   |
+# |  2|<html>                |<html>            |
+# |  3|  <head>              |  <head>          |
+# |  4|  <body>              |  <body>          |
+# |  5|    <svg svg>         |    <svg svg>     |
+# |  6|      <svg desc>      |      <svg desc>  |
+# *  7|        <svg mglyph>  |        <mglyph>  *
+# +---+----------------------+------------------+
+ok 6046 - Parse error: qq'<!DOCTYPE html><svg><desc><malignmark>'; 1:38:not closed, 1:38:not closed;no </malignmark></desc> before EOF, no </svg> before EOF
+ok 6047 - SHOULD-level error: qq'<!DOCTYPE html><svg><desc><malignmark>'; ;
+not ok 6048 - Document tree: qq'<!DOCTYPE html><svg><desc><malignmark>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><svg><desc><malignmark>''
+#   at HTML-tree.t test () ok line 9.
+# +---+--------------------------+----------------------+
+# | Ln|Got                       |Expected              |
+# +---+--------------------------+----------------------+
+# |  1|<!DOCTYPE html>           |<!DOCTYPE html>       |
+# |  2|<html>                    |<html>                |
+# |  3|  <head>                  |  <head>              |
+# |  4|  <body>                  |  <body>              |
+# |  5|    <svg svg>             |    <svg svg>         |
+# |  6|      <svg desc>          |      <svg desc>      |
+# *  7|        <svg malignmark>  |        <malignmark>  *
+# +---+--------------------------+----------------------+
+ok 6049 - Parse error: qq'<!DOCTYPE html><svg><foreignObject><mglyph>'; 1:43:not closed, 1:43:not closed;no </mglyph></foreignObject> before EOF, no </svg> before EOF
+ok 6050 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignObject><mglyph>'; ;
+not ok 6051 - Document tree: qq'<!DOCTYPE html><svg><foreignObject><mglyph>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><svg><foreignObject><mglyph>''
+#   at HTML-tree.t test () ok line 9.
+# +---+---------------------------+---------------------------+
+# | Ln|Got                        |Expected                   |
+# +---+---------------------------+---------------------------+
+# |  1|<!DOCTYPE html>            |<!DOCTYPE html>            |
+# |  2|<html>                     |<html>                     |
+# |  3|  <head>                   |  <head>                   |
+# |  4|  <body>                   |  <body>                   |
+# |  5|    <svg svg>              |    <svg svg>              |
+# |  6|      <svg foreignObject>  |      <svg foreignObject>  |
+# *  7|        <svg mglyph>       |        <mglyph>           *
+# +---+---------------------------+---------------------------+
+ok 6052 - Parse error: qq'<!DOCTYPE html><svg><foreignObject><malignmark>'; 1:47:not closed, 1:47:not closed;no </malignmark></foreignObject> before EOF, no </svg> before EOF
+ok 6053 - SHOULD-level error: qq'<!DOCTYPE html><svg><foreignObject><malignmark>'; ;
+not ok 6054 - Document tree: qq'<!DOCTYPE html><svg><foreignObject><malignmark>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><svg><foreignObject><malignmark>''
+#   at HTML-tree.t test () ok line 9.
+# +---+---------------------------+---------------------------+
+# | Ln|Got                        |Expected                   |
+# +---+---------------------------+---------------------------+
+# |  1|<!DOCTYPE html>            |<!DOCTYPE html>            |
+# |  2|<html>                     |<html>                     |
+# |  3|  <head>                   |  <head>                   |
+# |  4|  <body>                   |  <body>                   |
+# |  5|    <svg svg>              |    <svg svg>              |
+# |  6|      <svg foreignObject>  |      <svg foreignObject>  |
+# *  7|        <svg malignmark>   |        <malignmark>       *
+# +---+---------------------------+---------------------------+
+not ok 6055 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'; 1:45:not closed;no </mglyph></annotation-xml> before EOF, no </math> before EOF
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'; 1:45:not closed;no </mglyph></annotation-xml> before EOF, no </math> before EOF'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
+ok 6056 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'; ;
+not ok 6057 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><mglyph>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><math><annotation-xml><mglyph>''
+#   at HTML-tree.t test () ok line 9.
+# +---+-----------------------------+-----------------------------+
+# | Ln|Got                          |Expected                     |
+# +---+-----------------------------+-----------------------------+
+# |  1|<!DOCTYPE html>              |<!DOCTYPE html>              |
+# |  2|<html>                       |<html>                       |
+# |  3|  <head>                     |  <head>                     |
+# |  4|  <body>                     |  <body>                     |
+# |  5|    <math math>              |    <math math>              |
+# |  6|      <math annotation-xml>  |      <math annotation-xml>  |
+# *  7|        <math mglyph>        |        <mglyph>             *
+# +---+-----------------------------+-----------------------------+
+not ok 6058 - Parse error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; 1:49:not closed;no </malignmark></annotation-xml> before EOF, no </math> before EOF
+#   Failed test 'Parse error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; 1:49:not closed;no </malignmark></annotation-xml> before EOF, no </math> before EOF'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
+ok 6059 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'; ;
+not ok 6060 - Document tree: qq'<!DOCTYPE html><math><annotation-xml><malignmark>'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><math><annotation-xml><malignmark>''
+#   at HTML-tree.t test () ok line 9.
+# +---+-----------------------------+-----------------------------+
+# | Ln|Got                          |Expected                     |
+# +---+-----------------------------+-----------------------------+
+# |  1|<!DOCTYPE html>              |<!DOCTYPE html>              |
+# |  2|<html>                       |<html>                       |
+# |  3|  <head>                     |  <head>                     |
+# |  4|  <body>                     |  <body>                     |
+# |  5|    <math math>              |    <math math>              |
+# |  6|      <math annotation-xml>  |      <math annotation-xml>  |
+# *  7|        <math malignmark>    |        <malignmark>         *
+# +---+-----------------------------+-----------------------------+
+ok 6061 - Parse error: qq'<!DOCTYPE html><math><mi><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mi> before EOF, no </math> before EOF
+ok 6062 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><mglyph>'; ;
+ok 6063 - Document tree: qq'<!DOCTYPE html><math><mi><mglyph>'
+ok 6064 - Parse error: qq'<!DOCTYPE html><math><mi><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mi> before EOF, no </math> before EOF
+ok 6065 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><malignmark>'; ;
+ok 6066 - Document tree: qq'<!DOCTYPE html><math><mi><malignmark>'
+ok 6067 - Parse error: qq'<!DOCTYPE html><math><mo><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mo> before EOF, no </math> before EOF
+ok 6068 - SHOULD-level error: qq'<!DOCTYPE html><math><mo><mglyph>'; ;
+ok 6069 - Document tree: qq'<!DOCTYPE html><math><mo><mglyph>'
+ok 6070 - Parse error: qq'<!DOCTYPE html><math><mo><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mo> before EOF, no </math> before EOF
+ok 6071 - SHOULD-level error: qq'<!DOCTYPE html><math><mo><malignmark>'; ;
+ok 6072 - Document tree: qq'<!DOCTYPE html><math><mo><malignmark>'
+ok 6073 - Parse error: qq'<!DOCTYPE html><math><ms><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></ms> before EOF, no </math> before EOF
+ok 6074 - SHOULD-level error: qq'<!DOCTYPE html><math><ms><mglyph>'; ;
+ok 6075 - Document tree: qq'<!DOCTYPE html><math><ms><mglyph>'
+ok 6076 - Parse error: qq'<!DOCTYPE html><math><ms><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></ms> before EOF, no </math> before EOF
+ok 6077 - SHOULD-level error: qq'<!DOCTYPE html><math><ms><malignmark>'; ;
+ok 6078 - Document tree: qq'<!DOCTYPE html><math><ms><malignmark>'
+ok 6079 - Parse error: qq'<!DOCTYPE html><math><mn><mglyph>'; 1:33:not closed, 1:33:not closed;no </mglyph></mn> before EOF, no </math> before EOF
+ok 6080 - SHOULD-level error: qq'<!DOCTYPE html><math><mn><mglyph>'; ;
+ok 6081 - Document tree: qq'<!DOCTYPE html><math><mn><mglyph>'
+ok 6082 - Parse error: qq'<!DOCTYPE html><math><mn><malignmark>'; 1:37:not closed, 1:37:not closed;no </malignmark></mn> before EOF, no </math> before EOF
+ok 6083 - SHOULD-level error: qq'<!DOCTYPE html><math><mn><malignmark>'; ;
+ok 6084 - Document tree: qq'<!DOCTYPE html><math><mn><malignmark>'
+ok 6085 - Parse error: qq'<!DOCTYPE html><math><mtext><mglyph>'; 1:36:not closed, 1:36:not closed;no </mglyph></mtext> before EOF, no </math> before EOF
+ok 6086 - SHOULD-level error: qq'<!DOCTYPE html><math><mtext><mglyph>'; ;
+ok 6087 - Document tree: qq'<!DOCTYPE html><math><mtext><mglyph>'
+ok 6088 - Parse error: qq'<!DOCTYPE html><math><mtext><malignmark>'; 1:40:not closed, 1:40:not closed;no </malignmark></mtext> before EOF, no </math> before EOF
+ok 6089 - SHOULD-level error: qq'<!DOCTYPE html><math><mtext><malignmark>'; ;
+ok 6090 - Document tree: qq'<!DOCTYPE html><math><mtext><malignmark>'
+1..6090
+# Looks like you failed 138 tests of 6090.
