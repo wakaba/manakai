@@ -3539,10 +3539,7 @@ sub _tree_construction_main ($) {
               INSCOPE: {
                 for (reverse 0..$#{$self->{open_elements}}) {
                   my $node = $self->{open_elements}->[$_];
-                  if ($node->[0]->manakai_local_name eq $token->{tag_name} and
-                      # XXX not in spec
-                      $node->[0]->namespace_uri and
-                      $node->[0]->namespace_uri eq HTML_NS) {
+                  if ($node->[0]->manakai_local_name eq $token->{tag_name}) {
                     
                     $i = $_;
 
