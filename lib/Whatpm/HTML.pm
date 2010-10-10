@@ -5248,7 +5248,9 @@ sub _tree_construction_main ($) {
         ## NOTE: This is an "as if in head" code clone
         $parse_rcdata->($self, $insert, $open_tables, 1); # RCDATA
         next B;
+
       } elsif ($token->{tag_name} eq 'body') {
+        ## "In body" insertion mode, "body" start tag token.
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body', text => 'body', token => $token);
               
         if (@{$self->{open_elements}} == 1 or
@@ -5256,6 +5258,7 @@ sub _tree_construction_main ($) {
           
           ## Ignore the token
         } else {
+          delete $self->{frameset_ok};
           my $body_el = $self->{open_elements}->[1]->[0];
           for my $attr_name (keys %{$token->{attributes}}) {
             unless ($body_el->has_attribute_ns (undef, $attr_name)) {
