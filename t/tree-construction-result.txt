@@ -7258,5 +7258,29 @@ ok 6204 - Document tree: qq'<!DOCTYPE html><svg><p><desc><form>'
 ok 6205 - Parse error: qq'<!DOCTYPE html><p><svg><desc><table><td>'; 1:40:missing start tag:tr, 1:40:in body:\#eof;no <tr> before <td>, EOF
 ok 6206 - SHOULD-level error: qq'<!DOCTYPE html><p><svg><desc><table><td>'; ;
 ok 6207 - Document tree: qq'<!DOCTYPE html><p><svg><desc><table><td>'
-1..6207
-# Looks like you failed 132 tests of 6207.
+ok 6208 - Parse error: qq'<!DOCTYPE html><svg><script></script></svg>'; ;
+ok 6209 - SHOULD-level error: qq'<!DOCTYPE html><svg><script></script></svg>'; ;
+ok 6210 - Document tree: qq'<!DOCTYPE html><svg><script></script></svg>'
+ok 6211 - Parse error: qq'<!DOCTYPE html><svg><script>a</script></svg>'; ;
+ok 6212 - SHOULD-level error: qq'<!DOCTYPE html><svg><script>a</script></svg>'; ;
+ok 6213 - Document tree: qq'<!DOCTYPE html><svg><script>a</script></svg>'
+ok 6214 - Parse error: qq'<!DOCTYPE html><svg><g><script></script></g></svg>'; ;
+ok 6215 - SHOULD-level error: qq'<!DOCTYPE html><svg><g><script></script></g></svg>'; ;
+ok 6216 - Document tree: qq'<!DOCTYPE html><svg><g><script></script></g></svg>'
+ok 6217 - Parse error: qq'<!DOCTYPE html><math><g><script></script></g></math>'; ;
+ok 6218 - SHOULD-level error: qq'<!DOCTYPE html><math><g><script></script></g></math>'; ;
+ok 6219 - Document tree: qq'<!DOCTYPE html><math><g><script></script></g></math>'
+ok 6220 - Parse error: qq'<!DOCTYPE html><svg><script><g></g></script></svg>'; ;
+ok 6221 - SHOULD-level error: qq'<!DOCTYPE html><svg><script><g></g></script></svg>'; ;
+ok 6222 - Document tree: qq'<!DOCTYPE html><svg><script><g></g></script></svg>'
+ok 6223 - Parse error: qq'<!DOCTYPE html><svg><title><script><g></g></script></title></svg>'; ;
+ok 6224 - SHOULD-level error: qq'<!DOCTYPE html><svg><title><script><g></g></script></title></svg>'; ;
+ok 6225 - Document tree: qq'<!DOCTYPE html><svg><title><script><g></g></script></title></svg>'
+ok 6226 - Parse error: qq'<!DOCTYPE html><svg><script><g></script></svg>'; 1:41:unmatched end tag;no </g>
+ok 6227 - SHOULD-level error: qq'<!DOCTYPE html><svg><script><g></script></svg>'; ;
+ok 6228 - Document tree: qq'<!DOCTYPE html><svg><script><g></script></svg>'
+ok 6229 - Parse error: qq'<!DOCTYPE html><math><script><g></script></math>'; 1:42:unmatched end tag;no </g>
+ok 6230 - SHOULD-level error: qq'<!DOCTYPE html><math><script><g></script></math>'; ;
+ok 6231 - Document tree: qq'<!DOCTYPE html><math><script><g></script></math>'
+1..6231
+# Looks like you failed 132 tests of 6231.

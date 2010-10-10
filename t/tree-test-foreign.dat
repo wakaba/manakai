@@ -2996,3 +2996,101 @@ EOF
 |             <tbody>
 |               <tr>
 |                 <td>
+
+#data
+<!DOCTYPE html><svg><script></script></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg script>
+
+#data
+<!DOCTYPE html><svg><script>a</script></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg script>
+|         "a"
+
+#data
+<!DOCTYPE html><svg><g><script></script></g></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg g>
+|         <svg script>
+
+#data
+<!DOCTYPE html><math><g><script></script></g></math>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math g>
+|         <math script>
+
+#data
+<!DOCTYPE html><svg><script><g></g></script></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg script>
+|         <svg g>
+
+#data
+<!DOCTYPE html><svg><title><script><g></g></script></title></svg>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg title>
+|         <script>
+|           "<g></g>"
+
+#data
+<!DOCTYPE html><svg><script><g></script></svg>
+#errors
+no </g>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg script>
+|         <svg g>
+
+#data
+<!DOCTYPE html><math><script><g></script></math>
+#errors
+no </g>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math script>
+|         <math g>

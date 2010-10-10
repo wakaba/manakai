@@ -178,6 +178,12 @@ sub SVG_INTEGRATION_EL () {
   FOREIGN_FLOW_CONTENT_EL
 } # SVG_INTEGRATION_EL
 
+sub SVG_SCRIPT_EL () {
+  SVG_EL |
+  FOREIGN_EL |
+  0b101
+} # SVG_SCRIPT_EL
+
 my $el_category = {
   a => A_EL,
   address => ADDRESS_DIV_EL,
@@ -296,6 +302,7 @@ my $el_category_f = {
     foreignObject => SVG_INTEGRATION_EL,
     desc => SVG_INTEGRATION_EL,
     title => SVG_INTEGRATION_EL,
+    script => SVG_SCRIPT_EL,
   },
   ## NOTE: In addition, FOREIGN_EL is set to non-HTML elements, MML_EL
   ## is set to MathML elements, and SVG_EL is set to SVG elements.
@@ -2187,13 +2194,16 @@ sub _tree_construction_main ($) {
         }
 
       } elsif ($token->{type} == END_TAG_TOKEN) {
-        if ($token->{tag_name} eq 'script') { ## XXX
-          ## "In foreign content" insertion mode, "script" end tag,
-          ## XXX if the current node is an SVG |script| element.
+        if ($token->{tag_name} eq 'script' and
+            $self->{open_elements}->[-1]->[1] == SVG_SCRIPT_EL) {
+          ## "In foreign content" insertion mode, "script" end tag, if
+          ## the current node is an SVG |script| element.
           !!!cp ('t87.41');
-          ## XXX
-          ##
+          pop @{$self->{open_elements}};
+
           ## XXXscript: Execute script here.
+          !!!next-token;
+          next B;
 
         } elsif (not $self->{open_elements}->[-1]->[1] & FOREIGN_EL) {
           ## "In foreign content" insertion mode, an end tag, if the
@@ -2204,7 +2214,8 @@ sub _tree_construction_main ($) {
           # ...
 
         } else {
-          ## XXX
+          ## "In foreign content" insertion mode, an end tag, if the
+          ## current node is a foreign element.
           !!!cp ('t87.42');
           
           ## 1.
