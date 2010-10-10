@@ -8640,6 +8640,38 @@ EOF
 |             <li>
 
 #data
+<!DOCTYPE HTML><ul><li><math><annotation-xml><li>
+#errors
+no </annotation-xml></math> before <li>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <math math>
+|           <math annotation-xml>
+|       <li>
+
+#data
+<!DOCTYPE HTML><ul><li><math><annotation-xml encoding="text/html"><li>
+#errors
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <ul>
+|       <li>
+|         <math math>
+|           <math annotation-xml>
+|             encoding="text/html"
+|             <li>
+
+#data
 <!DOCTYPE HTML><dl><dt><address><dt>
 #errors
 no </address>
@@ -9482,9 +9514,8 @@ EOF
 #data
 <!DOCTYPE HTML><dl><dt><math><annotation-xml><dt>
 #errors
-no </dt> before EOF
-no </annotation-xml> before EOF
-no </math> before EOF
+no </dt> before <math>
+EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -9494,14 +9525,13 @@ no </math> before EOF
 |       <dt>
 |         <math math>
 |           <math annotation-xml>
-|             <dt>
+|       <dt>
 
 #data
 <!DOCTYPE HTML><dl><dd><math><annotation-xml><dd>
 #errors
-no </dd> before EOF
-no </annotation-xml> before EOF
-no </math> before EOF
+no </dd> before <math>
+EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -9511,7 +9541,23 @@ no </math> before EOF
 |       <dd>
 |         <math math>
 |           <math annotation-xml>
-|             <dd>
+|       <dd>
+
+#data
+<!DOCTYPE HTML><dl><dt><math><annotation-xml encoding="text/html"><dt>
+#errors
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|         <math math>
+|           <math annotation-xml>
+|             encoding="text/html"
+|             <dt>
 
 #data
 <span><address></span>a

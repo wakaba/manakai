@@ -2127,30 +2127,30 @@ sub _tree_construction_main ($) {
                           token => $token);
 
           pop @{$self->{open_elements}};
-          {
+          V: {
             my $current_node = $self->{open_elements}->[-1];
             if (
               ## An HTML element.
               not $current_node->[1] & FOREIGN_EL or
 
               ## An MathML text integration point.
-              $current_node->[1] & MML_TEXT_INTEGRATION_EL or # XXX
+              $current_node->[1] == MML_TEXT_INTEGRATION_EL or
               
               ## An HTML integration point.
-              $current_node->[1] & SVG_INTEGRATION_EL or # XXX
+              $current_node->[1] == SVG_INTEGRATION_EL or
               ($current_node->[1] == MML_AXML_EL and
                do {
                  my $encoding = $current_node->[0]->get_attribute_ns (undef, 'encoding') || '';
                  $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-                 return ($encoding eq 'text/html' or
-                         $encoding eq 'application/xhtml+xml');
+                 ($encoding eq 'text/html' or
+                  $encoding eq 'application/xhtml+xml');
                })
             ) {
-              last;
+              last V;
             }
             
             pop @{$self->{open_elements}};
-            redo;
+            redo V;
           }
           
           ## Reprocess.

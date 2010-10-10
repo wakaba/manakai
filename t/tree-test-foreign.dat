@@ -2732,8 +2732,7 @@ EOF
 #data
 <!DOCTYPE html><ul><li><math><annotation-xml><li>
 #errors
-no </annotation-xml> before <li>
-no </math> before <li>
+no </annotation-xml></math> before <li>
 no </ul> before EOF
 #document
 | <!DOCTYPE html>
@@ -3099,8 +3098,7 @@ no </g>
 #data
 <!DOCTYPE html><math><annotation-xml><b>
 #errors
-no </annotation-xml> before <b>
-no </math> before <b>
+no </annotation-xml></math> before <b>
 EOF
 #document
 | <!DOCTYPE html>
@@ -3114,8 +3112,7 @@ EOF
 #data
 <!DOCTYPE html><math><annotation-xml encoding="text/xml"><b>
 #errors
-no </annotation-xml> before <b>
-no </math> before <b>
+no </annotation-xml></math> before <b>
 EOF
 #document
 | <!DOCTYPE html>
@@ -3130,8 +3127,7 @@ EOF
 #data
 <!DOCTYPE html><math><annotation-xml encoding="text/html "><b>
 #errors
-no </annotation-xml> before <b>
-no </math> before <b>
+no </annotation-xml></math> before <b>
 EOF
 #document
 | <!DOCTYPE html>
@@ -3189,9 +3185,7 @@ EOF
 #data
 <!DOCTYPE html><math><annotation-xml><math><b>
 #errors
-no </math>
-no </annotation-xml>
-no </math>
+no </math></annotation-xml></math>
 EOF
 #document
 | <!DOCTYPE html>
@@ -3206,9 +3200,7 @@ EOF
 #data
 <!DOCTYPE html><math><annotation-xml encoding="MathML"><math><b>
 #errors
-no </math>
-no </annotation-xml>
-no </math>
+no </math></annotation-xml></math>
 EOF
 #document
 | <!DOCTYPE html>
