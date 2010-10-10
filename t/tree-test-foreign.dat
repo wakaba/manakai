@@ -3046,3 +3046,135 @@ no </mi></math> before EOF
 |         <object>
 |           <span>
 |       <math mi>
+
+#data
+<!DOCTYPE html><p><math><foo><mi><p>a
+#errors
+no </p> before EOF
+no </mi></foo></math> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <math math>
+|         <math foo>
+|           <math mi>
+|             <p>
+|               "a"
+
+#data
+<!DOCTYPE html><p><math><mi><xmp>
+#errors
+no </xmp> before EOF
+no </mi></math> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <math math>
+|         <math mi>
+|           <xmp>
+
+#data
+<!DOCTYPE html><p><math><mi><dd>
+#errors
+no </dd> before EOF
+no </mi></math> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <math math>
+|         <math mi>
+|           <dd>
+
+#data
+<!DOCTYPE html><button><math><mi><button>
+#errors
+no </button> before EOF
+no </mi></math> before EOF
+no </button> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <button>
+|       <math math>
+|         <math mi>
+|           <button>
+
+#data
+<!DOCTYPE html><svg><body x><desc></html><!---->
+#errors
+no </svg> before <body>
+second <body>
+no </desc> before </html>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     x=""
+|     <svg svg>
+|     <desc>
+| <!--  -->
+
+#data
+<!DOCTYPE html><table><tr><td><svg><desc><td><!---->
+#errors
+<td> outside of <table>
+no </desc></svg> before EOF
+no </table> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <svg svg>
+|               <svg desc>
+|                 <!--  -->
+
+#data
+<!DOCTYPE html><svg><p><desc><form>
+#errors
+no </svg> before <p>
+no </desc> before <form>
+no </form> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|     <p>
+|       <desc>
+|     <form>
+
+#data
+<!DOCTYPE html><p><svg><desc><table><td>
+#errors
+no <tr> before <td>
+no </table></desc></svg> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <svg svg>
+|         <svg desc>
+|           <table>
+|             <tbody>
+|               <tr>
+|                 <td>

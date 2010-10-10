@@ -1329,13 +1329,10 @@ sub _reset_insertion_mode ($) {
   my $last;
   
   ## Step 2
-  my $foreign;
-
-  ## Step 3
   my $i = -1;
   my $node = $self->{open_elements}->[$i];
     
-  ## LOOP: Step 4
+  ## LOOP: Step 3
   LOOP: {
     if ($self->{open_elements}->[0]->[0] eq $node->[0]) {
       $last = 1;
@@ -1347,14 +1344,14 @@ sub _reset_insertion_mode ($) {
       }
     }
     
-    ## Step 5..15
+    ## Step 4..14
     my $new_mode;
     if ($node->[1] & FOREIGN_EL) {
       
       ## NOTE: Strictly spaking, this case should only applies to
       ## MathML and SVG elements.  Currently the HTML syntax
       ## supports only MathML and SVG elements as foreigners.
-      $foreign = 1;
+      $new_mode = IN_FOREIGN_CONTENT_IM | IN_BODY_IM;
     } elsif ($node->[1] == TABLE_CELL_EL) {
       if ($last) {
         
@@ -1383,7 +1380,7 @@ sub _reset_insertion_mode ($) {
     }
     $self->{insertion_mode} = $new_mode and last LOOP if defined $new_mode;
     
-    ## Step 16
+    ## Step 15
     if ($node->[1] == HTML_EL) {
       ## NOTE: Commented out in the spec (HTML5 revision 3894).
       #unless (defined $self->{head_element}) {
@@ -1398,21 +1395,18 @@ sub _reset_insertion_mode ($) {
       
     }
     
-    ## Step 17
+    ## Step 16
     $self->{insertion_mode} = IN_BODY_IM and last LOOP if $last;
     
-    ## Step 18
+    ## Step 17
     $i--;
     $node = $self->{open_elements}->[$i];
     
-    ## Step 19
+    ## Step 18
     redo LOOP;
   } # LOOP
   
-  ## END: Step 20
-  if ($foreign) {
-    $self->{insertion_mode} |= IN_FOREIGN_CONTENT_IM;
-  }
+  ## END
 } # _reset_insertion_mode
 
   my $parse_rcdata = sub ($$$$) {
@@ -6291,10 +6285,7 @@ sub _tree_construction_main ($) {
           delete $self->{self_closing};
         } else {
           
-          $self->{insertion_mode} |= IN_FOREIGN_CONTENT_IM;
-          ## NOTE: |<body><math><mi><svg>| -> "in foreign content" insertion
-          ## mode, "in body" (not "in foreign content") secondary insertion
-          ## mode, maybe.
+          $self->{insertion_mode} = IN_FOREIGN_CONTENT_IM | IN_BODY_IM;
         }
 
         $token = $self->_get_next_token;

@@ -7234,5 +7234,29 @@ ok 6180 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="appli
 ok 6181 - Parse error: qq'<!DOCTYPE html><math><mi><object><span></span></object></mi><mi>'; 1:64:not closed;no </mi></math> before EOF
 ok 6182 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><object><span></span></object></mi><mi>'; ;
 ok 6183 - Document tree: qq'<!DOCTYPE html><math><mi><object><span></span></object></mi><mi>'
-1..6183
-# Looks like you failed 132 tests of 6183.
+ok 6184 - Parse error: qq'<!DOCTYPE html><p><math><foo><mi><p>a'; 1:37:not closed, 1:37:not closed;no </p> before EOF, no </mi></foo></math> before EOF
+ok 6185 - SHOULD-level error: qq'<!DOCTYPE html><p><math><foo><mi><p>a'; ;
+ok 6186 - Document tree: qq'<!DOCTYPE html><p><math><foo><mi><p>a'
+ok 6187 - Parse error: qq'<!DOCTYPE html><p><math><mi><xmp>'; 1:33:not closed, 1:33:not closed;no </xmp> before EOF, no </mi></math> before EOF
+ok 6188 - SHOULD-level error: qq'<!DOCTYPE html><p><math><mi><xmp>'; ;
+ok 6189 - Document tree: qq'<!DOCTYPE html><p><math><mi><xmp>'
+ok 6190 - Parse error: qq'<!DOCTYPE html><p><math><mi><dd>'; 1:32:not closed, 1:32:not closed;no </dd> before EOF, no </mi></math> before EOF
+ok 6191 - SHOULD-level error: qq'<!DOCTYPE html><p><math><mi><dd>'; ;
+ok 6192 - Document tree: qq'<!DOCTYPE html><p><math><mi><dd>'
+ok 6193 - Parse error: qq'<!DOCTYPE html><button><math><mi><button>'; 1:41:not closed, 1:41:not closed, 1:41:in body:\#eof;no </button> before EOF, no </mi></math> before EOF, no </button> before EOF
+ok 6194 - SHOULD-level error: qq'<!DOCTYPE html><button><math><mi><button>'; ;
+ok 6195 - Document tree: qq'<!DOCTYPE html><button><math><mi><button>'
+ok 6196 - Parse error: qq'<!DOCTYPE html><svg><body x><desc></html><!---->'; 1:29:not closed, 1:29:in body, 1:42:not closed;no </svg> before <body>, second <body>, no </desc> before </html>
+ok 6197 - SHOULD-level error: qq'<!DOCTYPE html><svg><body x><desc></html><!---->'; ;
+ok 6198 - Document tree: qq'<!DOCTYPE html><svg><body x><desc></html><!---->'
+ok 6199 - Parse error: qq'<!DOCTYPE html><table><tr><td><svg><desc><td><!---->'; 1:46:in body, 1:52:not closed, 1:52:in body:\#eof;<td> outside of <table>, no </desc></svg> before EOF, no </table> before EOF
+ok 6200 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td><svg><desc><td><!---->'; ;
+ok 6201 - Document tree: qq'<!DOCTYPE html><table><tr><td><svg><desc><td><!---->'
+ok 6202 - Parse error: qq'<!DOCTYPE html><svg><p><desc><form>'; 1:24:not closed, 1:35:not closed, 1:35:in body:\#eof;no </svg> before <p>, no </desc> before <form>, no </form> before EOF
+ok 6203 - SHOULD-level error: qq'<!DOCTYPE html><svg><p><desc><form>'; ;
+ok 6204 - Document tree: qq'<!DOCTYPE html><svg><p><desc><form>'
+ok 6205 - Parse error: qq'<!DOCTYPE html><p><svg><desc><table><td>'; 1:40:missing start tag:tr, 1:40:in body:\#eof;no <tr> before <td>, no </table></desc></svg> before EOF
+ok 6206 - SHOULD-level error: qq'<!DOCTYPE html><p><svg><desc><table><td>'; ;
+ok 6207 - Document tree: qq'<!DOCTYPE html><p><svg><desc><table><td>'
+1..6207
+# Looks like you failed 132 tests of 6207.
