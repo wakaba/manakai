@@ -2007,8 +2007,6 @@ sub _tree_construction_main ($) {
       }
 
     } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
-      my $break_foreign_land;
-
       if ($token->{type} == CHARACTER_TOKEN) {
         ## "In foreign content" insertion mode, character token.
         !!!cp ('t87.1');
@@ -2086,7 +2084,44 @@ sub _tree_construction_main ($) {
           ## "In foreign content" insertion mode, HTML-only start
           ## tags.
           !!!cp ('t87.2');
-          $break_foreign_land = 1;
+
+          !!!parse-error (type => 'not closed',
+                          text => $self->{open_elements}->[-1]->[0]
+                              ->manakai_local_name,
+                          token => $token);
+
+          pop @{$self->{open_elements}};
+          {
+            my $current_node = $self->{open_elements}->[-1];
+            if (not $current_node->[1] & FOREIGN_EL) {
+              last;
+            }
+            my $current_node_ns = $current_node->[0]->namespace_uri;
+            if (defined $current_node_ns) {
+              if ($current_node_ns eq SVG_NS) {
+                my $current_ln = $current_node->[0]->manakai_local_name;
+                if ({
+                  foreignObject => 1, desc => 1, title => 1,
+                }->{$current_ln}) {
+                  last;
+                }
+              } elsif ($current_node_ns eq MML_NS) {
+                my $current_ln = $current_node->[0]->manakai_local_name;
+                if ({
+                  mi => 1, mo => 1, mn => 1, ms => 1, mtext => 1,
+                  'annotation-xml' => 1,
+                }->{$current_ln}) {
+                  last;
+                }
+              }
+            }
+            
+            pop @{$self->{open_elements}};
+            redo;
+          }
+          
+          ## Reprocess.
+          next B; # goto |continue|
 
         } else {
           ## "In foreign content" insertion mode, foreign start tags.
@@ -2205,7 +2240,7 @@ sub _tree_construction_main ($) {
           !!!cp ('t87.5');
           ## Process the token "using the rules for" the "in body"
           ## insertion mode, then goto |continue|.
-          #
+          # ...
         }
 
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
@@ -2213,50 +2248,13 @@ sub _tree_construction_main ($) {
         !!!cp ('t87.6');
         ## Process the token "using the rules for" the "in body"
         ## insertion mode, then goto |continue|.
+        # ...
 
       } else {
         die "$0: $token->{type}: Unknown token type";        
       }
 
-      if ($break_foreign_land) {
-        !!!parse-error (type => 'not closed',
-                        text => $self->{open_elements}->[-1]->[0]
-                            ->manakai_local_name,
-                        token => $token);
-
-        pop @{$self->{open_elements}};
-        {
-          my $current_node = $self->{open_elements}->[-1];
-          if (not $current_node->[1] & FOREIGN_EL) {
-            last;
-          }
-          my $current_node_ns = $current_node->[0]->namespace_uri;
-          if (defined $current_node_ns) {
-            if ($current_node_ns eq SVG_NS) {
-              my $current_ln = $current_node->[0]->manakai_local_name;
-              if ({
-                foreignObject => 1, desc => 1, title => 1,
-              }->{$current_ln}) {
-                last;
-              }
-            } elsif ($current_node_ns eq MML_NS) {
-              my $current_ln = $current_node->[0]->manakai_local_name;
-              if ({
-                mi => 1, mo => 1, mn => 1, ms => 1, mtext => 1,
-                'annotation-xml' => 1,
-              }->{$current_ln}) {
-                last;
-              }
-            }
-          }
-
-          pop @{$self->{open_elements}};
-          redo;
-        }
-
-        ## Reprocess.
-        next B; # goto |continue|
-      } # $break_foreign_land
+      # ...
     } # insertion_mode
 
     if ($self->{insertion_mode} & HEAD_IMS) {
