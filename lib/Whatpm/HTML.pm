@@ -4616,7 +4616,7 @@ sub _tree_construction_main ($) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed', text => 'select',
                           token => $token);
 
-          ## If there "have an element in table scope" where element
+          ## If there "have an element in select scope" where element
           ## is a |select| element.
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4625,7 +4625,11 @@ sub _tree_construction_main ($) {
               
               $i = $_;
               last INSCOPE;
-            } elsif ($node->[1] & TABLE_SCOPING_EL) {
+            } elsif ($node->[1] == OPTGROUP_EL or
+                     $node->[1] == OPTION_EL) {
+              
+              #
+            } else {
               
               last INSCOPE;
             }
@@ -4724,7 +4728,7 @@ sub _tree_construction_main ($) {
           ## "In select" / "in select in table" insertion mode,
           ## "select" end tag.
 
-          ## There "have an element in table scope" where the element
+          ## There "have an element in select scope" where the element
           ## is |select|.
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -4733,7 +4737,11 @@ sub _tree_construction_main ($) {
               
               $i = $_;
               last INSCOPE;
-            } elsif ($node->[1] & TABLE_SCOPING_EL) {
+            } elsif ($node->[1] == OPTION_EL or
+                     $node->[1] == OPTGROUP_EL) {
+              
+              #
+            } else {
               
               last INSCOPE;
             }
