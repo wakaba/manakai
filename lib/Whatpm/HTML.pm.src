@@ -2195,7 +2195,15 @@ sub _tree_construction_main ($) {
           ##
           ## XXXscript: Execute script here.
 
-        } elsif ($self->{open_elements}->[-1]->[1] & FOREIGN_EL) {
+        } elsif (not $self->{open_elements}->[-1]->[1] & FOREIGN_EL) {
+          ## "In foreign content" insertion mode, an end tag, if the
+          ## current node is an HTML element.
+          !!!cp ('t87.5');
+          ## Process the token "using the rules for" the "in body"
+          ## insertion mode, then goto |continue|.
+          # ...
+
+        } else {
           ## XXX
           !!!cp ('t87.42');
           
@@ -2234,13 +2242,6 @@ sub _tree_construction_main ($) {
           !!!next-token;
           next B;
 
-        } else {
-          ## "In foreign content" insertion mode, an end tag, if the
-          ## current node is an HTML element.
-          !!!cp ('t87.5');
-          ## Process the token "using the rules for" the "in body"
-          ## insertion mode, then goto |continue|.
-          # ...
         }
 
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
