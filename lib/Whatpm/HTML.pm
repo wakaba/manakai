@@ -4602,8 +4602,13 @@ sub _tree_construction_main ($) {
                    tbody => 1, tfoot => 1, thead => 1,
                    tr => 1, td => 1, th => 1,
                   }->{$token->{tag_name}})) {
+          ## "In select" / "in select in table" insertion mode,
+          ## "select" start tag; "in select" / "in select in table"
+          ## insertion mode, "input", "keygen", "textarea" start tag;
+          ## "in select in table" insertion mode, table-related start
+          ## tags.
 
-          ## 1. Parse error.
+          ## Parse error.
           if ($token->{tag_name} eq 'select') {
               $self->{parse_error}->(level => $self->{level}->{must}, type => 'select in select', ## XXX: documentation
                               token => $token);
@@ -4612,7 +4617,9 @@ sub _tree_construction_main ($) {
                             token => $token);
           }
 
-          ## 2./<select>-1. Unless "have an element in table scope" (select):
+          ## If there "have an element in table scope" where element
+          ## is a |select| element, ("input", "keygen", "textarea"
+          ## start tag)
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
@@ -4628,6 +4635,8 @@ sub _tree_construction_main ($) {
           unless (defined $i) {
             
             if ($token->{tag_name} eq 'select') {
+              ## Act as if there were <select> - parse error.
+              ##
               ## NOTE: This error would be raised when
               ## |select.innerHTML = '<select>'| is executed; in this
               ## case two errors, "select in select" and "unmatched
@@ -4643,15 +4652,18 @@ sub _tree_construction_main ($) {
             next B;
           }
 
-          ## 3. Otherwise, as if there were <select>:
-              
+          ## Act as if there were <select> - pop elements until a
+          ## |select| element is popped.
           
           splice @{$self->{open_elements}}, $i;
 
+          ## Act as if there were <select> - reset the insertion mode
+          ## appropriately.
           $self->_reset_insertion_mode;
 
           if ($token->{tag_name} eq 'select') {
             
+            ## Ignore the token. (<select> was processed instead.)
             $token = $self->_get_next_token;
             next B;
           } else {
@@ -4706,8 +4718,13 @@ sub _tree_construction_main ($) {
           
           $token = $self->_get_next_token;
           next B;
+
         } elsif ($token->{tag_name} eq 'select') {
-          ## have an element in table scope
+          ## "In select" / "in select in table" insertion mode,
+          ## "select" end tag.
+
+          ## There "have an element in table scope" where the element
+          ## is |select|.
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
@@ -4724,12 +4741,13 @@ sub _tree_construction_main ($) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                             text => $token->{tag_name}, token => $token);
-            ## Ignore the token
+            ## Ignore the token.
             
             $token = $self->_get_next_token;
             next B;
           }
-              
+          
+          ## Otherwise,
           
           splice @{$self->{open_elements}}, $i;
 
@@ -4738,17 +4756,21 @@ sub _tree_construction_main ($) {
           
           $token = $self->_get_next_token;
           next B;
+
         } elsif (($self->{insertion_mode} & IM_MASK)
                      == IN_SELECT_IN_TABLE_IM and
                  {
                   caption => 1, table => 1, tbody => 1,
                   tfoot => 1, thead => 1, tr => 1, td => 1, th => 1,
                  }->{$token->{tag_name}}) {
-## TODO: The following is wrong?
+          ## "In select in table" insertion mode, table-related end
+          ## tags.
+
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
                           text => $token->{tag_name}, token => $token);
-              
-          ## have an element in table scope
+
+          ## There "have an element in table scope" where the element
+          ## is same tag name as |$token|.
           my $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
@@ -4769,8 +4791,8 @@ sub _tree_construction_main ($) {
             next B;
           }
               
-          ## As if </select>
-          ## have an element in table scope
+          ## As if </select> - there "have an element in table scope"
+          ## where the element is |select|.
           undef $i;
           INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
             my $node = $self->{open_elements}->[$_];
@@ -4779,7 +4801,7 @@ sub _tree_construction_main ($) {
               $i = $_;
               last INSCOPE;
             } elsif ($node->[1] & TABLE_SCOPING_EL) {
-## ISSUE: Can this state be reached?
+              ## It might not be possible to reach this state.
               
               last INSCOPE;
             }
