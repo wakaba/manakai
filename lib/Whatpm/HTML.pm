@@ -2357,7 +2357,6 @@ sub _tree_construction_main ($) {
         
         ## Process the token "using the rules for" the "in body"
         ## insertion mode, then goto |continue|.
-        $break_foreign_land = 1; # XXX
 
       } else {
         die "$0: $token->{type}: Unknown token type";        

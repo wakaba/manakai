@@ -8627,9 +8627,7 @@ eof in body
 #data
 <!DOCTYPE HTML><ul><li><svg><foreignobject><li>
 #errors
-no </li> before EOF
-no </foreignObject> before EOF
-no </svg> before EOF
+EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -9454,9 +9452,7 @@ eof in body
 #data
 <!DOCTYPE HTML><dl><dd><svg><foreignobject><dd>
 #errors
-no </dd> before EOF
-no </foreignObject> before EOF
-no </svg> before EOF
+EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -9471,9 +9467,7 @@ no </svg> before EOF
 #data
 <!DOCTYPE HTML><dl><dt><svg><foreignobject><dt>
 #errors
-no </dt> before EOF
-no </foreignObject> before EOF
-no </svg> before EOF
+EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -9970,9 +9964,8 @@ unexpected EOF
 <span><svg><foreignobject></span>a
 #errors
 no DOCTYPE
-unmatched end tag
-EOF in foreign content
-unexpected EOF
+unexpected </span>
+EOF
 #document
 | <html>
 |   <head>
