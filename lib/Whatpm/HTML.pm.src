@@ -35,18 +35,16 @@ sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 ## Element categories
 
-## Bits 17-18
-sub SVG_EL () { 0b1_000000000000000000 }
-sub MML_EL () { 0b1_00000000000000000 }
+## Bits 14-18
+sub BUTTON_SCOPING_EL () { 0b1_000000000000000000 } ## Special
+sub SPECIAL_EL () { 0b1_00000000000000000 }         ## Special
+sub SCOPING_EL () { 0b1_0000000000000000 }          ## Special
+sub FORMATTING_EL () { 0b1_000000000000000 }        ## Formatting
+sub PHRASING_EL () { 0b1_00000000000000 }           ## Ordinary
 
-## Bits 12-16
-sub BUTTON_SCOPING_EL () { 0b1_0000000000000000 } ## Special
-sub SPECIAL_EL () { 0b1_000000000000000 }         ## Special
-sub SCOPING_EL () { 0b1_00000000000000 }          ## Special
-sub FORMATTING_EL () { 0b1_0000000000000 }        ## Formatting
-sub PHRASING_EL () { 0b1_000000000000 }           ## Ordinary
-
-## Bits 10-11
+## Bits 10-13
+sub SVG_EL () { 0b1_0000000000000 }
+sub MML_EL () { 0b1_000000000000 }
 #sub FOREIGN_EL () { 0b1_00000000000 } # see Whatpm::HTML::Tokenizer
 sub FOREIGN_FLOW_CONTENT_EL () { 0b1_0000000000 }
 
@@ -149,10 +147,19 @@ sub NOBR_EL () { FORMATTING_EL | 0b010 }
 
 sub RUBY_EL () { PHRASING_EL | 0b001 }
 
-## ISSUE: ALL_END_TAG_OPTIONAL_EL?
+## NOTE: These elements are not included in |ALL_END_TAG_OPTIONAL_EL|.
 sub OPTGROUP_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b001 }
 sub OPTION_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b010 }
 sub RUBY_COMPONENT_EL () { PHRASING_EL | END_TAG_OPTIONAL_EL | 0b100 }
+
+## "MathML text integration point" elements.
+sub MML_TEXT_INTEGRATION_EL () {
+  MML_EL |
+  SCOPING_EL |
+  BUTTON_SCOPING_EL |
+  FOREIGN_EL |
+  FOREIGN_FLOW_CONTENT_EL
+} # MML_TEXT_INTEGRATION_EL
 
 sub MML_AXML_EL () {
   MML_EL |
@@ -161,6 +168,15 @@ sub MML_AXML_EL () {
   FOREIGN_EL |
   0b001
 } # MML_AXML_EL
+
+## "HTML integration point" elements in SVG namespace.
+sub SVG_INTEGRATION_EL () {
+  SVG_EL |
+  SCOPING_EL |
+  BUTTON_SCOPING_EL |
+  FOREIGN_EL |
+  FOREIGN_FLOW_CONTENT_EL
+} # SVG_INTEGRATION_EL
 
 my $el_category = {
   a => A_EL,
@@ -270,17 +286,16 @@ my $el_category = {
 my $el_category_f = {
   (MML_NS) => {
     'annotation-xml' => MML_AXML_EL,
-    mi => MML_EL | SCOPING_EL | BUTTON_SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    mo => MML_EL | SCOPING_EL | BUTTON_SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    mn => MML_EL | SCOPING_EL | BUTTON_SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    ms => MML_EL | SCOPING_EL | BUTTON_SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    mtext => MML_EL | SCOPING_EL | BUTTON_SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    mi => MML_TEXT_INTEGRATION_EL,
+    mo => MML_TEXT_INTEGRATION_EL,
+    mn => MML_TEXT_INTEGRATION_EL,
+    ms => MML_TEXT_INTEGRATION_EL,
+    mtext => MML_TEXT_INTEGRATION_EL,
   },
   (SVG_NS) => {
-    foreignObject => SVG_EL | SCOPING_EL | BUTTON_SCOPING_EL |
-        FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    desc => SVG_EL | SCOPING_EL | BUTTON_SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
-    title => SVG_EL | SCOPING_EL | BUTTON_SCOPING_EL | FOREIGN_EL | FOREIGN_FLOW_CONTENT_EL,
+    foreignObject => SVG_INTEGRATION_EL,
+    desc => SVG_INTEGRATION_EL,
+    title => SVG_INTEGRATION_EL,
   },
   ## NOTE: In addition, FOREIGN_EL is set to non-HTML elements, MML_EL
   ## is set to MathML elements, and SVG_EL is set to SVG elements.
