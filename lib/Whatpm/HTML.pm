@@ -2104,15 +2104,30 @@ sub _tree_construction_main ($) {
 
         $token = $self->_get_next_token;
         next B;
+
       } elsif ($token->{type} == START_TAG_TOKEN) {
-        if ((not {mglyph => 1, malignmark => 1}->{$token->{tag_name}} and
-             $self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL) or
-            not ($self->{open_elements}->[-1]->[1] & FOREIGN_EL) or
-            ($token->{tag_name} eq 'svg' and
-             $self->{open_elements}->[-1]->[1] == MML_AXML_EL)) {
+        ## "In foreign content" insertion mode, start tag token.
+
+        if (
+          (
+            not $self->{open_elements}->[-1]->[1] & FOREIGN_EL
+          ) or
+          (
+            $self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL and
+            (
+              $self->{open_elements}->[-1]->[1] & SVG_EL or
+              not {mglyph => 1, malignmark => 1}->{$token->{tag_name}}
+            )
+          ) or
+          (
+            $token->{tag_name} eq 'svg' and
+            $self->{open_elements}->[-1]->[1] == MML_AXML_EL
+          )
+        ) {
           ## NOTE: "using the rules for secondary insertion mode"then"continue"
           
           #
+
         } elsif ({
                   b => 1, big => 1, blockquote => 1, body => 1, br => 1,
                   center => 1, code => 1, dd => 1, div => 1, dl => 1, dt => 1,

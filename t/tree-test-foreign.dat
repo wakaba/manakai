@@ -2331,6 +2331,24 @@ no </svg> before EOF
 |           <b>
 
 #data
+<!DOCTYPE html><svg><foreignobject><span><math><sub>
+#errors
+no </math> before <sub>
+no </span> before EOF
+no </foreignObject> before EOF
+no </svg> before EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg foreignObject>
+|         <span>
+|           <math math>
+|           <sub>
+
+#data
 <!DOCTYPE html><svg><title><mglyph>
 #errors
 no </mglyph></title> before EOF
