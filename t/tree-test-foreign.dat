@@ -2648,8 +2648,8 @@ no </ruby> before EOF
 #data
 <!DOCTYPE html><ruby><math><annotation-xml><rt>
 #errors
-no </annotation-xml> before EOF
-no </math> before EOF
+no </rt> before EOF
+no </annotation-xml></math> before EOF
 no </ruby> before EOF
 #document
 | <!DOCTYPE html>
@@ -2664,8 +2664,8 @@ no </ruby> before EOF
 #data
 <!DOCTYPE html><ruby><math><annotation-xml encoding="text/html"><rt>
 #errors
-no </rt></annotation-xml> before <rt>
-no </math> before EOF
+no </rt> before EOF
+no </annotation-xml></math> before EOF
 no </ruby> before EOF
 #document
 | <!DOCTYPE html>
@@ -2697,9 +2697,8 @@ no </ul> before EOF
 #data
 <!DOCTYPE html><ul><li><math><annotation-xml><li>
 #errors
-no </li></annotation-xml> before <li>
-no </math> before EOF
-no </ruby> before EOF
+no </annotation-xml></math> before <li>
+no </ul> before EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2709,13 +2708,13 @@ no </ruby> before EOF
 |       <li>
 |         <math math>
 |           <math annotation-xml>
-|             <li>
+|       <li>
 
 #data
 <!DOCTYPE html><math><annotation-xml><wbr><rt><malignmark>
 #errors
-no </annotation-xml>
-no </math>
+no </malignmark></rt></wbr>
+no </annotation-xml></math>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2730,8 +2729,8 @@ no </math>
 #data
 <!DOCTYPE html><math><annotation-xml encoding="text/xml"><wbr><rt><malignmark>
 #errors
-no </annotation-xml>
-no </math>
+no </malignmark></rt></wbr>
+no </annotation-xml></math>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2747,8 +2746,8 @@ no </math>
 #data
 <!DOCTYPE html><math><annotation-xml encoding="text/html "><wbr><rt><malignmark>
 #errors
-no </annotation-xml>
-no </math>
+no </malignmark></rt></wbr>
+no </annotation-xml></math>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2764,8 +2763,9 @@ no </math>
 #data
 <!DOCTYPE html><math><annotation-xml encoding="text/html"><wbr><rt><malignmark>
 #errors
-no </annotation-xml>
-no </math>
+no </malignmark>
+no </rt>
+no </annotation-xml></math>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2781,8 +2781,9 @@ no </math>
 #data
 <!DOCTYPE html><math><annotation-xml encoding="TEXT/HTML"><wbr><rt><malignmark>
 #errors
-no </annotation-xml>
-no </math>
+no </malignmark>
+no </rt>
+no </annotation-xml></math>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2798,8 +2799,9 @@ no </math>
 #data
 <!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><wbr><rt><malignmark>
 #errors
-no </annotation-xml>
-no </math>
+no </malignmark>
+no </rt>
+no </annotation-xml></math>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -2815,8 +2817,9 @@ no </math>
 #data
 <!DOCTYPE html><math><annotation-xml encoding="application/xhtml+XML"><wbr><rt><malignmark>
 #errors
-no </annotation-xml>
-no </math>
+no </malignmark>
+no </rt>
+no </annotation-xml></math>
 #document
 | <!DOCTYPE html>
 | <html>

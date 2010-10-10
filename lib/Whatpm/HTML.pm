@@ -2347,6 +2347,7 @@ sub _tree_construction_main ($) {
               my $current_ln = $current_node->[0]->manakai_local_name;
               if ({
                 mi => 1, mo => 1, mn => 1, ms => 1, mtext => 1,
+                'annotation-xml' => 1,
               }->{$current_ln}) {
                 last;
               }
