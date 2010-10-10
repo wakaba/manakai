@@ -3284,3 +3284,349 @@ EOF
 |         encoding="Application/xhtml+xml"
 |         <math math>
 |         <b>
+
+#data
+<!DOCTYPE html><math><mi><i>a</math><math>b
+#errors
+unexpected </math>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|           <math math>
+|             "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><math>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math math>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><x>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math x>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><mi>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math mi>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><ms>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math ms>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><mo>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math mo>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><mn>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math mn>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><mtext>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math mtext>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><mi><div>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math mi>
+|         <div>
+|           <i>
+|             "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><mi><b>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math mi>
+|         <i>
+|           <b>
+|             "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><annotation-xml>b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math annotation-xml>
+|         "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html">b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <i>
+|           "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="application/xhtml+XML">b
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math annotation-xml>
+|         encoding="application/xhtml+XML"
+|         <i>
+|           "b"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><desc>x
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <i>
+|           <svg svg>
+|             <svg desc>
+|               "x"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><title>x
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <i>
+|           <svg svg>
+|             <svg title>
+|               "x"
+
+#data
+<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><foreignobject>x
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <i>
+|           "a"
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <i>
+|           <svg svg>
+|             <svg foreignObject>
+|               "x"
+
+#data
+<!DOCTYPE html><svg><title><i>a</title><desc>x
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg title>
+|         <i>
+|           "a"
+|       <svg desc>
+|         <i>
+|           "x"
+
+#data
+<!DOCTYPE html><svg><title><i>a</title><title>x
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg title>
+|         <i>
+|           "a"
+|       <svg title>
+|         <i>
+|           "x"
+
+#data
+<!DOCTYPE html><svg><title><i>a</title><foreignObJect>x
+#errors
+no </i>
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg title>
+|         <i>
+|           "a"
+|       <svg foreignObject>
+|         <i>
+|           "x"

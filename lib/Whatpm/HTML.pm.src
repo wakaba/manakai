@@ -2018,12 +2018,45 @@ sub _tree_construction_main ($) {
         ## "In foreign content" insertion mode, character token.
         !!!cp ('t87.1');
 
-        # XXX If the current node is an HTML element; If the current
-        # node is an HTML integration point.
+        if (
+          ( ## If the current node is an HTML element.
+            not $self->{open_elements}->[-1]->[1] & FOREIGN_EL
+          ) or
+          ( ## If the current node is an HTML integration point (other
+            ## than |annotation-xml|).
+            $self->{open_elements}->[-1]->[1] == SVG_INTEGRATION_EL
+          ) or
+          ( ## If the current node is an |annotation-xml| whose
+            ## |encoding| is |text/html| or |application/xhtml+xml|
+            ## (HTML integration point).
+            $self->{open_elements}->[-1]->[1] == MML_AXML_EL and
+            do {
+              my $encoding = $self->{open_elements}->[-1]->[0]->get_attribute_ns (undef, 'encoding') || '';
+              $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+              if ($encoding eq 'text/html' or 
+                  $encoding eq 'application/xhtml+xml') {
+                1;
+              } else {
+                0;
+              }
+            }
+          )
+        ) {
+          ## I.e., if the current node is an HTML element, or if the
+          ## current node is an HTML integration point.
+
+          ## In these cases, the character token is handled "using the
+          ## rules for" the "in body" insertion mode.  The only
+          ## difference of handling of the character token is whethter
+          ## the following action is done:
+          $reconstruct_active_formatting_elements
+              ->($self, $insert_to_current, $active_formatting_elements,
+                 $open_tables);
+        }
 
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
-        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) { ## XXX
           delete $self->{frameset_ok};
         }
 
@@ -2105,10 +2138,10 @@ sub _tree_construction_main ($) {
               not $current_node->[1] & FOREIGN_EL or
 
               ## An MathML text integration point.
-              $current_node->[1] & MML_TEXT_INTEGRATION_EL or
+              $current_node->[1] & MML_TEXT_INTEGRATION_EL or # XXX
               
               ## An HTML integration point.
-              $current_node->[1] & SVG_INTEGRATION_EL or
+              $current_node->[1] & SVG_INTEGRATION_EL or # XXX
               ($current_node->[1] == MML_AXML_EL and
                do {
                  my $encoding = $current_node->[0]->get_attribute_ns (undef, 'encoding') || '';
@@ -2850,8 +2883,14 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: Unknown token type";
       }
+
     } elsif ($self->{insertion_mode} & BODY_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
+        ## "In body" insertion mode, character token.  Note that a
+        ## character token that is processed "using the rules for" the
+        ## "in body" insertion mode in the "in foreign content"
+        ## insertion mode is handled in the "in foreign content"
+        ## insertion mode's code.
         !!!cp ('t150');
         $reconstruct_active_formatting_elements
             ->($self, $insert_to_current, $active_formatting_elements,

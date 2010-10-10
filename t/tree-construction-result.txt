@@ -7310,5 +7310,62 @@ ok 6264 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="appli
 ok 6265 - Parse error: qq'<!DOCTYPE html><math><annotation-xml encoding="Application/xhtml+xml"><math><b>'; 1:79:not closed, 1:79:in body:\#eof;no </math>, EOF
 ok 6266 - SHOULD-level error: qq'<!DOCTYPE html><math><annotation-xml encoding="Application/xhtml+xml"><math><b>'; ;
 ok 6267 - Document tree: qq'<!DOCTYPE html><math><annotation-xml encoding="Application/xhtml+xml"><math><b>'
-1..6267
-# Looks like you failed 130 tests of 6267.
+ok 6268 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</math><math>b'; 1:37:unmatched end tag, 1:43:in body:\#eof;unexpected </math>, EOF
+ok 6269 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</math><math>b'; ;
+ok 6270 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</math><math>b'
+ok 6271 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><math>b'; 1:35:not closed, 1:41:in body:\#eof;no </i>, EOF
+ok 6272 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><math>b'; ;
+ok 6273 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><math>b'
+ok 6274 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><x>b'; 1:35:not closed, 1:38:in body:\#eof;no </i>, EOF
+ok 6275 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><x>b'; ;
+ok 6276 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><x>b'
+ok 6277 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><mi>b'; 1:35:not closed, 1:39:in body:\#eof;no </i>, EOF
+ok 6278 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><mi>b'; ;
+ok 6279 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><mi>b'
+ok 6280 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><ms>b'; 1:35:not closed, 1:39:in body:\#eof;no </i>, EOF
+ok 6281 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><ms>b'; ;
+ok 6282 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><ms>b'
+ok 6283 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><mo>b'; 1:35:not closed, 1:39:in body:\#eof;no </i>, EOF
+ok 6284 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><mo>b'; ;
+ok 6285 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><mo>b'
+ok 6286 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><mn>b'; 1:35:not closed, 1:39:in body:\#eof;no </i>, EOF
+ok 6287 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><mn>b'; ;
+ok 6288 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><mn>b'
+ok 6289 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><mtext>b'; 1:35:not closed, 1:42:in body:\#eof;no </i>, EOF
+ok 6290 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><mtext>b'; ;
+ok 6291 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><mtext>b'
+ok 6292 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><mi><div>b'; 1:35:not closed, 1:44:in body:\#eof;no </i>, EOF
+ok 6293 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><mi><div>b'; ;
+ok 6294 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><mi><div>b'
+ok 6295 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><mi><b>b'; 1:35:not closed, 1:42:in body:\#eof;no </i>, EOF
+ok 6296 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><mi><b>b'; ;
+ok 6297 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><mi><b>b'
+ok 6298 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml>b'; 1:35:not closed, 1:51:in body:\#eof;no </i>, EOF
+ok 6299 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml>b'; ;
+ok 6300 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml>b'
+ok 6301 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html">b'; 1:35:not closed, 1:72:in body:\#eof;no </i>, EOF
+ok 6302 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html">b'; ;
+ok 6303 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html">b'
+ok 6304 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="application/xhtml+XML">b'; 1:35:not closed, 1:84:in body:\#eof;no </i>, EOF
+ok 6305 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="application/xhtml+XML">b'; ;
+ok 6306 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="application/xhtml+XML">b'
+ok 6307 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><desc>x'; 1:35:not closed, 1:83:in body:\#eof;no </i>, EOF
+ok 6308 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><desc>x'; ;
+ok 6309 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><desc>x'
+ok 6310 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><title>x'; 1:35:not closed, 1:84:in body:\#eof;no </i>, EOF
+ok 6311 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><title>x'; ;
+ok 6312 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><title>x'
+ok 6313 - Parse error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><foreignobject>x'; 1:35:not closed, 1:92:in body:\#eof;no </i>, EOF
+ok 6314 - SHOULD-level error: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><foreignobject>x'; ;
+ok 6315 - Document tree: qq'<!DOCTYPE html><math><mi><i>a</mi><annotation-xml encoding="text/html"><svg><foreignobject>x'
+ok 6316 - Parse error: qq'<!DOCTYPE html><svg><title><i>a</title><desc>x'; 1:40:not closed, 1:46:in body:\#eof;no </i>, EOF
+ok 6317 - SHOULD-level error: qq'<!DOCTYPE html><svg><title><i>a</title><desc>x'; ;
+ok 6318 - Document tree: qq'<!DOCTYPE html><svg><title><i>a</title><desc>x'
+ok 6319 - Parse error: qq'<!DOCTYPE html><svg><title><i>a</title><title>x'; 1:40:not closed, 1:47:in body:\#eof;no </i>, EOF
+ok 6320 - SHOULD-level error: qq'<!DOCTYPE html><svg><title><i>a</title><title>x'; ;
+ok 6321 - Document tree: qq'<!DOCTYPE html><svg><title><i>a</title><title>x'
+ok 6322 - Parse error: qq'<!DOCTYPE html><svg><title><i>a</title><foreignObJect>x'; 1:40:not closed, 1:55:in body:\#eof;no </i>, EOF
+ok 6323 - SHOULD-level error: qq'<!DOCTYPE html><svg><title><i>a</title><foreignObJect>x'; ;
+ok 6324 - Document tree: qq'<!DOCTYPE html><svg><title><i>a</title><foreignObJect>x'
+1..6324
+# Looks like you failed 130 tests of 6324.
