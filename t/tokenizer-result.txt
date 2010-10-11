@@ -497,8 +497,40 @@ not ok 216 - <!----\u0000: qq'<!----\x{00}'
 # |  8|        ];                  |  9|        ];                  |
 # +---+----------------------------+---+----------------------------+
 # 
-ok 217 - <!----\u0009: qq'<!----\x{09}'
-ok 218 - <!----\u000A: qq'<!----\x{0A}'
+not ok 217 - <!----\u0009: qq'<!----\x{09}'
+#   Failed test '<!----\u0009: qq'<!----\x{09}''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+---------------------------+---+---------------------------+
+# | Ln|Got                        | Ln|Expected                   |
+# +---+---------------------------+---+---------------------------+
+# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
+# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
+# |   |                           *  3|          qq'ParseError',  *
+# |  3|          [                |  4|          [                |
+# |  4|            qq'Comment',   |  5|            qq'Comment',   |
+# |  5|            qq'--\x{09}'   |  6|            qq'--\x{09}'   |
+# |  6|          ]                |  7|          ]                |
+# |  7|        ];                 |  8|        ];                 |
+# +---+---------------------------+---+---------------------------+
+# 
+not ok 218 - <!----\u000A: qq'<!----\x{0A}'
+#   Failed test '<!----\u000A: qq'<!----\x{0A}''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+---------------------------+---+---------------------------+
+# | Ln|Got                        | Ln|Expected                   |
+# +---+---------------------------+---+---------------------------+
+# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
+# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
+# |   |                           *  3|          qq'ParseError',  *
+# |  3|          [                |  4|          [                |
+# |  4|            qq'Comment',   |  5|            qq'Comment',   |
+# |  5|            qq'--\x{0A}'   |  6|            qq'--\x{0A}'   |
+# |  6|          ]                |  7|          ]                |
+# |  7|        ];                 |  8|        ];                 |
+# +---+---------------------------+---+---------------------------+
+# 
 not ok 219 - <!----\u000B: qq'<!----\x{0B}'
 #   Failed test '<!----\u000B: qq'<!----\x{0B}''
 #   at HTML-tokenizer.t ok line 1.
@@ -517,8 +549,40 @@ not ok 219 - <!----\u000B: qq'<!----\x{0B}'
 # |  7|        ];                 |  9|        ];                 |
 # +---+---------------------------+---+---------------------------+
 # 
-ok 220 - <!----\u000C: qq'<!----\x{0C}'
-ok 221 - <!---- : qq'<!---- '
+not ok 220 - <!----\u000C: qq'<!----\x{0C}'
+#   Failed test '<!----\u000C: qq'<!----\x{0C}''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+---------------------------+---+---------------------------+
+# | Ln|Got                        | Ln|Expected                   |
+# +---+---------------------------+---+---------------------------+
+# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
+# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
+# |   |                           *  3|          qq'ParseError',  *
+# |  3|          [                |  4|          [                |
+# |  4|            qq'Comment',   |  5|            qq'Comment',   |
+# |  5|            qq'--\x{0C}'   |  6|            qq'--\x{0C}'   |
+# |  6|          ]                |  7|          ]                |
+# |  7|        ];                 |  8|        ];                 |
+# +---+---------------------------+---+---------------------------+
+# 
+not ok 221 - <!---- : qq'<!---- '
+#   Failed test '<!---- : qq'<!---- ''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+---------------------------+---+---------------------------+
+# | Ln|Got                        | Ln|Expected                   |
+# +---+---------------------------+---+---------------------------+
+# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
+# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
+# |   |                           *  3|          qq'ParseError',  *
+# |  3|          [                |  4|          [                |
+# |  4|            qq'Comment',   |  5|            qq'Comment',   |
+# |  5|            qq'-- '        |  6|            qq'-- '        |
+# |  6|          ]                |  7|          ]                |
+# |  7|        ];                 |  8|        ];                 |
+# +---+---------------------------+---+---------------------------+
+# 
 not ok 222 - <!----!: qq'<!----!'
 #   Failed test '<!----!: qq'<!----!''
 #   at HTML-tokenizer.t ok line 1.
@@ -14299,17 +14363,17 @@ not ok 2275 - Double hyphen in comment: qq'<!-- foo -- bar -->'
 #   Failed test 'Double hyphen in comment: qq'<!-- foo -- bar -->''
 #   at HTML-tokenizer.t ok line 1.
 #   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+------------------------------+-------------------------------+
-# | Ln|Got                           |Expected                       |
-# +---+------------------------------+-------------------------------+
-# |  1|$VAR1 = [                     |$VAR1 = [                      |
-# |  2|          qq'ParseError',     |          qq'ParseError',      |
-# |  3|          [                   |          [                    |
-# |  4|            qq'Comment',      |            qq'Comment',       |
-# *  5|            qq' foo -- bar '  |            qq' foo - - bar '  *
-# |  6|          ]                   |          ]                    |
-# |  7|        ];                    |        ];                     |
-# +---+------------------------------+-------------------------------+
+# +---+------------------------------+---+-------------------------------+
+# | Ln|Got                           | Ln|Expected                       |
+# +---+------------------------------+---+-------------------------------+
+# |  1|$VAR1 = [                     |  1|$VAR1 = [                      |
+# |   |                              *  2|          qq'ParseError',      *
+# |  2|          [                   |  3|          [                    |
+# |  3|            qq'Comment',      |  4|            qq'Comment',       |
+# *  4|            qq' foo -- bar '  *  5|            qq' foo - - bar '  *
+# |  5|          ]                   |  6|          ]                    |
+# |  6|        ];                    |  7|        ];                     |
+# +---+------------------------------+---+-------------------------------+
 # 
 ok 2276 - FF between attributes: qq'<a b=\x{27}\x{27}\x{0C}c=\x{27}\x{27}>'
 # t/tokenizer-test-1.test
@@ -14670,7 +14734,22 @@ ok 2543 - <!--a--
 # >: qq'<!--a--\x{0A}>'
 ok 2544 - <!--a-- a>: qq'<!--a-- a>'
 ok 2545 - <!--a-- ->: qq'<!--a-- ->'
-ok 2546 - <!--a-- -->: qq'<!--a-- -->'
+not ok 2546 - <!--a-- -->: qq'<!--a-- -->'
+#   Failed test '<!--a-- -->: qq'<!--a-- -->''
+#   at HTML-tokenizer.t ok line 1.
+#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
+# +---+--------------------------+---+---------------------------+
+# | Ln|Got                       | Ln|Expected                   |
+# +---+--------------------------+---+---------------------------+
+# |  1|$VAR1 = [                 |  1|$VAR1 = [                  |
+# |   |                          *  2|          qq'ParseError',  *
+# |  2|          [               |  3|          [                |
+# |  3|            qq'Comment',  |  4|            qq'Comment',   |
+# |  4|            qq'a-- '      |  5|            qq'a-- '       |
+# |  5|          ]               |  6|          ]                |
+# |  6|        ];                |  7|        ];                 |
+# +---+--------------------------+---+---------------------------+
+# 
 ok 2547 - <!--a-- : qq'<!--a-- '
 ok 2548 - <!--a-- --b-- >: qq'<!--a-- --b-- >'
 ok 2549 - <a href=''rel=''>: qq'<a href=\x{27}\x{27}rel=\x{27}\x{27}>'
@@ -14779,4 +14858,4 @@ ok 2597 - start tag not closed (self-closing start tag): qq'<p class=\x{27}a\x{2
 ok 2598 - end tag not closed (self-closing start tag): qq'</p/'
 ok 2599 - end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/'
 1..2599
-# Looks like you failed 672 tests of 2599.
+# Looks like you failed 677 tests of 2599.

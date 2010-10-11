@@ -181,6 +181,7 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}texts-1.dat
   ${test_dir_name}cdata-1.dat
   ${test_dir_name}charref-1.dat
+  ${test_dir_name}comments-1.dat
   ${test_dir_name}comments-2.dat
   ${test_dir_name}pis-1.dat
   ${test_dir_name}pis-2.dat

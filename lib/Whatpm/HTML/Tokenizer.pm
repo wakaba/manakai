@@ -126,7 +126,7 @@ sub COMMENT_START_DASH_STATE () { 15 }
 sub COMMENT_STATE () { 16 }
 sub COMMENT_END_STATE () { 17 }
 sub COMMENT_END_BANG_STATE () { 102 }
-sub COMMENT_END_SPACE_STATE () { 103 }
+#sub COMMENT_END_SPACE_STATE () { 103 } ## REMOVED
 sub COMMENT_END_DASH_STATE () { 18 }
 sub BOGUS_COMMENT_STATE () { 19 }
 sub DOCTYPE_STATE () { 20 }
@@ -2623,24 +2623,6 @@ sub _get_next_token ($) {
   
         redo A;
       } elsif ($state != COMMENT_END_BANG_STATE and
-               $is_space->{$nc}) {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'comment end space'); # XXX error type
-        $self->{ct}->{data} .= '--' . chr ($nc); # comment
-        $self->{state} = COMMENT_END_SPACE_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($state != COMMENT_END_BANG_STATE and
                $nc == 0x0021) { # !
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'comment end bang'); # XXX error type
@@ -2692,79 +2674,6 @@ sub _get_next_token ($) {
   
         redo A;
       } 
-    } elsif ($state == COMMENT_END_SPACE_STATE) {
-      ## XML5: Not exist.
-
-      if ($nc == 0x003E) { # >
-        if ($self->{in_subset}) {
-          
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-        } else {
-          
-          $self->{state} = DATA_STATE;
-        }
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-
-        return  ($self->{ct}); # comment
-
-        redo A;
-      } elsif ($is_space->{$nc}) {
-        
-        $self->{ct}->{data} .= chr ($nc); # comment
-        ## Stay in the state.
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      } elsif ($nc == -1) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed comment');
-        if ($self->{in_subset}) {
-          
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-        } else {
-          
-          $self->{state} = DATA_STATE;
-        }
-        ## Reconsume.
-
-        return  ($self->{ct}); # comment
-
-        redo A;
-      } else {
-        
-        $self->{ct}->{data} .= chr ($nc); # comment
-        $self->{state} = COMMENT_STATE;
-        
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
-  
-        redo A;
-      }
     } elsif ($state == DOCTYPE_STATE) {
       if ($is_space->{$nc}) {
         

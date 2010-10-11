@@ -1,0 +1,26 @@
+#data
+<!--
+< !--x-- >
+< !--y-- >
+--><a/>
+#errors
+#document escaped
+| <!--\u0020
+| < !--x-- >
+| < !--y-- >
+|  -->
+| <{} a>
+
+#data
+<!--< !--x-- >< !--y-- >--><a/>
+#errors
+#document escaped
+| <!--\u0020< !--x-- >< !--y-- > -->
+| <{} a>
+
+#data
+<!-- xxx -- > yyy --><a/>
+#errors
+#document
+| <!--  xxx -- > yyy  -->
+| <{} a>

@@ -126,7 +126,7 @@ sub COMMENT_START_DASH_STATE () { 15 }
 sub COMMENT_STATE () { 16 }
 sub COMMENT_END_STATE () { 17 }
 sub COMMENT_END_BANG_STATE () { 102 }
-sub COMMENT_END_SPACE_STATE () { 103 }
+#sub COMMENT_END_SPACE_STATE () { 103 } ## REMOVED
 sub COMMENT_END_DASH_STATE () { 18 }
 sub BOGUS_COMMENT_STATE () { 19 }
 sub DOCTYPE_STATE () { 20 }
@@ -2203,14 +2203,6 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } elsif ($state != COMMENT_END_BANG_STATE and
-               $is_space->{$nc}) {
-        !!!cp (152.1);
-        !!!parse-error (type => 'comment end space'); # XXX error type
-        $self->{ct}->{data} .= '--' . chr ($nc); # comment
-        $self->{state} = COMMENT_END_SPACE_STATE;
-        !!!next-input-character;
-        redo A;
-      } elsif ($state != COMMENT_END_BANG_STATE and
                $nc == 0x0021) { # !
         !!!cp (152.2);
         !!!parse-error (type => 'comment end bang'); # XXX error type
@@ -2242,49 +2234,6 @@ sub _get_next_token ($) {
         !!!next-input-character;
         redo A;
       } 
-    } elsif ($state == COMMENT_END_SPACE_STATE) {
-      ## XML5: Not exist.
-
-      if ($nc == 0x003E) { # >
-        if ($self->{in_subset}) {
-          !!!cp (154.4);
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-        } else {
-          !!!cp (154.5);
-          $self->{state} = DATA_STATE;
-        }
-        !!!next-input-character;
-
-        !!!emit ($self->{ct}); # comment
-
-        redo A;
-      } elsif ($is_space->{$nc}) {
-        !!!cp (154.6);
-        $self->{ct}->{data} .= chr ($nc); # comment
-        ## Stay in the state.
-        !!!next-input-character;
-        redo A;
-      } elsif ($nc == -1) {
-        !!!parse-error (type => 'unclosed comment');
-        if ($self->{in_subset}) {
-          !!!cp (154.7);
-          $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-        } else {
-          !!!cp (154.8);
-          $self->{state} = DATA_STATE;
-        }
-        ## Reconsume.
-
-        !!!emit ($self->{ct}); # comment
-
-        redo A;
-      } else {
-        !!!cp (154.9);
-        $self->{ct}->{data} .= chr ($nc); # comment
-        $self->{state} = COMMENT_STATE;
-        !!!next-input-character;
-        redo A;
-      }
     } elsif ($state == DOCTYPE_STATE) {
       if ($is_space->{$nc}) {
         !!!cp (155);
