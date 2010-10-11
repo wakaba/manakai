@@ -3777,3 +3777,57 @@ bad comment
 |       <svg foreignObject>
 |         <div>
 |           <!-- [CDATA[foo]] -->
+
+#data
+<!DOCTYPE html><table><svg><desc><i>a</desc><title><b>b</title><foreignobject><table><td>c</table>d</i>e</foreignObject></svg><math><mi>f<i>g</mi><annotation-xml encoding=text/html>h</annotation-xml><annotation-xml>i</annotation-xml></math>j
+#errors
+<svg> in table
+no </i> before </desc>
+no </b> before </title>
+no <tr> before <td>
+no </b> before </i>; AAA
+no </b> before </foreignObject>
+<math> in table
+no </i> before </annotation-xml>
+no </i> before </mi>
+"j" in table
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg desc>
+|         <i>
+|           "a"
+|       <svg title>
+|         <i>
+|           <b>
+|             "b"
+|       <svg foreignObject>
+|         <table>
+|           <tbody>
+|             <tr>
+|               <td>
+|                 "c"
+|         <i>
+|           <b>
+|             "d"
+|         <b>
+|           "e"
+|     <b>
+|       <math math>
+|         <math mi>
+|           "f"
+|           <i>
+|             "g"
+|         <math annotation-xml>
+|           encoding="text/html"
+|           <i>
+|             "h"
+|         <math annotation-xml>
+|           "i"
+|       <i>
+|         "j"
+|     <table>

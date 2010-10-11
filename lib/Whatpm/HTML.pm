@@ -5883,10 +5883,11 @@ sub _tree_construction_main ($) {
             last AFE;
           }
         } # AFE
-          
+        
+        my $insert = $self->{insertion_mode} & TABLE_IMS
+            ? $insert_to_foster : $insert_to_current;
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements,
-               $open_tables);
+            ->($self, $insert, $active_formatting_elements, $open_tables);
 
         
     {
@@ -5922,9 +5923,10 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{tag_name} eq 'nobr') {
+        my $insert = $self->{insertion_mode} & TABLE_IMS
+            ? $insert_to_foster : $insert_to_current;
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements,
-               $open_tables);
+            ->($self, $insert, $active_formatting_elements, $open_tables);
 
         ## has a |nobr| element in scope
         INSCOPE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -6000,9 +6002,10 @@ sub _tree_construction_main ($) {
           }
         } # INSCOPE
           
+        my $insert = $self->{insertion_mode} & TABLE_IMS
+            ? $insert_to_foster : $insert_to_current;
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements,
-               $open_tables);
+            ->($self, $insert, $active_formatting_elements, $open_tables);
           
         
     {
@@ -6067,8 +6070,10 @@ sub _tree_construction_main ($) {
             }
           } # INSCOPE
 
+          my $insert = $self->{insertion_mode} & TABLE_IMS
+              ? $insert_to_foster : $insert_to_current;
           $reconstruct_active_formatting_elements
-              ->($self, $insert_to_current, $active_formatting_elements,
+              ->($self, $insert, $active_formatting_elements,
                  $open_tables);
 
           delete $self->{frameset_ok};
@@ -6198,9 +6203,10 @@ sub _tree_construction_main ($) {
           next B;
         }
 
+        my $insert = $self->{insertion_mode} & TABLE_IMS
+            ? $insert_to_foster : $insert_to_current;
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements,
-               $open_tables);
+            ->($self, $insert, $active_formatting_elements, $open_tables);
 
         
     {
@@ -6292,9 +6298,10 @@ sub _tree_construction_main ($) {
         redo B;
       } elsif ($token->{tag_name} eq 'math' or
                $token->{tag_name} eq 'svg') {
+        my $insert = $self->{insertion_mode} & TABLE_IMS
+            ? $insert_to_foster : $insert_to_current;
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements,
-               $open_tables);
+            ->($self, $insert, $active_formatting_elements, $open_tables);
 
         ## "Adjust MathML attributes" ('math' only) - done in insert-element-f
 
@@ -6413,9 +6420,10 @@ sub _tree_construction_main ($) {
         }
 
         ## NOTE: There is an "as if <br>" code clone.
+        my $insert = $self->{insertion_mode} & TABLE_IMS
+            ? $insert_to_foster : $insert_to_current;
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements,
-               $open_tables);
+            ->($self, $insert, $active_formatting_elements, $open_tables);
         
         
     {
@@ -6818,9 +6826,10 @@ sub _tree_construction_main ($) {
                         text => 'br', token => $token);
 
         ## As if <br>
+        my $insert = $self->{insertion_mode} & TABLE_IMS
+            ? $insert_to_foster : $insert_to_current;
         $reconstruct_active_formatting_elements
-            ->($self, $insert_to_current, $active_formatting_elements,
-               $open_tables);
+            ->($self, $insert, $active_formatting_elements, $open_tables);
         
         my $el;
         

@@ -402,3 +402,292 @@ no </button>
 |         "b"
 |         <p>
 |         "c"
+
+#data
+<!DOCTYPE html><table><b><i>a</b><a>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<a> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <a>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><nobr>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<nobr> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <nobr>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><button>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<button> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <button>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><xmp>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<xmp> in table
+no </i> before </b>; reconstruction
+EOF (RAWTEXT)
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <xmp>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><iframe>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+no </i> before </b>; reconstruction
+<iframe> in table
+EOF (RAWTEXT)
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <iframe>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><noframes>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+no </i> before </b>; reconstruction
+<noframes> in table
+EOF (RAWTEXT)
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <noframes>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><noembed>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+no </i> before </b>; reconstruction
+<noembed> in table
+EOF (RAWTEXT)
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <noembed>
+|     <table>
+
+#note When scripting is disabled.
+#data
+<!DOCTYPE html><table><b><i>a</b><noscript>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<noscript> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <noscript>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><option>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<option> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <option>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><optgroup>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<optgroup> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <optgroup>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><img>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<img> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <img>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b><br>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+<br> in table
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <br>
+|     <table>
+
+#data
+<!DOCTYPE html><table><b><i>a</b></br>
+#errors
+<b> in table
+<i> in table
+"a" in table
+</b> in table
+</br> in table
+</br>
+no </i> before </b>; reconstruction
+EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <b>
+|       <i>
+|         "a"
+|     <i>
+|       <br>
+|     <table>
