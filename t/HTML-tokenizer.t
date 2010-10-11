@@ -145,6 +145,7 @@ sub _tokenize_test ($$) {
           $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
           push @token, 'ParseError';
         } elsif ($self->{nc} <= 0x0008 or
+                 $self->{nc} == 0x000B or
                  (0x000E <= $self->{nc} and
                   $self->{nc} <= 0x001F) or
                  (0x007F <= $self->{nc} and

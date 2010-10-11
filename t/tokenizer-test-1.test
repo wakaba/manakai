@@ -90,36 +90,36 @@
 
 {"description": "VT in DOCTYPE state",
 "input": "<!DOCTYPE\u000b html>",
-"output": ["ParseError", "ParseError",
+"output": ["ParseError", "ParseError", "ParseError",
           ["DOCTYPE", "\u000b", null, null, false]]},
 
 {"description": "VT in before DOCTYPE name state",
 "input": "<!DOCTYPE \u000bhtml>",
-"output": [["DOCTYPE", "\u000bhtml", null, null, true]]},
+"output": ["ParseError", ["DOCTYPE", "\u000bhtml", null, null, true]]},
 
 {"description": "VT in DOCTYPE name state",
 "input": "<!DOCTYPE html\u000babcd>",
-"output": [["DOCTYPE", "html\u000babcd", null, null, true]]},
+"output": ["ParseError", ["DOCTYPE", "html\u000babcd", null, null, true]]},
 
 {"description": "VT in after DOCTYPE name state",
 "input": "<!DOCTYPE html \u000b>",
-"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "VT in before DOCTYPE public identifier state",
 "input": "<!DOCTYPE html PUBLIC \u000b\"xx\">",
-"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "VT in after DOCTYPE public identifier state",
 "input": "<!DOCTYPE html PUBLIC \"x\"\u000b>",
-"output": ["ParseError", ["DOCTYPE", "html", "x", null, false]]},
+"output": ["ParseError", "ParseError", ["DOCTYPE", "html", "x", null, false]]},
 
 {"description": "VT in before DOCTYPE system identifier state",
 "input": "<!DOCTYPE html SYSTEM \u000b\"aa\">",
-"output": ["ParseError", ["DOCTYPE", "html", null, null, false]]},
+"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, null, false]]},
 
 {"description": "VT in after DOCTYPE system identifier state",
 "input": "<!DOCTYPE html SYSTEM \"a\"\u000b>",
-"output": ["ParseError", ["DOCTYPE", "html", null, "a", true]]},
+"output": ["ParseError", "ParseError", ["DOCTYPE", "html", null, "a", true]]},
 
 {"description": "PUBLIC>",
 "input": "<!DOCTYPE html PUBLIC>",
@@ -695,7 +695,7 @@
 
 {"description": "&VT",
 "input": "&\u000B",
-"output": [["Character", "&\u000B"]]},
+"output": ["ParseError", ["Character", "&\u000B"]]},
 
 {"description":"&FF",
 "input":"&\u000C",
@@ -853,7 +853,7 @@
 "contentModelFlags":["RCDATA","CDATA"],
 "lastStartTag":"xxx",
 "input":"</xxx\u000Babc",
-"output":[["Character", "</xxx\u000Babc"]]},
+"output":["ParseError", ["Character", "</xxx\u000Babc"]]},
 
 {"description":"< in tag name state",
 "input":"<p<div>",
@@ -861,7 +861,7 @@
 
 {"description":"VT in tag name state",
 "input":"<p\u000ba>",
-"output":[["StartTag", "p\u000Ba", {}]]},
+"output":["ParseError", ["StartTag", "p\u000Ba", {}]]},
 
 {"description":"< in before attribute name state",
 "input":"<p <div>",
@@ -869,7 +869,7 @@
 
 {"description":"VT in before attribute name state",
 "input":"<p \u000bx>",
-"output":[["StartTag", "p", {"\u000Bx":""}]]},
+"output":["ParseError", ["StartTag", "p", {"\u000Bx":""}]]},
 
 {"description":"< in attribute name state",
 "input":"<p align<div>",
@@ -877,7 +877,7 @@
 
 {"description":"VT in attribute name state",
 "input":"<p a\u000bc>",
-"output":[["StartTag", "p", {"a\u000bc":""}]]},
+"output":["ParseError", ["StartTag", "p", {"a\u000bc":""}]]},
 
 {"description":"< in after attribute name state",
 "input":"<p align <div>",
@@ -885,7 +885,7 @@
 
 {"description":"VT in after attribute name state",
 "input":"<p a \u000bb>",
-"output":[["StartTag", "p", {"a":"","\u000bb":""}]]},
+"output":["ParseError", ["StartTag", "p", {"a":"","\u000bb":""}]]},
 
 {"description":"< in before attribute value state",
 "input":"<p align=<div>",
@@ -893,7 +893,7 @@
 
 {"description":"VT in before attribute value state",
 "input":"<p a=\u000bc>",
-"output":[["StartTag", "p", {"a":"\u000bc"}]]},
+"output":["ParseError", ["StartTag", "p", {"a":"\u000bc"}]]},
 
 {"description":"< in attribute value (unquoted) state",
 "input":"<p align=left<div>",
@@ -901,7 +901,7 @@
 
 {"description":"VT in attribute value (unquoted) state",
 "input":"<p align=left\u000bc>",
-"output":[["StartTag", "p", {"align":"left\u000bc"}]]},
+"output":["ParseError", ["StartTag", "p", {"align":"left\u000bc"}]]},
 
 {"description":"< in attribute value (single-unquoted) state",
 "input":"<p align='left<div>",
@@ -913,7 +913,7 @@
 
 {"description": "< in after attribute value (quoted) state",
 "input": "<p a=\"b\"\u000bc>",
-"output": ["ParseError", ["StartTag", "p", {"a":"b", "\u000bc": ""}]]},
+"output": ["ParseError", "ParseError", ["StartTag", "p", {"a":"b", "\u000bc": ""}]]},
 
 {"description":"/''b=\"\"",
 "input": "<a /''b=\"\">",
@@ -1109,7 +1109,7 @@
 
 {"description": "<!--a--!-->",
 "input": "<!--a--!-->",
-"output": [["Comment", "a--!"]]},
+"output": ["ParseError", ["Comment", "a--!"]]},
 
 {"description": "<!----!",
 "input": "<!----!",

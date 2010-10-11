@@ -37,3 +37,27 @@ no DOCTYPE
 |   <body>
 |     <p>
 |       "...\u2aa2\u0338?"
+
+#data escaped
+<p>\u0003
+#errors
+no DOCTYPE
+U+0003
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "\u0003"
+
+#data escaped
+<p>\u000B
+#errors
+no DOCTYPE
+U+000B
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       "\u000b"
