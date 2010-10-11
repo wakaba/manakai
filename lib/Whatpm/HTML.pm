@@ -1353,12 +1353,12 @@ sub _reset_insertion_mode ($) {
     
     ## Step 4..14
     my $new_mode;
-    if ($node->[1] & FOREIGN_EL) {
+    if ($node->[1] & SVG_EL or $node->[1] & MML_EL) {
       
-      ## NOTE: Strictly spaking, this case should only applies to
-      ## MathML and SVG elements.  Currently the HTML syntax
-      ## supports only MathML and SVG elements as foreigners.
       $new_mode = IN_FOREIGN_CONTENT_IM | IN_BODY_IM;
+    } elsif ($node->[1] & FOREIGN_EL) {
+      
+      #
     } elsif ($node->[1] == TABLE_CELL_EL) {
       if ($last) {
         
@@ -2339,7 +2339,7 @@ sub _tree_construction_main ($) {
             if defined $token->{column};
       
       $insert->($self, $el, $open_tables);
-      push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL | ($nsuri eq SVG_NS ? SVG_EL : $nsuri eq MML_NS ? MML_EL : 0)];
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL | (($nsuri) eq SVG_NS ? SVG_EL : ($nsuri) eq MML_NS ? MML_EL : 0)];
 
       if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($nsuri)) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
@@ -6342,7 +6342,7 @@ sub _tree_construction_main ($) {
             if defined $token->{column};
       
       $insert->($self, $el, $open_tables);
-      push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? MML_NS : SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL | ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS eq SVG_NS ? SVG_EL : $token->{tag_name} eq 'math' ? MML_NS : SVG_NS eq MML_NS ? MML_EL : 0)];
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$token->{tag_name} eq 'math' ? MML_NS : SVG_NS}->{ $token->{tag_name}} || 0) | FOREIGN_EL | (($token->{tag_name} eq 'math' ? MML_NS : SVG_NS) eq SVG_NS ? SVG_EL : ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS) eq MML_NS ? MML_EL : 0)];
 
       if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS)) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
@@ -7115,27 +7115,39 @@ sub set_inner_html ($$$$;$) {
     ## F4. If /context/ is not undef...
 
     ## F4.1. content model flag
+    my $node_ns = $node->namespace_uri || '';
     my $node_ln = $node->manakai_local_name;
-    if ($node_ln eq 'title' or $node_ln eq 'textarea') {
-      $p->{state} = RCDATA_STATE;
-    } elsif ($node_ln eq 'script') {
-      $p->{state} = SCRIPT_DATA_STATE;
-    } elsif ({
-      style => 1,
-      script => 1,
-      xmp => 1,
-      iframe => 1,
-      noembed => 1,
-      noframes => 1,
-      noscript => 1,
-    }->{$node_ln}) {
-      $p->{state} = RAWTEXT_STATE;
-    } elsif ($node_ln eq 'plaintext') {
-      $p->{state} = PLAINTEXT_STATE;
+    if ($node_ns eq HTML_NS) {
+      if ($node_ln eq 'title' or $node_ln eq 'textarea') {
+        $p->{state} = RCDATA_STATE;
+      } elsif ($node_ln eq 'script') {
+        $p->{state} = SCRIPT_DATA_STATE;
+      } elsif ({
+        style => 1,
+        script => 1,
+        xmp => 1,
+        iframe => 1,
+        noembed => 1,
+        noframes => 1,
+        noscript => 1,
+      }->{$node_ln}) {
+        $p->{state} = RAWTEXT_STATE;
+      } elsif ($node_ln eq 'plaintext') {
+        $p->{state} = PLAINTEXT_STATE;
+      }
+      
+      $p->{inner_html_node} = [$node, $el_category->{$node_ln}];
+    } elsif ($node_ns eq SVG_NS) {
+      $p->{inner_html_node} = [$node,
+                               $el_category_f->{$node_ns}->{$node_ln}
+                                   || FOREIGN_EL | SVG_EL];
+    } elsif ($node_ns eq MML_NS) {
+      $p->{inner_html_node} = [$node,
+                               $el_category_f->{$node_ns}->{$node_ln}
+                                   || FOREIGN_EL | MML_EL];
+    } else {
+      $p->{inner_html_node} = [$node, FOREIGN_EL];
     }
-
-    $p->{inner_html_node} = [$node, $el_category->{$node_ln}];
-      ## TODO: Foreign element OK?
 
     ## F4.2. Root |html| element
     my $root = $doc->create_element_ns

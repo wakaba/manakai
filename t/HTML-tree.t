@@ -104,8 +104,19 @@ sub test ($) {
         ($test->{data}->[0] => $doc, $onerror, $chk);
     $result = dumptree ($doc);
   } else {
-    my $el = $doc->create_element_ns
-      ('http://www.w3.org/1999/xhtml', [undef, $test->{element}]);
+    my $el;
+    if ($test->{element} =~ s/^svg\s*//) {
+      $el = $doc->create_element_ns
+          (q<http://www.w3.org/2000/svg>, [undef, $test->{element}]);
+    } elsif ($test->{element} =~ s/^math\s*//) {
+      $el = $doc->create_element_ns
+          (q<http://www.w3.org/1998/Math/MathML>, [undef, $test->{element}]);
+    } elsif ($test->{element} =~ s/^\{([^{}]*)\}\s*//) {
+      $el = $doc->create_element_ns ($1, [undef, $test->{element}]);
+    } else {
+      $el = $doc->create_element_ns
+          (q<http://www.w3.org/1999/xhtml>, [undef, $test->{element}]);
+    }
     Whatpm::HTML->set_inner_html ($el, $test->{data}->[0], $onerror, $chk);
     $result = dumptree ($el);
   }

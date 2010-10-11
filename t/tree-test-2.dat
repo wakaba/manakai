@@ -910,3 +910,64 @@ no </noframes>
 #errors
 #document-fragment noframes
 | "<span>"
+
+#document-fragment
+{} table
+#data
+<tr><td>
+#errors
+<tr> in body
+<td> in body
+#document
+
+#document-fragment
+svg script
+#data
+<p>abc
+#errors
+#document
+| <p>
+|   "abc"
+
+#document-fragment
+math math
+#data
+<annotation-xml xlink:href="foo">a
+#errors
+no </annotation-xml>
+#document
+| <annotation-xml>
+|   xlink:href="foo"
+|   "a"
+
+#document-fragment
+svg svg
+#data
+<g xlink:href="foo">a
+#errors
+no </g>
+#document
+| <g>
+|   xlink:href="foo"
+|   "a"
+
+#document-fragment
+svg foreignObject
+#data
+<g xlink:href="foo">a
+#errors
+no </g>
+#document
+| <g>
+|   xlink:href="foo"
+|   "a"
+
+#document-fragment
+svg svg
+#data
+<![CDATA[<p>]]>
+#errors
+bogus comment
+#document
+| <!-- [CDATA[<p -->
+| "]]>"

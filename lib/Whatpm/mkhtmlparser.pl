@@ -39,7 +39,7 @@ while (<>) {
       my \$el;
       !!!create-element (\$el, $1, $2, $3, $4);
       \$insert->(\$self, \$el, \$open_tables);
-      push \@{\$self->{open_elements}}, [\$el, (\$el_category_f->{$1}->{$2} || 0) | FOREIGN_EL | ($1 eq SVG_NS ? SVG_EL : $1 eq MML_NS ? MML_EL : 0)];
+      push \@{\$self->{open_elements}}, [\$el, (\$el_category_f->{$1}->{$2} || 0) | FOREIGN_EL | (($1) eq SVG_NS ? SVG_EL : ($1) eq MML_NS ? MML_EL : 0)];
 
       if ($3\->{xmlns} and $3\->{xmlns}->{value} ne ($1)) {
         !!!parse-error (type => 'bad namespace', token => $4);
