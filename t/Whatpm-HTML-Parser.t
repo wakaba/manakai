@@ -102,7 +102,7 @@ sub _html_parser_change_the_encoding_fragment : Test(2) {
   ok !$called;
 } # _html_parser_change_the_encoding_fragment
 
-sub _html_parser_change_the_encoding_byte_string : Test(20) {
+sub _html_parser_change_the_encoding_byte_string : Test(32) {
   my $parser = Whatpm::HTML->new;
   my $called = 0;
   my $onerror = sub {
@@ -114,6 +114,12 @@ sub _html_parser_change_the_encoding_byte_string : Test(20) {
   for my $input (
     '<meta charset=shift_jis>',
     '<meta http-equiv=Content-Type content="text/html; charset=shift_jis">',
+    '<meta http-equiv=Content-Type content="text/html; charsetcharset=shift_jis">',
+    '<meta http-equiv=Content-Type content="text/html; charset.charset=shift_jis">',
+    '<meta http-equiv=Content-Type content="text/html; charset-edition=1997;charset=shift_jis">',
+    '<meta http-equiv=Content-Type content="text/html; charset=shift_jis;charset=euc-jp">',
+    '<meta http-equiv=Content-Type content="text/html; charset  charset=shift_jis">',
+    '<meta http-equiv=Content-Type content="text/html; charset = shift_jis">',
     '<meta http-equiv="Content-Type" content="text/html; charset=shift_jis">',
     '<meta http-equiv=Content-Type content="text/html;charset=shift_jis">',
     '<meta http-equiv=Content-Type content=text/html; charset=shift_jis>',
