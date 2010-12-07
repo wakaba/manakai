@@ -20,6 +20,15 @@ sub _parse_global_date_and_time_string : Test(8) {
   is $date->to_global_date_and_time_string, '2010-12-13T01:02:03Z';
 } # _parse_global_date_and_time_string
 
+sub _to_datetime : Test(3) {
+  my $date = Message::Date->parse_global_date_and_time_string
+      ('2010-12-13T01:02:03Z');
+  my $dt = $date->to_datetime;
+  isa_ok $dt, 'DateTime';
+  is $dt . '', '2010-12-13T01:02:03';
+  is $dt->time_zone->name, 'UTC';
+} # _to_datetime
+
 __PACKAGE__->runtests;
 
 1;

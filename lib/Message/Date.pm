@@ -666,6 +666,12 @@ sub to_unix_integer ($) {
   return $self->{value} - $unix_epoch;
 } # to_unix_integer
 
+sub to_datetime ($) {
+  my $self = shift;
+  require DateTime;
+  return DateTime->from_epoch (epoch => $self->to_unix_integer);
+} # to_datetime
+
 package Message::Date::DateTime;
 push our @ISA, 'Message::Date';
 
