@@ -104,11 +104,11 @@ sub parse_week_string ($$) {
     $self->{onerror}->(type => 'datetime:bad year',
                        level => $self->{level}->{must}), return undef if $y == 0;
     $self->{onerror}->(type => 'week:bad week', ## TODOC: type
-                       level => $self->{level}->{must})
-        if $w > _last_week_number ($y);
+                       level => $self->{level}->{must}), return undef
+        if $w > _last_week_number ($y) || $w == 0;
     
     if (defined wantarray) {
-      my $day = $w * 7 - _week_year_diff ($y);
+      my $day = ($w - 1) * 7 - _week_year_diff ($y);
     
       return $self->_create_object ($y, 1, 1, 0, 0, 0, '', 0, 0,
                                     $day * 24 * 3600 * 1000);
