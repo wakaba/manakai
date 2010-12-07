@@ -91,7 +91,7 @@ sub to_time_string ($) {
   
   return sprintf '%02d:%02d:%02d%s',
       $self->utc_hour, $self->utc_minute,
-      $self->utc_second, $self->utc_second_fraction_string;
+      $self->utc_second, $self->second_fraction_string;
 } # to_time_string
 
 ## Week string [HTML5]
@@ -325,7 +325,7 @@ sub to_global_date_and_time_string ($) {
   return sprintf '%04d-%02d-%02dT%02d:%02d:%02d%sZ',
       $self->utc_year, $self->utc_month, $self->utc_day,
       $self->utc_hour, $self->utc_minute,
-      $self->utc_second, $self->utc_second_fraction_string;
+      $self->utc_second, $self->second_fraction_string;
 } # to_global_date_and_time_string
 
 ## Date string with optional time [Web Applications 1.0]
