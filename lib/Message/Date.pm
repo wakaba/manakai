@@ -26,12 +26,12 @@ sub _create_object ($$$$$$$$$;$) {
   my $self = shift;
 
   my $class = 'Message::Date::TimeT';
-  unless ($DateTime::VERSION) {
+#  unless ($DateTime::VERSION) {
 #    eval { require DateTime };
-  }
-  if ($DateTime::VERSION) {
-    $class = 'Message::Date::DateTime';
-  }
+#  }
+#  if ($DateTime::VERSION) {
+#    $class = 'Message::Date::DateTime';
+#  }
   
   bless $self, $class;
   return $self->_set_value (@_);
