@@ -34,34 +34,22 @@ sub _element_tag_name_xml_mixcase : Test(4) {
 sub _element_tag_name_html_lowercase : Test(4) {
   my $doc = Whatpm::NanoDOM::Document->new;
   my $el1 = $doc->create_element_ns (q<http://www.w3.org/1999/xhtml>, [undef, 'element']);
-  {
-    local $TODO = 'Not implemented yet';
-    is $el1->tag_name, 'ELEMENT';
-  }
+  is $el1->tag_name, 'element';
   is $el1->manakai_tag_name, 'element';
 
   $doc->manakai_is_html (1);
-  {
-    local $TODO = 'Not implemented yet';
-    is $el1->tag_name, 'ELEMENT';
-  }
+  is $el1->tag_name, 'ELEMENT';
   is $el1->manakai_tag_name, 'element';
 }
 
 sub _element_tag_name_html_mixcase : Test(4) {
   my $doc = Whatpm::NanoDOM::Document->new;
   my $el1 = $doc->create_element_ns (q<http://www.w3.org/1999/xhtml>, [undef, 'eleMent']);
-  {
-    local $TODO = 'Not implemented yet';
-    is $el1->tag_name, 'ELEMENT';
-  }
+  is $el1->tag_name, 'eleMent';
   is $el1->manakai_tag_name, 'eleMent';
 
   $doc->manakai_is_html (1);
-  {
-    local $TODO = 'Not implemented yet';
-    is $el1->tag_name, 'ELEMENT';
-  }
+  is $el1->tag_name, 'ELEMENT';
   is $el1->manakai_tag_name, 'eleMent';
 }
 

@@ -509,13 +509,10 @@ sub attributes ($) {
   return $r;
 } # attributes
 
-sub local_name ($) { # TODO: HTML5 case
+sub local_name ($) {
   return shift->{local_name};
 } # local_name
-
-sub manakai_local_name ($) {
-  return shift->{local_name}; # no case fixing for HTML5
-} # manakai_local_name
+*manakai_local_name = \&local_name;
 
 sub namespace_uri ($) {
   return shift->{namespace_uri};
@@ -540,14 +537,21 @@ sub manakai_element_type_match ($$$) {
 
 sub node_type { 1 }
 
-## TODO: HTML5 capitalization
 sub tag_name ($) {
   my $self = shift;
+  my $n;
   if (defined $self->{prefix}) {
-    return $self->{prefix} . ':' . $self->{local_name};
+    $n = $self->{prefix} . ':' . $self->{local_name};
   } else {
-    return $self->{local_name};
+    $n = $self->{local_name};
   }
+  if ($self->{owner_document}->{manakai_is_html}) {
+    my $nsurl = $self->{namespace_uri} || '';
+    if ($nsurl eq q<http://www.w3.org/1999/xhtml>) {
+      $n =~ tr/a-z/A-Z/;
+    }
+  }
+  return $n;
 } # tag_name
 
 sub manakai_tag_name ($) {
@@ -648,7 +652,6 @@ sub owner_document ($) {
   return shift->owner_element->owner_document;
 } # owner_document
 
-## TODO: HTML5 case stuff?
 sub name ($) {
   my $self = shift;
   if (defined $self->{prefix}) {
@@ -657,6 +660,7 @@ sub name ($) {
     return $self->{local_name};
   }
 } # name
+*manakai_name = \&name;
 
 sub manakai_name ($) {
   my $self = shift;
