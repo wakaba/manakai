@@ -7,6 +7,7 @@ use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->stringify;
 use base qw(Test::Class);
 use Test::More;
+use Test::Differences;
 use Whatpm::HTML::Serializer;
 use Message::DOM::DOMImplementation;
 
@@ -133,6 +134,30 @@ sub _svg : Test(1) {
   is $div->inner_html, q<<svg:svg></svg:svg>>;
 } # _svg
 
+sub _nanodom : Test(1) {
+  require Whatpm::NanoDOM;
+  my $doc = Whatpm::NanoDOM::Document->new;
+  my $div = $doc->create_element_ns (q<http://www.w3.org/1999/xhtml>, [undef, 'div']);
+  my $el = $doc->create_element_ns (q<http://www.w3.org/1999/xhtml>, [undef, 'p']);
+  $div->append_child ($el);
+  $el->text_content ("a b \x{1000}\x{2000}<!&\"'>\xA0");
+  $el->set_attribute_ns (undef, [undef, 'title'], '<!&"\'>' . "\xA0");
+  $el->append_child ($doc->create_comment ('A -- B'));
+  $el->append_child ($doc->create_processing_instruction ('xml', 'version="1.0?>"'));
+  $doc->append_child ($div);
+  my $html = Whatpm::HTML::Serializer->get_inner_html ($doc);
+  eq_or_diff $$html, qq{<div><p title="<!&amp;&quot;'>&nbsp;">a b \x{1000}\x{2000}&lt;!&amp;"'&gt;&nbsp;<!--A -- B--><?xml version="1.0?>"></p></div>};
+}
+
 __PACKAGE__->runtests;
 
 1;
+
+=head1 LICENSE
+
+Copyright 2009-2011 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

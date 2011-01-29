@@ -550,6 +550,15 @@ sub tag_name ($) {
   }
 } # tag_name
 
+sub manakai_tag_name ($) {
+  my $self = shift;
+  if (defined $self->{prefix}) {
+    return $self->{prefix} . ':' . $self->{local_name};
+  } else {
+    return $self->{local_name};
+  }
+} # manakai_tag_name
+
 sub get_attribute_ns ($$$) {
   my ($self, $nsuri, $ln) = @_;
   $nsuri = '' unless defined $nsuri;
@@ -648,6 +657,15 @@ sub name ($) {
     return $self->{local_name};
   }
 } # name
+
+sub manakai_name ($) {
+  my $self = shift;
+  if (defined $self->{prefix}) {
+    return $self->{prefix} . ':' . $self->{local_name};
+  } else {
+    return $self->{local_name};
+  }
+} # manakai_name
 
 sub value ($;$) {
   if (@_ > 1) {
@@ -902,10 +920,10 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
