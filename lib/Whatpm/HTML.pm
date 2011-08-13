@@ -1555,8 +1555,20 @@ sub push_afe ($$) {
 
     ## NOTE: The adoption agency algorithm (AAA).
 
-    FET: {
-      ## Step 1
+    ## Step 1
+    my $outer_loop_counter = 0;
+
+    ## Step 2
+    OUTER: {
+      if ($outer_loop_counter >= 8) {
+        $token = $self->_get_next_token;
+        last OUTER;
+      }
+
+      ## Step 3
+      $outer_loop_counter++;
+      
+      ## Step 4
       my $formatting_element;
       my $formatting_element_i_in_active;
       AFE: for (reverse 0..$#$active_formatting_elements) {
@@ -1621,7 +1633,7 @@ sub push_afe ($$) {
                         token => $end_tag_token);
       }
       
-      ## Step 2
+      ## Step 5
       my $furthest_block;
       my $furthest_block_i_in_open;
       OE: for (reverse 0..$#{$self->{open_elements}}) {
@@ -1637,7 +1649,7 @@ sub push_afe ($$) {
         }
       } # OE
       
-      ## Step 3
+      ## Step 6
       unless (defined $furthest_block) { # MUST
         
         splice @{$self->{open_elements}}, $formatting_element_i_in_open;
@@ -1646,24 +1658,37 @@ sub push_afe ($$) {
         return;
       }
       
-      ## Step 4
+      ## Step 7
       my $common_ancestor_node = $self->{open_elements}->[$formatting_element_i_in_open - 1];
       
-      ## Step 5
+      ## Step 8
       my $bookmark_prev_el
         = $active_formatting_elements->[$formatting_element_i_in_active - 1]
           ->[0];
       
-      ## Step 6
+      ## Step 9
       my $node = $furthest_block;
       my $node_i_in_open = $furthest_block_i_in_open;
       my $last_node = $furthest_block;
-      S7: {
-        ## Step 6.1
+
+      ## Step 9.1
+      my $inner_loop_counter = 0;
+
+      INNER: {
+        ## Step 9.2
+        if ($inner_loop_counter >= 3) {
+          $token = $self->_get_next_token;
+          last OUTER;
+        }
+
+        ## Step 9.3
+        $inner_loop_counter++;
+
+        ## Step 9.4
         $node_i_in_open--;
         $node = $self->{open_elements}->[$node_i_in_open];
         
-        ## Step 6.2
+        ## Step 9.5
         my $node_i_in_active;
         my $node_token;
         S7S2: {
@@ -1676,13 +1701,13 @@ sub push_afe ($$) {
             }
           }
           splice @{$self->{open_elements}}, $node_i_in_open, 1;
-          redo S7;
+          redo INNER;
         } # S7S2
         
-        ## Step 6.3
-        last S7 if $node->[0] eq $formatting_element->[0];
+        ## Step 9.6
+        last INNER if $node->[0] eq $formatting_element->[0];
         
-        ## Step 6.4
+        ## Step 9.7
         my $new_element = [];
         
       $new_element->[0] = $self->{document}->create_element_ns
@@ -1708,23 +1733,23 @@ sub push_afe ($$) {
         $self->{open_elements}->[$node_i_in_open] = $new_element;
         $node = $new_element;
         
-        ## Step 6.5
+        ## Step 9.8
         if ($last_node->[0] eq $furthest_block->[0]) {
           
           $bookmark_prev_el = $node->[0];
         }
         
-        ## Step 6.6
+        ## Step 9.9
         $node->[0]->append_child ($last_node->[0]);
         
-        ## Step 6.7
+        ## Step 9.10
         $last_node = $node;
         
-        ## Step 6.8
-        redo S7;
-      } # S7  
+        ## Step 9.11
+        redo INNER;
+      } # INNER
       
-      ## Step 7
+      ## Step 10
       if ($common_ancestor_node->[1] & TABLE_ROWS_EL) {
         ## Foster parenting.
         my $foster_parent_element;
@@ -1748,7 +1773,7 @@ sub push_afe ($$) {
         $common_ancestor_node->[0]->append_child ($last_node->[0]);
       }
       
-      ## Step 8
+      ## Step 11
       my $new_element = [];
       
       $new_element->[0] = $self->{document}->create_element_ns
@@ -1771,14 +1796,14 @@ sub push_afe ($$) {
       $new_element->[1] = $formatting_element->[1];
       $new_element->[2] = $formatting_element->[2];
       
-      ## Step 9
+      ## Step 12
       my @cn = @{$furthest_block->[0]->child_nodes};
       $new_element->[0]->append_child ($_) for @cn;
       
-      ## Step 10
+      ## Step 13
       $furthest_block->[0]->append_child ($new_element->[0]);
       
-      ## Step 11
+      ## Step 14
       my $i;
       AFE: for (reverse 0..$#$active_formatting_elements) {
         if ($active_formatting_elements->[$_]->[0] eq $formatting_element->[0]) {
@@ -1792,7 +1817,7 @@ sub push_afe ($$) {
       } # AFE
       splice @$active_formatting_elements, $i + 1, 0 => $new_element;
       
-      ## Step 12
+      ## Step 15
       undef $i;
       OE: for (reverse 0..$#{$self->{open_elements}}) {
         if ($self->{open_elements}->[$_]->[0] eq $formatting_element->[0]) {
@@ -1806,9 +1831,9 @@ sub push_afe ($$) {
       } # OE
       splice @{$self->{open_elements}}, $i + 1, 0, $new_element;
       
-      ## Step 13
-      redo FET;
-    } # FET
+      ## Step 16
+      redo OUTER;
+    } # OUTER
   }; # $formatting_end_tag
 
   my $reconstruct_active_formatting_elements = sub ($$$$) {

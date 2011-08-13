@@ -68,6 +68,7 @@ span not closed
 <cite><b><cite><code><cite><code><cite><code><div>X</b>TEST
 #errors
 aaa
+unexpected EOF
 #document
 | <!DOCTYPE html>
 | <html>
@@ -81,13 +82,48 @@ aaa
 |               <code>
 |                 <cite>
 |                   <code>
-|       <code>
-|         <code>
+
+#data
+<!DOCTYPE HTML>
+<cite><b><cite><code><cite><code><cite><code>Y<div>X</b>TEST
+#errors
+aaa
+unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <cite>
+|       <b>
+|         <cite>
 |           <code>
-|             <div>
-|               <b>
-|                 "X"
-|               "TEST"
+|             <cite>
+|               <code>
+|                 <cite>
+|                   <code>
+|                     "Y"
+
+#data
+<!DOCTYPE HTML>
+<cite><b><cite><code><cite><code><cite><code>Y<div>X</b>TEST<p>a
+#errors
+aaa
+unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <cite>
+|       <b>
+|         <cite>
+|           <code>
+|             <cite>
+|               <code>
+|                 <cite>
+|                   <code>
+|                     "Y"
 
 #data
 <!DOCTYPE html><i><b>a<button>b</i>c
@@ -876,3 +912,130 @@ Unexpected EOF
 |           <b>
 |             a="1"
 |             "c"
+
+#data
+<!DOCTYPE HTML><a><b><big><code><em><font><i><nobr><s><small><strike><strong><tt><u><div>a</a>b</b>c</big>d</code>e</em>f</font>g</i>h</nobr>i</s>j</small>k</strike>l</strong>m</tt>n</u>o
+#errors
+unmatched </a>
+unmatched </b>
+unmatched </big>
+unmatched </code>
+unmatched </em>
+unmatched </font>
+unmatched </i>
+unmatched </nobr>
+unmatched </s>
+unmatched </small>
+unmatched </strike>
+unmatched </strong>
+unmatched </tt>
+unmatched </u>
+unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       <b>
+|         <big>
+|           <code>
+|             <em>
+|               <font>
+|                 <i>
+|                   <nobr>
+|                     <s>
+|                       <small>
+|                         <strike>
+|                           <strong>
+|                             <tt>
+|                               <u>
+|                           <tt>
+|                             <u>
+|                           <u>
+|                           <div>
+|                             <u>
+|                               <tt>
+|                                 <strong>
+|                                   "abcdefghijkl"
+|                                 "m"
+|                               "n"
+|                             "o"
+
+#data
+<!DOCTYPE HTML><a><div><div><div><div><div><div><div><div><div>b</a>c
+#errors
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|     <div>
+|       <a>
+|       <div>
+|         <a>
+|         <div>
+|           <a>
+|           <div>
+|             <a>
+|             <div>
+|               <a>
+|               <div>
+|                 <a>
+|                 <div>
+|                   <a>
+|                   <div>
+|                     <a>
+|                       <div>
+|                         "bc"
+
+#data
+<!DOCTYPE HTML><a><div><div><div><div><div><div><div><div><div>b<a>c
+#errors
+unexpected <a>
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+AAA error
+unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|     <div>
+|       <a>
+|       <div>
+|         <a>
+|         <div>
+|           <a>
+|           <div>
+|             <a>
+|             <div>
+|               <a>
+|               <div>
+|                 <a>
+|                 <div>
+|                   <a>
+|                   <div>
+|                     <a>
+|                       <div>
+|                         "b"
+|                         <a>
+|                           "c"
+
