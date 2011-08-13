@@ -6503,124 +6503,18 @@ ok 5490 - Document tree: qq'<!DOCTYPE html><table><b><i>a</b><br>'
 ok 5491 - Parse error: qq'<!DOCTYPE html><table><b><i>a</b></br>'; 1:26:in table, 1:29:in table, 1:34:in table:\#text, 1:34:in table:/, 1:34:not closed, 1:38:in table:/, 1:38:unmatched end tag, 1:38:in body:\#eof;<b> in table, <i> in table, "a" in table, </b> in table, </br> in table, </br>, no </i> before </b>; reconstruction, EOF
 ok 5492 - SHOULD-level error: qq'<!DOCTYPE html><table><b><i>a</b></br>'; ;
 ok 5493 - Document tree: qq'<!DOCTYPE html><table><b><i>a</b></br>'
-not ok 5494 - Parse error: qq'<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X'; 1:73:not closed, 1:77:not closed, 1:98:not closed, 1:102:unmatched end tag, 1:106:unmatched end tag, 1:110:unmatched end tag, 1:114:unmatched end tag, 1:118:unmatched end tag, 1:122:unmatched end tag, 1:122:in body:\#eof;Unexpected start tag <p>, Unexpected start tag <p>, Unexpected start tag <p>
-#   Failed test 'Parse error: qq'<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X'; 1:73:not closed, 1:77:not closed, 1:98:not closed, 1:102:unmatched end tag, 1:106:unmatched end tag, 1:110:unmatched end tag, 1:114:unmatched end tag, 1:118:unmatched end tag, 1:122:unmatched end tag, 1:122:in body:\#eof;Unexpected start tag <p>, Unexpected start tag <p>, Unexpected start tag <p>'
-#   at HTML-tree.t test () ok line 3.
-#          got: '10'
-#     expected: '3'
+ok 5494 - Parse error: qq'<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X'; 1:73:not closed, 1:77:not closed, 1:98:not closed, 1:102:unmatched end tag, 1:106:unmatched end tag, 1:110:unmatched end tag, 1:114:unmatched end tag, 1:118:unmatched end tag, 1:122:unmatched end tag;Unexpected start tag <p>, Unexpected start tag <p>, Unexpected start tag <p>, Misnested </b>, Misnested </b>, Misnested </b>, Misnested </b>, Misnested </b>, Misnested </b>
 ok 5495 - SHOULD-level error: qq'<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X'; ;
-not ok 5496 - Document tree: qq'<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X''
-#   at HTML-tree.t test () ok line 9.
-# +---+---------------------------------+---+-------------------------------+
-# | Ln|Got                              | Ln|Expected                       |
-# +---+---------------------------------+---+-------------------------------+
-# | 18|      <b>                        | 18|      <b>                      |
-# | 19|        class="x"                | 19|        class="x"              |
-# | 20|        <b>                      | 20|        <b>                    |
-# * 21|          class="x"              *   |                               |
-# | 22|          <b>                    | 21|          <b>                  |
-# |   |                                 * 22|            class="x"          *
-# | 23|            <b>                  | 23|            <b>                |
-# | 24|              class="x"          | 24|              class="x"        |
-# | 25|              <b>                | 25|              <b>              |
-# * 26|                class="x"        * 26|                "X"            *
-# * 27|                <b>              *   |                               |
-# * 28|                  "X"            *   |                               |
-# | 29|    <p>                          | 27|    <p>                        |
-# | 30|      <b>                        | 28|      <b>                      |
-# | 31|        class="x"                | 29|        class="x"              |
-# | 32|        <b>                      | 30|        <b>                    |
-# * 33|          class="x"              *   |                               |
-# | 34|          <b>                    | 31|          <b>                  |
-# |   |                                 * 32|            class="x"          *
-# | 35|            <b>                  | 33|            <b>                |
-# | 36|              class="x"          | 34|              class="x"        |
-# | 37|              <b>                | 35|              <b>              |
-# * 38|                class="x"        *   |                               |
-# | 39|                <b>              | 36|                <b>            |
-# | 40|                  <b>            | 37|                  <b>          |
-# |   |                                 * 38|                    class="x"  *
-# | 41|                    <b>          | 39|                    <b>        |
-# * 42|                      class="x"  * 40|                      "X"      *
-# * 43|                      <b>        *   |                               |
-# * 44|                        "X"      *   |                               |
-# | 45|    <p>                          | 41|    <p>                        |
-# * 46|      <b>                        * 42|      "X"                      *
-# * 47|        class="x"                *   |                               |
-# * 48|        <b>                      *   |                               |
-# * 49|          class="x"              *   |                               |
-# * 50|          <b>                    *   |                               |
-# * 51|            "X"                  *   |                               |
-# +---+---------------------------------+---+-------------------------------+
+ok 5496 - Document tree: qq'<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X'
 ok 5497 - Parse error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=2><b a=1>a<p>b'; 1:65:not closed, 1:65:in body:\#eof;Unexpected <p>, Unexpected EOF
 ok 5498 - SHOULD-level error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=2><b a=1>a<p>b'; ;
-not ok 5499 - Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=2><b a=1>a<p>b'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=2><b a=1>a<p>b''
-#   at HTML-tree.t test () ok line 9.
-# +---+-------------------------+---+---------------------+
-# | Ln|Got                      | Ln|Expected             |
-# +---+-------------------------+---+---------------------+
-# | 22|        <b>              | 22|        <b>          |
-# | 23|          a="1"          | 23|          a="1"      |
-# | 24|          <b>            | 24|          <b>        |
-# * 25|            a="1"        * 25|            a="2"    *
-# | 26|            <b>          | 26|            <b>      |
-# | 27|              a="1"      | 27|              a="1"  |
-# * 28|              <b>        * 28|              "b"    *
-# * 29|                a="2"    *   |                     |
-# * 30|                <b>      *   |                     |
-# * 31|                  a="1"  *   |                     |
-# * 32|                  "b"    *   |                     |
-# +---+-------------------------+---+---------------------+
+ok 5499 - Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=2><b a=1>a<p>b'
 ok 5500 - Parse error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b'; 1:69:not closed, 1:69:in body:\#eof;Unexpected <p>, Unexpected EOF
 ok 5501 - SHOULD-level error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b'; ;
-not ok 5502 - Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b''
-#   at HTML-tree.t test () ok line 9.
-# +---+-------------------------+---+---------------------+
-# | Ln|Got                      | Ln|Expected             |
-# +---+-------------------------+---+---------------------+
-# | 23|        <b>              | 23|        <b>          |
-# | 24|          a="1"          | 24|          a="1"      |
-# | 25|          <b>            | 25|          <b>        |
-# * 26|            a="1"        * 26|            a="2"    *
-# |   |                         * 27|            b="2"    *
-# | 27|            <b>          | 28|            <b>      |
-# | 28|              a="1"      | 29|              a="1"  |
-# * 29|              <b>        * 30|              "b"    *
-# * 30|                a="1"    *   |                     |
-# * 31|                b="2"    *   |                     |
-# * 32|                <b>      *   |                     |
-# * 33|                  a="1"  *   |                     |
-# * 34|                  "b"    *   |                     |
-# +---+-------------------------+---+---------------------+
-ok 5503 - Parse error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c'; 1:110:not closed, 1:113:not closed, 1:113:in body:\#eof;Unexpected <p>, Unexpected </marquee>, Unexpected EOF
-ok 5504 - SHOULD-level error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c'; ;
-not ok 5505 - Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c''
-#   at HTML-tree.t test () ok line 9.
-# +---+---------------------------------+---+---------------------------------+
-# | Ln|Got                              | Ln|Expected                         |
-# +---+---------------------------------+---+---------------------------------+
-# | 24|                        <b>      | 24|                        <b>      |
-# | 25|                          a="1"  | 25|                          a="1"  |
-# | 26|                          "a"    | 26|                          "a"    |
-# * 27|                          <p>    * 27|            <p>                  *
-# * 28|                            "b"  * 28|              <b>                *
-# |   |                                 * 29|                a="1"            *
-# |   |                                 * 30|                <b>              *
-# |   |                                 * 31|                  a="1"          *
-# |   |                                 * 32|                  <b>            *
-# |   |                                 * 33|                    a="2"        *
-# |   |                                 * 34|                    b="2"        *
-# |   |                                 * 35|                    <b>          *
-# |   |                                 * 36|                      a="1"      *
-# |   |                                 * 37|                      "b"        *
-# | 29|    <p>                          | 38|    <p>                          |
-# | 30|      <b>                        | 39|      <b>                        |
-# | 31|        a="1"                    | 40|        a="1"                    |
-# +---+---------------------------------+---+---------------------------------+
+ok 5502 - Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b'
+ok 5503 - Parse error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c'; 1:102:not closed, 1:113:not closed, 1:116:not closed, 1:116:in body:\#eof;Unexpected <p>, Unexpected </marquee>, Unexpected <p>, Unexpected EOF
+ok 5504 - SHOULD-level error: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c'; ;
+ok 5505 - Document tree: qq'<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c'
 # t/tree-test-form.dat
 ok 5506 - Parse error: qq'<option>x'; 1:9:no DOCTYPE, 1:9:in body:\#eof;no DOCTYPE, no </option> before EOF
 ok 5507 - SHOULD-level error: qq'<option>x'; ;
@@ -7570,4 +7464,4 @@ ok 6448 - Parse error: qq'<!DOCTYPE html><table><svg><desc><i>a</desc><title><b>
 ok 6449 - SHOULD-level error: qq'<!DOCTYPE html><table><svg><desc><i>a</desc><title><b>b</title><foreignobject><table><td>c</table>d</i>e</foreignObject></svg><math><mi>f<i>g</mi><annotation-xml encoding=text/html>h</annotation-xml><annotation-xml>i</annotation-xml></math>j'; ;
 ok 6450 - Document tree: qq'<!DOCTYPE html><table><svg><desc><i>a</desc><title><b>b</title><foreignobject><table><td>c</table>d</i>e</foreignObject></svg><math><mi>f<i>g</mi><annotation-xml encoding=text/html>h</annotation-xml><annotation-xml>i</annotation-xml></math>j'
 1..6450
-# Looks like you failed 133 tests of 6450.
+# Looks like you failed 128 tests of 6450.

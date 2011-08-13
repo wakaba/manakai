@@ -698,6 +698,12 @@ EOF
 Unexpected start tag <p>
 Unexpected start tag <p>
 Unexpected start tag <p>
+Misnested </b>
+Misnested </b>
+Misnested </b>
+Misnested </b>
+Misnested </b>
+Misnested </b>
 #document
 | <!DOCTYPE html>
 | <html>
@@ -810,17 +816,18 @@ Unexpected EOF
 |         <b>
 |           a="1"
 |           <b>
-|             a="2"
+|             a="1"
 |             b="2"
 |             <b>
 |               a="1"
 |               "b"
 
 #data
-<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c
+<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c
 #errors
 Unexpected <p>
 Unexpected </marquee>
+Unexpected <p>
 Unexpected EOF
 #document
 | <!DOCTYPE html>
@@ -835,8 +842,7 @@ Unexpected EOF
 |           <b>
 |             a="1"
 |             <marquee>
-|               <b>
-|                 a="1"
+|               <p>
 |                 <b>
 |                   a="1"
 |                   <b>
@@ -845,21 +851,23 @@ Unexpected EOF
 |                       a="1"
 |                       <b>
 |                         a="1"
-|                         b="2"
 |                         <b>
 |                           a="1"
-|                           "a"
-|             <p>
-|               <b>
-|                 a="1"
+|                           b="2"
+|                           <b>
+|                             a="1"
+|                             "a"
+|               <p>
 |                 <b>
 |                   a="1"
 |                   <b>
-|                     a="2"
-|                     b="2"
+|                     a="1"
 |                     <b>
 |                       a="1"
-|                       "b"
+|                       b="2"
+|                       <b>
+|                         a="1"
+|                         "b"
 |     <p>
 |       <b>
 |         a="1"

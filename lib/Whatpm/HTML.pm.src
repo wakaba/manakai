@@ -1443,6 +1443,43 @@ sub _reset_insertion_mode ($) {
 
 sub push_afe ($$) {
   my ($item => $afes) = @_;
+  my $item_token = $item->[2];
+
+  my $depth = 0;
+  OUTER: for my $i (reverse 0..$#$afes) {
+    my $afe = $afes->[$i];
+    if ($afe->[0] eq '#marker') {
+      last OUTER;
+    } else {
+      my $token = $afe->[2];
+      ## Both |$token| and |$item_token| should be start tag tokens.
+      if ($token->{tag_name} eq $item_token->{tag_name}) {
+        if ((keys %{$token->{attributes}}) !=
+            (keys %{$item_token->{attributes}})) {
+          next OUTER;
+        }
+        for my $attr_name (keys %{$item_token->{attributes}}) {
+          next OUTER unless $token->{attributes}->{$attr_name};
+          next OUTER unless
+              $token->{attributes}->{$attr_name}->{value} eq 
+              $item_token->{attributes}->{$attr_name}->{value};
+        }
+
+        $depth++;
+        if ($depth == 3) {
+          splice @$afes, $i, 1 => ();
+          last OUTER;
+        }
+      }
+
+      ## We don't have to check namespaces of elements and attributes,
+      ##  nevertheless the spec requires it, because |$afes| could
+      ##  never contain a non-HTML element at the time of writing.  In
+      ##  addition, scripted changes would never change the original
+      ##  start tag token.
+    }
+  } # OUTER
+
   push @$afes, $item;
 } # push_afe
 
@@ -1731,7 +1768,7 @@ sub push_afe ($$) {
 
     S7: {
       ## Step 8
-      my $clone = [$entry->[0]->clone_node (0), $entry->[1]];
+      my $clone = [$entry->[0]->clone_node (0), $entry->[1], $entry->[2]];
     
       ## Step 9
       $insert->($self, $clone->[0], $open_tables);
