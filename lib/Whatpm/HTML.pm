@@ -1507,6 +1507,15 @@ sub _reset_insertion_mode ($) {
     $token = $self->_get_next_token;
   }; # $script_start_tag
 
+sub push_afe ($$;%) {
+  my ($item => $afes, %args) = @_;
+  if (defined $args{offset}) {
+    splice @$afes, $args{offset}, 0 => $item;
+  } else {
+    push @$afes, $item;
+  }
+} # push_afe
+
   my $formatting_end_tag = sub {
     my ($self, $active_formatting_elements, $open_tables, $end_tag_token) = @_;
     my $tag_name = $end_tag_token->{tag_name};
@@ -1748,7 +1757,7 @@ sub _reset_insertion_mode ($) {
           $i = $_;
         }
       } # AFE
-      splice @$active_formatting_elements, $i + 1, 0, $new_element;
+      push_afe $new_element => $active_formatting_elements, offset => $i + 1;
       
       ## Step 12
       undef $i;
@@ -5914,10 +5923,10 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-        push @$active_formatting_elements,
-            [$self->{open_elements}->[-1]->[0],
-             $self->{open_elements}->[-1]->[1],
-             $token];
+        push_afe [$self->{open_elements}->[-1]->[0],
+                  $self->{open_elements}->[-1]->[1],
+                  $token]
+            => $active_formatting_elements;
 
         
         $token = $self->_get_next_token;
@@ -5973,10 +5982,10 @@ sub _tree_construction_main ($) {
       push @{$self->{open_elements}}, [$el, $el_category->{$token->{tag_name}} || 0];
     }
   
-        push @$active_formatting_elements,
-            [$self->{open_elements}->[-1]->[0],
-             $self->{open_elements}->[-1]->[1],
-             $token];
+        push_afe [$self->{open_elements}->[-1]->[0],
+                  $self->{open_elements}->[-1]->[1],
+                  $token]
+            => $active_formatting_elements;
         
         
         $token = $self->_get_next_token;
@@ -6467,10 +6476,10 @@ sub _tree_construction_main ($) {
                   strong => 1, tt => 1, u => 1,
                  }->{$token->{tag_name}}) {
           
-          push @$active_formatting_elements,
-              [$self->{open_elements}->[-1]->[0],
+          push_afe [$self->{open_elements}->[-1]->[0],
                $self->{open_elements}->[-1]->[1],
-               $token];
+               $token]
+              => $active_formatting_elements;
           
         } elsif ($token->{tag_name} eq 'input') {
           
