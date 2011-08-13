@@ -662,15 +662,6 @@ sub name ($) {
 } # name
 *manakai_name = \&name;
 
-sub manakai_name ($) {
-  my $self = shift;
-  if (defined $self->{prefix}) {
-    return $self->{prefix} . ':' . $self->{local_name};
-  } else {
-    return $self->{local_name};
-  }
-} # manakai_name
-
 sub value ($;$) {
   if (@_ > 1) {
     $_[0]->{value} = $_[1];
