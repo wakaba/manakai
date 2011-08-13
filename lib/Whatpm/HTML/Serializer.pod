@@ -97,8 +97,9 @@ Whatpm <http://suika.fam.cx/www/markup/html/whatpm/readme>.
 Web Applications 1.0 - HTML fragment serialization algorithm
 <http://www.whatwg.org/specs/web-apps/current-work/complete.html#html-fragment-serialization-algorithm>.
 
-manakai's L<Message::DOM::Document> and L<Message::DOM::Element>
-modules are implementing the C<inner_html> attribute.
+Modules L<Message::DOM::Document> and L<Message::DOM::Element> of
+manakai are implementing the C<inner_html> attribute using the
+C<Whatpm::HTML::Serializer> module.
 
 =head1 AUTHOR
 
@@ -106,9 +107,9 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007, 2009 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

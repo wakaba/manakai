@@ -48,6 +48,7 @@ sub get_inner_html ($$$) {
     ## Step 2.2
     my $nt = $child->node_type;
     if ($nt == 1) { # Element
+      # XXX namespace
       my $tag_name = $child->manakai_tag_name; # In the original (lower) case.
       $s .= '<' . $tag_name;
       ## NOTE: The tag name might contain namespace prefix.  See
@@ -73,8 +74,9 @@ sub get_inner_html ($$$) {
         br => 1, col => 1, embed => 1, frame => 1, hr => 1,
         img => 1, input => 1, link => 1, meta => 1, param => 1,
         wbr => 1, keygen => 1,
-      }->{$tag_name};
+      }->{$tag_name} and defined $child->namespace_uri and $child->namespace_uri eq q<http://www.w3.org/1999/xhtml>;
 
+      # XXX namespace
       $s .= "\x0A" if {pre => 1, textarea => 1, listing => 1}->{$tag_name};
 
       my $child_in_cdata = $in_cdata->($child);
@@ -113,12 +115,11 @@ sub get_inner_html ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2009 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
 1;
-## $Date: 2009/09/06 01:21:44 $
