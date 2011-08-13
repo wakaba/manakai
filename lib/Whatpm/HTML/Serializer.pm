@@ -3,36 +3,36 @@ use strict;
 use warnings;
 our $VERSION = '1.8';
 
+sub _in_cdata ($) {
+  my $node = $_[0];
+  
+  my $ns = $node->namespace_uri;
+  return 0 if not defined $ns; # in no namespace, or not an Element
+  return 0 unless $ns eq q<http://www.w3.org/1999/xhtml>;
+  
+  my $ln = $node->manakai_local_name;
+  return 1 if {
+    style => 1,
+    script => 1,
+    xmp => 1,
+    iframe => 1,
+    noembed => 1,
+    noframes => 1,
+    plaintext => 1,
+  }->{$ln};
+  return $Whatpm::ScriptingEnabled if $ln eq 'noscript';
+
+  return 0;
+} # _in_cdata
+
 sub get_inner_html ($$$) {
   my (undef, $node, $onerror) = @_;
 
   ## Step 1
   my $s = '';
-
-  my $in_cdata = sub ($) {
-    my $node = $_[0];
-
-    my $ns = $node->namespace_uri;
-    return 0 if not defined $ns; # in no namespace, or not an Element
-    return 0 unless $ns eq q<http://www.w3.org/1999/xhtml>;
-
-    my $ln = $node->manakai_local_name;
-    return 1 if {
-        style => 1,
-        script => 1,
-        xmp => 1,
-        iframe => 1,
-        noembed => 1,
-        noframes => 1,
-        plaintext => 1,
-    }->{$ln};
-    return $Whatpm::ScriptingEnabled if $ln eq 'noscript';
-
-    return 0;
-  }; # $in_cdata
-
+  
   ## Step 2
-  my $node_in_cdata = $in_cdata->($node);
+  my $node_in_cdata = _in_cdata ($node);
   my @node = map { [$_, $node_in_cdata] } @{$node->child_nodes};
   C: while (@node) {
     ## Step 2.1
@@ -99,7 +99,7 @@ sub get_inner_html ($$$) {
           if {pre => 1, textarea => 1, listing => 1}->{$tag_name} and
               $child_ns eq q<http://www.w3.org/1999/xhtml>;
 
-      my $child_in_cdata = $in_cdata->($child);
+      my $child_in_cdata = _in_cdata ($child);
       unshift @node,
           (map { [$_, $child_in_cdata] } @{$child->child_nodes}),
           (['</' . $tag_name . '>', 0]);
