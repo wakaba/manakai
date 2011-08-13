@@ -815,3 +815,56 @@ Unexpected EOF
 |             <b>
 |               a="1"
 |               "b"
+
+#data
+<!DOCTYPE html><p><b a=1><b a=1><b a=1><marquee><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b</marquee><p>c
+#errors
+Unexpected <p>
+Unexpected </marquee>
+Unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <b>
+|         a="1"
+|         <b>
+|           a="1"
+|           <b>
+|             a="1"
+|             <marquee>
+|               <b>
+|                 a="1"
+|                 <b>
+|                   a="1"
+|                   <b>
+|                     a="1"
+|                     <b>
+|                       a="1"
+|                       <b>
+|                         a="1"
+|                         b="2"
+|                         <b>
+|                           a="1"
+|                           "a"
+|             <p>
+|               <b>
+|                 a="1"
+|                 <b>
+|                   a="1"
+|                   <b>
+|                     a="2"
+|                     b="2"
+|                     <b>
+|                       a="1"
+|                       "b"
+|     <p>
+|       <b>
+|         a="1"
+|         <b>
+|           a="1"
+|           <b>
+|             a="1"
+|             "c"
