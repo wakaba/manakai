@@ -691,3 +691,127 @@ EOF
 |     <i>
 |       <br>
 |     <table>
+
+#data
+<!DOCTYPE html><p><b class=x><b class=x><b><b class=x><b class=x><b>X<p>X<p><b><b class=x><b>X<p></b></b></b></b></b></b>X
+#errors
+Unexpected start tag <p>
+Unexpected start tag <p>
+Unexpected start tag <p>
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <b>
+|         class="x"
+|         <b>
+|           class="x"
+|           <b>
+|             <b>
+|               class="x"
+|               <b>
+|                 class="x"
+|                 <b>
+|                   "X"
+|     <p>
+|       <b>
+|         class="x"
+|         <b>
+|           <b>
+|             class="x"
+|             <b>
+|               class="x"
+|               <b>
+|                 "X"
+|     <p>
+|       <b>
+|         class="x"
+|         <b>
+|           <b>
+|             class="x"
+|             <b>
+|               class="x"
+|               <b>
+|                 <b>
+|                   <b>
+|                     class="x"
+|                     <b>
+|                       "X"
+|     <p>
+|       "X"
+#comment
+<http://www.whatwg.org/specs/web-apps/current-work/complete.html#unclosed-formatting-elements>
+
+#data
+<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=2><b a=1>a<p>b
+#errors
+Unexpected <p>
+Unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <b>
+|         a="1"
+|         <b>
+|           a="1"
+|           <b>
+|             a="1"
+|             <b>
+|               a="1"
+|               <b>
+|                 a="2"
+|                 <b>
+|                   a="1"
+|                   "a"
+|     <p>
+|       <b>
+|         a="1"
+|         <b>
+|           a="1"
+|           <b>
+|             a="2"
+|             <b>
+|               a="1"
+|               "b"
+
+#data
+<!DOCTYPE html><p><b a=1><b a=1><b a=1><b a=1><b a=1 b=2><b a=1>a<p>b
+#errors
+Unexpected <p>
+Unexpected EOF
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <p>
+|       <b>
+|         a="1"
+|         <b>
+|           a="1"
+|           <b>
+|             a="1"
+|             <b>
+|               a="1"
+|               <b>
+|                 a="1"
+|                 b="2"
+|                 <b>
+|                   a="1"
+|                   "a"
+|     <p>
+|       <b>
+|         a="1"
+|         <b>
+|           a="1"
+|           <b>
+|             a="2"
+|             b="2"
+|             <b>
+|               a="1"
+|               "b"
