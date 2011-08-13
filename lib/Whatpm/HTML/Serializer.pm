@@ -48,15 +48,33 @@ sub get_inner_html ($$$) {
     ## Step 2.2
     my $nt = $child->node_type;
     if ($nt == 1) { # Element
-      # XXX namespace
-      my $tag_name = $child->manakai_tag_name; # In the original (lower) case.
+      my $tag_name;
+      my $child_ns = $child->namespace_uri || '';
+      if ($child_ns eq q<http://www.w3.org/1999/xhtml> or
+          $child_ns eq q<http://www.w3.org/2000/svg> or
+          $child_ns eq q<http://www.w3.org/1998/Math/MathML>) {
+        $tag_name = $child->manakai_local_name;
+      } else {
+        $tag_name = $child->manakai_tag_name;
+      }
       $s .= '<' . $tag_name;
-      ## NOTE: The tag name might contain namespace prefix.  See
-      ## <http://permalink.gmane.org/gmane.org.w3c.whatwg.discuss/11191>.
 
       my @attrs = @{$child->attributes}; # sort order MUST be stable
       for my $attr (@attrs) { # order is implementation dependent
-        my $attr_name = $attr->manakai_name;
+        my $attr_name;
+        my $attr_ns = $attr->namespace_uri;
+        if (not defined $attr_ns) {
+          $attr_name = $attr->manakai_local_name;
+        } elsif ($attr_ns eq q<http://www.w3.org/XML/1998/namespace>) {
+          $attr_name = 'xml:' . $attr->manakai_local_name;
+        } elsif ($attr_ns eq q<http://www.w3.org/2000/xmlns/>) {
+          $attr_name = 'xmlns:' . $attr->manakai_local_name;
+          $attr_name = 'xmlns' if $attr_name eq 'xmlns:xmlns';
+        } elsif ($attr_ns eq q<http://www.w3.org/1999/xlink>) {
+          $attr_name = 'xlink:' . $attr->manakai_local_name;
+        } else {
+          $attr_name = $attr->manakai_name;
+        }
         $s .= ' ' . $attr_name . '="';
         my $attr_value = $attr->value;
         ## escape
@@ -75,10 +93,11 @@ sub get_inner_html ($$$) {
         img => 1, input => 1, keygen => 1, link => 1, meta => 1,
         param => 1, source => 1, track => 1, wbr => 1,
         # image, isindex
-      }->{$tag_name} and defined $child->namespace_uri and $child->namespace_uri eq q<http://www.w3.org/1999/xhtml>;
+      }->{$tag_name} and $child_ns eq q<http://www.w3.org/1999/xhtml>;
 
-      # XXX namespace
-      $s .= "\x0A" if {pre => 1, textarea => 1, listing => 1}->{$tag_name};
+      $s .= "\x0A"
+          if {pre => 1, textarea => 1, listing => 1}->{$tag_name} and
+              $child_ns eq q<http://www.w3.org/1999/xhtml>;
 
       my $child_in_cdata = $in_cdata->($child);
       unshift @node,

@@ -53,19 +53,117 @@ sub _element_inner_html : Test(6) {
   }
 } # _element_inner_html
 
-sub _plaintext : Test(4) {
-  my ($doc, $el) = create_el_from_html ('<plaintext>');
-  my $pt = $el->first_child;
-  is $pt->inner_html, q<>;
+sub _element_name_html : Test(1) {
+  my ($doc, $el) = create_el_from_html ('');
+  my $abc = $doc->create_element_ns ('http://www.w3.org/1999/xhtml', 'xyz:aBc');
+  $el->append_child ($abc);
+  is $el->inner_html, q<<aBc></aBc>>;
+} # _element_name_html
 
-  $pt->inner_html (q<abc>);
-  is $pt->inner_html, q<abc>;
+sub _element_name_svg : Test(1) {
+  my ($doc, $el) = create_el_from_html ('');
+  my $abc = $doc->create_element_ns ('http://www.w3.org/2000/svg', 'xyz:aBc');
+  $el->append_child ($abc);
+  is $el->inner_html, q<<aBc></aBc>>;
+} # _element_name_svg
 
-  $pt->append_child ($doc->create_text_node ('<p>xyz'));
-  is $pt->inner_html, q<abc<p>xyz>;
+sub _element_name_mathml : Test(1) {
+  my ($doc, $el) = create_el_from_html ('');
+  my $abc = $doc->create_element_ns ('http://www.w3.org/1998/Math/MathML', 'xyz:aBc');
+  $el->append_child ($abc);
+  is $el->inner_html, q<<aBc></aBc>>;
+} # _element_name_mathml
 
-  $pt->append_child ($doc->create_element ('A'))->text_content ('bcd');
-  is $pt->inner_html, q<abc<p>xyz<A>bcd</A>>;
+sub _element_name_null : Test(1) {
+  my ($doc, $el) = create_el_from_html ('');
+  my $abc = $doc->create_element_ns (undef, 'aBc');
+  $el->append_child ($abc);
+  is $el->inner_html, q<<aBc></aBc>>;
+} # _element_name_null
+
+sub _element_name_null_prefixed : Test(1) {
+  my ($doc, $el) = create_el_from_html ('');
+  my $abc = $doc->create_element_ns (undef, 'aBc');
+  $abc->prefix ('xyz');
+  $el->append_child ($abc);
+  is $el->inner_html, q<<xyz:aBc></xyz:aBc>>;
+} # _element_name_null_prefixed
+
+sub _element_name_external : Test(1) {
+  my ($doc, $el) = create_el_from_html ('');
+  my $abc = $doc->create_element_ns ('http://test/', 'xyz:aBc');
+  $el->append_child ($abc);
+  is $el->inner_html, q<<xyz:aBc></xyz:aBc>>;
+} # _element_name_external
+
+sub _attr_name_null : Test(1) {
+  my ($doc, $el) = create_el_from_html ('<p>');
+  my $p = $el->first_child;
+  $p->set_attribute_ns (undef, 'hOge' => 'fuga');
+  is $el->inner_html, q<<p hOge="fuga"></p>>;
+} # _attr_name_null
+
+sub _attr_name_xml : Test(1) {
+  my ($doc, $el) = create_el_from_html ('<p>');
+  my $p = $el->first_child;
+  $p->set_attribute_ns ('http://www.w3.org/XML/1998/namespace', 'hOge' => 'fuga');
+  is $el->inner_html, q<<p xml:hOge="fuga"></p>>;
+} # _attr_name_xml
+
+sub _attr_name_xmlns : Test(1) {
+  my ($doc, $el) = create_el_from_html ('<p>');
+  $doc->strict_error_checking (0);
+  my $p = $el->first_child;
+  $p->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'hOge' => 'fuga');
+  is $el->inner_html, q<<p xmlns:hOge="fuga"></p>>;
+} # _attr_name_xmlns
+
+sub _attr_name_xmlns_xmlns : Test(1) {
+  my ($doc, $el) = create_el_from_html ('<p>');
+  my $p = $el->first_child;
+  $p->set_attribute_ns ('http://www.w3.org/2000/xmlns/', 'xmlns' => 'fuga');
+  is $el->inner_html, q<<p xmlns="fuga"></p>>;
+} # _attr_name_xmlns_xmlns
+
+sub _attr_name_xlink : Test(1) {
+  my ($doc, $el) = create_el_from_html ('<p>');
+  my $p = $el->first_child;
+  $p->set_attribute_ns ('http://www.w3.org/1999/xlink', 'hOge' => 'fuga');
+  is $el->inner_html, q<<p xlink:hOge="fuga"></p>>;
+} # _attr_name_xlink
+
+sub _attr_name_html : Test(1) {
+  my ($doc, $el) = create_el_from_html ('<p>');
+  $doc->strict_error_checking (0);
+  my $p = $el->first_child;
+  $p->set_attribute_ns ('http://www.w3.org/1999/html', 'xmlns:hOge' => 'fuga');
+  is $el->inner_html, q<<p xmlns:hOge="fuga"></p>>;
+} # _attr_name_html
+
+sub _attr_name_unknown : Test(1) {
+  my ($doc, $el) = create_el_from_html ('<p>');
+  my $p = $el->first_child;
+  $p->set_attribute_ns ('http://test', 'hOge' => 'fuga');
+  is $el->inner_html, q<<p hOge="fuga"></p>>;
+} # _attr_name_unknown
+
+sub _plaintext : Test(35) {
+  for my $tag_name (qw(style script xmp iframe noembed noframes plaintext)) {
+    my ($doc, $el) = create_el_from_html
+        ($tag_name eq 'plaintext' ? '<plaintext>' : '<' . $tag_name . '></' . $tag_name . '>');
+    my $pt = $el->first_child;
+    is $pt->inner_html, q<>;
+    
+    $pt->inner_html (q<abc>);
+    is $pt->inner_html, q<abc>;
+    
+    $pt->append_child ($doc->create_text_node ('<p>xyz'));
+    is $pt->inner_html, q<abc<p>xyz>;
+    
+    $pt->append_child ($doc->create_element ('A'))->text_content ('bcd');
+    is $pt->inner_html, q<abc<p>xyz<A>bcd</A>>;
+    is $el->inner_html, qq<<$tag_name>abc<p>xyz<A>bcd</A></$tag_name>>;
+  }
 } # _plaintext
 
 sub _noscript : Test(4) {
@@ -93,7 +191,7 @@ sub _xmp_descendant : Test(2) {
   my ($doc, $el) = create_el_from_html ('<xmp></xmp>');
   my $xmp = $el->first_child;
   $xmp->append_child ($doc->create_text_node ('abc<>&"' . "\xA0"));
-  my $pre = $xmp->append_child ($doc->create_element ('pre'));
+  my $pre = $xmp->append_child ($doc->create_element_ns ('http://www.w3.org/1999/xhtml', 'pre'));
   $pre->append_child ($doc->create_text_node ('abc<>&"' . "\xA0"));
 
   is $xmp->inner_html, qq<abc<>&"\xA0<pre>\x0Aabc&lt;&gt;&amp;"&nbsp;</pre>>;
@@ -115,12 +213,12 @@ sub _void_elements : Test(95) {
   )) {
     my ($doc, $el) = create_el_from_html ('<p>');
     my $p = $el->first_child;
-    my $el = $doc->create_element_ns ('http://www.w3.org/1999/xhtml', $tag_name);
-    $p->append_child ($el);
+    my $el1 = $doc->create_element_ns ('http://www.w3.org/1999/xhtml', $tag_name);
+    $p->append_child ($el1);
     is $p->inner_html, qq{<$tag_name>};
 
     my $el2 = $doc->create_element ($tag_name);
-    $p->replace_child ($el2, $el);
+    $p->replace_child ($el2, $el1);
     is $p->inner_html, qq{<$tag_name></$tag_name>};
 
     my $el3 = $doc->create_element_ns ('http://test/', $tag_name);
@@ -137,6 +235,33 @@ sub _void_elements : Test(95) {
   }
 } # _void_elements
 
+sub _start_tag_trailing_newlines : Test(15) {
+  for my $tag_name (qw(textarea pre listing)) {
+    {
+      my ($doc, $el) = create_el_from_html ('');
+      my $child = $doc->create_element_ns ('http://www.w3.org/1999/xhtml', $tag_name);
+      $child->text_content ("\x0Aabc\x0A");
+      $el->append_child ($child);
+      is $el->inner_html, qq<<$tag_name>\x0A\x0Aabc\x0A</$tag_name>>;
+    }
+
+    for my $nsurl (undef, q<http://test/>, q<http://www.w3.org/2000/svg>) {
+      my ($doc, $el) = create_el_from_html ('');
+      my $child = $doc->create_element_ns ($nsurl, $tag_name);
+      $child->text_content ("\x0Aabc\x0A");
+      $el->append_child ($child);
+      is $el->inner_html, qq<<$tag_name>\x0Aabc\x0A</$tag_name>>;
+    }
+
+    {
+      my ($doc, $el) = create_el_from_html ('');
+      my $child = $doc->create_element_ns ('http://www.w3.org/1999/xhtml', $tag_name);
+      $child->text_content ("\x0Aabc\x0A");
+      is $child->inner_html, qq<\x0Aabc\x0A>;
+    }
+  }
+} # _start_tag_trailing_newlines
+
 sub _doc : Test(1) {
   my $doc = create_doc_from_html ('<!DOCTYPE html><p>');
   is $doc->inner_html, q<<!DOCTYPE html><html><head></head><body><p></p></body></html>>;
@@ -152,15 +277,12 @@ sub _df : Test(1) {
 } # _df
 
 sub _svg : Test(1) {
-  ## See
-  ## <http://permalink.gmane.org/gmane.org.w3c.whatwg.discuss/11191>.
-
   my $doc = create_doc_from_html ('<!DOCTYPE HTML>');
   my $div = $doc->create_element ('div');
   my $svg = $doc->create_element_ns (q<http://www.w3.org/2000/svg>, 'svg:svg');
   $div->append_child ($svg);
   
-  is $div->inner_html, q<<svg:svg></svg:svg>>;
+  is $div->inner_html, q<<svg></svg>>;
 } # _svg
 
 sub _nanodom : Test(1) {
