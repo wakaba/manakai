@@ -108,6 +108,35 @@ sub _attr_value : Test(1) {
   is $el->inner_html, qq{<p id="<>&amp;&quot;&quot;']]>&nbsp;"></p>};
 } # _attr_value
 
+sub _void_elements : Test(95) {
+  for my $tag_name (qw(
+    area base basefont bgsound br col command embed frame hr img input
+    keygen link meta param source track wbr
+  )) {
+    my ($doc, $el) = create_el_from_html ('<p>');
+    my $p = $el->first_child;
+    my $el = $doc->create_element_ns ('http://www.w3.org/1999/xhtml', $tag_name);
+    $p->append_child ($el);
+    is $p->inner_html, qq{<$tag_name>};
+
+    my $el2 = $doc->create_element ($tag_name);
+    $p->replace_child ($el2, $el);
+    is $p->inner_html, qq{<$tag_name></$tag_name>};
+
+    my $el3 = $doc->create_element_ns ('http://test/', $tag_name);
+    $p->replace_child ($el3, $el2);
+    is $p->inner_html, qq{<$tag_name></$tag_name>};
+
+    my $el4 = $doc->create_element_ns ('http://www.w3.org/2000/svg', $tag_name);
+    $p->replace_child ($el4, $el3);
+    is $p->inner_html, qq{<$tag_name></$tag_name>};
+
+    my $el5 = $doc->create_element_ns ('http://www.w3.org/1998/Math/MathML', $tag_name);
+    $p->replace_child ($el5, $el4);
+    is $p->inner_html, qq{<$tag_name></$tag_name>};
+  }
+} # _void_elements
+
 sub _doc : Test(1) {
   my $doc = create_doc_from_html ('<!DOCTYPE html><p>');
   is $doc->inner_html, q<<!DOCTYPE html><html><head></head><body><p></p></body></html>>;
