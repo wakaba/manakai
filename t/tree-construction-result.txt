@@ -3,13 +3,13 @@ Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree
 Name "Whatpm::HTML::Debug::cp" used only once: possible typo at t/HTML-tree.t line 34.
 # t/tokenizer-test-chars.dat
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 1 - Parse error: qq'í €í í¿°í¿¿'; 1:1:surrogate, 1:2:surrogate, 1:2:no DOCTYPE, 1:3:surrogate, 1:4:surrogate;surrogate, surrogate, surrogate, surrogate, no DOCTYPE
+ok 1 - Parse error: qq'í €í í¿°í¿¿'; 1:2:no DOCTYPE;no DOCTYPE
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 2 - SHOULD-level error: qq'í €í í¿°í¿¿'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 3 - Document tree: qq'í €í í¿°í¿¿'
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 4 - Parse error: qq'<p>aaaí €í í¿°í¿¿'; 1:4:no DOCTYPE, 1:7:surrogate, 1:8:surrogate, 1:9:surrogate, 1:10:surrogate;surrogate, surrogate, surrogate, surrogate, no DOCTYPE
+ok 4 - Parse error: qq'<p>aaaí €í í¿°í¿¿'; 1:4:no DOCTYPE;no DOCTYPE
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 5 - SHOULD-level error: qq'<p>aaaí €í í¿°í¿¿'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
@@ -136,25 +136,25 @@ ok 124 - Parse error: qq'\x{9F}'; 1:1:control char:U+009F;control character
 ok 125 - SHOULD-level error: qq'\x{9F}'; ;
 ok 126 - Document tree: qq'\x{9F}'
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 127 - Parse error: qq'í €'; 1:1:surrogate, 1:1:no DOCTYPE;no DOCTYPE, surrogate
+ok 127 - Parse error: qq'í €'; 1:1:no DOCTYPE;no DOCTYPE
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 128 - SHOULD-level error: qq'í €'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 129 - Document tree: qq'í €'
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 130 - Parse error: qq'í €'; 1:1:surrogate;surrogate
+ok 130 - Parse error: qq'í €'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 131 - SHOULD-level error: qq'í €'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 132 - Document tree: qq'í €'
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 133 - Parse error: qq'í¿¿'; 1:1:surrogate, 1:1:no DOCTYPE;no DOCTYPE, surrogate
+ok 133 - Parse error: qq'í¿¿'; 1:1:no DOCTYPE;no DOCTYPE
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 134 - SHOULD-level error: qq'í¿¿'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 135 - Document tree: qq'í¿¿'
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 136 - Parse error: qq'í¿¿'; 1:1:surrogate;surrogate
+ok 136 - Parse error: qq'í¿¿'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
 ok 137 - SHOULD-level error: qq'í¿¿'; ;
 Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.

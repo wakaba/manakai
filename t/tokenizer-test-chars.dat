@@ -1,31 +1,23 @@
 #data escaped
 \uD800\uD801\uDFF0\uDFFF
 #errors
-surrogate
-surrogate
-surrogate
-surrogate
 no DOCTYPE
 #document escaped
 | <html>
 |   <head>
 |   <body>
-|     "\uFFFD\uFFFD\uFFFD\uFFFD"
+|     "\uD800\uD801\uDFF0\uDFFF"
 
 #data escaped
 <p>aaa\uD800\uD801\uDFF0\uDFFF
 #errors
-surrogate
-surrogate
-surrogate
-surrogate
 no DOCTYPE
 #document escaped
 | <html>
 |   <head>
 |   <body>
 |     <p>
-|       "aaa\uFFFD\uFFFD\uFFFD\uFFFD"
+|       "aaa\uD800\uD801\uDFF0\uDFFF"
 
 #data
 <p>...&NotNestedGreaterGreater;?
