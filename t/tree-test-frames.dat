@@ -322,16 +322,17 @@ unclosed frameset
 \uFFFD<frameset>
 #errors
 no DOCTYPE
-no </frameset>
-elements not closed before EOF
-#document
+bad <frameset>
+#document escaped
 | <html>
 |   <head>
-|   <frameset>
+|   <body>
+|     "\uFFFD"
 
 #data escaped
 \u0000<frameset>
 #errors
+NULL (tokenizer)
 NULL
 no DOCTYPE
 no </frameset>

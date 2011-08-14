@@ -758,10 +758,6 @@ sub parse_char_stream ($$$;$$) {
       $self->{nc} = 0x000A; # LF # MUST
       $self->{line}++;
       $self->{column} = 0;
-    } elsif ($self->{nc} == 0x0000) { # NULL
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
-      $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
 
@@ -2022,10 +2018,12 @@ sub _tree_construction_main ($) {
 
       if ($token->{type} == CHARACTER_TOKEN) {
         ## "In foreign content", character tokens.
-
-        $self->{open_elements}->[-1]->[0]->manakai_append_text
-            ($token->{data});
-        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+        my $data = $token->{data};
+        while ($data =~ s/\x00/\x{FFFD}/) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+        }
+        $self->{open_elements}->[-1]->[0]->manakai_append_text ($data);
+        if ($data =~ /[^\x09\x0A\x0C\x0D\x20]/) {
           delete $self->{frameset_ok};
         }
         
@@ -2285,7 +2283,12 @@ sub _tree_construction_main ($) {
           if ($self->{pending_chars}) {
             $s = join '', map { $_->{data} } @{$self->{pending_chars}};
             delete $self->{pending_chars};
-            if ($s =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+            while ($s =~ s/\x00//) {
+              $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+            }
+            if ($s eq '') {
+              last C;
+            } elsif ($s =~ /[^\x09\x0A\x0C\x0D\x20]/) {
               
               #
             } else {
@@ -2401,6 +2404,7 @@ sub _tree_construction_main ($) {
 
         if (length $token->{data}) {
           
+          ## NOTE: NULLs are replaced into U+FFFDs in tokenizer.
           $self->{open_elements}->[-1]->[0]->manakai_append_text
               ($token->{data});
         } else {
@@ -3318,8 +3322,17 @@ sub _tree_construction_main ($) {
     } elsif ($self->{insertion_mode} & BODY_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         ## "In body" insertion mode, character token.  It is also used
-        ## for character tokens in "in foreign content" insertion
-        ## mode, for certain cases.
+        ## for character tokens "in foreign content" for certain
+        ## cases.
+
+        while ($token->{data} =~ s/\x00//g) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+        }
+        if ($token->{data} eq '') {
+          $token = $self->_get_next_token;
+          next B;
+        }
+
         
         $reconstruct_active_formatting_elements
             ->($self, $insert_to_current, $active_formatting_elements,
@@ -3328,7 +3341,7 @@ sub _tree_construction_main ($) {
         $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
 
         if ($self->{frameset_ok} and
-            $token->{data} =~ /[^\x09\x0A\x0C\x0D\x20\x{FFFD}]/) {
+            $token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
           delete $self->{frameset_ok};
         }
 
@@ -4619,7 +4632,12 @@ sub _tree_construction_main ($) {
     } elsif ($self->{insertion_mode} & SELECT_IMS) {
       if ($token->{type} == CHARACTER_TOKEN) {
         
-        $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+        my $data = $token->{data};
+        while ($data =~ s/\x00//) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+        }
+        $self->{open_elements}->[-1]->[0]->manakai_append_text ($data)
+            if $data ne '';
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{type} == START_TAG_TOKEN) {
@@ -7091,10 +7109,6 @@ sub set_inner_html ($$$$;$) {
         $p->{line}++;
         $p->{column} = 0;
         
-      } elsif ($self->{nc} == 0x0000) { # NULL
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
-        $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
       }
     };
 

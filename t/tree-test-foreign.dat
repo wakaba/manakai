@@ -547,6 +547,7 @@ EOF
 <address><svg><foreignobject></address>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched </address>
 EOF
 #document
@@ -562,6 +563,7 @@ EOF
 <article><svg><foreignobject></article>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched </article>
 EOF
 #document
@@ -577,6 +579,7 @@ EOF
 <aside><svg><foreignobject></aside>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched </aside>
 EOF
 #document
@@ -592,6 +595,7 @@ EOF
 <ul><svg><foreignobject></ul>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched </ul>
 EOF
 #document
@@ -607,6 +611,7 @@ EOF
 <form><svg><foreignobject></form>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched end tag
 EOF
 #document
@@ -622,6 +627,7 @@ EOF
 <p><svg><foreignobject></p>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched end tag
 EOF in foreign content
 #document
@@ -638,6 +644,7 @@ EOF in foreign content
 <dd><svg><foreignobject></dd>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched end tag
 EOF in foreign content
 #document
@@ -653,6 +660,7 @@ EOF in foreign content
 <dt><svg><foreignobject></dt>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched end tag
 EOF in foreign content
 #document
@@ -668,6 +676,7 @@ EOF in foreign content
 <li><svg><foreignobject></li>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched end tag
 EOF in foreign content
 #document
@@ -683,6 +692,7 @@ EOF in foreign content
 <h1><svg><foreignobject></h1>x
 #errors
 no DOCTYPE
+unmatched end tag (foreign)
 unmatched end tag
 EOF
 #document
@@ -3681,6 +3691,19 @@ EOF
 |   <frameset>
 
 #data escaped
+<!DOCTYPE html><math><mi>\u0000<frameset>
+#errors
+NULL (tokenizer)
+NULL
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
 <!DOCTYPE html><math><mi>\uFFFD<frameset>
 #errors
 <frameset> in body
@@ -3695,6 +3718,19 @@ EOF
 |         "\uFFFD"
 
 #data escaped
+<!DOCTYPE html><math><mi><div>\u0000<frameset>
+#errors
+NULL (tokenizer)
+NULL
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
 <!DOCTYPE html><math><mi><div>\uFFFD<frameset>
 #errors
 <frameset> in body
@@ -3703,7 +3739,28 @@ EOF
 | <!DOCTYPE html>
 | <html>
 |   <head>
-|   <frameset>
+|   <body>
+|     <math math>
+|       <math mi>
+|         <div>
+|           "\uFFFD"
+
+#data escaped
+<!DOCTYPE html><math><annotation-xml>\u0000<mi><frameset>
+#errors
+NULL (tokenizer)
+NULL
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         "\uFFFD"
+|         <math mi>
 
 #data escaped
 <!DOCTYPE html><math><annotation-xml>\uFFFD<mi><frameset>
@@ -3721,8 +3778,39 @@ EOF
 |         <math mi>
 
 #data escaped
+<!DOCTYPE html><math><annotation-xml encoding="text/html"><div>\u0000<frameset>
+#errors
+NULL (tokenizer)
+NULL
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
 <!DOCTYPE html><math><annotation-xml encoding="text/html"><div>\uFFFD<frameset>
 #errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="text/html"
+|         <div>
+|           "\uFFFD"
+
+#data escaped
+<!DOCTYPE html><math><annotation-xml encoding="application/xhtml+xml"><div>\u0000<frameset>
+#errors
+NULL (tokenizer)
+NULL
 <frameset> in body
 EOF
 #document escaped
@@ -3740,11 +3828,57 @@ EOF
 | <!DOCTYPE html>
 | <html>
 |   <head>
+|   <body>
+|     <math math>
+|       <math annotation-xml>
+|         encoding="application/xhtml+xml"
+|         <div>
+|           "\uFFFD"
+
+#data escaped
+<!DOCTYPE html><svg><desc>\u0000<frameset>
+#errors
+NULL (tokenizer)
+NULL
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <frameset>
+
+#data escaped
+<!DOCTYPE html><svg><desc><![CDATA[\u0000]]><frameset>
+#errors
+NULL
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
 |   <frameset>
 
 #data escaped
 <!DOCTYPE html><svg><desc>\uFFFD<frameset>
 #errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg desc>
+|         "\uFFFD"
+
+#data escaped
+<!DOCTYPE html><svg><desc><div>\u0000<frameset>
+#errors
+NULL (tokenizer)
+NULL
 <frameset> in body
 EOF
 #document escaped
@@ -3762,11 +3896,44 @@ EOF
 | <!DOCTYPE html>
 | <html>
 |   <head>
+|   <body>
+|     <svg svg>
+|       <svg desc>
+|         <div>
+|           "\uFFFD"
+
+#data escaped
+<!DOCTYPE html><svg><title>\u0000<frameset>
+#errors
+NULL
+NULL (tokenizer)
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
 |   <frameset>
 
 #data escaped
 <!DOCTYPE html><svg><title>\uFFFD<frameset>
 #errors
+<frameset> in body
+EOF
+#document escaped
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg title>
+|         "\uFFFD"
+
+#data escaped
+<!DOCTYPE html><svg><foreignobject>\u0000<frameset>
+#errors
+NULL (tokenizer)
+NULL
 <frameset> in body
 EOF
 #document escaped
@@ -3784,7 +3951,10 @@ EOF
 | <!DOCTYPE html>
 | <html>
 |   <head>
-|   <frameset>
+|   <body>
+|     <svg svg>
+|       <svg foreignObject>
+|         "\uFFFD"
 
 #data
 <!DOCTYPE html><svg></svg><![CDATA[foo]]>

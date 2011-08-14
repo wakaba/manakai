@@ -53,3 +53,770 @@ U+000B
 |   <body>
 |     <p>
 |       "\u000b"
+
+#data escaped
+<title>a\u0000</title>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <title>
+|       "a\uFFFD"
+|   <body>
+
+#data escaped
+<xmp>a\u0000</xmp>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <xmp>
+|       "a\uFFFD"
+
+#data escaped
+<script>a\u0000</script>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <script>
+|       "a\uFFFD"
+|   <body>
+
+#data escaped
+<plaintext>a\u0000
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <plaintext>
+|       "a\uFFFD"
+
+#data escaped
+<a\u0000></a\u0000>b
+#errors
+no DOCTYPE
+NULL
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a\uFFFD>
+|     "b"
+
+#data escaped
+<\u0000>
+#errors
+no DOCTYPE
+bogus <
+NULL (tokenizer)
+NULL (in body)
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "<>"
+
+#data escaped
+</\u0000>
+#errors
+no DOCTYPE
+bogus </
+#document escaped
+| <!-- \uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<![ \u0000 ]>
+#errors
+no DOCTYPE
+bogus comment
+#document escaped
+| <!-- [ \uFFFD ] -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<script><!--\u0000--></script>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <script>
+|       "<!--\uFFFD-->"
+|   <body>
+
+#data escaped
+<script><!---\u0000--></script>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <script>
+|       "<!---\uFFFD-->"
+|   <body>
+
+#data escaped
+<script><!----\u0000--></script>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <script>
+|       "<!----\uFFFD-->"
+|   <body>
+
+#data escaped
+<script><!--<script>\u0000--></script>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <script>
+|       "<!--<script>\uFFFD-->"
+|   <body>
+
+#data escaped
+<script><!--<script>-\u0000--></script>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <script>
+|       "<!--<script>-\uFFFD-->"
+|   <body>
+
+#data escaped
+<script><!--<script>--\u0000--></script>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|     <script>
+|       "<!--<script>--\uFFFD-->"
+|   <body>
+
+#data escaped
+<a \u0000b>
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       \uFFFDb=""
+
+#data escaped
+<a c\u0000b>
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       c\uFFFDb=""
+
+#data escaped
+<a c \u0000b>
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       c=""
+|       \uFFFDb=""
+
+#data escaped
+<a c=\u0000b>
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       c="\uFFFDb"
+
+#data escaped
+<a c=d\u0000b>
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       c="d\uFFFDb"
+
+#data escaped
+<a c="d\u0000b">
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       c="d\uFFFDb"
+
+#data escaped
+<a c='d\u0000b'>
+#errors
+no DOCTYPE
+NULL
+EOF
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <a>
+|       c="d\uFFFDb"
+
+#data escaped
+<!--\u0000-->
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <!-- \uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!---\u0000-->
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <!-- -\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!----\u0000-->
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <!-- --\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!-----\u0000-->
+#errors
+no DOCTYPE
+--
+NULL
+#document escaped
+| <!-- ---\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!------\u0000-->
+#errors
+no DOCTYPE
+--
+--
+NULL
+#document escaped
+| <!-- ----\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!------!\u0000-->
+#errors
+no DOCTYPE
+--
+--
+!
+NULL
+#document escaped
+| <!-- ----!\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!--a\u0000-->
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <!-- a\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!--a-\u0000-->
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <!-- a-\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!--a--\u0000-->
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <!-- a--\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!--a---\u0000-->
+#errors
+no DOCTYPE
+--
+NULL
+#document escaped
+| <!-- a---\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!--a----\u0000-->
+#errors
+no DOCTYPE
+--
+--
+NULL
+#document escaped
+| <!-- a----\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!--a----!\u0000-->
+#errors
+no DOCTYPE
+--
+--
+!
+NULL
+#document escaped
+| <!-- a----!\uFFFD -->
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE \u0000>
+#errors
+NULL
+#document escaped
+| <!DOCTYPE \uFFFD>
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE a\u0000>
+#errors
+NULL
+#document escaped
+| <!DOCTYPE a\uFFFD>
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE html PUBLIC "a\u0000">
+#errors
+NULL
+#document escaped
+| <!DOCTYPE html "a\uFFFD" "">
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE html PUBLIC 'a\u0000'>
+#errors
+NULL
+#document escaped
+| <!DOCTYPE html "a\uFFFD" "">
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE html PUBLIC "x" "a\u0000">
+#errors
+NULL
+#document escaped
+| <!DOCTYPE html "x" "a\uFFFD">
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE html PUBLIC "x" 'a\u0000'>
+#errors
+NULL
+#document escaped
+| <!DOCTYPE html "x" "a\uFFFD">
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE html SYSTEM "a\u0000">
+#errors
+NULL
+#document escaped
+| <!DOCTYPE html "" "a\uFFFD">
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<!DOCTYPE html SYSTEM 'a\u0000'>
+#errors
+NULL
+#document escaped
+| <!DOCTYPE html "" "a\uFFFD">
+| <html>
+|   <head>
+|   <body>
+
+#data escaped
+<svg><![CDATA[a\u0000b]]></svg>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       "a\uFFFDb"
+
+#data escaped
+<svg><desc><![CDATA[a\u0000b]]></desc></svg>
+#errors
+no DOCTYPE
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg desc>
+|         "ab"
+
+#data escaped
+<svg><desc><p>\u0000</p></desc></svg>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       <svg desc>
+|         <p>
+
+#data escaped
+<table>\u0000</table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <table>
+
+#data escaped
+<table>a\u0000b</table>
+#errors
+no DOCTYPE
+text in <table>
+NULL (tokenizer)
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "ab"
+|     <table>
+
+#data escaped
+<table><span>\u0000</span></table>
+#errors
+no DOCTYPE
+<span> in table
+NULL (tokenizer)
+NULL
+</span> in table
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <span>
+|     <table>
+
+#data escaped
+<table>\u0000\u0000</table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL
+NULL (tokenizer)
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <table>
+
+#data escaped
+<table><svg>\u0000</svg></table>
+#errors
+no DOCTYPE
+<svg> in table
+NULL
+</svg> in table
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <svg svg>
+|       "\uFFFD"
+|     <table>
+
+#data escaped
+<table><tbody>\u0000\u0000</table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL
+NULL (tokenizer)
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+
+#data escaped
+<table><tr>\u0000\u0000</table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL
+NULL (tokenizer)
+NULL
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+
+#data escaped
+<table><caption>\u0000</caption></table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in body)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+
+#data escaped
+<table><caption>a\u0000b</caption></table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in body)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <caption>
+|         "ab"
+
+#data escaped
+<table><tr><th>\u0000</table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in body)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+
+#data escaped
+<table><tr><th>a\u0000b</table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in body)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <th>
+|             "ab"
+
+#data escaped
+<select>\u0000</select>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in select)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <select>
+
+#data escaped
+<select>a\u0000b</select>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in select)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <select>
+|       "ab"
+
+#data escaped
+<table><tr><td><select>\u0000</select></table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in select)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+
+#data escaped
+<table><tr><td><select>a\u0000b</select></table>
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL (in select)
+#document
+| <html>
+|   <head>
+|   <body>
+|     <table>
+|       <tbody>
+|         <tr>
+|           <td>
+|             <select>
+|               "ab"
+
+#data escaped
+a</body>\u0000
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL
+after body
+#document
+| <html>
+|   <head>
+|   <body>
+|     "a"
+
+#data escaped
+a</body></html>\u0000
+#errors
+no DOCTYPE
+NULL (tokenizer)
+NULL
+after after body
+#document
+| <html>
+|   <head>
+|   <body>
+|     "a"
