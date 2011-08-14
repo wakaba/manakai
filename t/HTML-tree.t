@@ -88,9 +88,9 @@ sub test ($) {
   my $onerror = sub {
     my %opt = @_;
     if ($opt{level} eq 's') {
-      push @shoulds, join ':', $opt{line}, $opt{column}, $opt{type};
+      push @shoulds, join ':', grep { defined } $opt{line}, $opt{column}, $opt{type}, $opt{text};
     } else {
-      push @errors, join ':', $opt{line}, $opt{column}, $opt{type};
+      push @errors, join ':', grep { defined } $opt{line}, $opt{column}, $opt{type}, $opt{text};
     }
   };
 

@@ -229,7 +229,6 @@ sub BOGUS_MD_STATE () { 101 }
 ## of tokenization state constants.  See Whatpm::HTML for the full
 ## list and the descriptions for constants.
 
-sub IN_FOREIGN_CONTENT_IM () { 0b100000000000 }
 sub FOREIGN_EL () { 0b1_00000000000 }
 
 ## ------ Character reference mappings ------
@@ -2139,9 +2138,9 @@ sub _get_next_token ($) {
     }
   
         redo A;
-      } elsif ((($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
-                 $self->{open_elements}->[-1]->[1] & FOREIGN_EL) or
-                $self->{is_xml}) and
+      } elsif (($self->{is_xml} or
+                (@{$self->{open_elements} || []} and
+                 ($self->{open_elements}->[-1]->[1] & FOREIGN_EL))) and
                $nc == 0x005B) { # [
                         
         $self->{state} = MD_CDATA_STATE;

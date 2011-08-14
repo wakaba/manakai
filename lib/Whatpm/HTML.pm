@@ -884,10 +884,6 @@ sub ROW_IMS ()        { 0b10000000 }
 sub BODY_AFTER_IMS () { 0b100000000 }
 sub FRAME_IMS ()      { 0b1000000000 }
 sub SELECT_IMS ()     { 0b10000000000 }
-#sub IN_FOREIGN_CONTENT_IM () { 0b100000000000 } # see Whatpm::HTML::Tokenizer
-    ## NOTE: "in foreign content" insertion mode is special; it is combined
-    ## with the secondary insertion mode.  In this parser, they are stored
-    ## together in the bit-or'ed form.
 sub IN_CDATA_RCDATA_IM () { 0b1000000000000 }
     ## NOTE: "in CDATA/RCDATA" insertion mode is also special; it is
     ## combined with the original insertion mode.  In thie parser,
@@ -1351,22 +1347,18 @@ sub _reset_insertion_mode ($) {
       }
     }
     
-    ## Step 4..14
+    ## Step 4..13
     my $new_mode;
-    if ($node->[1] & SVG_EL or $node->[1] & MML_EL) {
-      
-      $new_mode = IN_FOREIGN_CONTENT_IM | IN_BODY_IM;
-    } elsif ($node->[1] & FOREIGN_EL) {
-      
-      #
-    } elsif ($node->[1] == TABLE_CELL_EL) {
+    if ($node->[1] == TABLE_CELL_EL) {
       if ($last) {
         
         #
       } else {
         
         $new_mode = IN_CELL_IM;
-      }
+      } 
+    } elsif ($node->[1] & FOREIGN_EL) {
+      #
     } else {
       
       $new_mode = {
@@ -1387,7 +1379,7 @@ sub _reset_insertion_mode ($) {
     }
     $self->{insertion_mode} = $new_mode and last LOOP if defined $new_mode;
     
-    ## Step 15
+    ## Step 14
     if ($node->[1] == HTML_EL) {
       ## NOTE: Commented out in the spec (HTML5 revision 3894).
       #unless (defined $self->{head_element}) {
@@ -1402,14 +1394,14 @@ sub _reset_insertion_mode ($) {
       
     }
     
-    ## Step 16
+    ## Step 15
     $self->{insertion_mode} = IN_BODY_IM and last LOOP if $last;
     
-    ## Step 17
+    ## Step 16
     $i--;
     $node = $self->{open_elements}->[$i];
     
-    ## Step 18
+    ## Step 17
     redo LOOP;
   } # LOOP
   
@@ -1981,9 +1973,308 @@ sub _tree_construction_main ($) {
   B: while (1) {
     
 
+    if ($token->{n}++ == 100) {
+      $self->{parse_error}->(level => $self->{level}->{must}, type => 'parser impl error', # XXXtest
+                      token => $token);
+      require Data::Dumper;
+      warn "====== HTML Parser Error ======\n";
+      warn join (' ', map { $_->[0]->manakai_local_name } @{$self->{open_elements}}) . ' #' . $self->{insertion_mode} . "\n";
+      warn Data::Dumper::Dumper ($token);
+      $token = $self->_get_next_token;
+      next B;
+    }
+
+    ## <http://c.whatwg.org/#tree-construction>
+    if (
+      (not @{$self->{open_elements}}) or
+      (not $self->{open_elements}->[-1]->[1] & FOREIGN_EL) or ## HTML element
+      ($self->{open_elements}->[-1]->[1] == MML_TEXT_INTEGRATION_EL and
+       (($token->{type} == START_TAG_TOKEN and
+         $token->{tag_name} ne 'mglyph' and
+         $token->{tag_name} ne 'malignmark') or
+        $token->{type} == CHARACTER_TOKEN)) or
+      ($self->{open_elements}->[-1]->[1] & MML_AXML_EL and
+       $token->{type} == START_TAG_TOKEN and
+       $token->{tag_name} eq 'svg') or
+      ( ## If the current node is an HTML integration point (other
+        ## than |annotation-xml|).
+       $self->{open_elements}->[-1]->[1] == SVG_INTEGRATION_EL and
+       ($token->{type} == START_TAG_TOKEN or
+        $token->{type} == CHARACTER_TOKEN)) or
+      ( ## If the current node is an |annotation-xml| whose |encoding|
+        ## is |text/html| or |application/xhtml+xml| (HTML integration
+        ## point).
+       $self->{open_elements}->[-1]->[1] == MML_AXML_EL and
+       ($token->{type} == START_TAG_TOKEN or
+        $token->{type} == CHARACTER_TOKEN) and
+       do {
+         my $encoding = $self->{open_elements}->[-1]->[0]->get_attribute_ns (undef, 'encoding') || '';
+         $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+         if ($encoding eq 'text/html' or 
+             $encoding eq 'application/xhtml+xml') {
+           1;
+         } else {
+           0;
+         }
+       }) or
+      ($token->{type} == END_OF_FILE_TOKEN)) {
+      
+      ## Use the rules for the current insertion mode in HTML content.
+      #
+    } else {
+      ## Use the rules for the foreign content.
+
+      if ($token->{type} == CHARACTER_TOKEN) {
+        ## "In foreign content", character tokens.
+
+        $self->{open_elements}->[-1]->[0]->manakai_append_text
+            ($token->{data});
+        if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+          delete $self->{frameset_ok};
+        }
+        
+        $token = $self->_get_next_token;
+        next B;
+      } elsif ($token->{type} == START_TAG_TOKEN) {
+        ## "In foreign content", start tag token.
+
+        if (
+          {
+            b => 1, big => 1, blockquote => 1, body => 1, br => 1,
+            center => 1, code => 1, dd => 1, div => 1, dl => 1, dt => 1,
+            em => 1, embed => 1, h1 => 1, h2 => 1, h3 => 1, h4 => 1,
+            h5 => 1, h6 => 1, head => 1, hr => 1, i => 1, img => 1, li => 1,
+            listing => 1, menu => 1, meta => 1, nobr => 1, ol => 1,
+            p => 1, pre => 1, ruby => 1, s => 1, small => 1, span => 1,
+            strong => 1, strike => 1, sub => 1, sup => 1, table => 1,
+            tt => 1, u => 1, ul => 1, var => 1,
+          }->{$token->{tag_name}} or
+          ($token->{tag_name} eq 'font' and
+           ($token->{attributes}->{color} or
+            $token->{attributes}->{face} or
+            $token->{attributes}->{size}))
+        ) {
+          ## "In foreign content", HTML-only start tag.
+          
+
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
+                          text => $self->{open_elements}->[-1]->[0]
+                              ->manakai_local_name,
+                          token => $token);
+
+          pop @{$self->{open_elements}};
+          V: {
+            my $current_node = $self->{open_elements}->[-1];
+            if (
+              ## An HTML element.
+              not $current_node->[1] & FOREIGN_EL or
+
+              ## An MathML text integration point.
+              $current_node->[1] == MML_TEXT_INTEGRATION_EL or
+              
+              ## An HTML integration point.
+              $current_node->[1] == SVG_INTEGRATION_EL or
+              ($current_node->[1] == MML_AXML_EL and
+               do {
+                 my $encoding = $current_node->[0]->get_attribute_ns (undef, 'encoding') || '';
+                 $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+                 ($encoding eq 'text/html' or
+                  $encoding eq 'application/xhtml+xml');
+               })
+            ) {
+              last V;
+            }
+            
+            pop @{$self->{open_elements}};
+            redo V;
+          }
+          
+          ## Reprocess the token.
+          next B;
+
+        } else {
+          ## "In foreign content", foreign start tag.
+
+          my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
+          my $tag_name = $token->{tag_name};
+          if ($nsuri eq SVG_NS) {
+            $tag_name = {
+               altglyph => 'altGlyph',
+               altglyphdef => 'altGlyphDef',
+               altglyphitem => 'altGlyphItem',
+               animatecolor => 'animateColor',
+               animatemotion => 'animateMotion',
+               animatetransform => 'animateTransform',
+               clippath => 'clipPath',
+               feblend => 'feBlend',
+               fecolormatrix => 'feColorMatrix',
+               fecomponenttransfer => 'feComponentTransfer',
+               fecomposite => 'feComposite',
+               feconvolvematrix => 'feConvolveMatrix',
+               fediffuselighting => 'feDiffuseLighting',
+               fedisplacementmap => 'feDisplacementMap',
+               fedistantlight => 'feDistantLight',
+               feflood => 'feFlood',
+               fefunca => 'feFuncA',
+               fefuncb => 'feFuncB',
+               fefuncg => 'feFuncG',
+               fefuncr => 'feFuncR',
+               fegaussianblur => 'feGaussianBlur',
+               feimage => 'feImage',
+               femerge => 'feMerge',
+               femergenode => 'feMergeNode',
+               femorphology => 'feMorphology',
+               feoffset => 'feOffset',
+               fepointlight => 'fePointLight',
+               fespecularlighting => 'feSpecularLighting',
+               fespotlight => 'feSpotLight',
+               fetile => 'feTile',
+               feturbulence => 'feTurbulence',
+               foreignobject => 'foreignObject',
+               glyphref => 'glyphRef',
+               lineargradient => 'linearGradient',
+               radialgradient => 'radialGradient',
+               #solidcolor => 'solidColor', ## NOTE: Commented in spec (SVG1.2)
+               textpath => 'textPath',  
+            }->{$tag_name} || $tag_name;
+          }
+
+          ## "adjust SVG attributes" (SVG only) - done in insert-element-f
+
+          ## "adjust foreign attributes" - done in insert-element-f
+
+          
+    {
+      my $el;
+      
+      $el = $self->{document}->create_element_ns
+        ($nsuri, [undef,   $tag_name]);
+    
+        for my $attr_name (keys %{  $token->{attributes}}) {
+          my $attr_t =   $token->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (
+          @{
+            $foreign_attr_xname->{$attr_name} ||
+            [undef, [undef,
+                     ($nsuri) eq SVG_NS ?
+                         ($svg_attr_name->{$attr_name} || $attr_name) :
+                     ($nsuri) eq MML_NS ?
+                         ($attr_name eq 'definitionurl' ?
+                             'definitionURL' : $attr_name) :
+                         $attr_name]]
+          }
+        );
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $el->set_attribute_node_ns ($attr);
+        }
+      
+        $el->set_user_data (manakai_source_line => $token->{line})
+            if defined $token->{line};
+        $el->set_user_data (manakai_source_column => $token->{column})
+            if defined $token->{column};
+      
+      $insert->($self, $el, $open_tables);
+      push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL | (($nsuri) eq SVG_NS ? SVG_EL : ($nsuri) eq MML_NS ? MML_EL : 0)];
+
+      if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($nsuri)) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
+## TODO: Error type documentation
+      }
+      if ( $token->{attributes}->{'xmlns:xlink'} and
+           $token->{attributes}->{'xmlns:xlink'}->{value} ne q<http://www.w3.org/1999/xlink>) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
+      }
+    }
+  
+
+          if ($self->{self_closing}) {
+            pop @{$self->{open_elements}};
+            delete $self->{self_closing};
+          } else {
+            
+          }
+
+          $token = $self->_get_next_token;
+          next B;
+        }
+
+      } elsif ($token->{type} == END_TAG_TOKEN) {
+        ## "In foreign content", end tag.
+
+        if ($token->{tag_name} eq 'script' and
+            $self->{open_elements}->[-1]->[1] == SVG_SCRIPT_EL) {
+          ## "In foreign content", "script" end tag, if the current
+          ## node is an SVG |script| element.
+          
+          pop @{$self->{open_elements}};
+
+          ## XXXscript: Execute script here.
+          $token = $self->_get_next_token;
+          next B;
+
+        } else {
+          ## "In foreign content", end tag.
+          
+          
+          ## 1.
+          my $i = -1;
+          my $node = $self->{open_elements}->[$i];
+          
+          ## 2.
+          my $tag_name = $node->[0]->manakai_local_name;
+          $tag_name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+          if ($tag_name ne $token->{tag_name}) {
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
+                            text => $token->{tag_name},
+                            level => $self->{level}->{must});
+          }
+
+          ## 3.
+          LOOP: {
+            my $tag_name = $node->[0]->manakai_local_name;
+            $tag_name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+            if ($tag_name eq $token->{tag_name}) {
+              splice @{$self->{open_elements}}, $i, -$i, ();
+              $token = $self->_get_next_token;
+              next B;
+            }
+            
+            ## 4.
+            $i--;
+            $node = $self->{open_elements}->[$i];
+
+            ## 5.
+            if ($node->[1] & FOREIGN_EL) {
+              redo LOOP;
+            }
+          } # LOOP
+
+          ## Step 6 (Use the current insertion mode in HTML content)
+          #
+        }
+
+      } elsif ($token->{type} == COMMENT_TOKEN) {
+        ## "In foreign content", comment token.
+        my $comment = $self->{document}->create_comment ($token->{data});
+        $self->{open_elements}->[-1]->[0]->append_child ($comment);
+        $token = $self->_get_next_token;
+        next B;
+      } elsif ($token->{type} == DOCTYPE_TOKEN) {
+        
+        ## "In foreign content", DOCTYPE token.
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#DOCTYPE', token => $token);
+        ## Ignore the token.
+        $token = $self->_get_next_token;
+        next B;
+      } else {
+        die "$0: $token->{type}: Unknown token type";        
+      }
+    } # foreign
+
     ## The "in table text" insertion mode.
     if ($self->{insertion_mode} & TABLE_IMS and
-        not $self->{insertion_mode} & IN_FOREIGN_CONTENT_IM and
         not $self->{insertion_mode} & IN_CDATA_RCDATA_IM) {
       C: {
         my $s;
@@ -1994,6 +2285,7 @@ sub _tree_construction_main ($) {
           $token = $self->_get_next_token;
           next B;
         } else {
+          ## There is an "insert pending chars" code clone.
           if ($self->{pending_chars}) {
             $s = join '', map { $_->{data} } @{$self->{pending_chars}};
             delete $self->{pending_chars};
@@ -2179,331 +2471,6 @@ sub _tree_construction_main ($) {
       } else {
         die "$0: $token->{type}: In CDATA/RCDATA: Unknown token type";        
       }
-
-    } elsif ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
-      if ($token->{type} == CHARACTER_TOKEN) {
-        ## "In foreign content" insertion mode, character token.
-        
-
-        if (
-          ( ## If the current node is an HTML element.
-            not $self->{open_elements}->[-1]->[1] & FOREIGN_EL
-          ) or
-          ( ## If the current node is an HTML integration point (other
-            ## than |annotation-xml|).
-            $self->{open_elements}->[-1]->[1] == SVG_INTEGRATION_EL
-          ) or
-          ( ## If the current node is an |annotation-xml| whose
-            ## |encoding| is |text/html| or |application/xhtml+xml|
-            ## (HTML integration point).
-            $self->{open_elements}->[-1]->[1] == MML_AXML_EL and
-            do {
-              my $encoding = $self->{open_elements}->[-1]->[0]->get_attribute_ns (undef, 'encoding') || '';
-              $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-              if ($encoding eq 'text/html' or 
-                  $encoding eq 'application/xhtml+xml') {
-                1;
-              } else {
-                0;
-              }
-            }
-          )
-        ) {
-          ## I.e., if the current node is an HTML element, or if the
-          ## current node is an HTML integration point.
-
-          ## Process the token "using the rules for" the "in body"
-          ## insertion mode, then goto |continue|.
-          # ...
-        } else {
-          $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
-          
-          if ($token->{data} =~ /[^\x09\x0A\x0C\x0D\x20]/) {
-            delete $self->{frameset_ok};
-          }
-          
-          $token = $self->_get_next_token;
-          next B;
-        }
-
-      } elsif ($token->{type} == START_TAG_TOKEN) {
-        ## "In foreign content" insertion mode, start tag token.
-
-        if (
-          ( ## Start tag, if the current node is an HTML element.
-            not $self->{open_elements}->[-1]->[1] & FOREIGN_EL
-          ) or
-          ( ## Non-"mglyph" non-"malignmark" start tag, if the current
-            ## node is a MathML text integration point; Start tag, if
-            ## the current node is an HTML integration point (other
-            ## than |annotation-xml|).
-            $self->{open_elements}->[-1]->[1] & FOREIGN_FLOW_CONTENT_EL and
-            $self->{open_elements}->[-1]->[1] != MML_AXML_EL and
-            (
-              $self->{open_elements}->[-1]->[1] & SVG_EL or
-              not {mglyph => 1, malignmark => 1}->{$token->{tag_name}}
-            )
-          ) or
-          ( ## "svg" start tag, if the current node is an
-            ## |annotation-xml| element; Start tag, if the current
-            ## node is an |annotation-xml| whose |encoding| is
-            ## |text/html| or |application/xhtml+xml| (HTML
-            ## integration point).
-            $self->{open_elements}->[-1]->[1] == MML_AXML_EL and
-            (
-              $token->{tag_name} eq 'svg' or
-              do {
-                my $encoding = $self->{open_elements}->[-1]->[0]->get_attribute_ns (undef, 'encoding') || '';
-                $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-                if ($encoding eq 'text/html' or 
-                    $encoding eq 'application/xhtml+xml') {
-                  1;
-                } else {
-                  0;
-                }
-              }
-            )
-          )
-        ) {
-          
-          ## Process the token "using the rules for" the "in body"
-          ## insertion mode, then goto |continue|.
-          # ...
-
-        } elsif ({
-                  b => 1, big => 1, blockquote => 1, body => 1, br => 1,
-                  center => 1, code => 1, dd => 1, div => 1, dl => 1, dt => 1,
-                  em => 1, embed => 1, h1 => 1, h2 => 1, h3 => 1,
-                  h4 => 1, h5 => 1, h6 => 1, head => 1, hr => 1, i => 1,
-                  img => 1, li => 1, listing => 1, menu => 1, meta => 1,
-                  nobr => 1, ol => 1, p => 1, pre => 1, ruby => 1, s => 1,
-                  small => 1, span => 1, strong => 1, strike => 1, sub => 1,
-                  sup => 1, table => 1, tt => 1, u => 1, ul => 1, var => 1,
-                 }->{$token->{tag_name}} or
-                 ($token->{tag_name} eq 'font' and
-                  ($token->{attributes}->{color} or
-                   $token->{attributes}->{face} or
-                   $token->{attributes}->{size}))) {
-          ## "In foreign content" insertion mode, HTML-only start
-          ## tags.
-          
-
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not closed',
-                          text => $self->{open_elements}->[-1]->[0]
-                              ->manakai_local_name,
-                          token => $token);
-
-          pop @{$self->{open_elements}};
-          V: {
-            my $current_node = $self->{open_elements}->[-1];
-            if (
-              ## An HTML element.
-              not $current_node->[1] & FOREIGN_EL or
-
-              ## An MathML text integration point.
-              $current_node->[1] == MML_TEXT_INTEGRATION_EL or
-              
-              ## An HTML integration point.
-              $current_node->[1] == SVG_INTEGRATION_EL or
-              ($current_node->[1] == MML_AXML_EL and
-               do {
-                 my $encoding = $current_node->[0]->get_attribute_ns (undef, 'encoding') || '';
-                 $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-                 ($encoding eq 'text/html' or
-                  $encoding eq 'application/xhtml+xml');
-               })
-            ) {
-              last V;
-            }
-            
-            pop @{$self->{open_elements}};
-            redo V;
-          }
-          
-          ## Reprocess.
-          next B; # goto |continue|
-
-        } else {
-          ## "In foreign content" insertion mode, foreign start tags.
-          my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
-          my $tag_name = $token->{tag_name};
-          if ($nsuri eq SVG_NS) {
-            $tag_name = {
-               altglyph => 'altGlyph',
-               altglyphdef => 'altGlyphDef',
-               altglyphitem => 'altGlyphItem',
-               animatecolor => 'animateColor',
-               animatemotion => 'animateMotion',
-               animatetransform => 'animateTransform',
-               clippath => 'clipPath',
-               feblend => 'feBlend',
-               fecolormatrix => 'feColorMatrix',
-               fecomponenttransfer => 'feComponentTransfer',
-               fecomposite => 'feComposite',
-               feconvolvematrix => 'feConvolveMatrix',
-               fediffuselighting => 'feDiffuseLighting',
-               fedisplacementmap => 'feDisplacementMap',
-               fedistantlight => 'feDistantLight',
-               feflood => 'feFlood',
-               fefunca => 'feFuncA',
-               fefuncb => 'feFuncB',
-               fefuncg => 'feFuncG',
-               fefuncr => 'feFuncR',
-               fegaussianblur => 'feGaussianBlur',
-               feimage => 'feImage',
-               femerge => 'feMerge',
-               femergenode => 'feMergeNode',
-               femorphology => 'feMorphology',
-               feoffset => 'feOffset',
-               fepointlight => 'fePointLight',
-               fespecularlighting => 'feSpecularLighting',
-               fespotlight => 'feSpotLight',
-               fetile => 'feTile',
-               feturbulence => 'feTurbulence',
-               foreignobject => 'foreignObject',
-               glyphref => 'glyphRef',
-               lineargradient => 'linearGradient',
-               radialgradient => 'radialGradient',
-               #solidcolor => 'solidColor', ## NOTE: Commented in spec (SVG1.2)
-               textpath => 'textPath',  
-            }->{$tag_name} || $tag_name;
-          }
-
-          ## "adjust SVG attributes" (SVG only) - done in insert-element-f
-
-          ## "adjust foreign attributes" - done in insert-element-f
-
-          
-    {
-      my $el;
-      
-      $el = $self->{document}->create_element_ns
-        ($nsuri, [undef,   $tag_name]);
-    
-        for my $attr_name (keys %{  $token->{attributes}}) {
-          my $attr_t =   $token->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns (
-          @{
-            $foreign_attr_xname->{$attr_name} ||
-            [undef, [undef,
-                     ($nsuri) eq SVG_NS ?
-                         ($svg_attr_name->{$attr_name} || $attr_name) :
-                     ($nsuri) eq MML_NS ?
-                         ($attr_name eq 'definitionurl' ?
-                             'definitionURL' : $attr_name) :
-                         $attr_name]]
-          }
-        );
-          $attr->value ($attr_t->{value});
-          $attr->set_user_data (manakai_source_line => $attr_t->{line});
-          $attr->set_user_data (manakai_source_column => $attr_t->{column});
-          $el->set_attribute_node_ns ($attr);
-        }
-      
-        $el->set_user_data (manakai_source_line => $token->{line})
-            if defined $token->{line};
-        $el->set_user_data (manakai_source_column => $token->{column})
-            if defined $token->{column};
-      
-      $insert->($self, $el, $open_tables);
-      push @{$self->{open_elements}}, [$el, ($el_category_f->{$nsuri}->{ $tag_name} || 0) | FOREIGN_EL | (($nsuri) eq SVG_NS ? SVG_EL : ($nsuri) eq MML_NS ? MML_EL : 0)];
-
-      if ( $token->{attributes}->{xmlns} and  $token->{attributes}->{xmlns}->{value} ne ($nsuri)) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
-## TODO: Error type documentation
-      }
-      if ( $token->{attributes}->{'xmlns:xlink'} and
-           $token->{attributes}->{'xmlns:xlink'}->{value} ne q<http://www.w3.org/1999/xlink>) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad namespace', token =>  $token);
-      }
-    }
-  
-
-          if ($self->{self_closing}) {
-            pop @{$self->{open_elements}};
-            delete $self->{self_closing};
-          } else {
-            
-          }
-
-          $token = $self->_get_next_token;
-          next B;
-        }
-
-      } elsif ($token->{type} == END_TAG_TOKEN) {
-        if ($token->{tag_name} eq 'script' and
-            $self->{open_elements}->[-1]->[1] == SVG_SCRIPT_EL) {
-          ## "In foreign content" insertion mode, "script" end tag, if
-          ## the current node is an SVG |script| element.
-          
-          pop @{$self->{open_elements}};
-
-          ## XXXscript: Execute script here.
-          $token = $self->_get_next_token;
-          next B;
-
-        } elsif (not $self->{open_elements}->[-1]->[1] & FOREIGN_EL) {
-          ## "In foreign content" insertion mode, an end tag, if the
-          ## current node is an HTML element.
-          
-          ## Process the token "using the rules for" the "in body"
-          ## insertion mode, then goto |continue|.
-          # ...
-
-        } else {
-          ## "In foreign content" insertion mode, an end tag, if the
-          ## current node is a foreign element.
-          
-          
-          ## 1.
-          my $i = -1;
-          my $node = $self->{open_elements}->[$i];
-          
-          ## 2.
-          my $tag_name = $node->[0]->manakai_local_name;
-          $tag_name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-          if ($tag_name ne $token->{tag_name}) {
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                            text => $token->{tag_name},
-                            level => $self->{level}->{must});
-          }
-
-          ## 3.
-          LOOP: {
-            my $tag_name = $node->[0]->manakai_local_name;
-            $tag_name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-            if ($tag_name eq $token->{tag_name}) {
-              splice @{$self->{open_elements}}, $i, -$i, ();
-            }
-            
-            ## 4.
-            $i--;
-            $node = $self->{open_elements}->[$i];
-
-            ## 5.
-            if ($node->[1] & FOREIGN_EL) {
-              redo LOOP;
-            }
-          } # LOOP
-
-          ## Steps 6. and 7. is done in the |continue| block.
-          $token = $self->_get_next_token;
-          next B;
-
-        }
-
-      } elsif ($token->{type} == END_OF_FILE_TOKEN) {
-        ## "In foreign content" insertion mode, an end-of-file token.
-        
-        ## Process the token "using the rules for" the "in body"
-        ## insertion mode, then goto |continue|.
-        # ...
-
-      } else {
-        die "$0: $token->{type}: Unknown token type";        
-      }
-
-      # ...
     } # insertion_mode
 
     if ($self->{insertion_mode} & HEAD_IMS) {
@@ -6427,7 +6394,6 @@ sub _tree_construction_main ($) {
           delete $self->{self_closing};
         } else {
           
-          $self->{insertion_mode} = IN_FOREIGN_CONTENT_IM | IN_BODY_IM;
         }
 
         $token = $self->_get_next_token;
@@ -7002,10 +6968,6 @@ sub _tree_construction_main ($) {
       }
     }
     next B;
-  } continue { # B
-    if ($self->{insertion_mode} & IN_FOREIGN_CONTENT_IM) {
-      $self->_reset_insertion_mode;
-    }
   } # B
 
   ## Stop parsing # MUST
