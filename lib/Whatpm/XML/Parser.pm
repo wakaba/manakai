@@ -2,7 +2,7 @@ package Whatpm::XML::Parser; # -*- Perl -*-
 use strict;
 use warnings;
 no warnings 'utf8';
-our $VERSION = '2.0';
+our $VERSION = '2.1';
 
 push our @ISA, 'Whatpm::HTML';
 use Whatpm::HTML::Tokenizer qw/:token/;
@@ -45,7 +45,7 @@ sub parse_char_stream ($$$;$$) {
       $self->{char_buffer_pos} = 0;
 
       my $count = $input->manakai_read_until
-         ($self->{char_buffer}, qr/[^\x00\x0A\x0D\x{D800}-\x{DFFF}]/, $self->{char_buffer_pos});
+         ($self->{char_buffer}, qr/[^\x0A\x0D]/, $self->{char_buffer_pos});
       if ($count) {
         $self->{line_prev} = $self->{line};
         $self->{column_prev} = $self->{column};
@@ -81,10 +81,6 @@ sub parse_char_stream ($$$;$$) {
       $self->{nc} = 0x000A; # LF # MUST
       $self->{line}++;
       $self->{column} = 0;
-    } elsif ($self->{nc} == 0x0000) { # NULL
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
-      $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
 

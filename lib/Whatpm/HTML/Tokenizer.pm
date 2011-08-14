@@ -1737,7 +1737,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($nc);
         $self->{read_until}->($self->{ca}->{value},
-                              qq["&<\x09\x0C\x20],
+                              qq[\x00"&<\x09\x0C\x20],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -1890,7 +1890,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($nc);
         $self->{read_until}->($self->{ca}->{value},
-                              qq['&<\x09\x0C\x20],
+                              qq[\x00'&<\x09\x0C\x20],
                               length $self->{ca}->{value});
 
         ## Stay in the state
@@ -2093,7 +2093,7 @@ sub _get_next_token ($) {
         }
         $self->{ca}->{value} .= chr ($nc);
         $self->{read_until}->($self->{ca}->{value},
-                              qq["'=&` \x09\x0C<>],
+                              qq[\x00"'=&` \x09\x0C<>],
                               length $self->{ca}->{value});
 
         ## Stay in the state
