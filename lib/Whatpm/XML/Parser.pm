@@ -1,6 +1,7 @@
 package Whatpm::XML::Parser; # -*- Perl -*-
 use strict;
 use warnings;
+no warnings 'utf8';
 our $VERSION = '2.0';
 
 push our @ISA, 'Whatpm::HTML';
