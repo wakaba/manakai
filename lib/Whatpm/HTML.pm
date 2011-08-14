@@ -6542,7 +6542,21 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'input') {
           
           ## TODO: associate with $self->{form_element} if defined
+
           pop @{$self->{open_elements}};
+
+          if ($token->{attributes}->{type}) {
+            my $type = $token->{attributes}->{type}->{value};
+            $type =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+            if ($type eq 'hidden') {
+              #
+            } else {
+              delete $self->{frameset_ok};
+            }
+          } else {
+            delete $self->{frameset_ok};
+          }
+
           delete $self->{self_closing};
         } elsif ({
           area => 1, br => 1, embed => 1, img => 1, wbr => 1, keygen => 1,
