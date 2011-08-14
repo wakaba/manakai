@@ -85,10 +85,6 @@ sub parse_char_stream ($$$;$$) {
       !!!cp ('j4');
       !!!parse-error (type => 'NULL');
       $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
-    } elsif (0xD800 <= $self->{nc} and $self->{nc} <= 0xDFFF) {
-      !!!cp ('j5');
-      !!!parse-error (type => 'surrogate'); ## XXX documentation
-      $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
 

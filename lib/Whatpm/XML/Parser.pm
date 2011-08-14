@@ -85,10 +85,6 @@ sub parse_char_stream ($$$;$$) {
       
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
       $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
-    } elsif (0xD800 <= $self->{nc} and $self->{nc} <= 0xDFFF) {
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'surrogate'); ## XXX documentation
-      $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
     }
   };
 
