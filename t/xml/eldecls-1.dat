@@ -833,6 +833,50 @@
 #document
 | <!DOCTYPE a>
 
+#data escaped
+<!DOCTYPE a[
+<!ELEMENT b \u0000a>
+]><a/>
+#errors
+2;13;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b \uFFFDa>
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ELEMENT b x\u0000a>
+]><a/>
+#errors
+2;14;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b x\uFFFDa>
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ELEMENT b (\u0000a)>
+]><a/>
+#errors
+2;14;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b (\uFFFDa)>
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ELEMENT b (a\u0000a)>
+]><a/>
+#errors
+2;15;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b (a\uFFFDa)>
+| <{} a>
+
 #data
 <!DOCTYPE a[
 <!ELEMENT b EMPTY>

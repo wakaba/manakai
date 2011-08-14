@@ -34,6 +34,30 @@
 |   <!ELEMENT bcd >
 | <{} a>
 
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST \u0000bcd>
+]><a/>
+#errors escaped
+2;1;empty attlist decl;;\uFFFDbcd;w
+2;11;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT \uFFFDbcd >
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST a\u0000bcd>
+]><a/>
+#errors escaped
+2;1;empty attlist decl;;a\uFFFDbcd;w
+2;12;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT a\uFFFDbcd >
+| <{} a>
+
 #data
 <!DOCTYPE a[
 <!ATTLIST b >
@@ -681,6 +705,32 @@ c CDATA'd'
 | <!DOCTYPE a>
 |   <!ELEMENT b >
 |     c CDATA () EXPLICIT "d"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+\u0000c CDATA "d">
+]><a/>
+#errors
+3;1;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     \uFFFDc CDATA () EXPLICIT "d"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+x\u0000c CDATA "d">
+]><a/>
+#errors
+3;2;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     x\uFFFDc CDATA () EXPLICIT "d"
 | <{} a>
 
 #data
@@ -1528,6 +1578,77 @@ c (x     y) #IMPLIED>
 |     c ENUMERATION (x y) IMPLIED ""
 | <{} a>
 
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (\u0000yz) "x"
+>
+]><a/>
+#errors
+3;4;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (\uFFFDyz) EXPLICIT "x"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (x\u0000yz) "x"
+>
+]><a/>
+#errors
+3;5;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (x\uFFFDyz) EXPLICIT "x"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (  \u0000yz) "x"
+>
+]><a/>
+#errors
+3;6;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (\uFFFDyz) EXPLICIT "x"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (a \u0000yz) "x"
+>
+]><a/>
+#errors
+3;5;space in allowed token;;;m
+3;6;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (a \uFFFDyz) EXPLICIT "x"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b
+c (a|\u0000yz) "x"
+>
+]><a/>
+#errors
+3;6;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c ENUMERATION (a|\uFFFDyz) EXPLICIT "x"
+| <{} a>
+
 #data
 <!DOCTYPE a[
 <!attlist b>
@@ -1718,4 +1839,54 @@ c CDATA #REQUIRED>
 | <!DOCTYPE a>
 |   <!ELEMENT b >
 |     c CDATA () EXPLICIT "ab\u000d\u000a\u0009\u0020\u000c"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b c CDATA "ab\u0000cd">
+]><a/>
+#errors
+2;24;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "ab\uFFFDcd"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b c CDATA 'ab\u0000cd'>
+]><a/>
+#errors
+2;24;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "ab\uFFFDcd"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b c CDATA ab\u0000cd>
+]><a/>
+#errors
+2;21;unquoted attr value;;;m
+2;23;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "ab\uFFFDcd"
+| <{} a>
+
+#data escaped
+<!DOCTYPE a[
+<!ATTLIST b c CDATA \u0000cd>
+]><a/>
+#errors
+2;21;unquoted attr value;;;m
+2;21;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ELEMENT b >
+|     c CDATA () EXPLICIT "\uFFFDcd"
 | <{} a>

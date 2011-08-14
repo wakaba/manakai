@@ -148,3 +148,21 @@
 #document escaped
 | <{} \u4e00\u4e01>
 |   "ab"
+
+#data escaped
+<\u0000ab>a</\u0000ab>
+#errors
+1;2;NULL;;;m
+1;9;NULL;;;m
+#document escaped
+| <{} \uFFFDab>
+|   "a"
+
+#data escaped
+<a\u0000ab>a</a\u0000ab>
+#errors
+1;3;NULL;;;m
+1;11;NULL;;;m
+#document escaped
+| <{} a\uFFFDab>
+|   "a"

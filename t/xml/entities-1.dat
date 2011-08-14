@@ -634,6 +634,32 @@
 | <!DOCTYPE a>
 #entities
 
+#data escaped
+<!DOCTYPE a[
+<!ENTITY bc SYSTEM "x" NDATA \u0000zz >
+]><a/>
+#errors
+2;30;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ENTITY bc "" "" "x" \uFFFDzz>
+| <{} a>
+#entities escaped
+| <!ENTITY bc "" "" "x" \uFFFDzz>
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY bc SYSTEM "x" NDATA a\u0000zz >
+]><a/>
+#errors
+2;31;NULL;;;m
+#document escaped
+| <!DOCTYPE a>
+|   <!ENTITY bc "" "" "x" a\uFFFDzz>
+| <{} a>
+#entities escaped
+| <!ENTITY bc "" "" "x" a\uFFFDzz>
+
 #data
 <!DOCTYPE a[
 <!ENTITY b ""
@@ -842,6 +868,78 @@
 | <{} a>
 #entities
 <!ENTITY b "&amp;abc" "" "" >
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b "\u0000">
+]><a/>
+#errors
+2;13;NULL;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities escaped
+<!ENTITY b "\uFFFD" "" "" >
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b "a\u0000b">
+]><a/>
+#errors
+2;14;NULL;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities escaped
+<!ENTITY b "a\uFFFDb" "" "" >
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b '\u0000'>
+]><a/>
+#errors
+2;13;NULL;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities escaped
+<!ENTITY b "\uFFFD" "" "" >
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b 'a\u0000b'>
+]><a/>
+#errors
+2;14;NULL;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities escaped
+<!ENTITY b "a\uFFFDb" "" "" >
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b  \u0000 >
+]><a/>
+#errors
+2;13;string after DOCTYPE name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities escaped
+<!ENTITY b "" "" "" >
+
+#data escaped
+<!DOCTYPE a[
+<!ENTITY b  a\u0000b >
+]><a/>
+#errors
+2;13;string after DOCTYPE name;;;m
+#document
+| <!DOCTYPE a>
+| <{} a>
+#entities escaped
+<!ENTITY b "" "" "" >
 
 #data
 <!DOCTYPE a[

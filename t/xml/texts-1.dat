@@ -95,3 +95,83 @@ aa]]>bb
 #document
 | <{} p>
 |   "<>"
+
+#data escaped
+\u0000<p></p>
+#errors
+1;1;text outside of root element;;;m
+1;1;NULL;;;m
+1;1;NULL;;;m
+#document escaped
+| "\uFFFD"
+| <{} p>
+
+#data escaped
+a\u0000b<p></p>
+#errors
+1;1;text outside of root element;;;m
+1;2;NULL;;;m
+1;2;NULL;;;m
+#document escaped
+| "a\uFFFDb"
+| <{} p>
+
+#data escaped
+<!DOCTYPE p>\u0000<p></p>
+#errors
+1;13;text outside of root element;;;m
+1;13;NULL;;;m
+1;13;NULL;;;m
+#document escaped
+| <!DOCTYPE p>
+| "\uFFFD"
+| <{} p>
+
+#data escaped
+<!DOCTYPE p>a\u0000b<p></p>
+#errors
+1;13;text outside of root element;;;m
+1;14;NULL;;;m
+1;14;NULL;;;m
+#document escaped
+| <!DOCTYPE p>
+| "a\uFFFDb"
+| <{} p>
+
+#data escaped
+<p>\u0000</p>
+#errors
+1;4;NULL;;;m
+1;4;NULL;;;m
+#document escaped
+| <{} p>
+|   "\uFFFD"
+
+#data escaped
+<p>a\u0000b</p>
+#errors
+1;5;NULL;;;m
+1;5;NULL;;;m
+#document escaped
+| <{} p>
+|   "a\uFFFDb"
+
+#data escaped
+<p></p>\u0000
+#errors
+1;8;NULL;;;m
+1;8;NULL;;;m
+1;8;text outside of root element;;;m
+#document escaped
+| <{} p>
+| "\uFFFD"
+
+#data escaped
+<p></p>a\u0000b
+#errors
+1;8;text outside of root element;;;m
+1;9;NULL;;;m
+1;9;NULL;;;m
+#document escaped
+| <{} p>
+| "a\uFFFDb"

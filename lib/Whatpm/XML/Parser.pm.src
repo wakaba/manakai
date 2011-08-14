@@ -338,6 +338,10 @@ sub _tree_initial ($) {
       !!!next-token;
       next B;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
+      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
+        !!!parse-error (type => 'NULL', token => $token);
+      }
+
       if (not $self->{tainted} and
           not $token->{has_reference} and
           $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
@@ -529,6 +533,10 @@ sub _tree_before_root_element ($) {
       !!!next-token;
       next B;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
+      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
+        !!!parse-error (type => 'NULL', token => $token);
+      }
+
       if (not $self->{tainted} and
           not $token->{has_reference} and
           $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
@@ -587,6 +595,9 @@ sub _tree_in_element ($) {
   
   B: while (1) {
     if ($token->{type} == CHARACTER_TOKEN) {
+      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
+        !!!parse-error (type => 'NULL', token => $token);
+      }
       $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
       
       ## Stay in the mode.
@@ -816,6 +827,10 @@ sub _tree_after_root_element ($) {
       !!!next-token;
       next B;
     } elsif ($token->{type} == CHARACTER_TOKEN) {
+      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
+        !!!parse-error (type => 'NULL', token => $token);
+      }
+
       if (not $self->{tainted} and
           not $token->{has_reference} and
           $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {

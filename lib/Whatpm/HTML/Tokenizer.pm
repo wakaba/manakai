@@ -522,7 +522,16 @@ $Action->[TAG_OPEN_STATE]->[0x003E] = { # >
   emit_delta => 1,
 };
 $Action->[TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = $Action->[TAG_OPEN_STATE]->[0x003E];
-## XXXnull
+  $XMLAction->[TAG_OPEN_STATE]->[0x0000] = {
+    name => 'tag open null xml',
+    ct => {
+      type => START_TAG_TOKEN,
+      delta => 1,
+      append_tag_name => 0xFFFD,
+    },
+    error => 'NULL',
+    state => TAG_NAME_STATE,
+  };
   ## XML5: "<:" has a parse error.
   $XMLAction->[TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
     name => 'tag open else xml',
@@ -681,7 +690,16 @@ $Action->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
   ## the |data| of the comment token generated from the bogus end tag,
   ## as defined in the "bogus comment state" entry.
 };
-# XXXnull  
+  $XMLAction->[CLOSE_TAG_OPEN_STATE]->[0x0000] = {
+    name => 'end tag open null xml',
+    ct => {
+      type => END_TAG_TOKEN,
+      delta => 2,
+      append_tag_name => 0xFFFD,
+    },
+    error => 'NULL',
+    state => TAG_NAME_STATE, ## XML5: "end tag name state".
+  };
   ## XML5: "</:" is a parse error.
   $XMLAction->[CLOSE_TAG_OPEN_STATE]->[KEY_ELSE_CHAR] = {
     name => 'end tag open else xml',
@@ -3034,8 +3052,6 @@ sub _get_next_token ($) {
     } elsif ($state == DOCTYPE_NAME_STATE) {
       ## XML5: "DOCTYPE root name state".
 
-      ## ISSUE: Redundant "First," in the spec.
-
       if ($is_space->{$nc}) {
         
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
@@ -5310,7 +5326,7 @@ sub _get_next_token ($) {
         redo A;
       }
 
-    ## XML-only states
+    ## ========== XML-only states ==========
 
     } elsif ($state == PI_STATE) {
       ## XML5: "Pi state" and "DOCTYPE pi state".
@@ -5337,8 +5353,11 @@ sub _get_next_token ($) {
         redo A;
       } else {
         ## XML5: "DOCTYPE pi state": Stay in the state.
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
         $self->{ct} = {type => PI_TOKEN,
-                       target => chr $nc,
+                       target => $nc == 0x0000 ? "\x{FFFD}" : chr $nc,
                        data => '',
                        line => $self->{line_prev},
                        column => $self->{column_prev} - 1,
@@ -5403,7 +5422,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         ## XML5: typo ("tag name" -> "target")
-        $self->{ct}->{target} .= chr $nc; # pi
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{target} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # pi
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -5469,8 +5491,11 @@ sub _get_next_token ($) {
                   column => $self->{ct}->{column}});
         redo A;
       } else {
-        $self->{ct}->{data} .= chr $nc; # pi
-        $self->{read_until}->($self->{ct}->{data}, q[?],
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{data} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # pi
+        $self->{read_until}->($self->{ct}->{data}, qq[\x00?],
                               length $self->{ct}->{data});
         ## Stay in the state.
         
@@ -5599,7 +5624,7 @@ sub _get_next_token ($) {
       } elsif ($nc == 0x0025) { # %
         ## XML5: Not defined yet.
 
-        ## TODO:
+        ## TODO: parameter entity expansion
 
         if (not $self->{stop_processing} and
             not $self->{document}->xml_standalone) {
@@ -6325,7 +6350,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         ## XML5: [ATTLIST] Not defined yet.
-        $self->{ct}->{name} .= chr $nc;
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{name} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         $self->{state} = MD_NAME_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -6437,7 +6465,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         ## XML5: [ATTLIST] Not defined yet.
-        $self->{ct}->{name} .= chr $nc;
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{name} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -6490,7 +6521,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         ## XML5: Not defined yet.
-        $self->{ca} = {name => chr ($nc), # attrdef
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ca} = {name => $nc == 0x0000 ? "\x{FFFD}" : chr $nc, # attrdef
                        tokens => [],
                        line => $self->{line}, column => $self->{column}};
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_NAME_STATE;
@@ -6574,7 +6608,10 @@ sub _get_next_token ($) {
         redo A;
       } else {
         ## XML5: Not defined yet.
-        $self->{ca}->{name} .= chr $nc;
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ca}->{name} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -6999,7 +7036,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        push @{$self->{ca}->{tokens}}, chr $nc;
+        if ($nc == 0x000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        push @{$self->{ca}->{tokens}}, $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         $self->{state} = ALLOWED_TOKEN_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -7091,7 +7131,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        $self->{ca}->{tokens}->[-1] .= chr $nc;
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ca}->{tokens}->[-1] .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -7186,7 +7229,10 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'space in allowed token', ## TODO: type
                         line => $self->{line_prev},
                         column => $self->{column_prev});
-        $self->{ca}->{tokens}->[-1] .= ' ' . chr $nc;
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ca}->{tokens}->[-1] .= ' ' . ($nc == 0x0000 ? "\x{FFFD}" : chr $nc);
         $self->{state} = ALLOWED_TOKEN_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -7862,7 +7908,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        $self->{ct}->{notation} = chr $nc; # ENTITY
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{notation} = $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         $self->{state} = NOTATION_NAME_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -7924,7 +7973,10 @@ sub _get_next_token ($) {
         ## The current token.
         redo A;
       } else {
-        $self->{ct}->{notation} .= chr $nc; # ENTITY
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{notation} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -7978,7 +8030,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        $self->{ct}->{value} .= chr $nc; # ENTITY
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{value} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -8031,7 +8086,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        $self->{ct}->{value} .= chr $nc; # ENTITY
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{value} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
       $self->{line_prev} = $self->{line};
@@ -8146,7 +8204,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        $self->{ct}->{content} = [chr $nc];
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{content} = [$nc == 0x0000 ? "\x{FFFD}" : chr $nc];
         $self->{state} = CONTENT_KEYWORD_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -8208,7 +8269,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        $self->{ct}->{content}->[-1] .= chr $nc; # ELEMENT
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{content}->[-1] .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ELEMENT
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -8322,7 +8386,10 @@ sub _get_next_token ($) {
         ## Discard the current token.
         redo A;
       } else {
-        push @{$self->{ct}->{content}}, chr $nc;
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        push @{$self->{ct}->{content}}, $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         $self->{state} = CM_ELEMENT_NAME_STATE;
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
@@ -8436,7 +8503,10 @@ sub _get_next_token ($) {
         ## Discard the token.
         redo A;
       } else {
-        $self->{ct}->{content}->[-1] .= chr $nc;
+        if ($nc == 0x0000) {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
+        }
+        $self->{ct}->{content}->[-1] .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
