@@ -7513,5 +7513,56 @@ ok 6477 - Document tree: qq'<!DOCTYPE html><svg><foreignObject><div><![CDATA[foo
 ok 6478 - Parse error: qq'<!DOCTYPE html><table><svg><desc><i>a</desc><title><b>b</title><foreignobject><table><td>c</table>d</i>e</foreignObject></svg><math><mi>f<i>g</mi><annotation-xml encoding=text/html>h</annotation-xml><annotation-xml>i</annotation-xml></math>j'; 1:28:in table, 1:45:not closed, 1:64:not closed, 1:90:missing start tag:tr, 1:104:not closed, 1:121:not closed, 1:133:in table, 1:147:not closed, 1:200:not closed, 1:241:in table:\#text, 1:241:in body:\#eof;<svg> in table, no </i> before </desc>, no </b> before </title>, no <tr> before <td>, no </b> before </i>; AAA, no </b> before </foreignObject>, <math> in table, no </i> before </annotation-xml>, no </i> before </mi>, "j" in table, EOF
 ok 6479 - SHOULD-level error: qq'<!DOCTYPE html><table><svg><desc><i>a</desc><title><b>b</title><foreignobject><table><td>c</table>d</i>e</foreignObject></svg><math><mi>f<i>g</mi><annotation-xml encoding=text/html>h</annotation-xml><annotation-xml>i</annotation-xml></math>j'; ;
 ok 6480 - Document tree: qq'<!DOCTYPE html><table><svg><desc><i>a</desc><title><b>b</title><foreignobject><table><td>c</table>d</i>e</foreignObject></svg><math><mi>f<i>g</mi><annotation-xml encoding=text/html>h</annotation-xml><annotation-xml>i</annotation-xml></math>j'
-1..6480
-# Looks like you failed 128 tests of 6480.
+not ok 6481 - Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; 1:74:unmatched end tag, 1:77:not closed, 1:80:in body:\#eof;Unexpected </table>
+#   Failed test 'Parse error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; 1:74:unmatched end tag, 1:77:not closed, 1:80:in body:\#eof;Unexpected </table>'
+#   at HTML-tree.t test () ok line 3.
+#          got: '3'
+#     expected: '1'
+ok 6482 - SHOULD-level error: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'; ;
+not ok 6483 - Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux'
+#   Failed test 'Document tree: qq'<!DOCTYPE html><body><table><caption><svg><g>foo</g><g>bar</g>baz</table><p>quux''
+#   at HTML-tree.t test () ok line 9.
+# +---+-------------------+-------------------+
+# | Ln|Got                |Expected           |
+# +---+-------------------+-------------------+
+# |  1|<!DOCTYPE html>    |<!DOCTYPE html>    |
+# |  2|<html>             |<html>             |
+# |  3|  <head>           |  <head>           |
+# |  4|  <body>           |  <body>           |
+# |  5|    <table>        |    <table>        |
+# |  6|      <caption>    |      <caption>    |
+# |  7|        <svg svg>  |        <svg svg>  |
+# |  8|          <svg g>  |          <svg g>  |
+# |  9|            "foo"  |            "foo"  |
+# | 10|          <svg g>  |          <svg g>  |
+# | 11|            "bar"  |            "bar"  |
+# | 12|          "baz"    |          "baz"    |
+# * 13|        <p>        |    <p>            *
+# * 14|          "quux"   |      "quux"       *
+# +---+-------------------+-------------------+
+not ok 6484 - Parse error: qq'<table><tr><td><svg><desc><td></desc><circle>'; 1:8:no DOCTYPE, 1:31:in body, 1:45:in body:\#eof;7: Start tag seen without seeing a doctype first., 30: A table cell was implicitly closed, but there were open elements., 26: Unclosed "desc"., 20: Unclosed "svg"., 37: Stray end "desc"., 45: End of file seen and there were open elements., 45: Unclosed "circle"., 7: Unclosed "table".
+#   Failed test 'Parse error: qq'<table><tr><td><svg><desc><td></desc><circle>'; 1:8:no DOCTYPE, 1:31:in body, 1:45:in body:\#eof;7: Start tag seen without seeing a doctype first., 30: A table cell was implicitly closed, but there were open elements., 26: Unclosed "desc"., 20: Unclosed "svg"., 37: Stray end "desc"., 45: End of file seen and there were open elements., 45: Unclosed "circle"., 7: Unclosed "table".'
+#   at HTML-tree.t test () ok line 3.
+#          got: '3'
+#     expected: '8'
+ok 6485 - SHOULD-level error: qq'<table><tr><td><svg><desc><td></desc><circle>'; ;
+not ok 6486 - Document tree: qq'<table><tr><td><svg><desc><td></desc><circle>'
+#   Failed test 'Document tree: qq'<table><tr><td><svg><desc><td></desc><circle>''
+#   at HTML-tree.t test () ok line 9.
+# +---+----------------------------+---+--------------------------+
+# | Ln|Got                         | Ln|Expected                  |
+# +---+----------------------------+---+--------------------------+
+# |  1|<html>                      |  1|<html>                    |
+# |  2|  <head>                    |  2|  <head>                  |
+# |  3|  <body>                    |  3|  <body>                  |
+# |  4|    <table>                 |  4|    <table>               |
+# |  5|      <tbody>               |  5|      <tbody>             |
+# |  6|        <tr>                |  6|        <tr>              |
+# |  7|          <td>              |  7|          <td>            |
+# |  8|            <svg svg>       |  8|            <svg svg>     |
+# |  9|              <svg desc>    |  9|              <svg desc>  |
+# * 10|              <svg circle>  * 10|          <td>            *
+# |   |                            * 11|            <circle>      *
+# +---+----------------------------+---+--------------------------+
+1..6486
+# Looks like you failed 132 tests of 6486.
