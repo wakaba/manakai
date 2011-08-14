@@ -5269,8 +5269,6 @@ sub _tree_construction_main ($) {
                               text => $self->{open_elements}->[-1]->[0]
                                   ->manakai_local_name,
                               token => $token);
-              pop @{$self->{open_elements}}
-                  while not $self->{open_elements}->[-1]->[1] == RUBY_EL;
             }
             last INSCOPE;
           } elsif ($node->[1] & SCOPING_EL) {
@@ -5278,8 +5276,6 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
-          
-        ## TODO: <non-ruby><rt> is not allowed.
 
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
 

@@ -3855,6 +3855,7 @@ sub _tree_construction_main ($) {
                   tr => 1, # $self->{insertion_mode} == IN_ROW_IM
                  }->{$token->{tag_name}}) {
           if (($self->{insertion_mode} & IM_MASK) == IN_ROW_IM) {
+            ## XXXgeneratetoken
             ## As if </tr>
             ## have an element in table scope
             my $i;
@@ -4039,6 +4040,7 @@ sub _tree_construction_main ($) {
                                   ->manakai_local_name,
                               token => $token);
 
+              ## XXXgeneratetoken
               ## As if </table>
               ## have a table element in table scope
               my $i;
@@ -4248,6 +4250,7 @@ sub _tree_construction_main ($) {
               next B;
             } elsif ($token->{tag_name} eq 'table') {
               if (($self->{insertion_mode} & IM_MASK) == IN_ROW_IM) {
+                ## XXXgeneratetoken
                 ## As if </tr>
                 ## have an element in table scope
                 my $i;
@@ -4392,6 +4395,7 @@ sub _tree_construction_main ($) {
                     next B;
                   }
                 
+                ## XXXgeneratetoken
                 ## As if </tr>
                 ## have an element in table scope
                 my $i;
@@ -4585,6 +4589,7 @@ sub _tree_construction_main ($) {
           ## Stop parsing.
           last B;
         } else {
+          ## XXXgeneratetoken
           ## NOTE: As if </colgroup>.
           
           pop @{$self->{open_elements}}; # colgroup
@@ -4596,6 +4601,7 @@ sub _tree_construction_main ($) {
         die "$0: $token->{type}: Unknown token type";
       }
 
+          ## XXXgeneratetoken
           ## As if </colgroup>
           if ($self->{open_elements}->[-1]->[1] == HTML_EL) {
             
@@ -4624,6 +4630,7 @@ sub _tree_construction_main ($) {
         if ($token->{tag_name} eq 'option') {
           if ($self->{open_elements}->[-1]->[1] == OPTION_EL) {
             
+            ## XXXgeneratetoken
             ## As if </option>
             pop @{$self->{open_elements}};
           } else {
@@ -4661,6 +4668,7 @@ sub _tree_construction_main ($) {
         } elsif ($token->{tag_name} eq 'optgroup') {
           if ($self->{open_elements}->[-1]->[1] == OPTION_EL) {
             
+            ## XXXgenereatetoken
             ## As if </option>
             pop @{$self->{open_elements}};
           } else {
@@ -4669,6 +4677,7 @@ sub _tree_construction_main ($) {
 
           if ($self->{open_elements}->[-1]->[1] == OPTGROUP_EL) {
             
+            ## XXXgeneratetoken
             ## As if </optgroup>
             pop @{$self->{open_elements}};
           } else {
@@ -4712,6 +4721,7 @@ sub _tree_construction_main ($) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'select in select', ## XXX: documentation
                           token => $token);
 
+          ## XXXgenereatetoken
           ## Act as if the token were </select>.
           $token = {type => END_TAG_TOKEN, tag_name => 'select',
                     line => $token->{line}, column => $token->{column}};
@@ -4807,6 +4817,7 @@ sub _tree_construction_main ($) {
           if ($self->{open_elements}->[-1]->[1] == OPTION_EL and
               $self->{open_elements}->[-2]->[1] == OPTGROUP_EL) {
             
+            ## XXXgeneratetoken
             ## As if </option>
             splice @{$self->{open_elements}}, -2;
           } elsif ($self->{open_elements}->[-1]->[1] == OPTGROUP_EL) {
@@ -5617,6 +5628,7 @@ sub _tree_construction_main ($) {
         ## 2.
         for my $node (reverse @{$self->{open_elements}}) {
           if ($node->[1] == LI_EL) {
+            ## XXXgeneratetoken
             ## 3. (a) As if </li>
             {
               ## If no </li> - not applied
@@ -5730,6 +5742,7 @@ sub _tree_construction_main ($) {
         ## 2.
         for my $node (reverse @{$self->{open_elements}}) {
           if ($node->[1] == DTDD_EL) {
+            ## XXXgeneratetoken
             ## 3. (a) As if </li>
             {
               ## If no </li> - not applied
@@ -6226,6 +6239,7 @@ sub _tree_construction_main ($) {
                $token->{tag_name} eq 'option') {
         if ($self->{open_elements}->[-1]->[1] == OPTION_EL) {
           
+          ## XXXgeneratetoken
           ## NOTE: As if </option>
           
       $token->{self_closing} = $self->{self_closing};
@@ -6289,8 +6303,6 @@ sub _tree_construction_main ($) {
                               text => $self->{open_elements}->[-1]->[0]
                                   ->manakai_local_name,
                               token => $token);
-              pop @{$self->{open_elements}}
-                  while not $self->{open_elements}->[-1]->[1] == RUBY_EL;
             }
             last INSCOPE;
           } elsif ($node->[1] & SCOPING_EL) {
@@ -6298,8 +6310,6 @@ sub _tree_construction_main ($) {
             last INSCOPE;
           }
         } # INSCOPE
-          
-        ## TODO: <non-ruby><rt> is not allowed.
 
         
     {
@@ -6627,6 +6637,7 @@ sub _tree_construction_main ($) {
 
                 applet => 1, button => 1, marquee => 1, object => 1,
                }->{$token->{tag_name}}) {
+        ## XXXgeneraetetoken
         ## NOTE: Code for <li> start tags includes "as if </li>" code.
         ## Code for <dt> or <dd> start tags includes "as if </dt> or
         ## </dd>" code.

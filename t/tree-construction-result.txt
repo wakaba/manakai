@@ -4303,7 +4303,7 @@ ok 3303 - Document tree: qq'<!DOCTYPE HTML><ruby>a<rt>b</ruby>'
 ok 3304 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; ;
 ok 3305 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'; ;
 ok 3306 - Document tree: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rt>b</rt></ruby>'
-ok 3307 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a<rt>b</ruby>'; 1:31:not closed:rb;no </rb>
+ok 3307 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a<rt>b</ruby>'; 1:31:not closed:rb, 1:38:not closed:rb;no </rb>, EOF
 ok 3308 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby><rb>a<rt>b</ruby>'; ;
 ok 3309 - Document tree: qq'<!DOCTYPE HTML><ruby><rb>a<rt>b</ruby>'
 ok 3310 - Parse error: qq'<!DOCTYPE HTML><ruby>a<rp>b<rt>c<rp>d</ruby>'; ;
@@ -4318,7 +4318,7 @@ ok 3318 - Document tree: qq'<!DOCTYPE HTML><ruby>a<rp>b</rp><rt>c</rt><rp>d</rp>
 ok 3319 - Parse error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; ;
 ok 3320 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'; ;
 ok 3321 - Document tree: qq'<!DOCTYPE HTML><ruby><rb>a</rb><rp>b</rp><rt>c</rt><rp>d</rp></ruby>'
-ok 3322 - Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed:rtc, 1:84:unmatched end tag:rtc, 1:93:not closed:rtc, 1:115:unmatched end tag:rtc;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>
+ok 3322 - Parse error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; 1:62:not closed:rtc, 1:72:not closed:rtc, 1:93:not closed:rtc, 1:103:not closed:rtc;no </rtc>, unexpected </rtc>, no </rtc>, unexpected </rtc>
 ok 3323 - SHOULD-level error: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'; ;
 ok 3324 - Document tree: qq'<!DOCTYPE HTML><ruby><rbc><rb>a</rb><rb>b</rb></rbc><rtc><rt>c</rt><rt>d</rt></rtc><rtc><rt>e</rt><rt>f</rt></rtc></ruby>'
 ok 3325 - Parse error: qq'<!DOCTYPE HTML>\x{0A}... <ruby>\x{0A} SAI <rt> sai </rt>\x{0A} TOU <rt> tou </rt>\x{0A} NOBU <rt> nobu </rt>\x{0A} O <rt> o         </rt>\x{0A}</ruby> ...'; ;
