@@ -1165,6 +1165,59 @@ xxxx
 /p/object/style;SUBDOC;text/css
 
 #data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data="a" type="text/plain"
+    typemustmatch="">b</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data="a" type="text/plain"
+    typemustmatch="typemustmatch">b</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data="a" type="text/plain"
+    typemustmatch="TypeMUSTMatch">b</object>
+#errors
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data="a" type="text/plain"
+    typemustmatch="true">b</object>
+#errors
+/object/@typemustmatch;boolean:invalid;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data="a"
+    typemustmatch="">b</object>
+#errors
+/object/@typemustmatch;attribute not allowed;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    type="text/plain"
+    typemustmatch="">b</object>
+#errors
+/object/@typemustmatch;attribute not allowed;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    typemustmatch="">b</object>
+#errors
+/object/@typemustmatch;attribute not allowed;m
+/object;attribute missing:data|type;m
+
+#data
+<object xmlns="http://www.w3.org/1999/xhtml"
+    data="a" type="text/plain"
+    >b</object>
+#errors
+/object;attribute missing;typemustmatch;w
+
+#data
 <applet xmlns="http://www.w3.org/1999/xhtml" code="abc"></applet>
 #errors
 /applet;no significant content;s
@@ -7056,18 +7109,21 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
+/object;attribute missing;typemustmatch;w
 
 #data
 <object type=" text/css " data="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
+/object;attribute missing;typemustmatch;w
 
 #data
 <object type="text/css; charset=us-ascii" data="http://test/"
     xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /object;no significant content;s
+/object;attribute missing;typemustmatch;w
 
 #data
 <object type="text/css;a=b" data="http://test/"
@@ -7075,6 +7131,7 @@ allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
 #errors
 /object;no significant content;s
 /object/@type;IMT:parameter not allowed;m
+/object;attribute missing;typemustmatch;w
 
 #data
 <object data="" xmlns="http://www.w3.org/1999/xhtml"

@@ -5698,6 +5698,7 @@ $Element->{+HTML_NS}->{object} = {
     }),
     standby => sub {}, ## NOTE: %Text; in HTML4
     type => $MIMETypeChecker,
+    typemustmatch => $GetHTMLBooleanAttrChecker->('typemustmatch'),
     usemap => $HTMLUsemapAttrChecker,
     vspace => $HTMLLengthAttrChecker,
     width => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
@@ -5726,6 +5727,7 @@ $Element->{+HTML_NS}->{object} = {
     standby => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     tabindex => FEATURE_HTML5_DEFAULT | FEATURE_M12N10_REC,
     type => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+    typemustmatch => FEATURE_HTML5_CR,
     usemap => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     vspace => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
@@ -5734,10 +5736,27 @@ $Element->{+HTML_NS}->{object} = {
     my ($self, $item, $element_state) = @_;
     my $el = $item->{node};
 
-    unless ($el->has_attribute_ns (undef, 'data')) {
-      unless ($el->has_attribute_ns (undef, 'type')) {
+    my $has_data = $el->has_attribute_ns (undef, 'data');
+    my $has_type = $el->has_attribute_ns (undef, 'type');
+    if (not $has_data and not $has_type) {
+      $self->{onerror}->(node => $el,
+                         type => 'attribute missing:data|type',
+                         level => $self->{level}->{must});
+    }
+    if ($has_data and $has_type) {
+      unless ($el->has_attribute_ns (undef, 'typemustmatch')) {
+        ## Strictly speaking, if |data|'s origin is same as the
+        ## document's origin, this warning is not useful enough.
         $self->{onerror}->(node => $el,
-                           type => 'attribute missing:data|type',
+                           type => 'attribute missing',
+                           text => 'typemustmatch',
+                           level => $self->{level}->{warn});
+      }
+    } else {
+      my $tmm = $el->get_attribute_node_ns (undef, 'typemustmatch');
+      if ($tmm) {
+        $self->{onerror}->(node => $tmm,
+                           type => 'attribute not allowed',
                            level => $self->{level}->{must});
       }
     }
