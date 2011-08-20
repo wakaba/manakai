@@ -314,106 +314,19 @@ ok 302 - Document tree: qq'<a>&\#x0D;</a>'
 ok 303 - Parse error: qq'<a>&\#13;</a>'
 ok 304 - Document tree: qq'<a>&\#13;</a>'
 # t/xml/comments-1.dat
-not ok 305 - Parse error: qq'<!--\x{0A}< !--x-- >\x{0A}< !--y-- >\x{0A}--><a/>'
-#   Failed test 'Parse error: qq'<!--\x{0A}< !--x-- >\x{0A}< !--y-- >\x{0A}--><a/>''
-#   at HTML-tree.t test () skip line 60.
-# +---+--------------------------+---+----------+
-# | Ln|Got                       | Ln|Expected  |
-# +---+--------------------------+---+----------+
-# *  1|4;7;no root element;;;m   *   |          |
-# *  2|4;7;unclosed comment;;;m  *   |          |
-# +---+--------------------------+---+----------+
-not ok 306 - Document tree: qq'<!--\x{0A}< !--x-- >\x{0A}< !--y-- >\x{0A}--><a/>'
-#   Failed test 'Document tree: qq'<!--\x{0A}< !--x-- >\x{0A}< !--y-- >\x{0A}--><a/>''
-#   at HTML-tree.t test () skip line 117.
-# +---+-------------+---+------------+
-# | Ln|Got          | Ln|Expected    |
-# +---+-------------+---+------------+
-# |  1|<!--         |  1|<!--        |
-# |  2|< !--x-- >   |  2|< !--x-- >  |
-# |  3|< !--y-- >   |  3|< !--y-- >  |
-# *  4|--><a/> -->  *  4| -->        *
-# |   |             *  5|<{} a>      *
-# +---+-------------+---+------------+
-not ok 307 - Parse error: qq'<!--< !--x-- >< !--y-- >--><a/>'
-#   Failed test 'Parse error: qq'<!--< !--x-- >< !--y-- >--><a/>''
-#   at HTML-tree.t test () skip line 60.
-# +---+---------------------------+---+----------+
-# | Ln|Got                        | Ln|Expected  |
-# +---+---------------------------+---+----------+
-# *  1|1;31;no root element;;;m   *   |          |
-# *  2|1;31;unclosed comment;;;m  *   |          |
-# +---+---------------------------+---+----------+
-not ok 308 - Document tree: qq'<!--< !--x-- >< !--y-- >--><a/>'
-#   Failed test 'Document tree: qq'<!--< !--x-- >< !--y-- >--><a/>''
-#   at HTML-tree.t test () skip line 117.
-# +---+--------------------------------------+---+-------------------------------+
-# | Ln|Got                                   | Ln|Expected                       |
-# +---+--------------------------------------+---+-------------------------------+
-# *  1|<!-- < !--x-- >< !--y-- >--><a/> -->  *  1|<!-- < !--x-- >< !--y-- > -->  *
-# |   |                                      *  2|<{} a>                         *
-# +---+--------------------------------------+---+-------------------------------+
-not ok 309 - Parse error: qq'<!-- xxx -- > yyy --><a/>'
-#   Failed test 'Parse error: qq'<!-- xxx -- > yyy --><a/>''
-#   at HTML-tree.t test () skip line 60.
-# +---+---------------------------+---+----------+
-# | Ln|Got                        | Ln|Expected  |
-# +---+---------------------------+---+----------+
-# *  1|1;25;no root element;;;m   *   |          |
-# *  2|1;25;unclosed comment;;;m  *   |          |
-# +---+---------------------------+---+----------+
-not ok 310 - Document tree: qq'<!-- xxx -- > yyy --><a/>'
-#   Failed test 'Document tree: qq'<!-- xxx -- > yyy --><a/>''
-#   at HTML-tree.t test () skip line 117.
-# +---+--------------------------------+---+-------------------------+
-# | Ln|Got                             | Ln|Expected                 |
-# +---+--------------------------------+---+-------------------------+
-# *  1|<!--  xxx -- > yyy --><a/> -->  *  1|<!--  xxx -- > yyy  -->  *
-# |   |                                *  2|<{} a>                   *
-# +---+--------------------------------+---+-------------------------+
+ok 305 - Parse error: qq'<!--\x{0A}< !--x-- >\x{0A}< !--y-- >\x{0A}--><a/>'
+ok 306 - Document tree: qq'<!--\x{0A}< !--x-- >\x{0A}< !--y-- >\x{0A}--><a/>'
+ok 307 - Parse error: qq'<!--< !--x-- >< !--y-- >--><a/>'
+ok 308 - Document tree: qq'<!--< !--x-- >< !--y-- >--><a/>'
+ok 309 - Parse error: qq'<!-- xxx -- > yyy --><a/>'
+ok 310 - Document tree: qq'<!-- xxx -- > yyy --><a/>'
 # t/xml/comments-2.dat
 ok 311 - Parse error: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}]><a/>'
 ok 312 - Document tree: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}]><a/>'
-not ok 313 - Parse error: qq'<!DOCTYPE a[\x{0A}<!--<?y?>-->\x{0A}<?x?>\x{0A}]><a/>'
-#   Failed test 'Parse error: qq'<!DOCTYPE a[\x{0A}<!--<?y?>-->\x{0A}<?x?>\x{0A}]><a/>''
-#   at HTML-tree.t test () skip line 60.
-# +---+----------------------------------+---+----------+
-# | Ln|Got                               | Ln|Expected  |
-# +---+----------------------------------+---+----------+
-# *  1|4;6;no root element;;;m           *   |          |
-# *  2|4;6;unclosed comment;;;m          *   |          |
-# *  3|4;6;unclosed internal subset;;;m  *   |          |
-# +---+----------------------------------+---+----------+
-not ok 314 - Document tree: qq'<!DOCTYPE a[\x{0A}<!--<?y?>-->\x{0A}<?x?>\x{0A}]><a/>'
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!--<?y?>-->\x{0A}<?x?>\x{0A}]><a/>''
-#   at HTML-tree.t test () skip line 117.
-# +---+--------------+---+--------------+
-# | Ln|Got           | Ln|Expected      |
-# +---+--------------+---+--------------+
-# |  1|<!DOCTYPE a>  |  1|<!DOCTYPE a>  |
-# |   |              *  2|  <?x ?>      *
-# |   |              *  3|<{} a>        *
-# +---+--------------+---+--------------+
-not ok 315 - Parse error: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}<!--]><b/>-->\x{0A}]><a/>'
-#   Failed test 'Parse error: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}<!--]><b/>-->\x{0A}]><a/>''
-#   at HTML-tree.t test () skip line 60.
-# +---+----------------------------------+---+----------+
-# | Ln|Got                               | Ln|Expected  |
-# +---+----------------------------------+---+----------+
-# *  1|5;6;no root element;;;m           *   |          |
-# *  2|5;6;unclosed comment;;;m          *   |          |
-# *  3|5;6;unclosed internal subset;;;m  *   |          |
-# +---+----------------------------------+---+----------+
-not ok 316 - Document tree: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}<!--]><b/>-->\x{0A}]><a/>'
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}<!--]><b/>-->\x{0A}]><a/>''
-#   at HTML-tree.t test () skip line 117.
-# +---+--------------+---+--------------+
-# | Ln|Got           | Ln|Expected      |
-# +---+--------------+---+--------------+
-# |  1|<!DOCTYPE a>  |  1|<!DOCTYPE a>  |
-# |  2|  <?x ?>      |  2|  <?x ?>      |
-# |   |              *  3|<{} a>        *
-# +---+--------------+---+--------------+
+ok 313 - Parse error: qq'<!DOCTYPE a[\x{0A}<!--<?y?>-->\x{0A}<?x?>\x{0A}]><a/>'
+ok 314 - Document tree: qq'<!DOCTYPE a[\x{0A}<!--<?y?>-->\x{0A}<?x?>\x{0A}]><a/>'
+ok 315 - Parse error: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}<!--]><b/>-->\x{0A}]><a/>'
+ok 316 - Document tree: qq'<!DOCTYPE a[\x{0A}<!---->\x{0A}<?x?>\x{0A}<!--]><b/>-->\x{0A}]><a/>'
 ok 317 - Parse error: qq'<!DOCTYPE a[\x{0A}< >\x{0A}<?x?>\x{0A}]><a/>'
 ok 318 - Document tree: qq'<!DOCTYPE a[\x{0A}< >\x{0A}<?x?>\x{0A}]><a/>'
 ok 319 - Parse error: qq'<!DOCTYPE a[\x{0A}<!  >\x{0A}<?x?>\x{0A}]><a/>'
@@ -2393,4 +2306,4 @@ ok 2142 - Parse error: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x
 ok 2143 - Entities: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 ok 2144 - Document tree: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 1..2144
-# Looks like you failed 28 tests of 2144.
+# Looks like you failed 18 tests of 2144.

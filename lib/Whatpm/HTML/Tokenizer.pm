@@ -2689,7 +2689,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{data} .= chr ($nc); # comment
         $self->{read_until}->($self->{ct}->{data},
-                              qq[\x00-],
+                              qq[-\x00],
                               length $self->{ct}->{data});
 
         ## Stay in the state

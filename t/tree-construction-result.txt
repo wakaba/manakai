@@ -959,29 +959,13 @@ not ok 828 - Document tree: qq'<!-----><font><div>hello<table>excite!<b>me!<th><
 # | 16|                  "please!"  | 15|                  "please!"  |
 # | 17|            <!-- X -->       | 16|            <!-- X -->       |
 # +---+-----------------------------+---+-----------------------------+
-ok 829 - Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; 1:70:unclosed comment;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).
+not ok 829 - Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).
+#   Failed test 'Parse error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;Line: 1 Col: 61 Unexpected end tag (li). Missing end tag (body).'
+#   at HTML-tree.t test () ok line 3.
+#          got: '0'
+#     expected: '1'
 ok 830 - SHOULD-level error: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'; ;
-not ok 831 - Document tree: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->''
-#   at HTML-tree.t test () ok line 9.
-# +---+------------------+-----------------+
-# | Ln|Got               |Expected         |
-# +---+------------------+-----------------+
-# |  1|<!DOCTYPE html>   |<!DOCTYPE html>  |
-# |  2|<html>            |<html>           |
-# |  3|  <head>          |  <head>         |
-# |  4|  <body>          |  <body>         |
-# |  5|    <li>          |    <li>         |
-# |  6|      "hello"     |      "hello"    |
-# |  7|    <li>          |    <li>         |
-# |  8|      "world"     |      "world"    |
-# |  9|      <ul>        |      <ul>       |
-# | 10|        "how"     |        "how"    |
-# | 11|        <li>      |        <li>     |
-# | 12|          "do"    |          "do"   |
-# | 13|      "you"       |      "you"      |
-# * 14|  <!-- do--> -->  |  <!-- do -->    *
-# +---+------------------+-----------------+
+ok 831 - Document tree: qq'<!DOCTYPE html><li>hello<li>world<ul>how<li>do</ul>you</body><!--do-->'
 ok 832 - Parse error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; 1:55:unmatched end tag:option, 1:55:in body:\#eof;Line: 1 Col: 54 Unexpected end tag (option) in the select phase. Ignored., Line: 1 Col: 55 Expected closing tag. Unexpected end of file.
 ok 833 - SHOULD-level error: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'; ;
 ok 834 - Document tree: qq'<!DOCTYPE html>A<option>B<optgroup>C<select>D</option>E'
@@ -1667,45 +1651,15 @@ ok 1191 - Document tree: qq'<!DOCTYPE html><select><optgroup><option><optgroup>'
 ok 1192 - Parse error: qq'<!DOCTYPE html><font><input><input></font>'; ;
 ok 1193 - SHOULD-level error: qq'<!DOCTYPE html><font><input><input></font>'; ;
 ok 1194 - Document tree: qq'<!DOCTYPE html><font><input><input></font>'
-not ok 1195 - Parse error: qq'<!DOCTYPE html><!-- XXX - XXX -->'; 1:33:unclosed comment;
-#   Failed test 'Parse error: qq'<!DOCTYPE html><!-- XXX - XXX -->'; 1:33:unclosed comment;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '1'
-#     expected: '0'
+ok 1195 - Parse error: qq'<!DOCTYPE html><!-- XXX - XXX -->'; ;
 ok 1196 - SHOULD-level error: qq'<!DOCTYPE html><!-- XXX - XXX -->'; ;
-not ok 1197 - Document tree: qq'<!DOCTYPE html><!-- XXX - XXX -->'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><!-- XXX - XXX -->''
-#   at HTML-tree.t test () ok line 9.
-# +---+-------------------------+----------------------+
-# | Ln|Got                      |Expected              |
-# +---+-------------------------+----------------------+
-# |  1|<!DOCTYPE html>          |<!DOCTYPE html>       |
-# *  2|<!--  XXX - XXX --> -->  |<!--  XXX - XXX  -->  *
-# |  3|<html>                   |<html>                |
-# |  4|  <head>                 |  <head>              |
-# |  5|  <body>                 |  <body>              |
-# +---+-------------------------+----------------------+
+ok 1197 - Document tree: qq'<!DOCTYPE html><!-- XXX - XXX -->'
 ok 1198 - Parse error: qq'<!DOCTYPE html><!-- XXX - XXX'; 1:29:unclosed comment;Line: 1 Col: 29 Unexpected end of file in comment (-)
 ok 1199 - SHOULD-level error: qq'<!DOCTYPE html><!-- XXX - XXX'; ;
 ok 1200 - Document tree: qq'<!DOCTYPE html><!-- XXX - XXX'
-not ok 1201 - Parse error: qq'<!DOCTYPE html><!-- XXX - XXX - XXX -->'; 1:39:unclosed comment;
-#   Failed test 'Parse error: qq'<!DOCTYPE html><!-- XXX - XXX - XXX -->'; 1:39:unclosed comment;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '1'
-#     expected: '0'
+ok 1201 - Parse error: qq'<!DOCTYPE html><!-- XXX - XXX - XXX -->'; ;
 ok 1202 - SHOULD-level error: qq'<!DOCTYPE html><!-- XXX - XXX - XXX -->'; ;
-not ok 1203 - Document tree: qq'<!DOCTYPE html><!-- XXX - XXX - XXX -->'
-#   Failed test 'Document tree: qq'<!DOCTYPE html><!-- XXX - XXX - XXX -->''
-#   at HTML-tree.t test () ok line 9.
-# +---+-------------------------------+----------------------------+
-# | Ln|Got                            |Expected                    |
-# +---+-------------------------------+----------------------------+
-# |  1|<!DOCTYPE html>                |<!DOCTYPE html>             |
-# *  2|<!--  XXX - XXX - XXX --> -->  |<!--  XXX - XXX - XXX  -->  *
-# |  3|<html>                         |<html>                      |
-# |  4|  <head>                       |  <head>                    |
-# |  5|  <body>                       |  <body>                    |
-# +---+-------------------------------+----------------------------+
+ok 1203 - Document tree: qq'<!DOCTYPE html><!-- XXX - XXX - XXX -->'
 ok 1204 - Parse error: qq'<isindex test=x name=x>'; 1:23:no DOCTYPE, 1:23:isindex;Line: 1 Col: 23 Unexpected start tag (isindex). Expected DOCTYPE., Line: 1 Col: 23 Unexpected start tag isindex. Don't use it!
 ok 1205 - SHOULD-level error: qq'<isindex test=x name=x>'; ;
 not ok 1206 - Document tree: qq'<isindex test=x name=x>'
@@ -1805,22 +1759,13 @@ ok 1254 - Document tree: qq'<!DOCTYPE html><!--x--'
 ok 1255 - Parse error: qq'<!DOCTYPE html><table><tr><td></p></table>'; 1:35:unmatched end tag:p;Line: 1 Col: 34 Unexpected end tag (p). Ignored.
 ok 1256 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td></p></table>'; ;
 ok 1257 - Document tree: qq'<!DOCTYPE html><table><tr><td></p></table>'
-ok 1258 - Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5, 1:41:unclosed comment;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.
+not ok 1258 - Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.
+#   Failed test 'Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '2'
+#     expected: '3'
 ok 1259 - SHOULD-level error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; ;
-not ok 1260 - Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'
-#   Failed test 'Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->''
-#   at HTML-tree.t test () ok line 9.
-# +---+--------------------------+---+----------------------+
-# | Ln|Got                       | Ln|Expected              |
-# +---+--------------------------+---+----------------------+
-# |  1|<!DOCTYPE <!doctype>      |  1|<!DOCTYPE <!doctype>  |
-# |  2|<html>                    |  2|<html>                |
-# |  3|  <head>                  |  3|  <head>              |
-# |  4|  <body>                  |  4|  <body>              |
-# |  5|    ">"                   |  5|    ">"               |
-# *  6|    <!-- <!--x-->--> -->  *  6|    <!-- <!--x -->    *
-# |   |                          *  7|    "-->"             *
-# +---+--------------------------+---+----------------------+
+ok 1260 - Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'
 # t/tree-construction/tests3.dat
 ok 1261 - Parse error: qq'<head></head><style></style>'; 1:7:no DOCTYPE, 1:21:after head:style;Line: 1 Col: 6 Unexpected start tag (head). Expected DOCTYPE., Line: 1 Col: 20 Unexpected start tag (style) that can be in head. Moved.
 ok 1262 - SHOULD-level error: qq'<head></head><style></style>'; ;
@@ -2083,24 +2028,20 @@ not ok 1386 - Document tree: qq'<title><!--</title>'
 # *  4|      "<!--"  |      "<!--</title>"  *
 # |  5|  <body>      |  <body>              |
 # +---+--------------+----------------------+
-not ok 1387 - Parse error: qq'<noscript><!--</noscript>--></noscript>'; 1:11:no DOCTYPE, 1:39:unclosed comment, 1:39:in noscript:\#eof;Line: 1 Col: 10 Unexpected start tag (noscript). Expected DOCTYPE.
-#   Failed test 'Parse error: qq'<noscript><!--</noscript>--></noscript>'; 1:11:no DOCTYPE, 1:39:unclosed comment, 1:39:in noscript:\#eof;Line: 1 Col: 10 Unexpected start tag (noscript). Expected DOCTYPE.'
-#   at HTML-tree.t test () ok line 3.
-#          got: '3'
-#     expected: '1'
+ok 1387 - Parse error: qq'<noscript><!--</noscript>--></noscript>'; 1:11:no DOCTYPE;Line: 1 Col: 10 Unexpected start tag (noscript). Expected DOCTYPE.
 ok 1388 - SHOULD-level error: qq'<noscript><!--</noscript>--></noscript>'; ;
 not ok 1389 - Document tree: qq'<noscript><!--</noscript>--></noscript>'
 #   Failed test 'Document tree: qq'<noscript><!--</noscript>--></noscript>''
 #   at HTML-tree.t test () ok line 9.
-# +---+------------------------------------------+----------------------------+
-# | Ln|Got                                       |Expected                    |
-# +---+------------------------------------------+----------------------------+
-# |  1|<html>                                    |<html>                      |
-# |  2|  <head>                                  |  <head>                    |
-# |  3|    <noscript>                            |    <noscript>              |
-# *  4|      <!-- </noscript>--></noscript> -->  |      "<!--</noscript>-->"  *
-# |  5|  <body>                                  |  <body>                    |
-# +---+------------------------------------------+----------------------------+
+# +---+----------------------------+----------------------------+
+# | Ln|Got                         |Expected                    |
+# +---+----------------------------+----------------------------+
+# |  1|<html>                      |<html>                      |
+# |  2|  <head>                    |  <head>                    |
+# |  3|    <noscript>              |    <noscript>              |
+# *  4|      <!-- </noscript> -->  |      "<!--</noscript>-->"  *
+# |  5|  <body>                    |  <body>                    |
+# +---+----------------------------+----------------------------+
 # t/tree-construction/tests6.dat
 utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
 utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
@@ -2298,20 +2239,24 @@ ok 1524 - Document tree: qq'<table></body></caption></col></colgroup></html></tb
 ok 1525 - Parse error: qq'</table><tr>'; 1:9:unmatched end tag:table, 1:12:in body:\#eof;Line: 1 Col: 8 Unexpected end tag (table). Ignored., Line: 1 Col: 12 Unexpected end of file. Expected table content.
 ok 1526 - SHOULD-level error: qq'</table><tr>'; ;
 ok 1527 - Document tree: qq'</table><tr>'
-ok 1528 - Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE, 1:25:unclosed comment;Line: 1 Col: 6 Unexpected start tag (html). Expected DOCTYPE., Line: 1 Col: 13 Unexpected end tag (html) after the (implied) root element.
+not ok 1528 - Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE;Line: 1 Col: 6 Unexpected start tag (html). Expected DOCTYPE., Line: 1 Col: 13 Unexpected end tag (html) after the (implied) root element.
+#   Failed test 'Parse error: qq'<html></html><!-- foo -->'; 1:7:no DOCTYPE;Line: 1 Col: 6 Unexpected start tag (html). Expected DOCTYPE., Line: 1 Col: 13 Unexpected end tag (html) after the (implied) root element.'
+#   at HTML-tree.t test () ok line 3.
+#          got: '1'
+#     expected: '2'
 ok 1529 - SHOULD-level error: qq'<html></html><!-- foo -->'; ;
 not ok 1530 - Document tree: qq'<html></html><!-- foo -->'
 #   Failed test 'Document tree: qq'<html></html><!-- foo -->''
 #   at HTML-tree.t test () ok line 9.
-# +---+-------------------+---+------------------+
-# | Ln|Got                | Ln|Expected          |
-# +---+-------------------+---+------------------+
-# |  1|<html>             |  1|<html>            |
-# |   |                   *  2|  <!--  foo  -->  *
-# |  2|  <head>           |  3|  <head>          |
-# |  3|  <body>           |  4|  <body>          |
-# *  4|<!--  foo --> -->  *   |                  |
-# +---+-------------------+---+------------------+
+# +---+----------------+---+------------------+
+# | Ln|Got             | Ln|Expected          |
+# +---+----------------+---+------------------+
+# |  1|<html>          |  1|<html>            |
+# |   |                *  2|  <!--  foo  -->  *
+# |  2|  <head>        |  3|  <head>          |
+# |  3|  <body>        |  4|  <body>          |
+# *  4|<!--  foo  -->  *   |                  |
+# +---+----------------+---+------------------+
 not ok 1531 - Parse error: qq'<body></body></html>'; 1:20:unmatched end tag:html;Line: 1 Col: 20 Unexpected html end tag in inner html mode., Line: 1 Col: 20 Unexpected EOF in inner html mode.
 #   Failed test 'Parse error: qq'<body></body></html>'; 1:20:unmatched end tag:html;Line: 1 Col: 20 Unexpected html end tag in inner html mode., Line: 1 Col: 20 Unexpected EOF in inner html mode.'
 #   at HTML-tree.t test () ok line 3.
@@ -3625,25 +3570,9 @@ ok 2598 - Document tree: qq'<!DOCTYPE HTML><html><head><title></title></head><bo
 ok 2599 - Parse error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!---->'; ;
 ok 2600 - SHOULD-level error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!---->'; ;
 ok 2601 - Document tree: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!---->'
-not ok 2602 - Parse error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->'; 1:78:unclosed comment;
-#   Failed test 'Parse error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->'; 1:78:unclosed comment;'
-#   at HTML-tree.t test () ok line 3.
-#          got: '1'
-#     expected: '0'
+ok 2602 - Parse error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->'; ;
 ok 2603 - SHOULD-level error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->'; ;
-not ok 2604 - Document tree: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->'
-#   Failed test 'Document tree: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->''
-#   at HTML-tree.t test () ok line 9.
-# +---+-----------------+-----------------+
-# | Ln|Got              |Expected         |
-# +---+-----------------+-----------------+
-# |  1|<!DOCTYPE html>  |<!DOCTYPE html>  |
-# |  2|<html>           |<html>           |
-# |  3|  <head>         |  <head>         |
-# |  4|    <title>      |    <title>      |
-# |  5|  <body>         |  <body>         |
-# *  6|<!-- aa--> -->   |<!-- aa -->      *
-# +---+-----------------+-----------------+
+ok 2604 - Document tree: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!--aa-->'
 ok 2605 - Parse error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!DOCTYPE HTML>'; 1:84:in html:\#DOCTYPE;<!DOCTYPE> after </html>
 ok 2606 - SHOULD-level error: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!DOCTYPE HTML>'; ;
 ok 2607 - Document tree: qq'<!DOCTYPE HTML><html><head><title></title></head><body></body></html><!DOCTYPE HTML>'
@@ -4821,28 +4750,9 @@ ok 3750 - Document tree: qq'<!DOCTYPE HTML><ul><li><h1><li>'
 ok 3751 - Parse error: qq'<!DOCTYPE HTML><ul><li><menu><li>'; 1:33:in body:\#eof;eof in body
 ok 3752 - SHOULD-level error: qq'<!DOCTYPE HTML><ul><li><menu><li>'; ;
 ok 3753 - Document tree: qq'<!DOCTYPE HTML><ul><li><menu><li>'
-not ok 3754 - Parse error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li>'; 1:70:unclosed comment, 1:70:no DOCTYPE;eof in body
-#   Failed test 'Parse error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li>'; 1:70:unclosed comment, 1:70:no DOCTYPE;eof in body'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '1'
+ok 3754 - Parse error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li>'; 1:70:in body:\#eof;eof in body
 ok 3755 - SHOULD-level error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li>'; ;
-not ok 3756 - Document tree: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li>'
-#   Failed test 'Document tree: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li>''
-#   at HTML-tree.t test () ok line 9.
-# +---+-----------------------------------------------------------------------------+---+-------------------------------------+
-# | Ln|Got                                                                          | Ln|Expected                             |
-# +---+-----------------------------------------------------------------------------+---+-------------------------------------+
-# *  1|<!--  NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li> -->  *  1|<!--  NOTE: Scripting disabled  -->  *
-# |   |                                                                             *  2|<!DOCTYPE html>                      *
-# |  2|<html>                                                                       |  3|<html>                               |
-# |  3|  <head>                                                                     |  4|  <head>                             |
-# |  4|  <body>                                                                     |  5|  <body>                             |
-# |   |                                                                             *  6|    <ul>                             *
-# |   |                                                                             *  7|      <li>                           *
-# |   |                                                                             *  8|        <noscript>                   *
-# |   |                                                                             *  9|          <li>                       *
-# +---+-----------------------------------------------------------------------------+---+-------------------------------------+
+ok 3756 - Document tree: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><ul><li><noscript><li>'
 ok 3757 - Parse error: qq'<!DOCTYPE HTML><ul><li><ol><li>'; 1:31:in body:\#eof;eof in body
 ok 3758 - SHOULD-level error: qq'<!DOCTYPE HTML><ul><li><ol><li>'; ;
 ok 3759 - Document tree: qq'<!DOCTYPE HTML><ul><li><ol><li>'
@@ -5017,28 +4927,9 @@ ok 3927 - Document tree: qq'<!DOCTYPE HTML><dl><dt><h1><dt>'
 ok 3928 - Parse error: qq'<!DOCTYPE HTML><dl><dt><menu><dt>'; 1:33:in body:\#eof;eof in body
 ok 3929 - SHOULD-level error: qq'<!DOCTYPE HTML><dl><dt><menu><dt>'; ;
 ok 3930 - Document tree: qq'<!DOCTYPE HTML><dl><dt><menu><dt>'
-not ok 3931 - Parse error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt>'; 1:70:unclosed comment, 1:70:no DOCTYPE;eof in body
-#   Failed test 'Parse error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt>'; 1:70:unclosed comment, 1:70:no DOCTYPE;eof in body'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '1'
+ok 3931 - Parse error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt>'; 1:70:in body:\#eof;eof in body
 ok 3932 - SHOULD-level error: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt>'; ;
-not ok 3933 - Document tree: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt>'
-#   Failed test 'Document tree: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt>''
-#   at HTML-tree.t test () ok line 9.
-# +---+-----------------------------------------------------------------------------+---+-------------------------------------+
-# | Ln|Got                                                                          | Ln|Expected                             |
-# +---+-----------------------------------------------------------------------------+---+-------------------------------------+
-# *  1|<!--  NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt> -->  *  1|<!--  NOTE: Scripting disabled  -->  *
-# |   |                                                                             *  2|<!DOCTYPE html>                      *
-# |  2|<html>                                                                       |  3|<html>                               |
-# |  3|  <head>                                                                     |  4|  <head>                             |
-# |  4|  <body>                                                                     |  5|  <body>                             |
-# |   |                                                                             *  6|    <dl>                             *
-# |   |                                                                             *  7|      <dt>                           *
-# |   |                                                                             *  8|        <noscript>                   *
-# |   |                                                                             *  9|          <dt>                       *
-# +---+-----------------------------------------------------------------------------+---+-------------------------------------+
+ok 3933 - Document tree: qq'<!-- NOTE: Scripting disabled --><!DOCTYPE HTML><dl><dt><noscript><dt>'
 ok 3934 - Parse error: qq'<!DOCTYPE HTML><dl><dt><ol><dt>'; 1:31:in body:\#eof;eof in body
 ok 3935 - SHOULD-level error: qq'<!DOCTYPE HTML><dl><dt><ol><dt>'; ;
 ok 3936 - Document tree: qq'<!DOCTYPE HTML><dl><dt><ol><dt>'
@@ -8069,4 +7960,4 @@ ok 6715 - Parse error: qq'<table><tr><td><svg><desc><td></desc><circle>'; 1:8:no
 ok 6716 - SHOULD-level error: qq'<table><tr><td><svg><desc><td></desc><circle>'; ;
 ok 6717 - Document tree: qq'<table><tr><td><svg><desc><td></desc><circle>'
 1..6717
-# Looks like you failed 173 tests of 6717.
+# Looks like you failed 163 tests of 6717.
