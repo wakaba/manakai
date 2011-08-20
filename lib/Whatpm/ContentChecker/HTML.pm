@@ -354,9 +354,13 @@ my $GetHTMLUnorderedUniqueSetOfSpaceSeparatedTokensAttrChecker = sub {
 ## whose allowed values are defined by the section on link types)
 my $HTMLLinkTypesAttrChecker = sub {
   my ($a_or_area, $todo, $self, $attr, $item, $element_state) = @_;
+
+  my $value = $attr->value;
+  $value =~ s/(?:\G|[\x09\x0A\x0C\x0D\x20])[Ss][Hh][Oo][Rr][Tt][Cc][Uu][Tt]\x20[Ii][Cc][Oo][Nn](?:$|[\x09\x0A\x0C\x0D\x20])/ icon /gs;
+
   my %word;
   for my $word (grep {length $_}
-                split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+                split /[\x09\x0A\x0C\x0D\x20]+/, $value) {
     $word =~ tr/A-Z/a-z/ unless $word =~ /:/; ## ASCII case-insensitive.
 
     unless ($word{$word}) {

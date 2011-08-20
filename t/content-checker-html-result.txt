@@ -3047,7 +3047,6 @@ ok 2935
 ok 2936
 ok 2937
 ok 2938
-# ../t/dom-conformance/html-objects-1.dat
 ok 2939
 ok 2940
 ok 2941
@@ -3065,6 +3064,7 @@ ok 2952
 ok 2953
 ok 2954
 ok 2955
+# ../t/dom-conformance/html-objects-1.dat
 ok 2956
 ok 2957
 ok 2958
@@ -4149,78 +4149,12 @@ ok 4036
 ok 4037
 ok 4038
 ok 4039
-not ok 4040 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="">aa</video>
-# </video>
-#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="">aa</video>
-# </video>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+------------------------------------------+
-# | Ln|Got  | Ln|Expected                                  |
-# +---+-----+---+------------------------------------------+
-# |   |     *  1|/video/video;element not allowed:minus;m  *
-# +---+-----+---+------------------------------------------+
-not ok 4041 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><video src="">aa</video></p>
-# </video>
-#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><video src="">aa</video></p>
-# </video>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+--------------------------------------------+
-# | Ln|Got  | Ln|Expected                                    |
-# +---+-----+---+--------------------------------------------+
-# |   |     *  1|/video/p/video;element not allowed:minus;m  *
-# +---+-----+---+--------------------------------------------+
-not ok 4042 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><video src="">aa</video></ins>
-# </video>
-#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><video src="">aa</video></ins>
-# </video>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+----------------------------------------------+
-# | Ln|Got  | Ln|Expected                                      |
-# +---+-----+---+----------------------------------------------+
-# |   |     *  1|/video/ins/video;element not allowed:minus;m  *
-# +---+-----+---+----------------------------------------------+
-not ok 4043 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="">aa</audio>
-# </video>
-#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="">aa</audio>
-# </video>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+------------------------------------------+
-# | Ln|Got  | Ln|Expected                                  |
-# +---+-----+---+------------------------------------------+
-# |   |     *  1|/video/audio;element not allowed:minus;m  *
-# +---+-----+---+------------------------------------------+
-not ok 4044 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><audio src="">aa</audio></p>
-# </video>
-#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><audio src="">aa</audio></p>
-# </video>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+--------------------------------------------+
-# | Ln|Got  | Ln|Expected                                    |
-# +---+-----+---+--------------------------------------------+
-# |   |     *  1|/video/p/audio;element not allowed:minus;m  *
-# +---+-----+---+--------------------------------------------+
-not ok 4045 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><audio src="">aa</audio></ins>
-# </video>
-#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><audio src="">aa</audio></ins>
-# </video>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+----------------------------------------------+
-# | Ln|Got  | Ln|Expected                                      |
-# +---+-----+---+----------------------------------------------+
-# |   |     *  1|/video/ins/audio;element not allowed:minus;m  *
-# +---+-----+---+----------------------------------------------+
+ok 4040
+ok 4041
+ok 4042
+ok 4043
+ok 4044
+ok 4045
 ok 4046
 ok 4047
 ok 4048
@@ -4232,12 +4166,78 @@ ok 4053
 ok 4054
 ok 4055
 ok 4056
-ok 4057
-ok 4058
-ok 4059
-ok 4060
-ok 4061
-ok 4062
+not ok 4057 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <video src="">aa</video>
+# </video>
+#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <video src="">aa</video>
+# </video>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+------------------------------------------+
+# | Ln|Got  | Ln|Expected                                  |
+# +---+-----+---+------------------------------------------+
+# |   |     *  1|/video/video;element not allowed:minus;m  *
+# +---+-----+---+------------------------------------------+
+not ok 4058 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><video src="">aa</video></p>
+# </video>
+#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><video src="">aa</video></p>
+# </video>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+--------------------------------------------+
+# | Ln|Got  | Ln|Expected                                    |
+# +---+-----+---+--------------------------------------------+
+# |   |     *  1|/video/p/video;element not allowed:minus;m  *
+# +---+-----+---+--------------------------------------------+
+not ok 4059 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><video src="">aa</video></ins>
+# </video>
+#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><video src="">aa</video></ins>
+# </video>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+----------------------------------------------+
+# | Ln|Got  | Ln|Expected                                      |
+# +---+-----+---+----------------------------------------------+
+# |   |     *  1|/video/ins/video;element not allowed:minus;m  *
+# +---+-----+---+----------------------------------------------+
+not ok 4060 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <audio src="">aa</audio>
+# </video>
+#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <audio src="">aa</audio>
+# </video>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+------------------------------------------+
+# | Ln|Got  | Ln|Expected                                  |
+# +---+-----+---+------------------------------------------+
+# |   |     *  1|/video/audio;element not allowed:minus;m  *
+# +---+-----+---+------------------------------------------+
+not ok 4061 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><audio src="">aa</audio></p>
+# </video>
+#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><audio src="">aa</audio></p>
+# </video>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+--------------------------------------------+
+# | Ln|Got  | Ln|Expected                                    |
+# +---+-----+---+--------------------------------------------+
+# |   |     *  1|/video/p/audio;element not allowed:minus;m  *
+# +---+-----+---+--------------------------------------------+
+not ok 4062 - <video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><audio src="">aa</audio></ins>
+# </video>
+#   Failed test '<video src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><audio src="">aa</audio></ins>
+# </video>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+----------------------------------------------+
+# | Ln|Got  | Ln|Expected                                      |
+# +---+-----+---+----------------------------------------------+
+# |   |     *  1|/video/ins/audio;element not allowed:minus;m  *
+# +---+-----+---+----------------------------------------------+
 ok 4063
 ok 4064
 ok 4065
@@ -4289,78 +4289,12 @@ ok 4110
 ok 4111
 ok 4112
 ok 4113
-not ok 4114 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="">aa</video>
-# </audio>
-#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="">aa</video>
-# </audio>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+------------------------------------------+
-# | Ln|Got  | Ln|Expected                                  |
-# +---+-----+---+------------------------------------------+
-# |   |     *  1|/audio/video;element not allowed:minus;m  *
-# +---+-----+---+------------------------------------------+
-not ok 4115 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><video src="">aa</video></p>
-# </audio>
-#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><video src="">aa</video></p>
-# </audio>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+--------------------------------------------+
-# | Ln|Got  | Ln|Expected                                    |
-# +---+-----+---+--------------------------------------------+
-# |   |     *  1|/audio/p/video;element not allowed:minus;m  *
-# +---+-----+---+--------------------------------------------+
-not ok 4116 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><video src="">aa</video></ins>
-# </audio>
-#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><video src="">aa</video></ins>
-# </audio>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+----------------------------------------------+
-# | Ln|Got  | Ln|Expected                                      |
-# +---+-----+---+----------------------------------------------+
-# |   |     *  1|/audio/ins/video;element not allowed:minus;m  *
-# +---+-----+---+----------------------------------------------+
-not ok 4117 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="">aa</audio>
-# </audio>
-#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="">aa</audio>
-# </audio>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+------------------------------------------+
-# | Ln|Got  | Ln|Expected                                  |
-# +---+-----+---+------------------------------------------+
-# |   |     *  1|/audio/audio;element not allowed:minus;m  *
-# +---+-----+---+------------------------------------------+
-not ok 4118 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><audio src="">aa</audio></p>
-# </audio>
-#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <p><audio src="">aa</audio></p>
-# </audio>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+--------------------------------------------+
-# | Ln|Got  | Ln|Expected                                    |
-# +---+-----+---+--------------------------------------------+
-# |   |     *  1|/audio/p/audio;element not allowed:minus;m  *
-# +---+-----+---+--------------------------------------------+
-not ok 4119 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><audio src="">aa</audio></ins>
-# </audio>
-#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
-#   <ins><audio src="">aa</audio></ins>
-# </audio>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+----------------------------------------------+
-# | Ln|Got  | Ln|Expected                                      |
-# +---+-----+---+----------------------------------------------+
-# |   |     *  1|/audio/ins/audio;element not allowed:minus;m  *
-# +---+-----+---+----------------------------------------------+
+ok 4114
+ok 4115
+ok 4116
+ok 4117
+ok 4118
+ok 4119
 ok 4120
 ok 4121
 ok 4122
@@ -4372,12 +4306,78 @@ ok 4127
 ok 4128
 ok 4129
 ok 4130
-ok 4131
-ok 4132
-ok 4133
-ok 4134
-ok 4135
-ok 4136
+not ok 4131 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <video src="">aa</video>
+# </audio>
+#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <video src="">aa</video>
+# </audio>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+------------------------------------------+
+# | Ln|Got  | Ln|Expected                                  |
+# +---+-----+---+------------------------------------------+
+# |   |     *  1|/audio/video;element not allowed:minus;m  *
+# +---+-----+---+------------------------------------------+
+not ok 4132 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><video src="">aa</video></p>
+# </audio>
+#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><video src="">aa</video></p>
+# </audio>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+--------------------------------------------+
+# | Ln|Got  | Ln|Expected                                    |
+# +---+-----+---+--------------------------------------------+
+# |   |     *  1|/audio/p/video;element not allowed:minus;m  *
+# +---+-----+---+--------------------------------------------+
+not ok 4133 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><video src="">aa</video></ins>
+# </audio>
+#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><video src="">aa</video></ins>
+# </audio>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+----------------------------------------------+
+# | Ln|Got  | Ln|Expected                                      |
+# +---+-----+---+----------------------------------------------+
+# |   |     *  1|/audio/ins/video;element not allowed:minus;m  *
+# +---+-----+---+----------------------------------------------+
+not ok 4134 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <audio src="">aa</audio>
+# </audio>
+#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <audio src="">aa</audio>
+# </audio>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+------------------------------------------+
+# | Ln|Got  | Ln|Expected                                  |
+# +---+-----+---+------------------------------------------+
+# |   |     *  1|/audio/audio;element not allowed:minus;m  *
+# +---+-----+---+------------------------------------------+
+not ok 4135 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><audio src="">aa</audio></p>
+# </audio>
+#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <p><audio src="">aa</audio></p>
+# </audio>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+--------------------------------------------+
+# | Ln|Got  | Ln|Expected                                    |
+# +---+-----+---+--------------------------------------------+
+# |   |     *  1|/audio/p/audio;element not allowed:minus;m  *
+# +---+-----+---+--------------------------------------------+
+not ok 4136 - <audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><audio src="">aa</audio></ins>
+# </audio>
+#   Failed test '<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+#   <ins><audio src="">aa</audio></ins>
+# </audio>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+----------------------------------------------+
+# | Ln|Got  | Ln|Expected                                      |
+# +---+-----+---+----------------------------------------------+
+# |   |     *  1|/audio/ins/audio;element not allowed:minus;m  *
+# +---+-----+---+----------------------------------------------+
 ok 4137
 ok 4138
 ok 4139
@@ -4604,7 +4604,6 @@ ok 4359
 ok 4360
 ok 4361
 ok 4362
-# ../t/dom-conformance/html-tables-1.dat
 ok 4363
 ok 4364
 ok 4365
@@ -4622,6 +4621,7 @@ ok 4376
 ok 4377
 ok 4378
 ok 4379
+# ../t/dom-conformance/html-tables-1.dat
 ok 4380
 ok 4381
 ok 4382
@@ -5227,7 +5227,6 @@ ok 4981
 ok 4982
 ok 4983
 ok 4984
-# ../t/dom-conformance/html-tables-2.dat
 ok 4985
 ok 4986
 ok 4987
@@ -5245,6 +5244,7 @@ ok 4998
 ok 4999
 ok 5000
 ok 5001
+# ../t/dom-conformance/html-tables-2.dat
 ok 5002
 ok 5003
 ok 5004
@@ -5254,7 +5254,6 @@ ok 5007
 ok 5008
 ok 5009
 ok 5010
-# ../t/dom-conformance/html-forms-1.dat
 ok 5011
 ok 5012
 ok 5013
@@ -5272,6 +5271,7 @@ ok 5024
 ok 5025
 ok 5026
 ok 5027
+# ../t/dom-conformance/html-forms-1.dat
 ok 5028
 ok 5029
 ok 5030
@@ -5347,16 +5347,7 @@ ok 5099
 ok 5100
 ok 5101
 ok 5102
-not ok 5103 - <form xmlns="http://www.w3.org/1999/xhtml"
-#     accept-charset="iso-2022-jp">x</form>
-#   Failed test '<form xmlns="http://www.w3.org/1999/xhtml"
-#     accept-charset="iso-2022-jp">x</form>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+--------------------------------------------------+
-# | Ln|Got  | Ln|Expected                                          |
-# +---+-----+---+--------------------------------------------------+
-# |   |     *  1|/form/@accept-charset;charset:not ascii compat;m  *
-# +---+-----+---+--------------------------------------------------+
+ok 5103
 ok 5104
 ok 5105
 ok 5106
@@ -5373,7 +5364,16 @@ ok 5116
 ok 5117
 ok 5118
 ok 5119
-ok 5120
+not ok 5120 - <form xmlns="http://www.w3.org/1999/xhtml"
+#     accept-charset="iso-2022-jp">x</form>
+#   Failed test '<form xmlns="http://www.w3.org/1999/xhtml"
+#     accept-charset="iso-2022-jp">x</form>'
+#   at content-checker-test-ok line 1.
+# +---+-----+---+--------------------------------------------------+
+# | Ln|Got  | Ln|Expected                                          |
+# +---+-----+---+--------------------------------------------------+
+# |   |     *  1|/form/@accept-charset;charset:not ascii compat;m  *
+# +---+-----+---+--------------------------------------------------+
 ok 5121
 ok 5122
 ok 5123
@@ -5682,7 +5682,6 @@ ok 5425
 ok 5426
 ok 5427
 ok 5428
-# ../t/dom-conformance/html-form-label.dat
 ok 5429
 ok 5430
 ok 5431
@@ -5700,6 +5699,7 @@ ok 5442
 ok 5443
 ok 5444
 ok 5445
+# ../t/dom-conformance/html-form-label.dat
 ok 5446
 ok 5447
 ok 5448
@@ -5779,7 +5779,6 @@ ok 5521
 ok 5522
 ok 5523
 ok 5524
-# ../t/dom-conformance/html-form-input-1.dat
 ok 5525
 ok 5526
 ok 5527
@@ -5797,6 +5796,7 @@ ok 5538
 ok 5539
 ok 5540
 ok 5541
+# ../t/dom-conformance/html-form-input-1.dat
 ok 5542
 ok 5543
 ok 5544
@@ -6347,7 +6347,6 @@ ok 6088
 ok 6089
 ok 6090
 ok 6091
-Parse error (lt in attr value) at line 3 column 12
 ok 6092
 ok 6093
 ok 6094
@@ -6365,6 +6364,7 @@ ok 6105
 ok 6106
 ok 6107
 ok 6108
+Parse error (lt in attr value) at line 3 column 12
 ok 6109
 ok 6110
 ok 6111
@@ -7177,17 +7177,7 @@ ok 6917
 ok 6918
 ok 6919
 ok 6920
-not ok 6921 - <input xmlns="http://www.w3.org/1999/xhtml"
-#     accept-charset="us-ascii iso-2022-jp"/>
-#   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
-#     accept-charset="us-ascii iso-2022-jp"/>'
-#   at content-checker-test-ok line 1.
-# +---+------------------------------------------------+---+---------------------------------------------------+
-# | Ln|Got                                             | Ln|Expected                                           |
-# +---+------------------------------------------------+---+---------------------------------------------------+
-# *  1|/input/@accept-charset;attribute not defined;m  *  1|/input/@accept-charset;attribute not defined;m\n   *
-# |   |                                                *  2|/input/@accept-charset;charset:not ascii compat;m  *
-# +---+------------------------------------------------+---+---------------------------------------------------+
+ok 6921
 ok 6922
 ok 6923
 ok 6924
@@ -7204,7 +7194,17 @@ ok 6934
 ok 6935
 ok 6936
 ok 6937
-ok 6938
+not ok 6938 - <input xmlns="http://www.w3.org/1999/xhtml"
+#     accept-charset="us-ascii iso-2022-jp"/>
+#   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
+#     accept-charset="us-ascii iso-2022-jp"/>'
+#   at content-checker-test-ok line 1.
+# +---+------------------------------------------------+---+---------------------------------------------------+
+# | Ln|Got                                             | Ln|Expected                                           |
+# +---+------------------------------------------------+---+---------------------------------------------------+
+# *  1|/input/@accept-charset;attribute not defined;m  *  1|/input/@accept-charset;attribute not defined;m\n   *
+# |   |                                                *  2|/input/@accept-charset;charset:not ascii compat;m  *
+# +---+------------------------------------------------+---+---------------------------------------------------+
 ok 6939
 ok 6940
 ok 6941
@@ -8349,7 +8349,6 @@ ok 8079
 ok 8080
 ok 8081
 ok 8082
-# ../t/dom-conformance/html-form-button.dat
 ok 8083
 ok 8084
 ok 8085
@@ -8367,6 +8366,7 @@ ok 8096
 ok 8097
 ok 8098
 ok 8099
+# ../t/dom-conformance/html-form-button.dat
 ok 8100
 ok 8101
 ok 8102
@@ -8563,7 +8563,6 @@ ok 8292
 ok 8293
 ok 8294
 ok 8295
-# ../t/dom-conformance/html-form-select.dat
 ok 8296
 ok 8297
 ok 8298
@@ -8581,6 +8580,7 @@ ok 8309
 ok 8310
 ok 8311
 ok 8312
+# ../t/dom-conformance/html-form-select.dat
 ok 8313
 ok 8314
 ok 8315
@@ -8684,7 +8684,6 @@ ok 8412
 ok 8413
 ok 8414
 ok 8415
-# ../t/dom-conformance/html-form-datalist.dat
 ok 8416
 ok 8417
 ok 8418
@@ -8702,6 +8701,7 @@ ok 8429
 ok 8430
 ok 8431
 ok 8432
+# ../t/dom-conformance/html-form-datalist.dat
 ok 8433
 ok 8434
 ok 8435
@@ -8745,7 +8745,6 @@ ok 8472
 ok 8473
 ok 8474
 ok 8475
-# ../t/dom-conformance/html-form-textarea.dat
 ok 8476
 ok 8477
 ok 8478
@@ -8763,6 +8762,7 @@ ok 8489
 ok 8490
 ok 8491
 ok 8492
+# ../t/dom-conformance/html-form-textarea.dat
 ok 8493
 ok 8494
 ok 8495
@@ -8826,17 +8826,7 @@ ok 8552
 ok 8553
 ok 8554
 ok 8555
-not ok 8556 - <textarea xmlns="http://www.w3.org/1999/xhtml"
-#     accept-charset="us-ascii iso-2022-jp"/>
-#   Failed test '<textarea xmlns="http://www.w3.org/1999/xhtml"
-#     accept-charset="us-ascii iso-2022-jp"/>'
-#   at content-checker-test-ok line 1.
-# +---+---------------------------------------------------+---+------------------------------------------------------+
-# | Ln|Got                                                | Ln|Expected                                              |
-# +---+---------------------------------------------------+---+------------------------------------------------------+
-# *  1|/textarea/@accept-charset;attribute not defined;m  *  1|/textarea/@accept-charset;attribute not defined;m\n   *
-# |   |                                                   *  2|/textarea/@accept-charset;charset:not ascii compat;m  *
-# +---+---------------------------------------------------+---+------------------------------------------------------+
+ok 8556
 ok 8557
 ok 8558
 ok 8559
@@ -8853,7 +8843,17 @@ ok 8569
 ok 8570
 ok 8571
 ok 8572
-ok 8573
+not ok 8573 - <textarea xmlns="http://www.w3.org/1999/xhtml"
+#     accept-charset="us-ascii iso-2022-jp"/>
+#   Failed test '<textarea xmlns="http://www.w3.org/1999/xhtml"
+#     accept-charset="us-ascii iso-2022-jp"/>'
+#   at content-checker-test-ok line 1.
+# +---+---------------------------------------------------+---+------------------------------------------------------+
+# | Ln|Got                                                | Ln|Expected                                              |
+# +---+---------------------------------------------------+---+------------------------------------------------------+
+# *  1|/textarea/@accept-charset;attribute not defined;m  *  1|/textarea/@accept-charset;attribute not defined;m\n   *
+# |   |                                                   *  2|/textarea/@accept-charset;charset:not ascii compat;m  *
+# +---+---------------------------------------------------+---+------------------------------------------------------+
 ok 8574
 ok 8575
 ok 8576
@@ -8927,7 +8927,6 @@ ok 8643
 ok 8644
 ok 8645
 ok 8646
-# ../t/dom-conformance/html-form-keygen.dat
 ok 8647
 ok 8648
 ok 8649
@@ -8945,6 +8944,7 @@ ok 8660
 ok 8661
 ok 8662
 ok 8663
+# ../t/dom-conformance/html-form-keygen.dat
 ok 8664
 ok 8665
 ok 8666
@@ -8964,13 +8964,30 @@ ok 8679
 ok 8680
 ok 8681
 ok 8682
-# ../t/dom-conformance/html-interactive-1.dat
 ok 8683
 ok 8684
 ok 8685
 ok 8686
 ok 8687
-not ok 8688 - <head xmlns="http://www.w3.org/1999/xhtml">
+ok 8688
+ok 8689
+ok 8690
+ok 8691
+ok 8692
+ok 8693
+ok 8694
+ok 8695
+ok 8696
+ok 8697
+ok 8698
+ok 8699
+# ../t/dom-conformance/html-interactive-1.dat
+ok 8700
+ok 8701
+ok 8702
+ok 8703
+ok 8704
+not ok 8705 - <head xmlns="http://www.w3.org/1999/xhtml">
 # <title/>
 # <noscript>
 # <meta name="keywords" content=""/>
@@ -8990,15 +9007,15 @@ not ok 8688 - <head xmlns="http://www.w3.org/1999/xhtml">
 # |  2|/head/noscript/meta;element not allowed:head noscript;m  |  1|/head/noscript/meta;element not allowed:head noscript;m  |
 # |  3|/head/noscript;in XML:noscript;m                         |  2|/head/noscript;in XML:noscript;m                         |
 # +---+---------------------------------------------------------+---+---------------------------------------------------------+
-ok 8689
-ok 8690
-ok 8691
-ok 8692
-ok 8693
-ok 8694
-ok 8695
-ok 8696
-not ok 8697 - <noscript xmlns="http://www.w3.org/1999/xhtml">
+ok 8706
+ok 8707
+ok 8708
+ok 8709
+ok 8710
+ok 8711
+ok 8712
+ok 8713
+not ok 8714 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # <meta name="keywords" content=""/>
 # </noscript>
 #   Failed test '<noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -9013,23 +9030,6 @@ not ok 8697 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/noscript;in XML:noscript;m                        |  2|/noscript;in XML:noscript;m                |
 # |  4|/noscript;no significant content;s                 |  3|/noscript;no significant content;s         |
 # +---+---------------------------------------------------+---+-------------------------------------------+
-ok 8698
-ok 8699
-ok 8700
-ok 8701
-ok 8702
-ok 8703
-ok 8704
-ok 8705
-ok 8706
-ok 8707
-ok 8708
-ok 8709
-ok 8710
-ok 8711
-ok 8712
-ok 8713
-ok 8714
 ok 8715
 ok 8716
 ok 8717
@@ -9280,7 +9280,6 @@ ok 8961
 ok 8962
 ok 8963
 ok 8964
-# ../t/dom-conformance/html-scripting-1.dat
 ok 8965
 ok 8966
 ok 8967
@@ -9298,6 +9297,7 @@ ok 8978
 ok 8979
 ok 8980
 ok 8981
+# ../t/dom-conformance/html-scripting-1.dat
 ok 8982
 ok 8983
 ok 8984
@@ -9368,7 +9368,6 @@ ok 9048
 ok 9049
 ok 9050
 ok 9051
-# ../t/dom-conformance/html-scripting-2.dat
 ok 9052
 ok 9053
 ok 9054
@@ -9386,6 +9385,7 @@ ok 9065
 ok 9066
 ok 9067
 ok 9068
+# ../t/dom-conformance/html-scripting-2.dat
 ok 9069
 ok 9070
 ok 9071
@@ -9462,7 +9462,6 @@ ok 9141
 ok 9142
 ok 9143
 ok 9144
-# ../t/dom-conformance/html-repetitions.dat
 ok 9145
 ok 9146
 ok 9147
@@ -9480,6 +9479,7 @@ ok 9158
 ok 9159
 ok 9160
 ok 9161
+# ../t/dom-conformance/html-repetitions.dat
 ok 9162
 ok 9163
 ok 9164
@@ -9546,7 +9546,6 @@ ok 9224
 ok 9225
 ok 9226
 ok 9227
-# ../t/dom-conformance/html-datatemplate.dat
 ok 9228
 ok 9229
 ok 9230
@@ -9564,6 +9563,7 @@ ok 9241
 ok 9242
 ok 9243
 ok 9244
+# ../t/dom-conformance/html-datatemplate.dat
 ok 9245
 ok 9246
 ok 9247
@@ -9876,7 +9876,6 @@ ok 9553
 ok 9554
 ok 9555
 ok 9556
-# ../t/dom-conformance/html-frames.dat
 ok 9557
 ok 9558
 ok 9559
@@ -9894,6 +9893,7 @@ ok 9570
 ok 9571
 ok 9572
 ok 9573
+# ../t/dom-conformance/html-frames.dat
 ok 9574
 ok 9575
 ok 9576
@@ -10107,5 +10107,22 @@ ok 9783
 ok 9784
 ok 9785
 ok 9786
-1..9786
-# Looks like you failed 23 tests of 9786.
+ok 9787
+ok 9788
+ok 9789
+ok 9790
+ok 9791
+ok 9792
+ok 9793
+ok 9794
+ok 9795
+ok 9796
+ok 9797
+ok 9798
+ok 9799
+ok 9800
+ok 9801
+ok 9802
+ok 9803
+1..9803
+# Looks like you failed 23 tests of 9803.
