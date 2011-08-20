@@ -2748,3 +2748,59 @@ a
 #errors
 /a/@utn;attribute not defined;m
 /a/@target;attribute not allowed;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" download="">b</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" download="hoge">b</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" download="hoge.txt">b</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" download="/foo/bar.txt">b</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" download="c:\windows\hoge">b</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    href="a" download="download">b</a>
+#errors
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml"
+    download="">b</a>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml"
+    shape="default" alt="x" href="a" download=""/>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml"
+    shape="default" alt="x" href="a" download="aaa"/>
+#errors
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml"
+    shape="default" alt="x" href="a" download="/foo/bar"/>
+#errors
+
+#data
+<link xmlns="http://www.w3.org/1999/xhtml"
+    rel="stylesheet" href="a" download=""/>
+#errors
+/link/@download;attribute not defined;m
