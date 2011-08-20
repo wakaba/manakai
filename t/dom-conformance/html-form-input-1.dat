@@ -1619,7 +1619,38 @@
     type="number"
     maxlength=""/>
 #errors
-/input/@maxlength;input attr not applicable;number;m
+/input/@maxlength;nninteger:syntax error;m
+/input/@maxlength;attribute not allowed;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    maxlength="0"/>
+#errors
+/input/@maxlength;attribute not allowed;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    maxlength="120"/>
+#errors
+/input/@maxlength;attribute not allowed;s
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    maxlength="-0"/>
+#errors
+/input/@maxlength;attribute not allowed;s
+/input/@maxlength;nninteger:syntax error;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    maxlength="0.0"/>
+#errors
+/input/@maxlength;attribute not allowed;s
+/input/@maxlength;nninteger:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"

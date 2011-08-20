@@ -6343,11 +6343,11 @@ ok 6084
 ok 6085
 ok 6086
 ok 6087
-Parse error (lt in attr value) at line 3 column 12
 ok 6088
 ok 6089
 ok 6090
 ok 6091
+Parse error (lt in attr value) at line 3 column 12
 ok 6092
 ok 6093
 ok 6094
@@ -7173,7 +7173,11 @@ ok 6913
 ok 6914
 ok 6915
 ok 6916
-not ok 6917 - <input xmlns="http://www.w3.org/1999/xhtml"
+ok 6917
+ok 6918
+ok 6919
+ok 6920
+not ok 6921 - <input xmlns="http://www.w3.org/1999/xhtml"
 #     accept-charset="us-ascii iso-2022-jp"/>
 #   Failed test '<input xmlns="http://www.w3.org/1999/xhtml"
 #     accept-charset="us-ascii iso-2022-jp"/>'
@@ -7184,10 +7188,6 @@ not ok 6917 - <input xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/input/@accept-charset;attribute not defined;m  *  1|/input/@accept-charset;attribute not defined;m\n   *
 # |   |                                                *  2|/input/@accept-charset;charset:not ascii compat;m  *
 # +---+------------------------------------------------+---+---------------------------------------------------+
-ok 6918
-ok 6919
-ok 6920
-ok 6921
 ok 6922
 ok 6923
 ok 6924
@@ -8345,11 +8345,11 @@ ok 8075
 ok 8076
 ok 8077
 ok 8078
-# ../t/dom-conformance/html-form-button.dat
 ok 8079
 ok 8080
 ok 8081
 ok 8082
+# ../t/dom-conformance/html-form-button.dat
 ok 8083
 ok 8084
 ok 8085
@@ -8559,11 +8559,11 @@ ok 8288
 ok 8289
 ok 8290
 ok 8291
-# ../t/dom-conformance/html-form-select.dat
 ok 8292
 ok 8293
 ok 8294
 ok 8295
+# ../t/dom-conformance/html-form-select.dat
 ok 8296
 ok 8297
 ok 8298
@@ -8680,11 +8680,11 @@ ok 8408
 ok 8409
 ok 8410
 ok 8411
-# ../t/dom-conformance/html-form-datalist.dat
 ok 8412
 ok 8413
 ok 8414
 ok 8415
+# ../t/dom-conformance/html-form-datalist.dat
 ok 8416
 ok 8417
 ok 8418
@@ -8741,11 +8741,11 @@ ok 8468
 ok 8469
 ok 8470
 ok 8471
-# ../t/dom-conformance/html-form-textarea.dat
 ok 8472
 ok 8473
 ok 8474
 ok 8475
+# ../t/dom-conformance/html-form-textarea.dat
 ok 8476
 ok 8477
 ok 8478
@@ -8822,7 +8822,11 @@ ok 8548
 ok 8549
 ok 8550
 ok 8551
-not ok 8552 - <textarea xmlns="http://www.w3.org/1999/xhtml"
+ok 8552
+ok 8553
+ok 8554
+ok 8555
+not ok 8556 - <textarea xmlns="http://www.w3.org/1999/xhtml"
 #     accept-charset="us-ascii iso-2022-jp"/>
 #   Failed test '<textarea xmlns="http://www.w3.org/1999/xhtml"
 #     accept-charset="us-ascii iso-2022-jp"/>'
@@ -8833,10 +8837,6 @@ not ok 8552 - <textarea xmlns="http://www.w3.org/1999/xhtml"
 # *  1|/textarea/@accept-charset;attribute not defined;m  *  1|/textarea/@accept-charset;attribute not defined;m\n   *
 # |   |                                                   *  2|/textarea/@accept-charset;charset:not ascii compat;m  *
 # +---+---------------------------------------------------+---+------------------------------------------------------+
-ok 8553
-ok 8554
-ok 8555
-ok 8556
 ok 8557
 ok 8558
 ok 8559
@@ -8923,11 +8923,11 @@ ok 8639
 ok 8640
 ok 8641
 ok 8642
-# ../t/dom-conformance/html-form-keygen.dat
 ok 8643
 ok 8644
 ok 8645
 ok 8646
+# ../t/dom-conformance/html-form-keygen.dat
 ok 8647
 ok 8648
 ok 8649
@@ -8960,13 +8960,17 @@ ok 8675
 ok 8676
 ok 8677
 ok 8678
-# ../t/dom-conformance/html-interactive-1.dat
 ok 8679
 ok 8680
 ok 8681
 ok 8682
+# ../t/dom-conformance/html-interactive-1.dat
 ok 8683
-not ok 8684 - <head xmlns="http://www.w3.org/1999/xhtml">
+ok 8684
+ok 8685
+ok 8686
+ok 8687
+not ok 8688 - <head xmlns="http://www.w3.org/1999/xhtml">
 # <title/>
 # <noscript>
 # <meta name="keywords" content=""/>
@@ -8986,15 +8990,15 @@ not ok 8684 - <head xmlns="http://www.w3.org/1999/xhtml">
 # |  2|/head/noscript/meta;element not allowed:head noscript;m  |  1|/head/noscript/meta;element not allowed:head noscript;m  |
 # |  3|/head/noscript;in XML:noscript;m                         |  2|/head/noscript;in XML:noscript;m                         |
 # +---+---------------------------------------------------------+---+---------------------------------------------------------+
-ok 8685
-ok 8686
-ok 8687
-ok 8688
 ok 8689
 ok 8690
 ok 8691
 ok 8692
-not ok 8693 - <noscript xmlns="http://www.w3.org/1999/xhtml">
+ok 8693
+ok 8694
+ok 8695
+ok 8696
+not ok 8697 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # <meta name="keywords" content=""/>
 # </noscript>
 #   Failed test '<noscript xmlns="http://www.w3.org/1999/xhtml">
@@ -9009,10 +9013,6 @@ not ok 8693 - <noscript xmlns="http://www.w3.org/1999/xhtml">
 # |  3|/noscript;in XML:noscript;m                        |  2|/noscript;in XML:noscript;m                |
 # |  4|/noscript;no significant content;s                 |  3|/noscript;no significant content;s         |
 # +---+---------------------------------------------------+---+-------------------------------------------+
-ok 8694
-ok 8695
-ok 8696
-ok 8697
 ok 8698
 ok 8699
 ok 8700
@@ -9276,11 +9276,11 @@ ok 8957
 ok 8958
 ok 8959
 ok 8960
-# ../t/dom-conformance/html-scripting-1.dat
 ok 8961
 ok 8962
 ok 8963
 ok 8964
+# ../t/dom-conformance/html-scripting-1.dat
 ok 8965
 ok 8966
 ok 8967
@@ -9364,11 +9364,11 @@ ok 9044
 ok 9045
 ok 9046
 ok 9047
-# ../t/dom-conformance/html-scripting-2.dat
 ok 9048
 ok 9049
 ok 9050
 ok 9051
+# ../t/dom-conformance/html-scripting-2.dat
 ok 9052
 ok 9053
 ok 9054
@@ -9458,11 +9458,11 @@ ok 9137
 ok 9138
 ok 9139
 ok 9140
-# ../t/dom-conformance/html-repetitions.dat
 ok 9141
 ok 9142
 ok 9143
 ok 9144
+# ../t/dom-conformance/html-repetitions.dat
 ok 9145
 ok 9146
 ok 9147
@@ -9542,11 +9542,11 @@ ok 9220
 ok 9221
 ok 9222
 ok 9223
-# ../t/dom-conformance/html-datatemplate.dat
 ok 9224
 ok 9225
 ok 9226
 ok 9227
+# ../t/dom-conformance/html-datatemplate.dat
 ok 9228
 ok 9229
 ok 9230
@@ -9872,11 +9872,11 @@ ok 9549
 ok 9550
 ok 9551
 ok 9552
-# ../t/dom-conformance/html-frames.dat
 ok 9553
 ok 9554
 ok 9555
 ok 9556
+# ../t/dom-conformance/html-frames.dat
 ok 9557
 ok 9558
 ok 9559
@@ -10103,5 +10103,9 @@ ok 9779
 ok 9780
 ok 9781
 ok 9782
-1..9782
-# Looks like you failed 23 tests of 9782.
+ok 9783
+ok 9784
+ok 9785
+ok 9786
+1..9786
+# Looks like you failed 23 tests of 9786.

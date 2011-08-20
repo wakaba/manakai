@@ -7551,6 +7551,15 @@ $Element->{+HTML_NS}->{input} = {
              }),
              list => $ListAttrChecker,
              max => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+             maxlength => sub {
+               my ($self, $attr, $item, $element_state) = @_;
+
+               $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 })->(@_);
+
+               $self->{onerror}->(node => $attr,
+                                  type => 'attribute not allowed',
+                                  level => $self->{level}->{obsconforming});
+             }, # maxlength
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
              precision => $PrecisionAttrChecker,
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
@@ -7758,7 +7767,7 @@ $Element->{+HTML_NS}->{input} = {
                    }
                  }
                }
-             },
+             }, # maxlength
              mode => $GetHTMLEnumeratedAttrChecker->({
                hiragana => 1, katakana => 1, hankakukana => 1,
                alphabet => 1, numeric => 1,
