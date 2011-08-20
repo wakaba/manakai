@@ -10166,3 +10166,109 @@ x</map>
 <area shape="default" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /area/@charset;attribute not defined;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="anonymous"/>
+#errors
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credentials"/>
+#errors
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use_credentials"/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credential"/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="yes"/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin=""/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  cross-origin=""/>
+#errors
+/img/@cross-origin;attribute not defined;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="anonymous">b</video>
+#errors
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credentials">b</video>
+#errors
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="yes">b</video>
+#errors
+/video/@crossorigin;enumerated:invalid;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="">b</video>
+#errors
+/video/@crossorigin;enumerated:invalid;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  cross-origin="">b</video>
+#errors
+/video/@cross-origin;attribute not defined;m
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="anonymous">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="ANONYMOUs">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credentials">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="Use-credentials">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="yes">b</audio>
+#errors
+/audio/@crossorigin;enumerated:invalid;m
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="">b</audio>
+#errors
+/audio/@crossorigin;enumerated:invalid;m
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  cross-origin="">b</audio>
+#errors
+/audio/@cross-origin;attribute not defined;m

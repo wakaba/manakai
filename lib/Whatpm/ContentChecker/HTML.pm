@@ -5318,6 +5318,9 @@ $Element->{+HTML_NS}->{img} = {
       copyright => $GetHTMLEnumeratedAttrChecker->({
         yes => 1, no => 1,
       }),
+      crossorigin => $GetHTMLEnumeratedAttrChecker->({
+        anonymous => 1, 'use-credentials' => 1,
+      }),
       datafld => sub { },
       datasrc => $NonEmptyURLChecker,
       dynsrc => $NonEmptyURLChecker,
@@ -5378,6 +5381,7 @@ $Element->{+HTML_NS}->{img} = {
       border => FEATURE_HTML5_LC | FEATURE_OBSVOCAB,
       composite => FEATURE_OBSVOCAB,
       copyright => FEATURE_OBSVOCAB,
+      crossorigin => FEATURE_HTML5_CR,
       datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
       dynsrc => FEATURE_OBSVOCAB,
@@ -5987,6 +5991,9 @@ $Element->{+HTML_NS}->{video} = {
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
+    crossorigin => $GetHTMLEnumeratedAttrChecker->({
+      anonymous => 1, 'use-credentials' => 1,
+    }),
     end => $TemporalPositionChecker,
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     loop => $GetHTMLBooleanAttrChecker->('loop'),
@@ -6006,6 +6013,7 @@ $Element->{+HTML_NS}->{video} = {
     autobuffer => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
+    crossorigin => FEATURE_HTML5_CR,
     end => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     height => FEATURE_HTML5_LC,
     loop => FEATURE_HTML5_LC,
@@ -6098,6 +6106,9 @@ $Element->{+HTML_NS}->{audio} = {
       $GetHTMLBooleanAttrChecker->('autoplay')->(@_);
     },
     controls => $GetHTMLBooleanAttrChecker->('controls'),
+    crossorigin => $GetHTMLEnumeratedAttrChecker->({
+      anonymous => 1, 'use-credentials' => 1,
+    }),
     end => $TemporalPositionChecker,
     loop => $GetHTMLBooleanAttrChecker->('loop'),
     loopend => $TemporalPositionChecker,
@@ -6114,6 +6125,7 @@ $Element->{+HTML_NS}->{audio} = {
     autobuffer => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     autoplay => FEATURE_HTML5_LC,
     controls => FEATURE_HTML5_LC,
+    crossorigin => FEATURE_HTML5_CR,
     end => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
     loop => FEATURE_HTML5_LC,
     loopend => FEATURE_HTML5_DROPPED | FEATURE_OBSVOCAB,
