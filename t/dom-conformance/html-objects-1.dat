@@ -3198,6 +3198,50 @@ xxxx
 /em/audio/style;element not allowed:phrasing;m
 
 #data
+<video src="a" muted="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="a" muted="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="a" muted="muted" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="a" muted="muted" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="a" muted="MUTED" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="a" muted="MUTED" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="a" muted="false" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@muted;boolean:invalid;m
+
+#data
+<audio src="a" muted="true" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@muted;boolean:invalid;m
+
+#data
+<video src="a" audio="muted" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@audio;attribute not defined;m
+
+#data
+<audio src="a" audio="muted" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@audio;attribute not defined;m
+
+#data
 <area shape="default" href="" alt="a" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 
