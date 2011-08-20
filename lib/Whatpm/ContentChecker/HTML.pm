@@ -2602,7 +2602,7 @@ $Element->{+HTML_NS}->{meta} = {
 
         $self->{onerror}->(node => $el,
                            type => 'content-language', # XXX documentation
-                           level => $self->{level}->{obsconforming});
+                           level => $self->{level}->{must});
       } elsif ($keyword eq 'set-cookie') {
         ## WA1 defines no |content| conformance for authors.
         ## XXX Check |content| XXXobsvocab
