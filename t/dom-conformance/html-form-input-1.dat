@@ -9219,7 +9219,26 @@
     type="number"
     placeholder=""/>
 #errors
-/input/@placeholder;input attr not applicable;number;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    placeholder="aaa"/>
+#errors
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    placeholder="abc&#xa;def"/>
+#errors
+/input/@placeholder;newline in value;m
+
+#data
+<input xmlns="http://www.w3.org/1999/xhtml"
+    type="number"
+    placeholder="abc&#xd;def"/>
+#errors
+/input/@placeholder;newline in value;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"

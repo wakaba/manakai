@@ -7573,6 +7573,7 @@ $Element->{+HTML_NS}->{input} = {
                                   level => $self->{level}->{obsconforming});
              }, # maxlength
              min => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+             placeholder => $PlaceholderAttrChecker,
              precision => $PrecisionAttrChecker,
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
