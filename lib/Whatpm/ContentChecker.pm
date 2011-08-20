@@ -663,8 +663,7 @@ sub check_element ($$$;$) {
     my $item = shift @item;
     if (ref $item eq 'ARRAY') {
       my $code = shift @$item;
-next unless $code;## TODO: temp.
-      $code->(@$item);
+      $code->(@$item) if $code;
     } elsif ($item->{type} eq 'element') {
       my $el = $item->{node};
       my $el_nsuri = $el->namespace_uri;
@@ -1121,10 +1120,10 @@ sub _check_get_children ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
