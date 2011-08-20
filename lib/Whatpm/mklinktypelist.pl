@@ -129,7 +129,7 @@ my $LinkTypes = {
   },
   tag => {
     status => 'accepted',
-    effect => ['hyperlink', 'hyperlink'],
+    effect => [undef, 'hyperlink'],
   },
   toc => {
     status => 'synonym', # index

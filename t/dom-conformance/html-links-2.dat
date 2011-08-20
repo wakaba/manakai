@@ -55,3 +55,16 @@
 <a href="a" rel="accessibility" xmlns="http://www.w3.org/1999/xhtml">b</a>
 #errors
 /a/@rel;link type:proposed;s
+
+#data
+<a href="a" rel="tag" xmlns="http://www.w3.org/1999/xhtml">b</a>
+#errors
+
+#data
+<area href="a" rel="tag" shape="default" alt="b" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<link href="a" rel="tag" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/link/@rel;link type:bad context;m
