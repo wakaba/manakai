@@ -6039,7 +6039,7 @@ $Element->{+HTML_NS}->{video} = {
       $self->{onerror}->(node => $item->{node},
                          type => 'child element missing',
                          text => 'source',
-                         level => $self->{level}->{must});
+                         level => $self->{level}->{warn});
     }
 
     $Element->{+HTML_NS}->{object}->{check_end}->(@_);
