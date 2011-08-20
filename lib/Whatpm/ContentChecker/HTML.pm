@@ -1094,10 +1094,15 @@ my $HTMLRepeatIndexAttrChecker = sub {
 
 my $PlaceholderAttrChecker = sub {
   my ($self, $attr) = @_;
-  if ($attr->value =~ /[\x0D\x0A]/) {
+  my $value = $attr->value;
+  if ($value =~ /[\x0D\x0A]/) {
     $self->{onerror}->(node => $attr,
                        type => 'newline in value', ## TODOC: type
                        level => $self->{level}->{must});
+  } elsif ($value eq '') {
+    $self->{onerror}->(node => $attr,
+                       type => 'empty attribute value',
+                       level => $self->{level}->{warn});
   }
 }; # $PlaceholderAttrChecker
 
