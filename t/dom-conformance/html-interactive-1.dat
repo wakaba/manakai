@@ -1937,86 +1937,108 @@
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
+/device;element not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml">  </device>
 #errors
+/device;element not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml">abc</device>
 #errors
-/device/"abc";character not allowed:empty;m
+/device;element not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"><div>a</div></device>
 #errors
-/device/div;element not allowed:empty;m
+/device;element not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"><span>a</span></device>
 #errors
-/device/span;element not allowed:empty;m
+/device;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><device/></div>
 #errors
 /div;no significant content;s
+/div/device;element not defined;m
+/div/device;element not allowed:flow;m
 
 #data
 <span xmlns="http://www.w3.org/1999/xhtml"><device/></span>
 #errors
 /span;no significant content;s
+/span/device;element not defined;m
+/span/device;element not allowed:phrasing;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><ins><device/></ins></div>
 #errors
 /div;no significant content;s
+/div/ins/device;element not defined;m
+/div/ins/device;element not allowed:flow;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type=""/>
 #errors
-/device/@type;enumerated:invalid;m
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="fs"/>
 #errors
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="media"/>
 #errors
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="rs232"/>
 #errors
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="usb"/>
 #errors
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="RS232"/>
 #errors
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="rs232c"/>
 #errors
-/device/@type;enumerated:invalid;m
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="filesystem"/>
 #errors
-/device/@type;enumerated:invalid;m
+/device;element not defined;m
+/device/@type;attribute not defined;m
 
 #data
 <device xmlns="http://www.w3.org/1999/xhtml"
     type="video"/>
 #errors
-/device/@type;enumerated:invalid;m
+/device;element not defined;m
+/device/@type;attribute not defined;m

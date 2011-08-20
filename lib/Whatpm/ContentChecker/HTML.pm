@@ -126,7 +126,7 @@ my $HTMLFlowContent = {
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1, s => 1, u => 1,
     script => 1, noscript => 1,
-    command => 1, device => 1,
+    command => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
     textarea => 1, keygen => 1, output => 1, wbr => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
@@ -173,7 +173,7 @@ my $HTMLPhrasingContent = {
     var => 1, samp => 1, kbd => 1, sub => 1, sup => 1, span => 1, i => 1,
     b => 1, bdo => 1, ruby => 1, s => 1, u => 1,
     script => 1, noscript => 1,
-    command => 1, device => 1,
+    command => 1,
     input => 1, button => 1, label => 1, select => 1, datalist => 1,
     textarea => 1, keygen => 1, output => 1, wbr => 1,
     ## NOTE: |area| is allowed only as a descendant of |map|.
@@ -201,7 +201,7 @@ my $HTMLInteractiveContent = {
     a => 1,
     label => 1, button => 1, select => 1, textarea => 1,
     keygen => 1, details => 1,
-    iframe => 1, embed => 1, device => 1,
+    iframe => 1, embed => 1,
 
     ## NOTE: When the |usemap| attribute is specified.
     img => 1, object => 1,
@@ -9274,20 +9274,6 @@ $Element->{+HTML_NS}->{menu} = {
     }
   }, # check_end
 }; # menu
-
-
-$Element->{+HTML_NS}->{device} = {
-  %HTMLEmptyChecker,
-  status => FEATURE_HTML5_FD,
-  check_attrs => $GetHTMLAttrsChecker->({
-    type => $GetHTMLEnumeratedAttrChecker->({
-      media => 1, fs => 1, rs232 => 1, usb => 1,
-    }),
-  }, {
-    %HTMLAttrStatus,
-    type => FEATURE_HTML5_FD,
-  }), # check_attrs
-}; # device
 
 # ---- Microdata ----
 
