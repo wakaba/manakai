@@ -8779,12 +8779,10 @@ $Element->{+HTML_NS}->{progress} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
-    form => $HTMLFormAttrChecker,
     max => sub { }, ## checked in |check_attrs2|
     value => sub { }, ## checked in |check_attrs2|
   }, {
     %HTMLAttrStatus,
-    form => FEATURE_HTML5_LC,
     max => FEATURE_HTML5_LC,
     value => FEATURE_HTML5_LC,
   }), # check_attrs
@@ -8839,7 +8837,6 @@ $Element->{+HTML_NS}->{meter} = {
   %HTMLPhrasingContentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
-    form => $HTMLFormAttrChecker,
     high => sub { 1 }, ## checked in |check_attrs2|
     low => sub { 1 }, ## checked in |check_attrs2|
     max => sub { 1 }, ## checked in |check_attrs2|
@@ -8848,7 +8845,6 @@ $Element->{+HTML_NS}->{meter} = {
     value => sub { 1 }, ## checked in |check_attrs2|
   }, {
     %HTMLAttrStatus,
-    form => FEATURE_HTML5_LC,
     high => FEATURE_HTML5_LC,
     low => FEATURE_HTML5_LC,
     max => FEATURE_HTML5_LC,
