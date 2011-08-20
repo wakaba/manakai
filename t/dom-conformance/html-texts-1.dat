@@ -2202,55 +2202,44 @@
 #data
 <u xmlns="http://www.w3.org/1999/xhtml"></u>
 #errors
-/u;element not defined;m
 /u;no significant content;s
 
 #data
 <u xmlns="http://www.w3.org/1999/xhtml">  </u>
 #errors
-/u;element not defined;m
 /u;no significant content;s
 
 #data
 <u xmlns="http://www.w3.org/1999/xhtml">x</u>
 #errors
-/u;element not defined;m
 
 #data
 <u xmlns="http://www.w3.org/1999/xhtml"><em>xx</em></u>
 #errors
-/u;element not defined;m
 
 #data
 <u xmlns="http://www.w3.org/1999/xhtml"><style scoped=""></style>x</u>
 #errors
-/u;element not defined;m
 /u/style;element not allowed:phrasing;m
 /u/style;SUBDOC;text/css
 
 #data
 <u xmlns="http://www.w3.org/1999/xhtml"><p>xx</p></u>
 #errors
-/u;element not defined;m
 /u/p;element not allowed:phrasing;m
 
 #data
 <span xmlns="http://www.w3.org/1999/xhtml"><u>xx</u></span>
 #errors
-/span/u;element not allowed:phrasing;m
-/span/u;element not defined;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml"><u>xx</u></div>
 #errors
-/div/u;element not allowed:flow;m
-/div/u;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><u>xx</u></rule>
 #errors
 /rule;element not defined;m
-/rule/u;element not defined;m
 
 #data
 <blink xmlns="http://www.w3.org/1999/xhtml"></blink>
