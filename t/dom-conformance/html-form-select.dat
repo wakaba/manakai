@@ -271,29 +271,223 @@
 #data
 <select xmlns="http://www.w3.org/1999/xhtml" required=""/>
 #errors
+/select;no placeholder label option;m
 
 #data
 <select xmlns="http://www.w3.org/1999/xhtml" required="required"/>
 #errors
+/select;no placeholder label option;m
 
 #data
 <select xmlns="http://www.w3.org/1999/xhtml" required="REQUIRED"/>
 #errors
+/select;no placeholder label option;m
 
 #data
 <select xmlns="http://www.w3.org/1999/xhtml" required="true"/>
 #errors
 /select/@required;boolean:invalid;m
+/select;no placeholder label option;m
 
 #data
 <select xmlns="http://www.w3.org/1999/xhtml" required="yes"/>
 #errors
 /select/@required;boolean:invalid;m
+/select;no placeholder label option;m
 
 #data
 <select xmlns="http://www.w3.org/1999/xhtml" required="no"/>
 #errors
 /select/@required;boolean:invalid;m
+/select;no placeholder label option;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option value="">abc</option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option>  </option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option/>
+  <option/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <!-- aaa -->
+  <option/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option/>
+  <option>aaa</option>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option value=""/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option value="  "/>
+</select>
+#errors
+/select;no placeholder label option;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option>abc</option>
+</select>
+#errors
+/select;no placeholder label option;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <optgroup label="a">
+    <option/>
+  </optgroup>
+</select>
+#errors
+/select;no placeholder label option;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <optgroup label="a">
+  </optgroup>
+  <option/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <optgroup label="a"/>
+  <optgroup label="a"/>
+  <optgroup label="a"/>
+  <option/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option>abc</option>
+  <option/>
+</select>
+#errors
+/select;no placeholder label option;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <div>
+    <option/>
+  </div>
+</select>
+#errors
+/select;no placeholder label option;m
+/select/div;element not allowed;m
+/select/div;no significant content;s
+/select/div/option;element not allowed:flow;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <select>
+    <option/>
+  </select>
+</select>
+#errors
+/select;no placeholder label option;m
+/select/select;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <p>aaa</p>
+  <option/>
+</select>
+#errors
+/select/p;element not allowed;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="" size=" 1">
+  <option>a</option>
+</select>
+#errors
+/select;no placeholder label option;m
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="" size="+1">
+  <option value="a"/>
+</select>
+#errors
+/select;no placeholder label option;m
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="" size="0001">
+  <option value="a"/>
+</select>
+#errors
+/select;no placeholder label option;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="" multiple="">
+  <option value="a"/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="" size="2">
+  <option value="a"/>
+</select>
+#errors
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="" size="+3">
+  <option value="a"/>
+</select>
+#errors
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="" size="abcde">
+  <option value="a"/>
+</select>
+#errors
+/select/@size;nninteger:syntax error;m
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option><span> </span></option>
+</select>
+#errors
+/select/option/span;element not allowed:text;m
+/select/option/span;no significant content;s
+
+#data
+<select xmlns="http://www.w3.org/1999/xhtml" required="">
+  <option><span>a</span></option>
+</select>
+#errors
+/select;no placeholder label option;m
+/select/option/span;element not allowed:text;m
 
 #data
 <optgroup xmlns="http://www.w3.org/1999/xhtml"></optgroup>

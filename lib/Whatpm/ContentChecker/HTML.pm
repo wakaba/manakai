@@ -8304,6 +8304,59 @@ $Element->{+HTML_NS}->{select} = {
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
     $FAECheckAttrs2->($self, $item, $element_state);
+
+    my $el = $item->{node};
+    if ($el->has_attribute_ns (undef, 'required') and
+        not $el->has_attribute_ns (undef, 'multiple')) {
+      ## Display size of the |select| element
+      my $size = $el->get_attribute_ns (undef, 'size');
+      if (not defined $size or
+          ## Rules for parsing non-negative integers
+          $size =~ /\A[\x09\x0A\x0C\x0D\x20]*\+?([0-9]+)/) {
+        $size = $1 || 1;
+      } else {
+        undef $size;
+      }
+
+      if (defined $size and $size == 1) {
+        my $opt_el;
+
+        ## Find the placeholder label option from list of options
+        SELECT: for my $el (@{$el->child_nodes}) {
+          next SELECT unless $el->node_type == 1;
+          my $nsurl = $el->namespace_uri;
+          next SELECT unless defined $nsurl;
+          next SELECT unless $nsurl eq HTML_NS;
+          my $ln = $el->manakai_local_name;
+          if ($ln eq 'option') {
+            $opt_el = $el;
+            last SELECT;
+          } elsif ($ln eq 'optgroup') {
+            for my $el (@{$el->child_nodes}) {
+              next unless $el->node_type == 1;
+              my $nsurl = $el->namespace_uri;
+              next unless defined $nsurl;
+              next unless $nsurl eq HTML_NS;
+              if ($el->manakai_local_name eq 'option') {
+                last SELECT;
+              }
+            }
+          }
+        }
+        my $value = $opt_el ? $opt_el->get_attribute_ns (undef, 'value') : undef;
+        if (not defined $value and $opt_el) {
+          $value = $opt_el->text_content;
+          $value =~ s/^[\x09\x0A\x0C\x0D\x20]+//;
+        }
+        if (defined $value and $value eq '') {
+          #
+        } else {
+          $self->{onerror}->(node => $el,
+                             type => 'no placeholder label option', # XXXdoctype
+                             level => $self->{level}->{must});
+        }
+      }
+    }
   }, # check_attrs2
   check_child_element => sub {
     ## NOTE: (option | optgroup)*
