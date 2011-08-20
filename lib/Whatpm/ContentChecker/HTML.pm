@@ -6513,12 +6513,7 @@ $Element->{+HTML_NS}->{table} = {
     rules => $GetHTMLEnumeratedAttrChecker->({
       none => 1, groups => 1, rows => 1, cols => 1, all => 1,
     }),
-    summary => sub {
-      my ($self, $attr) = @_;
-      $self->{onerror}->(node => $attr,
-                         type => 'table summary', # XXX documentatin
-                         level => $self->{level}->{obsconforming});
-    },
+    summary => sub { },
     tableborder => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),
     vspace => $HTMLLengthAttrChecker,
     width => $HTMLLengthAttrChecker,
@@ -6543,7 +6538,7 @@ $Element->{+HTML_NS}->{table} = {
     height => FEATURE_OBSVOCAB,
     hspace => FEATURE_OBSVOCAB,
     rules => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    summary => FEATURE_HTML5_LC,
+    summary => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     tableborder => FEATURE_OBSVOCAB,
     width => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     vspace => FEATURE_OBSVOCAB,
