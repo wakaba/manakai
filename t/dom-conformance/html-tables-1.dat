@@ -691,53 +691,63 @@
 #data
 <table border="" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;w
 
 #data
 <table border="1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;w
+
+#data
+<table border="0001" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not allowed;m
+
+#data
+<table border="2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/table/@border;attribute not allowed;m
 
 #data
 <table border="+1" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;m
 /table/@border;tableborder:syntax error;m
 
 #data
 <table border="   " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;m
 /table/@border;tableborder:syntax error;m
 
 #data
 <table border="abc" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;m
 /table/@border;tableborder:syntax error;m
 
 #data
 <table border="-120" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;m
 /table/@border;tableborder:syntax error;m
 
 #data
 <table border="10.55" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;m
 /table/@border;tableborder:syntax error;m
 
 #data
 <table border="34 " xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;m
 /table/@border;tableborder:syntax error;m
 
 #data
 <table border="border" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
-/table/@border;attribute not defined;m
+/table/@border;attribute not allowed;m
 /table/@border;tableborder:syntax error;m
 
 #data

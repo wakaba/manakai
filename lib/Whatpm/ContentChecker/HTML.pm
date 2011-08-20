@@ -6474,11 +6474,22 @@ $Element->{+HTML_NS}->{table} = {
     bgcolor => $HTMLColorAttrChecker,
     border => sub {
       my ($self, $attr) = @_;
-      ## A valid non-negative integer or the empty string.
-      unless ($attr->value =~ /\A[0-9]*\z/) {
+      my $value = $attr->value;
+      if ($value eq '' or $value eq '1') {
         $self->{onerror}->(node => $attr,
-                           type => 'tableborder:syntax error', # XXXdocumentation
+                           type => 'attribute not allowed',
+                           level => $self->{level}->{warn});
+      } else {
+        $self->{onerror}->(node => $attr,
+                           type => 'attribute not allowed',
                            level => $self->{level}->{must});
+
+        ## A valid non-negative integer or the empty string.
+        unless ($value =~ /\A[0-9]*\z/) {
+          $self->{onerror}->(node => $attr,
+                             type => 'tableborder:syntax error', # XXXdocumentation
+                             level => $self->{level}->{must});
+        }
       }
     }, # border
     bordercolor => $HTMLColorAttrChecker,
@@ -6517,7 +6528,7 @@ $Element->{+HTML_NS}->{table} = {
     align => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     background => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     bgcolor => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
-    border => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    border => FEATURE_HTML5_CR | FEATURE_OBSVOCAB,
     bordercolor => FEATURE_OBSVOCAB,
     bordercolordark => FEATURE_OBSVOCAB,
     bordercolorlight => FEATURE_OBSVOCAB,
