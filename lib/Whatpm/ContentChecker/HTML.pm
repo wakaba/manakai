@@ -7586,7 +7586,10 @@ $Element->{+HTML_NS}->{input} = {
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
-             value => $GetDateTimeAttrChecker->($v->[0]),
+             value => sub {
+               my ($self, $attr) = @_;
+               $GetDateTimeAttrChecker->($v->[0])->(@_) if $attr->value ne '';
+             }, # value
             }->{$attr_ln} || $checker;
 
             ## XXX Maybe it is better to check min <= value <= max
@@ -7614,7 +7617,12 @@ $Element->{+HTML_NS}->{input} = {
              readonly => $GetHTMLBooleanAttrChecker->('readonly'),
              required => $GetHTMLBooleanAttrChecker->('required'),
              step => $StepAttrChecker,
-             value => $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 }),
+             value => sub {
+               my ($self, $attr) = @_;
+               if ($attr->value ne '') {
+                 $GetHTMLFloatingPointNumberAttrChecker->(sub { 1 })->(@_);
+               }
+             }, # value
             }->{$attr_ln} || $checker;
           } elsif ($state eq 'range') {
             $checker =
@@ -7638,7 +7646,7 @@ $Element->{+HTML_NS}->{input} = {
              list => $ListAttrChecker,
              value => sub {
                my ($self, $attr) = @_;
-               unless ($attr->value =~ /\A#[0-9A-Fa-f]{6}\z/) {
+               if (not $attr->value =~ /\A#[0-9A-Fa-f]{6}\z|\A\z/) {
                  $self->{onerror}->(node => $attr,
                                     type => 'scolor:syntax error', ## TODOC: type
                                     level => $self->{level}->{must});
@@ -7830,9 +7838,11 @@ $Element->{+HTML_NS}->{input} = {
                my ($self, $attr, $item, $element_state) = @_;
                if ($state eq 'url') {
                  ## XXX MUST be absolute IRI.
-                 $HTMLURIAttrChecker->(@_);
+                 $HTMLURIAttrChecker->(@_) if $attr->value ne '';
                } elsif ($state eq 'email') {
-                 if ($item->{node}->has_attribute_ns (undef, 'multiple')) {
+                 if ($attr->value eq '') {
+                   #
+                 } elsif ($item->{node}->has_attribute_ns (undef, 'multiple')) {
                    ## A set of comma-separated tokens.
                    my @addr = split /,/, $attr->value, -1;
                    @addr = ('') unless @addr;
@@ -7861,21 +7871,21 @@ $Element->{+HTML_NS}->{input} = {
                                       level => $self->{level}->{must});
                  }
                }
-             },
-              vcard_name => $GetHTMLEnumeratedAttrChecker->({qw(
-                vcard.business.city 1 vcard.business.country 1
-                vcard.business.fax 1 vcard.business.phone 1
-                vcard.business.state 1 vcard.business.streetaddress 1
-                vcard.business.url 1 vcard.business.zipcode 1
-                vcard.cellular 1 vcard.company 1 vcard.department 1
-                vcard.displayname 1 vcard.email 1 vcard.firstname 1
-                vcard.gender 1 vcard.home.city 1 vcard.home.country 1
-                vcard.home.fax 1 vcard.home.phone 1 vcard.home.state 1
-                vcard.home.streetaddress 1 vcard.home.zipcode 1
-                vcard.homepage 1 vcard.jobtitle 1 vcard.lastname 1
-                vcard.middlename 1 vcard.notes 1 vcard.office 1
-                vcard.pager 1
-              )}),
+             }, # value
+             vcard_name => $GetHTMLEnumeratedAttrChecker->({qw(
+               vcard.business.city 1 vcard.business.country 1
+               vcard.business.fax 1 vcard.business.phone 1
+               vcard.business.state 1 vcard.business.streetaddress 1
+               vcard.business.url 1 vcard.business.zipcode 1
+               vcard.cellular 1 vcard.company 1 vcard.department 1
+               vcard.displayname 1 vcard.email 1 vcard.firstname 1
+               vcard.gender 1 vcard.home.city 1 vcard.home.country 1
+               vcard.home.fax 1 vcard.home.phone 1 vcard.home.state 1
+               vcard.home.streetaddress 1 vcard.home.zipcode 1
+               vcard.homepage 1 vcard.jobtitle 1 vcard.lastname 1
+               vcard.middlename 1 vcard.notes 1 vcard.office 1
+               vcard.pager 1
+             )}),
             }->{$attr_ln} || $checker;
             if ($state eq 'password') {
               $checker = '' if $attr_ln eq 'list';

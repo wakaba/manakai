@@ -3755,7 +3755,6 @@
     type="email"
     value=""/>
 #errors
-/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3886,7 +3885,6 @@
     type="email" multiple=""
     value=""/>
 #errors
-/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -3962,7 +3960,6 @@
     type="color"
     value=""/>
 #errors
-/input/@value;scolor:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -7263,7 +7260,6 @@
     value=""
     maxlength="1"/>
 #errors
-/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -7280,7 +7276,6 @@
     value=""
     maxlength="0"/>
 #errors
-/input/@value;email:syntax error;m
 
 #data
 <input xmlns="http://www.w3.org/1999/xhtml"
@@ -17286,3 +17281,28 @@
 /input/@type;enumerated:non-conforming;m
 /input/@template;attribute not defined;m
 /input/@template;input attr not applicable;quote;m
+
+#data
+<input type="datetime" xmlns="http://www.w3.org/1999/xhtml"
+    value=""/>
+#errors
+
+#data
+<input type="datetime-local" xmlns="http://www.w3.org/1999/xhtml"
+    value=""/>
+#errors
+
+#data
+<input type="date" xmlns="http://www.w3.org/1999/xhtml"
+    value=""/>
+#errors
+
+#data
+<input type="month" xmlns="http://www.w3.org/1999/xhtml"
+    value=""/>
+#errors
+
+#data
+<input type="week" xmlns="http://www.w3.org/1999/xhtml"
+    value=""/>
+#errors
