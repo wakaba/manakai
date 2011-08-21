@@ -7414,6 +7414,7 @@ $Element->{+HTML_NS}->{input} = {
          datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          dataformatas => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
          directkey => FEATURE_OBSVOCAB,
+         dirname => FEATURE_HTML5_CR,
          disabled => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
          dynsrc => FEATURE_OBSVOCAB,
          emptyok => FEATURE_OBSVOCAB,
@@ -7491,6 +7492,7 @@ $Element->{+HTML_NS}->{input} = {
          }),
          datasrc => $NonEmptyURLChecker,
          directkey => '',
+         dirname => '',
          disabled => $GetHTMLBooleanAttrChecker->('disabled'),
              ## NOTE: <input type=hidden disabled> is not disallowed.
          dynsrc => '',
@@ -7787,6 +7789,7 @@ $Element->{+HTML_NS}->{input} = {
              template => ($state eq 'add' ? $HTMLAttrChecker->{'repeat-template'} : undef),
              value => sub { }, ## NOTE: No restriction.
             }->{$attr_ln} || $checker;
+
           } else { # Text, Search, E-mail, URL, Telephone, Password
             $checker =
             {
@@ -7913,6 +7916,30 @@ $Element->{+HTML_NS}->{input} = {
                 $checker = $GetHTMLBooleanAttrChecker->('incremental');
               } elsif ($attr_ln eq 'results') {
                 $checker = $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 });
+              } elsif ($attr_ln eq 'dirname') {
+                $checker = sub {
+                  my ($self, $attr) = @_;
+                  if ($attr->value eq '') {
+                    $self->{onerror}->(node => $attr,
+                                       type => 'empty attribute value',
+                                       level => $self->{level}->{must});
+                  }
+                }; # dirname
+              }
+            } elsif ($state eq 'url') {
+              #
+            } elsif ($state eq 'tel') {
+              #
+            } else { # text
+              if ($attr_ln eq 'dirname') {
+                $checker = sub {
+                  my ($self, $attr) = @_;
+                  if ($attr->value eq '') {
+                    $self->{onerror}->(node => $attr,
+                                       type => 'empty attribute value',
+                                       level => $self->{level}->{must});
+                  }
+                }; # dirname
               }
             }
 
@@ -8629,6 +8656,14 @@ $Element->{+HTML_NS}->{textarea} = {
     cols => $GetHTMLNonNegativeIntegerAttrChecker->(sub { shift > 0 }),
     datafld => sub { },
     datasrc => $NonEmptyURLChecker,
+    dirname => sub {
+      my ($self, $attr) = @_;
+      if ($attr->value eq '') {
+        $self->{onerror}->(node => $attr,
+                           type => 'empty attribute value',
+                           level => $self->{level}->{must});
+      }
+    }, # dirname
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
     emptyok => $GetHTMLEnumeratedAttrChecker->({
       true => 1, false => 1,
@@ -8698,6 +8733,7 @@ $Element->{+HTML_NS}->{textarea} = {
     cols => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     datafld => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
     datasrc => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
+    dirname => FEATURE_HTML5_CR,
     disabled => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     emptyok => FEATURE_OBSVOCAB,
     form => FEATURE_HTML5_LC,

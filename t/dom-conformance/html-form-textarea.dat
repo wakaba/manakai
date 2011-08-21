@@ -1103,3 +1103,14 @@
 #errors
 /textarea/@mode;attribute not defined;m
 /textarea/@mode;enumerated:invalid;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    dirname=""/>
+#errors
+/textarea/@dirname;empty attribute value;m
+
+#data
+<textarea xmlns="http://www.w3.org/1999/xhtml"
+    dirname="abc"/>
+#errors
