@@ -297,11 +297,17 @@ my $GetHTMLEnumeratedAttrChecker = sub {
     my ($self, $attr) = @_;
     my $value = $attr->value;
     $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-    if ($states->{$value} and $states->{$value} > 0) {
-      #
-    } elsif ($states->{$value}) {
-      $self->{onerror}->(node => $attr, type => 'enumerated:non-conforming',
-                         level => $self->{level}->{must});
+    if ($states->{$value}) {
+      if ($states->{$value} eq 'last resort:good') {
+        $self->{onerror}->(node => $attr,
+                           type => 'last resort',
+                           level => $self->{level}->{good}); # urged
+      } elsif ($states->{$value} > 0) {
+        #
+      } else {
+        $self->{onerror}->(node => $attr, type => 'enumerated:non-conforming',
+                           level => $self->{level}->{must});
+      }
     } else {
       $self->{onerror}->(node => $attr, type => 'enumerated:invalid',
                          level => $self->{level}->{must});
@@ -1260,7 +1266,11 @@ my $HTMLAttrChecker = {
     ## non-conforming.  Such errors are detected by the checkers of
     ## |{}xml:lang| and |{xml}:lang| attributes.
   },
-  dir => $GetHTMLEnumeratedAttrChecker->({ltr => 1, rtl => 1}),
+  dir => $GetHTMLEnumeratedAttrChecker->({
+    ltr => 1,
+    rtl => 1,
+    auto => 'last resort:good',
+  }), # dir
   class => sub {
     my ($self, $attr) = @_;
     
