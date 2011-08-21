@@ -1,0 +1,1199 @@
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<iframe name="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:empty;m
+
+#data
+<iframe name="_" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="blank" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<iframe name="_parent" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_self" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe name="_main" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@name;window name:reserved;m
+
+#data
+<iframe src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<iframe src="&lt;http://test/>" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@src;syntax error:iriref3987;m
+
+#data
+<iframe src="" sandbox="" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="  " xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="
+" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-same-origin" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-same-origin
+  " xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="  allow-same-origin " xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-scripts
+" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-same-origin
+allow-scripts" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-forms" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-top-navigation" xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow-form"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-script"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-origin"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-script"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-plugins"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="xxx_origin_please_suggest_a_better_name"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="unrestricted-forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="unrestricted-scripts"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="Allow-Forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="allow"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="disallow-form"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-forms allow-forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;duplicate token;m
+
+#data
+<iframe src="" sandbox="allow-forms allow-Forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;duplicate token;m
+
+#data
+<iframe src="" sandbox="allow-forms allow-top-navigation allow-top-navigation"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;duplicate token;m
+
+#data
+<?xml version="1.1"?>
+<iframe src="" sandbox="allow-forms&#x000b;"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<?xml version="1.1"?>
+<iframe src="" sandbox="&#x000b;allow-forms"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<?xml version="1.1"?>
+<iframe src="" sandbox="allow-forms&#x000b;allow-scripts"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@sandbox;word not allowed;m
+
+#data
+<iframe src="" sandbox="allow-forms allow-top-navigation"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="Allow-TOP-navigation"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="ALLOW-SAME-ORIGIN"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" sandbox="Allow-Scripts"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" seemless=""
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" seemless="  "
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@seemless;boolean:invalid;m
+
+#data
+<iframe src="" seemless="seemless"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" seemless="Seemless"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+
+#data
+<iframe src="" seemless="seemless "
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@seemless;boolean:invalid;m
+
+#data
+<iframe src="" seemless="yes"
+    xmlns="http://www.w3.org/1999/xhtml">x</iframe>
+#errors
+/iframe/@seemless;boolean:invalid;m
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="">x</iframe>
+#errors
+/iframe/@height;nninteger:syntax error;m
+
+#data html
+<!DOCTYPE HTML><title>a</title>
+<iframe srcdoc="">a</iframe>
+#errors
+/html/body/iframe/@srcdoc;SUBDOC;text/x-html-srcdoc
+
+#data
+<iframe srcdoc="" xmlns="http://www.w3.org/1999/xhtml">a</iframe>
+#errors
+/iframe/@srcdoc;SUBDOC;text/xml
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0">x</iframe>
+#errors
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120">x</iframe>
+#errors
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="">x</iframe>
+#errors
+/iframe/@width;nninteger:syntax error;m
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0">x</iframe>
+#errors
+
+#data
+<iframe src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120">x</iframe>
+#errors
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace=""/>
+#errors
+/iframe/@hspace;attribute not defined;m
+/iframe/@hspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="0"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="1"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="0%"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="10%"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="%"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+/iframe/@hspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    hspace="auto"/>
+#errors
+/iframe/@hspace;attribute not defined;m
+/iframe/@hspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace=""/>
+#errors
+/iframe/@vspace;attribute not defined;m
+/iframe/@vspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="0"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="1"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="0%"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="10%"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="%"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+/iframe/@vspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="a"
+    vspace="auto"/>
+#errors
+/iframe/@vspace;attribute not defined;m
+/iframe/@vspace;length:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    longdesc=""/>
+#errors
+/iframe/@longdesc;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    longdesc="abc"/>
+#errors
+/iframe/@longdesc;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    longdesc="a/b/c?e#d"/>
+#errors
+/iframe/@longdesc;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    longdesc="[]"/>
+#errors
+/iframe/@longdesc;attribute not defined;m
+/iframe/@longdesc;syntax error:iriref3987;m
+
+#data
+<iframe src="" align="" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:invalid;m
+
+#data
+<iframe src="" align="char" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:invalid;m
+
+#data
+<iframe src="" align="justify" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:invalid;m
+
+#data
+<iframe src="" align="center" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="bottom" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+
+#data
+<iframe src="" align="middle" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+
+#data
+<iframe src="" align="top" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+
+#data
+<iframe src="" align="left" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+
+#data
+<iframe src="" align="right" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+
+#data
+<iframe src="" align="abscenter" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="texttop" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="baseline" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:non-conforming;m
+
+#data
+<iframe src="" align="TEXT-top" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:invalid;m
+
+#data escaped
+<iframe src="" align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:invalid;m
+
+#data escaped
+<iframe src="" align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"></iframe>
+#errors
+/iframe/@align;attribute not defined;m
+/iframe/@align;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder=""/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="1"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="0"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="yes"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="no"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="y"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="yet"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="no "/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="1 "/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="true"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="false"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="01"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="00"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    frameborder="frameborder"/>
+#errors
+/iframe/@frameborder;attribute not defined;m
+/iframe/@frameborder;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling=""/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="yes"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="no"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="auto"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="YES"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="NO"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="AutO"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="true"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="false"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="y"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="yes "/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="1"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="Scroll"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="off"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="ON"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="noScroll"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:non-conforming;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    scrolling="Scrolling"/>
+#errors
+/iframe/@scrolling;attribute not defined;m
+/iframe/@scrolling;enumerated:invalid;m
+
+#data
+<iframe marginwidth="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+
+#data
+<iframe marginwidth="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+
+#data
+<iframe marginwidth="1%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="1000%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="1 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth=" 4" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="1,45" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="1*" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginwidth="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginwidth;attribute not defined;m
+/iframe/@marginwidth;nninteger:syntax error;m
+
+#data
+<iframe marginheight="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+
+#data
+<iframe marginheight="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+
+#data
+<iframe marginheight="1%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="1000%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="1px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="1 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight=" 4" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="1,45" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="1*" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="+1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe marginheight="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/iframe/@marginheight;attribute not defined;m
+/iframe/@marginheight;nninteger:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="" src="abc"/>
+#errors
+/iframe/@allowtransparency;attribute not defined;m
+/iframe/@allowtransparency;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="true" src="abc"/>
+#errors
+/iframe/@allowtransparency;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="false" src="abc"/>
+#errors
+/iframe/@allowtransparency;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="True" src="abc"/>
+#errors
+/iframe/@allowtransparency;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="allowtransparency" src="abc"/>
+#errors
+/iframe/@allowtransparency;attribute not defined;m
+/iframe/@allowtransparency;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    allowtransparency="no" src="abc"/>
+#errors
+/iframe/@allowtransparency;attribute not defined;m
+/iframe/@allowtransparency;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application=""/>
+#errors
+/iframe/@application;attribute not defined;m
+/iframe/@application;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="yes"/>
+#errors
+/iframe/@application;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="no"/>
+#errors
+/iframe/@application;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="NO"/>
+#errors
+/iframe/@application;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="true"/>
+#errors
+/iframe/@application;attribute not defined;m
+/iframe/@application;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="false"/>
+#errors
+/iframe/@application;attribute not defined;m
+/iframe/@application;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="abc"
+    application="application"/>
+#errors
+/iframe/@application;attribute not defined;m
+/iframe/@application;enumerated:invalid;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing=""/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+/iframe/@framespacing;nninteger:syntax error;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="1"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="2"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="000100"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="0"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="1000.0"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+/iframe/@framespacing;nninteger:syntax error;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="-10"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+/iframe/@framespacing;nninteger:syntax error;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="+100"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+/iframe/@framespacing;nninteger:syntax error;m
+
+#data
+<iframe src="aa" xmlns="http://www.w3.org/1999/xhtml"
+    framespacing="no"/>
+#errors
+/iframe/@framespacing;attribute not defined;m
+/iframe/@framespacing;nninteger:syntax error;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize=""/>
+#errors
+/iframe/@noresize;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="noresize"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="noResize"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+
+#data escaped
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="nores\u0130ze"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+/iframe/@noresize;boolean:invalid;m
+
+#data escaped
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="nores\u0131ze"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+/iframe/@noresize;boolean:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="true"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+/iframe/@noresize;boolean:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="false"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+/iframe/@noresize;boolean:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="yes"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+/iframe/@noresize;boolean:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="resize"/>
+#errors
+/iframe/@noresize;attribute not defined;m
+/iframe/@noresize;boolean:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml"
+    noresize="noresize "/>
+#errors
+/iframe/@noresize;attribute not defined;m
+/iframe/@noresize;boolean:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security=""/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="restricted"/>
+#errors
+/iframe/@security;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="restructed"/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="safe"/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="RESTRICTED"/>
+#errors
+/iframe/@security;attribute not defined;m
+
+#data
+<iframe xmlns="http://www.w3.org/1999/xhtml" src="aa"
+    security="no"/>
+#errors
+/iframe/@security;attribute not defined;m
+/iframe/@security;enumerated:invalid;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border=""/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="  "/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="0"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="1"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="120"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="00001200032"/>
+#errors
+/iframe/@border;attribute not defined;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="10.00"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="+300"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="-0"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="-10000"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="10e44"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m
+
+#data
+<iframe src="a" xmlns="http://www.w3.org/1999/xhtml"
+    border="40px"/>
+#errors
+/iframe/@border;attribute not defined;m
+/iframe/@border;nninteger:syntax error;m

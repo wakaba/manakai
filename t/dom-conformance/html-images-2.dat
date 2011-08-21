@@ -1,0 +1,89 @@
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+
+#data
+<canvas width="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+/canvas/@width;nninteger:syntax error;m
+
+#data
+<canvas width="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+
+#data
+<canvas width="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+
+#data
+<canvas width="100" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+
+#data
+<canvas width="-1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+/canvas/@width;nninteger:syntax error;m
+
+#data
+<canvas width="saaa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;nninteger:syntax error;m
+/canvas;no significant content;s
+
+#data
+<canvas width="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;nninteger:syntax error;m
+/canvas;no significant content;s
+
+#data
+<canvas width="13344aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@width;nninteger:syntax error;m
+/canvas;no significant content;s
+
+#data
+<canvas height="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;nninteger:syntax error;m
+/canvas;no significant content;s
+
+#data
+<canvas height="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+
+#data
+<canvas height="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s
+
+#data
+<canvas height="-2" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;nninteger:syntax error;m
+/canvas;no significant content;s
+
+#data
+<canvas height="1&#xA;" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;nninteger:syntax error;m
+/canvas;no significant content;s
+
+#data
+<canvas height="xxx" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas/@height;nninteger:syntax error;m
+/canvas;no significant content;s
+
+#data
+<canvas width="44" height="14" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/canvas;no significant content;s

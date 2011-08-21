@@ -1,0 +1,2301 @@
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"></video>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml">  </video>
+#errors
+/video;child element missing;source;w
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml">xx</video>
+#errors
+/video;child element missing;source;w
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>xx</video>
+#errors
+/video;child element missing;source;w
+/video/style;SUBDOC;text/css
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><p>xx</p></video>
+#errors
+/video;child element missing;source;w
+/video/style;SUBDOC;text/css
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src=""></video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src="">  </video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src="">xx</video>
+#errors
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/>xx</video>
+#errors
+/video/style;SUBDOC;text/css
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/><p>xx</p></video>
+#errors
+/video/style;SUBDOC;text/css
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/></video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/>xx</video>
+#errors
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/>xx</video>
+#errors
+/video/style;SUBDOC;text/css
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><p>xx</p></video>
+#errors
+/video/style;SUBDOC;text/css
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><source src=""/></video>
+#errors
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></video>
+#errors
+/video/source;element not allowed:flow;m
+
+#data
+<?xml version="1.1"?>
+<video xmlns="http://www.w3.org/1999/xhtml">&#x0b;<source src=""/></video>
+#errors
+/video/source;element not allowed:flow;m
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><source src=""/></video>
+#errors
+/video/source;element not allowed:flow;m
+/video/style;SUBDOC;text/css
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/></video>
+#errors
+/video/source;element not allowed:flow;m
+/video/style;SUBDOC;text/css
+/video;no significant content;s
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/><source src=""/></video>
+#errors
+/video/source;element not allowed:flow;m
+/video/source;element not allowed:flow;m
+/video/style;SUBDOC;text/css
+/video;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video></video></div>
+#errors
+/div/video;child element missing;source;w
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video>  </video></div>
+#errors
+/div/video;child element missing;source;w
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video>xx</video></div>
+#errors
+/div/video;child element missing;source;w
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video><style scoped=""/>xx</video></div>
+#errors
+/div/video;child element missing;source;w
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><p>xx</p></video></div>
+#errors
+/div/video;child element missing;source;w
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video src=""></video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video src="">  </video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video src="">xx</video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/>xx</video></div>
+#errors
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/><p>xx</p></video></div>
+#errors
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/></video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/>xx</video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/>xx</video></div>
+#errors
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><p>xx</p></video></div>
+#errors
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><source src=""/></video></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><video>x<source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:flow;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:flow;m
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:flow;m
+/div/video/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/><source src=""/></video></div>
+#errors
+/div/video/source;element not allowed:flow;m
+/div/video/source;element not allowed:flow;m
+/div/video/style;SUBDOC;text/css
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video></video></em>
+#errors
+/em/video;child element missing;source;w
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video>  </video></em>
+#errors
+/em/video;child element missing;source;w
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video>xx</video></em>
+#errors
+/em/video;child element missing;source;w
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video><style scoped=""/>xx</video></em>
+#errors
+/em/video;child element missing;source;w
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><p>xx</p></video></em>
+#errors
+/em/video;child element missing;source;w
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+/em/video/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video src=""></video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video src="">  </video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video src="">xx</video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/>xx</video></em>
+#errors
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video src=""><style scoped=""/><p>xx</p></video></em>
+#errors
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+/em/video/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/></video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video><source src=""/>xx</video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/>xx</video></em>
+#errors
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><p>xx</p></video></em>
+#errors
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+/em/video/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><source src=""/></video></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><video>x<source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><style scoped=""/><source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<video><source src=""/><style scoped=""/><source src=""/><source src=""/></video></em>
+#errors
+/em/video/source;element not allowed:phrasing;m
+/em/video/source;element not allowed:phrasing;m
+/em/video/style;SUBDOC;text/css
+/em/video/style;element not allowed:phrasing;m
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"></audio>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml">  </audio>
+#errors
+/audio;child element missing;source;w
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml">xx</audio>
+#errors
+/audio;child element missing;source;w
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>xx</audio>
+#errors
+/audio;child element missing;source;w
+/audio/style;SUBDOC;text/css
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><p>xx</p></audio>
+#errors
+/audio;child element missing;source;w
+/audio/style;SUBDOC;text/css
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src=""></audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src="">  </audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src="">xx</audio>
+#errors
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/>xx</audio>
+#errors
+/audio/style;SUBDOC;text/css
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml" src=""><style scoped=""/><p>xx</p></audio>
+#errors
+/audio/style;SUBDOC;text/css
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/></audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/>xx</audio>
+#errors
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/>xx</audio>
+#errors
+/audio/style;SUBDOC;text/css
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><p>xx</p></audio>
+#errors
+/audio/style;SUBDOC;text/css
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><source src=""/></audio>
+#errors
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml">x<source src=""/></audio>
+#errors
+/audio/source;element not allowed:flow;m
+
+#data
+<?xml version="1.1"?>
+<audio xmlns="http://www.w3.org/1999/xhtml">&#x0b;<source src=""/></audio>
+#errors
+/audio/source;element not allowed:flow;m
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/><source src=""/></audio>
+#errors
+/audio/source;element not allowed:flow;m
+/audio/style;SUBDOC;text/css
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/></audio>
+#errors
+/audio/source;element not allowed:flow;m
+/audio/style;SUBDOC;text/css
+/audio;no significant content;s
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"><source src=""/><style scoped=""/><source src=""/><source src=""/></audio>
+#errors
+/audio/source;element not allowed:flow;m
+/audio/source;element not allowed:flow;m
+/audio/style;SUBDOC;text/css
+/audio;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio></audio></div>
+#errors
+/div/audio;child element missing;source;w
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio>  </audio></div>
+#errors
+/div/audio;child element missing;source;w
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio>xx</audio></div>
+#errors
+/div/audio;child element missing;source;w
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio><style scoped=""/>xx</audio></div>
+#errors
+/div/audio;child element missing;source;w
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><p>xx</p></audio></div>
+#errors
+/div/audio;child element missing;source;w
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio src=""></audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio src="">  </audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio src="">xx</audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/>xx</audio></div>
+#errors
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/><p>xx</p></audio></div>
+#errors
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/></audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/>xx</audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/>xx</audio></div>
+#errors
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><p>xx</p></audio></div>
+#errors
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><source src=""/></audio></div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><audio>x<source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:flow;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:flow;m
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:flow;m
+/div/audio/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/><source src=""/></audio></div>
+#errors
+/div/audio/source;element not allowed:flow;m
+/div/audio/source;element not allowed:flow;m
+/div/audio/style;SUBDOC;text/css
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio></audio></em>
+#errors
+/em/audio;child element missing;source;w
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio>  </audio></em>
+#errors
+/em/audio;child element missing;source;w
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio>xx</audio></em>
+#errors
+/em/audio;child element missing;source;w
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio><style scoped=""/>xx</audio></em>
+#errors
+/em/audio;child element missing;source;w
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><p>xx</p></audio></em>
+#errors
+/em/audio;child element missing;source;w
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+/em/audio/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio src=""></audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio src="">  </audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio src="">xx</audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/>xx</audio></em>
+#errors
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio src=""><style scoped=""/><p>xx</p></audio></em>
+#errors
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+/em/audio/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/></audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio><source src=""/>xx</audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/>xx</audio></em>
+#errors
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><p>xx</p></audio></em>
+#errors
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+/em/audio/p;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><source src=""/></audio></em>
+#errors
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml"><audio>x<source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><style scoped=""/><source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<em xmlns="http://www.w3.org/1999/xhtml">
+<audio><source src=""/><style scoped=""/><source src=""/><source src=""/></audio></em>
+#errors
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/source;element not allowed:phrasing;m
+/em/audio/style;SUBDOC;text/css
+/em/audio/style;element not allowed:phrasing;m
+
+#data
+<video src="a" muted="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="a" muted="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="a" muted="muted" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="a" muted="muted" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="a" muted="MUTED" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="a" muted="MUTED" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="a" muted="false" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@muted;boolean:invalid;m
+
+#data
+<audio src="a" muted="true" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@muted;boolean:invalid;m
+
+#data
+<video src="a" audio="muted" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@audio;attribute not defined;m
+
+#data
+<audio src="a" audio="muted" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@audio;attribute not defined;m
+
+#data
+<video xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+
+#data
+<video src="``http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@src;syntax error:iriref3987;m
+/video;no significant content;s
+
+#data
+<video autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+/video/@autoplay;attribute not allowed;w
+
+#data
+<video autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+/video/@autoplay;attribute not allowed;w
+
+#data
+<video autoplay="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video/@autoplay;boolean:invalid;m
+/video;child element missing;source;w
+/video/@autoplay;attribute not allowed;w
+
+#data
+<video autoplay="AUTOPlay" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+/video/@autoplay;attribute not allowed;w
+
+#data
+<video autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+/video/@autobuffer;attribute not defined;m
+
+#data
+<video autobuffer="autobuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+/video/@autobuffer;attribute not defined;m
+
+#data
+<video autobuffer="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video/@autobuffer;boolean:invalid;m
+/video;child element missing;source;w
+/video/@autobuffer;attribute not defined;m
+
+#data
+<video autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+/video/@autobuffer;attribute not defined;m
+
+#data
+<video autoplay="" autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+/video/@autoplay;attribute not allowed;w
+/video/@autobuffer;attribute not defined;m
+
+#data
+<video preload="" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="auto" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="none" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="metadata" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="NONE" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="AUTO" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<video preload="preload" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
+
+#data
+<video preload="true" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
+
+#data
+<video preload="  " src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
+
+#data
+<video preload="all" src="a" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@preload;enumerated:invalid;m
+
+#data
+<video controls="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video controls="Controls" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@controls;boolean:invalid;m
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video controls="control" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@controls;boolean:invalid;m
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video control="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@control;attribute not defined;m
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video poster="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video poster="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video;child element missing;source;w
+/video;no significant content;s
+
+#data
+<video poster="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/video/@poster;syntax error:iriref3987;m
+/video;no significant content;s
+/video;child element missing;source;w
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="">x</video>
+#errors
+/video/@height;nninteger:syntax error;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0">x</video>
+#errors
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120">x</video>
+#errors
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="">x</video>
+#errors
+/video/@width;nninteger:syntax error;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0">x</video>
+#errors
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120">x</video>
+#errors
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <video src="">aa</video>
+</video>
+#errors
+/video/video;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><video src="">aa</video></p>
+</video>
+#errors
+/video/p/video;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><video src="">aa</video></ins>
+</video>
+#errors
+/video/ins/video;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="">aa</audio>
+</video>
+#errors
+/video/audio;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><audio src="">aa</audio></p>
+</video>
+#errors
+/video/p/audio;element not allowed:minus;m
+
+#data
+<video src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><audio src="">aa</audio></ins>
+</video>
+#errors
+/video/ins/audio;element not allowed:minus;m
+
+#data
+<audio xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+
+#data
+<audio src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+
+#data
+<audio src="http://[test]/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio/@src;syntax error:iriref3987;m
+/audio;no significant content;s
+
+#data
+<audio autoplay="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autoplay;attribute not allowed;w
+
+#data
+<audio autoplay="autoplay" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autoplay;attribute not allowed;w
+
+#data
+<audio autoplay="AUTOPLAY" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autoplay;attribute not allowed;w
+
+#data
+<audio autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autobuffer;attribute not defined;m
+
+#data
+<audio autobuffer="autobuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autobuffer;attribute not defined;m
+
+#data
+<audio autobuffer="AUTOBuffer" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autobuffer;attribute not defined;m
+
+#data
+<audio autobuffer="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio/@autobuffer;boolean:invalid;m
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autobuffer;attribute not defined;m
+
+#data
+<audio autoplay="" autobuffer="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+/audio/@autoplay;attribute not allowed;w
+/audio/@autobuffer;attribute not defined;m
+
+#data
+<audio preload="" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="auto" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="none" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="metadata" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="NONE" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="AUTO" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<audio preload="preload" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
+
+#data
+<audio preload="true" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
+
+#data
+<audio preload="  " src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
+
+#data
+<audio preload="all" src="a" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@preload;enumerated:invalid;m
+
+#data
+<audio controls="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+
+#data
+<audio controls="controls" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+
+#data
+<audio controls="CONTROLS" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio;no significant content;s
+/audio;child element missing;source;w
+
+#data
+<audio controls="true" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/audio/@controls;boolean:invalid;m
+/audio;no significant content;s
+/audio;child element missing;source;w
+
+#data
+<video src="" start="" end="" loopstart="" loopend="" playcount=""
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+/video/@start;temporal:syntax error;m
+/video/@end;attribute not defined;m
+/video/@end;temporal:syntax error;m
+/video/@loopstart;attribute not defined;m
+/video/@loopstart;temporal:syntax error;m
+/video/@loopend;attribute not defined;m
+/video/@loopend;temporal:syntax error;m
+/video/@playcount;attribute not defined;m
+/video/@playcount;integer:syntax error;m
+
+#data
+<video src="a" playcount="0" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@playcount;attribute not defined;m
+
+#data
+<video src="a" playcount="-100" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@playcount;attribute not defined;m
+
+#data
+<video src="a" playcount="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@playcount;attribute not defined;m
+
+#data
+<video src="a" start="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+/video/@start;temporal:syntax error;m
+
+#data
+<video src="a" start="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+/video/@start;temporal:syntax error;m
+
+#data
+<video src="a" start="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+
+#data
+<video src="a" start="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@start;attribute not defined;m
+
+#data
+<video src="a" end="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+/video/@end;temporal:syntax error;m
+
+#data
+<video src="a" end="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+/video/@end;temporal:syntax error;m
+
+#data
+<video src="a" end="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+
+#data
+<video src="a" end="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@end;attribute not defined;m
+
+#data
+<video src="a" loopstart="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+/video/@loopstart;temporal:syntax error;m
+
+#data
+<video src="a" loopstart="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+/video/@loopstart;temporal:syntax error;m
+
+#data
+<video src="a" loopstart="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+
+#data
+<video src="a" loopstart="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopstart;attribute not defined;m
+
+#data
+<video src="a" loopend="" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+/video/@loopend;temporal:syntax error;m
+
+#data
+<video src="a" loopend="-20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+/video/@loopend;temporal:syntax error;m
+
+#data
+<video src="a" loopend="20" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+
+#data
+<video src="a" loopend="20:10" xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loopend;attribute not defined;m
+
+#data
+<audio src="" start="" end="" loopstart="" loopend="" playcount=""
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+/audio/@start;temporal:syntax error;m
+/audio/@end;attribute not defined;m
+/audio/@end;temporal:syntax error;m
+/audio/@loopstart;attribute not defined;m
+/audio/@loopstart;temporal:syntax error;m
+/audio/@loopend;attribute not defined;m
+/audio/@loopend;temporal:syntax error;m
+/audio/@playcount;attribute not defined;m
+/audio/@playcount;integer:syntax error;m
+
+#data
+<audio src="a" playcount="0" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="-100" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="0" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="-100" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" playcount="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@playcount;attribute not defined;m
+
+#data
+<audio src="a" start="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+/audio/@start;temporal:syntax error;m
+
+#data
+<audio src="a" start="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+/audio/@start;temporal:syntax error;m
+
+#data
+<audio src="a" start="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+
+#data
+<audio src="a" start="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@start;attribute not defined;m
+
+#data
+<audio src="a" end="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+/audio/@end;temporal:syntax error;m
+
+#data
+<audio src="a" end="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+/audio/@end;temporal:syntax error;m
+
+#data
+<audio src="a" end="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+
+#data
+<audio src="a" end="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@end;attribute not defined;m
+
+#data
+<audio src="a" loopstart="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+/audio/@loopstart;temporal:syntax error;m
+
+#data
+<audio src="a" loopstart="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+/audio/@loopstart;temporal:syntax error;m
+
+#data
+<audio src="a" loopstart="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+
+#data
+<audio src="a" loopstart="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopstart;attribute not defined;m
+
+#data
+<audio src="a" loopend="" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
+/audio/@loopend;temporal:syntax error;m
+
+#data
+<audio src="a" loopend="-20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
+/audio/@loopend;temporal:syntax error;m
+
+#data
+<audio src="a" loopend="20" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
+
+#data
+<audio src="a" loopend="20:10" xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loopend;attribute not defined;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <video src="">aa</video>
+</audio>
+#errors
+/audio/video;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><video src="">aa</video></p>
+</audio>
+#errors
+/audio/p/video;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><video src="">aa</video></ins>
+</audio>
+#errors
+/audio/ins/video;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="">aa</audio>
+</audio>
+#errors
+/audio/audio;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <p><audio src="">aa</audio></p>
+</audio>
+#errors
+/audio/p/audio;element not allowed:minus;m
+
+#data
+<audio src="" xmlns="http://www.w3.org/1999/xhtml">
+  <ins><audio src="">aa</audio></ins>
+</audio>
+#errors
+/audio/ins/audio;element not allowed:minus;m
+
+#data
+<video src="" 
+    loop=""
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="" 
+    loop=""
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="" 
+    loop="loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="" 
+    loop="loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="" 
+    loop="Loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+
+#data
+<audio src="" 
+    loop="Loop"
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+
+#data
+<video src="" 
+    loop="true"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loop;boolean:invalid;m
+
+#data
+<audio src="" 
+    loop="true"
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loop;boolean:invalid;m
+
+#data
+<video src="" 
+    loop="lop"
+    xmlns="http://www.w3.org/1999/xhtml">a</video>
+#errors
+/video/@loop;boolean:invalid;m
+
+#data
+<audio src="" 
+    loop="loop "
+    xmlns="http://www.w3.org/1999/xhtml">a</audio>
+#errors
+/audio/@loop;boolean:invalid;m
+
+#data
+<source xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source;attribute missing;src;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<source src="%http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@src;syntax error:iriref3987;m
+
+#data
+<source src="http://test/" type="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@type;IMT:no type;m
+
+#data
+<source src="http://test/" type="video" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@type;IMT:no /;m
+
+#data
+<source src="http://test/" type="audio/mpeg"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<source src="http://test/" type="audio/mpeg; a=b"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@type;IMT:parameter not allowed;m
+
+#data
+<source src="http://test/" type="video/3gpp2; codecs=sevc,s263"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@type;params:garbage;m
+
+#data
+<source src="http://test/" type="video/3gpp2; codecs=&quot;sevc,s263&quot;"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<source src="http://test/" type="video/3gpp2; codecs=&quot;sevc, s263&quot;"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<source src="http://test/" type="video/3gpp2; codecs='sevc, s263'"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@type;params:garbage;m
+
+#data
+<source src="http://test/" media="screen"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/source/@media;media query;u
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio=""/>
+#errors
+/source/@pixelratio;float:syntax error;m
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="1"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="1.00"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.001"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.5"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.00"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:out of range;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="-20"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:out of range;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.001e-20"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="10.4"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="1."/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio=".1"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="+0.2"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="43 "/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="aaaa"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="4 + 0.2"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0..3"/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="0.4."/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<source src="http://test/" xmlns="http://www.w3.org/1999/xhtml"
+    pixelratio="."/>
+#errors
+/source/@pixelratio;attribute not defined;m
+/source/@pixelratio;float:syntax error;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="anonymous">b</video>
+#errors
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credentials">b</video>
+#errors
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="yes">b</video>
+#errors
+/video/@crossorigin;enumerated:invalid;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="">b</video>
+#errors
+/video/@crossorigin;enumerated:invalid;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+  cross-origin="">b</video>
+#errors
+/video/@cross-origin;attribute not defined;m
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="anonymous">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="ANONYMOUs">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credentials">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="Use-credentials">b</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="yes">b</audio>
+#errors
+/audio/@crossorigin;enumerated:invalid;m
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="">b</audio>
+#errors
+/audio/@crossorigin;enumerated:invalid;m
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+  cross-origin="">b</audio>
+#errors
+/audio/@cross-origin;attribute not defined;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="">a</video>
+#errors
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="bbb">a</video>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="">a</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="bbb">a</audio>
+#errors
+
+#data
+<bgsound xmlns="http://www.w3.org/1999/xhtml"></bgsound>
+#errors
+/bgsound;element not defined;m
+/bgsound;attribute missing;src;m
+
+#data
+<bgsound xmlns="http://www.w3.org/1999/xhtml">   </bgsound>
+#errors
+/bgsound;element not defined;m
+/bgsound;attribute missing;src;m
+
+#data
+<bgsound xmlns="http://www.w3.org/1999/xhtml">abc</bgsound>
+#errors
+/bgsound;element not defined;m
+/bgsound/"abc";character not allowed:empty;m
+/bgsound;attribute missing;src;m
+
+#data
+<bgsound xmlns="http://www.w3.org/1999/xhtml"><p>aaa</p></bgsound>
+#errors
+/bgsound;element not defined;m
+/bgsound/p;element not allowed:empty;m
+/bgsound;attribute missing;src;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"><bgsound/></p>
+#errors
+/p/bgsound;element not defined;m
+/p/bgsound;element not allowed:phrasing;m
+/p;no significant content;s
+/p/bgsound;attribute missing;src;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><bgsound/></div>
+#errors
+/div/bgsound;element not defined;m
+/div/bgsound;element not allowed:flow;m
+/div/bgsound;attribute missing;src;m
+/div;no significant content;s
+
+#data
+<bgsound src="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;url:empty;m
+/bgsound/@src;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+
+#data
+<bgsound src="[abc]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;syntax error:iriref3987;m
+/bgsound/@src;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="  "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="xyz"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="+123"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10.45"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="+-0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="123 "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="balance"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="infinite"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="0120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="-10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="-120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="0000034"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="-10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    balance="10001"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@balance;attribute not defined;m
+/bgsound/@balance;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="  "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="xyz"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+123"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10.45"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+-0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="123 "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="loop"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="infinite"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:syntax error;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-2"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-120"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-1"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0000034"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+/bgsound/@loop;integer:out of range;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10001"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@loop;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="  "/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="volume"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="1"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="000"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="1234"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="none"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="-0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+/bgsound/@volume;enumerated:invalid;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="low"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="middle"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="high"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="0"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="LOW"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    volume="HIGH"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@volume;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as=""/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="as"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="AS"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="none"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m
+
+#data
+<bgsound src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    as="1"/>
+#errors
+/bgsound;element not defined;m
+/bgsound/@src;attribute not defined;m
+/bgsound/@as;attribute not defined;m

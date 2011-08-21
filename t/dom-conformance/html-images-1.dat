@@ -1,0 +1,2580 @@
+
+#data
+<area shape="default" href="" alt="a" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt="a"/>
+</div>
+#errors
+/div;no significant content;s
+/div/area;element not allowed:area;m
+
+#data
+<map id="map1" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt="a"/>
+</map>
+#errors
+/map;no significant content;s
+/map;attribute missing;name;m
+
+#data
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt="a"/>
+</map>
+#errors
+/map;no significant content;s
+
+#data
+<map id="map1" name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="default" href="" alt="a"/>
+</map>
+#errors
+/map;no significant content;s
+
+#data
+<map id="map1" xmlns="http://www.w3.org/1999/xhtml">
+<p><area shape="default" href="" alt="a"/></p>
+</map>
+#errors
+/map;no significant content;s
+/map/p;no significant content;s
+/map;attribute missing;name;m
+
+#data
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<p><area shape="default" href="" alt="a"/></p>
+</map>
+#errors
+/map;no significant content;s
+/map/p;no significant content;s
+
+#data
+<map id="map1" xmlns="http://www.w3.org/1999/xhtml">
+<map id="map2"><p><area shape="default" href="" alt="a"/></p></map>
+</map>
+#errors
+/map;no significant content;s
+/map/map/p;no significant content;s
+/map;attribute missing;name;m
+/map/map;attribute missing;name;m
+
+#data
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<map name="map2"><p><area shape="default" href="" alt="a"/></p></map>
+</map>
+#errors
+/map;no significant content;s
+/map/map/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="map1">
+<map name="map2"/>
+</map>
+<area shape="default" href="" alt="a"/></div>
+#errors
+/div;no significant content;s
+/div/area;element not allowed:area;m
+
+#data
+<map name="map1" xmlns="http://www.w3.org/1999/xhtml">
+<map name="map2"/><p><area shape="default" href="" alt="a"/></p>
+</map>
+#errors
+/map;no significant content;s
+/map/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="map2"/><p><area shape="default" href="" alt="a"/></p>
+</div>
+#errors
+/div;no significant content;s
+/div/p;no significant content;s
+/div/p/area;element not allowed:area;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+aa<map name="x">bbb</map>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<em>aa<map name="x">bbb</map></em>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+aa<map name="x">bbb<p>cc</p></map>
+</p>
+#errors
+/p/map/p;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<ins>aa<map name="x">bbb</map></ins>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<ins>aa<map name="x">bb<p>b</p></map></ins>
+</p>
+#errors
+/p/ins/map/p;element not allowed:phrasing;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+aa<map name="x">b<p>bb</p></map>
+</div>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+aa<map name="x">bbb</map>
+</p>
+#errors
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml">
+<map name="x">bbb</map>
+</br>
+#errors
+/br/map;element not allowed:empty;m
+/br/map/"bbb";character not allowed:empty;m
+
+#data
+<br xmlns="http://www.w3.org/1999/xhtml">
+<map name="x"><p>bbb</p></map>
+</br>
+#errors
+/br/map;element not allowed:empty;m
+/br/map/p;element not allowed:empty;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+aa<map name="x"></map>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+aa<map name="x">b<map name="y">bb</map></map>
+</p>
+#errors
+
+#data
+<img xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img;attribute missing;alt;s
+/img;attribute missing;src;m
+
+#data
+<img alt="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img;attribute missing;src;m
+
+#data
+<img src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img;attribute missing;alt;s
+
+#data
+<img alt="" src="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<img alt="" src="http://test/`" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@src;syntax error:iriref3987;m
+
+#data
+<img alt="" src="" longdesc="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@longdesc;attribute not defined;m
+
+#data
+<img alt="" src="" longdesc="http://www.example.com/"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@longdesc;attribute not defined;m
+
+#data
+<img alt="" src="" longdesc="[]" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@longdesc;attribute not defined;m
+/img/@longdesc;syntax error:iriref3987;m
+
+#data
+<img alt="" src="" hspace="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" hspace="  " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="  " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" hspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+
+#data
+<img alt="" src="" vspace="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="120" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+
+#data
+<img alt="" src="" vspace="120" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="120%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+
+#data
+<img alt="" src="" vspace="120%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="1 %" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="1 %" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" hspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="1.0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" hspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="10px" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" hspace="0 " xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace=" 0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" hspace="0%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+
+#data
+<img alt="" src="" vspace="20%" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+
+#data
+<img alt="" src="" hspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@hspace;attribute not defined;m
+/img/@hspace;length:syntax error;m
+
+#data
+<img alt="" src="" vspace="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@vspace;attribute not defined;m
+/img/@vspace;length:syntax error;m
+
+#data
+<img alt="" src="" border="0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;img border:0;s
+
+#data
+<img alt="" src="" border="1" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;img border:nninteger;m
+
+#data
+<img alt="" src="" border="4563" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;img border:nninteger;m
+
+#data
+<img alt="" src="" border="4563000" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;img border:nninteger;m
+
+#data
+<img alt="" src="" border="-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;nninteger:syntax error;m
+
+#data
+<img alt="" src="" border="10-0" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;nninteger:syntax error;m
+
+#data
+<img alt="" src="" border="none" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;nninteger:syntax error;m
+
+#data
+<img alt="" src="" border="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@border;nninteger:syntax error;m
+
+#data
+<img alt="" src="" noborder="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@noborder;attribute not defined;m
+
+#data
+<img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@ismap;attribute not allowed:ismap;m
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    height=""/>
+#errors
+/img/@height;nninteger:syntax error;m
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="0"/>
+#errors
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    height="120"/>
+#errors
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    width=""/>
+#errors
+/img/@width;nninteger:syntax error;m
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="0"/>
+#errors
+
+#data
+<img alt="x" src="" xmlns="http://www.w3.org/1999/xhtml"
+    width="120"/>
+#errors
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
+</span>
+#errors
+/span/img/@ismap;attribute not allowed:ismap;m
+
+#data
+<span xmlns="http://www.w3.org/1999/xhtml">
+<a>a</a>
+<img alt="" src="http://test/" ismap="" xmlns="http://www.w3.org/1999/xhtml"/>
+</span>
+#errors
+/span/img/@ismap;attribute not allowed:ismap;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="ismap"/>
+</a>
+#errors
+/a/img/@ismap;attribute not allowed:ismap;m
+
+#data
+<a title="" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="ismap"/>
+</a>
+#errors
+/a/img/@ismap;attribute not allowed:ismap;m
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap=""/>
+</a>
+#errors
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="ismap"/>
+</a>
+#errors
+
+#data escaped
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="\u0130smap"/>
+</a>
+#errors
+/a/img/@ismap;boolean:invalid;m
+
+#data escaped
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="\u0131smap"/>
+</a>
+#errors
+/a/img/@ismap;boolean:invalid;m
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="true"/>
+</a>
+#errors
+/a/img/@ismap;boolean:invalid;m
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<img alt="" src="http://test/" ismap="IsMap"/>
+</a>
+#errors
+
+#data
+<div  xmlns="http://www.w3.org/1999/xhtml">
+<a href="http://link.test/">a</a>
+<img alt="" src="http://test/" ismap="ismap"/>
+</div>
+#errors
+/div/img/@ismap;attribute not allowed:ismap;m
+
+#data
+<a href="http://link.test/" xmlns="http://www.w3.org/1999/xhtml">
+<span>
+<img alt="" src="http://test/" ismap="ismap"/>
+</span>
+</a>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap=""/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashref:syntax error;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="abc"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashref:syntax error;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="abc#"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashref:syntax error;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="&#x0A;#abc"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashref:syntax error;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+<map id="aa"/>
+</div>
+#errors
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa" id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/map;attribute missing;name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="a a"/>
+<p><img src="http://test/" alt="" usemap="#a a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID;m
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a a"/>
+<p><img src="http://test/" alt="" usemap="#a a"/></p>
+</div>
+#errors
+/div/map/@name;space in map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a a" id="a a"/>
+<p><img src="http://test/" alt="" usemap="#a a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID;m
+/div/map/@name;space in map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="a a"/>
+<p><img src="http://test/" alt="" usemap="#a%20a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID;m
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="a a" name="a a"/>
+<p><img src="http://test/" alt="" usemap="#a%20a"/></p>
+</div>
+#errors
+/div/map/@id;space in ID;m
+/div/map/@name;space in map name;m
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="&#x4E00;"/>
+<p><img src="http://test/" alt="" usemap="#&#x4E00;"/></p>
+</div>
+#errors
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="&#x4E00;"/>
+<p><img src="http://test/" alt="" usemap="#&#x4E00;"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#bb"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map;m
+/div/map;attribute missing;name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
+<p><img src="http://test/" alt="" usemap="#bb"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="aa"/>
+<p><img src="http://test/" alt="" usemap="#AA"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map;m
+/div/map;attribute missing;name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa"/>
+<p><img src="http://test/" alt="" usemap="#AA"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashref:wrong case;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map id="AA"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map;m
+/div/map;attribute missing;name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="AA"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/p/img/@usemap;hashref:wrong case;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p id="aa"/>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/p/img/@usemap;no referenced map;m
+/div/p;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<a name="aa">x</a>
+<p><img src="http://test/" alt="" usemap="#aa"/></p>
+</div>
+#errors
+/div/a/@name;anchor name;s
+/div/p/img/@usemap;no referenced map;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a" id="b">x</map>
+</div>
+#errors
+/div/map/@id;id ne name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a" id="A">x</map>
+</div>
+#errors
+/div/map/@id;id ne name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="A" id="a">x</map>
+</div>
+#errors
+/div/map/@id;id ne name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="">x</map>
+<img src="" alt="" usemap="#"/>
+</div>
+#errors
+/div/map/@name;empty attribute value;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x</map>
+<map name="a">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x</map>
+<map name="A">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="A">x</map>
+<map name="a">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x
+<map name="a">x</map>
+</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/map/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="a">x</map>
+<img src="" alt="" usemap="#A"/>
+</div>
+#errors
+/div/img/@usemap;hashref:wrong case;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="A">x</map>
+<img src="" alt="" usemap="#a"/>
+</div>
+#errors
+/div/img/@usemap;hashref:wrong case;m
+
+#data
+<img alt="" src="" align="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
+#data
+<img alt="" src="" align="char" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
+#data
+<img alt="" src="" align="justify" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
+#data
+<img alt="" src="" align="center" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="abscenter" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="absmiddle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="texttop" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="BASELINE" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:non-conforming;m
+
+#data
+<img alt="" src="" align="text-top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
+#data
+<img alt="" src="" align="bottom" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="middle" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="top" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="left" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data
+<img alt="" src="" align="right" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+
+#data escaped
+<img alt="" src="" align="r\u0130ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
+#data escaped
+<img alt="" src="" align="r\u0131ght" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/img/@align;attribute not defined;m
+/img/@align;enumerated:invalid;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name=""/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;anchor name:empty;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="  "/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="aaa"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc"/>
+  <a name="abc">aa</a>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/a/@name;duplicate anchor name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <a name="abc">aa</a>
+  <img src="" alt="a" name="abc"/>
+</div>
+#errors
+/div/a/@name;anchor name;s
+/div/img/@name;attribute not defined;m
+/div/img/@name;duplicate anchor name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <span id="abc">aa</span>
+  <img src="" alt="a" name="abc"/>
+</div>
+#errors
+/div/img/@name;id name confliction;m
+/div/img/@name;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <span xml:id="abc">aa</span>
+  <img src="" alt="a" name="abc"/>
+</div>
+#errors
+/div/img/@name;id name confliction;m
+/div/img/@name;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc"/>
+  <span id="abc">aa</span>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/span/@id;id name confliction;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc"/>
+  <span xml:id="abc">aa</span>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/span/@id;id name confliction;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abd"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;id name mismatch;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abd" xml:id="abe"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;id name mismatch;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abd" xml:id="abc"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" id="abc" xml:id="abd"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <img src="" alt="a" name="abc" xml:id="abd"/>
+</div>
+#errors
+/div/img/@name;attribute not defined;m
+/div/img/@name;id name mismatch;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration=""
+/>
+#errors
+/img/@vibration;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="select"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focuS"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="auto"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength=""
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="1"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="8"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="9"/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="10"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="100"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="0"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="+1"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="4.00"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  vibration="focus" viblength="vib"
+/>
+#errors
+/img/@vibration;attribute not defined;m
+/img/@viblength;attribute not defined;m
+
+#data
+<img src="a" alt="x" xmlns="http://www.w3.org/1999/xhtml"
+  viblength="3"
+/>
+#errors
+/img/@viblength;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop=""/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="  "/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="xyz"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+123"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10.45"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="+-0"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="123 "/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="loop"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="infinite"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0120"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-2"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-120"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-1"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="0000034"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10000000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="-10000000"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="abc" xmlns="http://www.w3.org/1999/xhtml"
+    loop="10001"/>
+#errors
+/img/@loop;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite=""/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="source-over"/>
+#errors
+/img/@composite;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="SOURCE-oVER"/>
+#errors
+/img/@composite;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="sourceover"/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="source"/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    composite="true"/>
+#errors
+/img/@composite;attribute not defined;m
+/img/@composite;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private=""/>
+#errors
+/img/@private;attribute not defined;m
+/img/@private;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="yes"/>
+#errors
+/img/@private;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="No"/>
+#errors
+/img/@private;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    private="true"/>
+#errors
+/img/@private;attribute not defined;m
+/img/@private;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout=""/>
+#errors
+/img/@mediaout;attribute not defined;m
+/img/@mediaout;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="yes"/>
+#errors
+/img/@mediaout;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="No"/>
+#errors
+/img/@mediaout;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediaout="true"/>
+#errors
+/img/@mediaout;attribute not defined;m
+/img/@mediaout;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright=""/>
+#errors
+/img/@copyright;attribute not defined;m
+/img/@copyright;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="yes"/>
+#errors
+/img/@copyright;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="No"/>
+#errors
+/img/@copyright;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    copyright="true"/>
+#errors
+/img/@copyright;attribute not defined;m
+/img/@copyright;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc=""/>
+#errors
+/img/@dynsrc;attribute not defined;m
+/img/@dynsrc;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc="abc"/>
+#errors
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    dynsrc="[]"/>
+#errors
+/img/@dynsrc;attribute not defined;m
+/img/@dynsrc;syntax error:iriref3987;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc=""/>
+#errors
+/img/@lowsrc;attribute not defined;m
+/img/@lowsrc;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc="abc"/>
+#errors
+/img/@lowsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    lowsrc="[]"/>
+#errors
+/img/@lowsrc;attribute not defined;m
+/img/@lowsrc;syntax error:iriref3987;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml=""/>
+#errors
+/img/@vrml;attribute not defined;m
+/img/@vrml;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml="abc"/>
+#errors
+/img/@vrml;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vrml="[]"/>
+#errors
+/img/@vrml;attribute not defined;m
+/img/@vrml;syntax error:iriref3987;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    vmrl="[]"/>
+#errors
+/img/@vmrl;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    oversrc=""/>
+#errors
+/img/@oversrc;attribute not defined;m
+/img/@oversrc;url:empty;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    oversrc="abc"/>
+#errors
+/img/@oversrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    oversrc="[]"/>
+#errors
+/img/@oversrc;attribute not defined;m
+/img/@oversrc;syntax error:iriref3987;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg=""/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="yes"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="NO"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="true"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="false"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="galleryimg"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="on"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    galleryimg="http://foo.test/"/>
+#errors
+/img/@galleryimg;attribute not defined;m
+/img/@galleryimg;enumerated:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc=""/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="  "/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="123"/>
+#errors
+/img/@localsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="1"/>
+#errors
+/img/@localsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="0"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:deprecated;s
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="abc"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:deprecated;s
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="+120"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="-120"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="0120"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:deprecated;s
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="10.00"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc=" 123 "/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    localsrc="http://foo/"/>
+#errors
+/img/@localsrc;attribute not defined;m
+/img/@localsrc;localsrc:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave=""/>
+#errors
+/img/@nosave;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="   "/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="nosave"/>
+#errors
+/img/@nosave;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave=" nosave "/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="true"/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="yes"/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="on"/>
+#errors
+/img/@nosave;attribute not defined;m
+/img/@nosave;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    nosave="NoSave"/>
+#errors
+/img/@nosave;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="true" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="fileopen" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mouseover" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="FileOPEN" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="MouseOver" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="onmouseover" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="load" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="10:10:0:0" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="none" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mouseout" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mousemove" dynsrc="b"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;enumerated:invalid;m
+/img/@dynsrc;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    start="mouseover"/>
+#errors
+/img/@start;attribute not defined;m
+/img/@start;attribute not allowed;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress=""/>
+#errors
+/img/@suppress;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="suppress"/>
+#errors
+/img/@suppress;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="SUPPRESS"/>
+#errors
+/img/@suppress;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="no"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="yes"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="on"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress="Supress"/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppress=" "/>
+#errors
+/img/@suppress;attribute not defined;m
+/img/@suppress;boolean:invalid;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    suppres="yes"/>
+#errors
+/img/@suppres;attribute not defined;m
+
+#data
+<img alt="x" src="a" xmlns="http://www.w3.org/1999/xhtml"
+    supress="yes"/>
+#errors
+/img/@supress;attribute not defined;m
+
+#data
+<map xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/map;attribute missing;name;m
+/map;no significant content;s
+
+#data
+<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/map;no significant content;s
+
+#data
+<map name="aa" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/map;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<map name="aa" id="aa"/>
+<p id="aa">x</p>
+</div>
+#errors
+/div/p/@id;duplicate ID;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+<p id="aa">x</p>
+<map id="aa" name="aa"/>
+</div>
+#errors
+/div/map/@id;duplicate ID;m
+
+#data
+<map name="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/map/@name;empty attribute value;m
+/map;no significant content;s
+
+#data
+<map xmlns="http://www.w3.org/1999/xhtml" name="y">
+  <map name="x"></map>
+</map>
+#errors
+/map;no significant content;s
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <map name="x"></map>
+</div>
+#errors
+/div;no significant content;s
+
+#data
+<map xmlns="http://www.w3.org/1999/xhtml"
+    name="ab c">xx</map>
+#errors
+/map/@name;space in map name;m
+
+#data
+<map xmlns="http://www.w3.org/1999/xhtml"
+    name="ab&#xA;">xx</map>
+#errors
+/map/@name;space in map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <map name="a">a</map>
+  <map name="a">a</map>
+</div>
+#errors
+/div/map/@name;duplicate map name;m
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml">
+  <map name="a">a</map>
+  <map name="a ">a</map>
+</div>
+#errors
+/div/map/@name;space in map name;m
+
+#data
+<area xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area;attribute missing;coords;m
+
+#data
+<area href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area;attribute missing;alt;m
+/area;attribute missing;coords;m
+
+#data
+<area alt="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@alt;attribute not allowed;m
+/area;attribute missing;coords;m
+
+#data
+<area href="http://test/" alt="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area;attribute missing;coords;m
+
+#data
+<area href="http://test/" alt="" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="%%http://test/" alt="" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@href;syntax error:iriref3987;m
+
+#data
+<area href="http://test/" alt="" coords="1,2,3,4"
+    hreflang=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@hreflang;langtag:language:nosemantics;m
+
+#data
+<area href="http://test/" alt="" coords="1,2,3,4"
+    hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area coords="1,2,3,4" hreflang="en"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@hreflang;attribute not allowed;m
+
+#data
+<area href="http://test/" alt="" coords="1,2,3,4"
+    media="screen"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@media;media query;u
+
+#data
+<area coords="1,2,3,4" media="screen"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@media;attribute not allowed;m
+/area/@media;media query;u
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;window name:empty;m
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;window name:reserved;m
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_parent"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_top"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_blank"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area href="http://test/" coords="1,2,3,4" alt="" target="_any"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;window name:reserved;m
+
+#data
+<area coords="1,2,3,4" target="_self"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@target;attribute not allowed;m
+
+#data
+<area coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="RECT" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rectangle" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:non-conforming;m
+
+#data
+<area shape="rec" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data
+<area shape="default"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="defaulT"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="circ" coords="1,2,3"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:non-conforming;m
+
+#data
+<area shape="circle" coords="1,2,3"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="poly" coords="1,2,3,4,5,6"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="polygon" coords="1,2,3,4,5,6"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:non-conforming;m
+
+#data
+<area shape="XXX" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0130rcle" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0131rcle" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0130rc" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data escaped
+<area shape="c\u0131rc" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@shape;enumerated:invalid;m
+
+#data
+<area shape="circle" coords=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:syntax error;m
+
+#data
+<area shape="circle" coords="1"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 3;1;m
+
+#data
+<area shape="circle" coords="1,2"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 3;2;m
+
+#data
+<area shape="circle" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 3;4;m
+
+#data
+<area shape="circle" coords="1,2,3,4,5"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 3;5;m
+
+#data
+<area shape="circle" coords="1,2,-3"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:out of range;m
+
+#data
+<area shape="circle" coords="1,2,0"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="circle" coords="-1,-2,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="circle" coords="0,0,0"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="circle"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area;attribute missing;coords;m
+
+#data
+<area shape="default" coords="1"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;attribute not allowed;m
+
+#data
+<area shape="poly" coords=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:syntax error;m
+
+#data
+<area shape="poly" coords="1"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number lt 6;1;m
+
+#data
+<area shape="poly" coords="1,2"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number lt 6;2;m
+
+#data
+<area shape="poly" coords="1,2,3"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number lt 6;3;m
+
+#data
+<area shape="poly" coords="1,2,3,4"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number lt 6;4;m
+
+#data
+<area shape="poly" coords="1,2,3,4,5"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number lt 6;5;m
+
+#data
+<area shape="poly" coords="1,2,3,4,5,6,7"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not even;7;m
+
+#data
+<area shape="poly" coords="-1,-23,55,455,232,0"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="poly" coords="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="poly"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area;attribute missing;coords;m
+
+#data
+<area shape="rect" coords=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:syntax error;m
+
+#data
+<area shape="rect" coords="1"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 4;1;m
+
+#data
+<area shape="rect" coords="1,2"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 4;2;m
+
+#data
+<area shape="rect" coords="1,2,3"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 4;3;m
+
+#data
+<area shape="rect" coords="1,2,3,4,5"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:number not 4;5;m
+
+#data
+<area shape="rect"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area;attribute missing;coords;m
+
+#data
+<area shape="rect" coords="0,0,1,1"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="-1,-1,0,0"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="-1,-1,6,6"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="54,54,7876,466"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="646,4,3,657"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:out of range;m
+
+#data
+<area shape="rect" coords="4,646,657,7"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@coords;coords:out of range;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    ping="a b"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@ping;attribute not allowed;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    rel="author"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;attribute not allowed;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    type="text/css"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@type;attribute not allowed;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" type="" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@type;IMT:no type;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" type="text" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@type;IMT:no /;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" type="text/css" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" type="text/css; a=b" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@type;IMT:parameter not allowed;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="author" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<?xml version="1.1"?>
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="author&#x0b;" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="&#x0b;author" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
+<?xml version="1.1"?>
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="author&#x0b;license" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="author author" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;duplicate token;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="bookmark" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="previous" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type:non-conforming;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="edit" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type:proposed;s
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="contributor" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type:proposed;s
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="script" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type:non-conforming;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="icon" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;link type:bad context;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" rel="example-link-type" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rel;unknown link type;u
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" ping="a b" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" ping="a [b]" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@ping;syntax error:iriref3987;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" ping="a [b] [@c]" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@ping;syntax error:iriref3987;m
+/area/@ping;syntax error:iriref3987;m
+
+#data
+<area shape="rect" coords="1,2,3,4"
+    href="http://test/" ping="a a" alt=""
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@ping;duplicate token;m
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+x<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+</map>
+#errors
+/map/area/@alt;empty area alt;m
+/map/area/@alt;empty area alt;m
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+<area shape="rect" coords="5,6,7,8" href="" alt="x"/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt="x"/>
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+<area shape="rect" coords="9,10,11,12" href="" alt="x"/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="a" alt="x"/>
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>
+x</map>
+#errors
+/map/area/@alt;empty area alt;m
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="a" alt=""/>
+<area shape="rect" coords="5,6,7,8" href="a" alt=""/>
+x</map>
+#errors
+/map/area/@alt;empty area alt;m
+/map/area/@alt;empty area alt;m
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="b" alt="a"/>
+<area shape="rect" coords="5,6,7,8" href="b" alt=""/>
+x</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt=""/>
+<map name="n">
+<area shape="rect" coords="5,6,7,8" href="" alt="x"/>x
+</map>
+</map>
+#errors
+
+#data
+<map name="m" xmlns="http://www.w3.org/1999/xhtml">
+<area shape="rect" coords="1,2,3,4" href="" alt="x"/>
+<map name="n">
+<area shape="rect" coords="5,6,7,8" href="" alt=""/>x
+</map>
+</map>
+#errors
+/map/map/area/@alt;empty area alt;m
+
+#data
+<area shape="default" rev="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@rev;attribute not defined;m
+
+#data
+<area shape="default" nohref="" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+
+#data
+<area shape="default" nohref="nohref" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+
+#data
+<area shape="default" nohref="noHREF" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+
+#data
+<area shape="default" nohref="http://example/" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@nohref;attribute not defined;m
+/area/@nohref;boolean:invalid;m
+
+#data
+<area shape="default" charset="us-ascii" xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/area/@charset;attribute not defined;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="anonymous"/>
+#errors
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credentials"/>
+#errors
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use_credentials"/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="use-credential"/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin="yes"/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  crossorigin=""/>
+#errors
+/img/@crossorigin;enumerated:invalid;m
+
+#data
+<img src="a" alt="b" xmlns="http://www.w3.org/1999/xhtml"
+  cross-origin=""/>
+#errors
+/img/@cross-origin;attribute not defined;m

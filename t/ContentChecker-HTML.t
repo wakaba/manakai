@@ -18,10 +18,14 @@ test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/dom-conformance/html-metadata-1.dat
   t/dom-conformance/html-metadata-2.dat
   t/dom-conformance/html-flows-1.dat
+  t/dom-conformance/html-flowstructs-1.dat
   t/dom-conformance/html-texts-1.dat
   t/dom-conformance/html-links-1.dat
   t/dom-conformance/html-links-2.dat
   t/dom-conformance/html-objects-1.dat
+  t/dom-conformance/html-media-1.dat
+  t/dom-conformance/html-images-1.dat
+  t/dom-conformance/html-images-2.dat
   t/dom-conformance/html-tables-1.dat
   t/dom-conformance/html-tables-2.dat
   t/dom-conformance/html-forms-1.dat
@@ -38,6 +42,7 @@ test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/dom-conformance/html-repetitions.dat
   t/dom-conformance/html-datatemplate.dat
   t/dom-conformance/html-frames.dat
+  t/dom-conformance/html-frames-2.dat
 ]);
 
 done_testing;
