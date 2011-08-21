@@ -6436,7 +6436,8 @@ sub _tree_construction_main ($) {
         $token = $self->_get_next_token;
         next B;
       } elsif ($token->{tag_name} eq 'param' or
-               $token->{tag_name} eq 'source') {
+               $token->{tag_name} eq 'source' or
+               $token->{tag_name} eq 'track') {
         
     {
       my $el;

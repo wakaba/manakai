@@ -760,3 +760,38 @@ no DOCTYPE
 |       <a>
 |         "b"
 |     "c"
+
+#data
+<!DOCTYPE HTML><track>a
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <track>
+|     "a"
+
+#data
+<!DOCTYPE HTML><video><track>a</video>
+#errors
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <video>
+|       <track>
+|       "a"
+
+#data
+<!DOCTYPE HTML><track>a</track>
+#errors
+bad end tag
+#document
+| <!DOCTYPE html>
+| <html>
+|   <head>
+|   <body>
+|     <track>
+|     "a"

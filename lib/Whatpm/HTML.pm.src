@@ -5334,7 +5334,8 @@ sub _tree_construction_main ($) {
         !!!next-token;
         next B;
       } elsif ($token->{tag_name} eq 'param' or
-               $token->{tag_name} eq 'source') {
+               $token->{tag_name} eq 'source' or
+               $token->{tag_name} eq 'track') {
         !!!insert-element-t ($token->{tag_name}, $token->{attributes}, $token);
         pop @{$self->{open_elements}};
 
