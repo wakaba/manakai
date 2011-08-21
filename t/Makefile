@@ -146,11 +146,11 @@ swml-result.txt: always
 	-cd .. && $(PERL_) t/SWML-Parser.t &> t/$@
 
 content-checker-files: \
-  content-checker-html-result.txt \
+  results/content-checker-html.txt \
   content-checker-atom-result.txt \
   content-checker-xml-result.txt
 
-content-checker-html-result.txt: always
+results/content-checker-html.txt: always
 	-$(PERL_) ContentChecker-HTML.t &> $@
 
 content-checker-atom-result.txt: always
