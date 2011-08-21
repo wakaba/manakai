@@ -1513,8 +1513,8 @@ for (qw(
 
   onabort oncanplay oncanplaythrough onchange onclick oncontextmenu
   ondblclick ondrag ondragend ondragenter ondragleave ondragover
-  ondragstart ondrop ondurationchange onemptied onended onformchange
-  onforminput oninput oninvalid onkeydown onkeypress onkeyup
+  ondragstart ondrop ondurationchange onemptied onended
+  oninput oninvalid onkeydown onkeypress onkeyup
   onloadeddata onloadedmetadata onloadstart onmousedown onmousemove
   onmouseout onmouseover onmouseup onmousewheel onpause onplay
   onplaying onprogress onratechange onreadystatechange onreset
@@ -1532,7 +1532,8 @@ for (qw(
   onbeforedeactivate onbeforeeditfocus onbeforepaste onbeforeupdate
   oncellchange oncontrolselect oncopy oncut ondataavailable
   ondatasetchanged ondatasetcomplete ondeactivate onerrorupdate
-  onfilterchange onfocusin onfocusout ongesturechange ongestureend
+  onfilterchange onfocusin onfocusout onformchange onforminput
+  ongesturechange ongestureend
   ongesturestart onhelp onlayoutcomplete onlosecapture onmouseenter
   onmouseleave onmove onmoveend onmovestart onorientationchange
   onpaste onpropertychange onresizeend onresizestart onrowenter

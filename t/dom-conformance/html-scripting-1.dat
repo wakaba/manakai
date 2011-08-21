@@ -631,3 +631,15 @@
 #errors
 /unknown;element not defined;m
 /unknown/@onscroll;event handler;u
+
+#data
+<p onforminput="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onforminput;attribute not defined;m
+/p/@onforminput;event handler;u
+
+#data
+<p onformchange="alert(1);" xmlns="http://www.w3.org/1999/xhtml">x</p>
+#errors
+/p/@onformchange;attribute not defined;m
+/p/@onformchange;event handler;u
