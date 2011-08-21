@@ -10272,3 +10272,23 @@ x</map>
   cross-origin="">b</audio>
 #errors
 /audio/@cross-origin;attribute not defined;m
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="">a</video>
+#errors
+
+#data
+<video src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="bbb">a</video>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="">a</audio>
+#errors
+
+#data
+<audio src="a" xmlns="http://www.w3.org/1999/xhtml"
+    mediagroup="bbb">a</audio>
+#errors
