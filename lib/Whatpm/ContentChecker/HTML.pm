@@ -1553,9 +1553,8 @@ my %HTMLM12NXHTML2CommonAttrStatus = (
 );
 
 for (qw(
-
   onabort oncanplay oncanplaythrough onchange onclick oncontextmenu
-  ondblclick ondrag ondragend ondragenter ondragleave ondragover
+  oncuechange ondblclick ondrag ondragend ondragenter ondragleave ondragover
   ondragstart ondrop ondurationchange onemptied onended
   oninput oninvalid onkeydown onkeypress onkeyup
   onloadeddata onloadedmetadata onloadstart onmousedown onmousemove
@@ -1567,7 +1566,7 @@ for (qw(
   onblur onerror onfocus onload onscroll
 )) {
   $HTMLAttrChecker->{$_} = $HTMLEventHandlerAttrChecker;
-  $HTMLAttrStatus{$_} = FEATURE_HTML5_LC;
+  $HTMLAttrStatus{$_} = FEATURE_HTML5_CR;
 }
 
 for (qw(
