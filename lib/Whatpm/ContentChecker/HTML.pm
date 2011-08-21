@@ -1300,6 +1300,38 @@ my $HTMLAttrChecker = {
   },
   datatype => sub { },
   disabled => $GetHTMLBooleanAttrChecker->('disabled'),
+  dropzone => sub {
+    ## Unordered set of space-separated tokens, ASCII case-insensitive.
+    my ($self, $attr) = @_;
+    my $has_feedback;
+    my %word;
+    for my $word (grep {length $_}
+                  split /[\x09\x0A\x0C\x0D\x20]+/, $attr->value) {
+      $word =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+      if ($word eq 'copy' or $word eq 'move' or $word eq 'link') {
+        if ($has_feedback) {
+          $self->{onerror}->(node => $attr,
+                             type => 'dropzone:duplicate feedback', # XXXdoc
+                             value => $word,
+                             level => $self->{level}->{must});
+        }
+        $has_feedback = 1;
+      } elsif ($word =~ /^[sf]:./s) {
+        if ($word{$word}) {
+          $self->{onerror}->(node => $attr,
+                             type => 'duplicate token',
+                             value => $word,
+                             level => $self->{level}->{must});
+        }
+        $word{$word} = 1;
+      } else {
+          $self->{onerror}->(node => $attr,
+                             type => 'word not allowed',
+                             value => $word,
+                             level => $self->{level}->{must});
+      }
+    }
+  }, # dropzone
   hidden => $GetHTMLBooleanAttrChecker->('hidden'),
   hidefocus => $GetHTMLBooleanAttrChecker->('hidefocus'),
   language => sub {
@@ -1452,6 +1484,7 @@ my %HTMLAttrStatus = (
   dir => FEATURE_HTML5_REC,
   disabled => FEATURE_OBSVOCAB,
   draggable => FEATURE_HTML5_LC,
+  dropzone => FEATURE_HTML5_FD,
   hidden => FEATURE_HTML5_LC,
   hidefocus => FEATURE_OBSVOCAB,
   id => FEATURE_HTML5_REC,

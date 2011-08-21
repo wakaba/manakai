@@ -2363,3 +2363,87 @@ id=""><span id="">x</span></p>
 #errors
 /html/body/p/@xml:space;attribute not defined;m
 /html/body/p/@xml:space;enumerated:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="copy">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="move">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="link">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="COPY">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone=" Move ">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="s:abc">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="S:abc">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="f:hoge">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="F:fuga">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="s:abc copy">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="copy S:abc f:hoge">a</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="bad">a</p>
+#errors
+/p/@dropzone;word not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="x:hoge">a</p>
+#errors
+/p/@dropzone;word not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="copy copy">a</p>
+#errors
+/p/@dropzone;dropzone:duplicate feedback;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="f:hoge f:hoge">a</p>
+#errors
+/p/@dropzone;duplicate token;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="bad bad">a</p>
+#errors
+/p/@dropzone;word not allowed;m
+/p/@dropzone;word not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="s:">a</p>
+#errors
+/p/@dropzone;word not allowed;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml"  dropzone="f:">a</p>
+#errors
+/p/@dropzone;word not allowed;m
