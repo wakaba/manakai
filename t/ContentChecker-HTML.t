@@ -24,6 +24,7 @@ test_files (map { file (__FILE__)->dir->parent->file($_)->stringify } qw[
   t/dom-conformance/html-links-2.dat
   t/dom-conformance/html-objects-1.dat
   t/dom-conformance/html-media-1.dat
+  t/dom-conformance/html-media-2.dat
   t/dom-conformance/html-images-1.dat
   t/dom-conformance/html-images-2.dat
   t/dom-conformance/html-tables-1.dat

@@ -1,0 +1,237 @@
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/track;attribute missing;src;m
+/track;attribute missing;srclang;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml">  </track>
+#errors
+/track;attribute missing;src;m
+/track;attribute missing;srclang;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml">aa</track>
+#errors
+/track;attribute missing;src;m
+/track;attribute missing;srclang;m
+/track/"aa";character not allowed:empty;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"><span>aa</span></track>
+#errors
+/track;attribute missing;src;m
+/track;attribute missing;srclang;m
+/track/span;element not allowed:empty;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"><div>aa</div></track>
+#errors
+/track;attribute missing;src;m
+/track;attribute missing;srclang;m
+/track/div;element not allowed:empty;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"/>
+#errors
+/track;attribute missing;srclang;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="[abc]" srclang="ja"/>
+#errors
+/track/@src;syntax error:iriref3987;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="!!"/>
+#errors
+/track/@srclang;langtag:illegal;m
+/track/@srclang;langtag:language:nosemantics;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="subtitles"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="captions"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="descriptions"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="chapters"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="metadata"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="SUBTITLES"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="Metadata"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind=""/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind=" subtitles "/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="subtitle"/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="sub-titles"/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="caption"/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="description"/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="chapter"/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc" srclang="ja"
+    kind="metadatum"/>
+#errors
+/track/@kind;enumerated:invalid;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="captions"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="descriptions"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="chapters"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    srclang=""/>
+#errors
+/track/@srclang;langtag:illegal;m
+/track/@srclang;langtag:language:nosemantics;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"
+    label=""/>
+#errors
+/track/@label;empty attribute value;m
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"
+    label="abc"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"
+    label="aa be e a+qa"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"
+    default=""/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"
+    default="default"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"
+    default="DEFAult"/>
+#errors
+
+#data
+<track xmlns="http://www.w3.org/1999/xhtml"
+    src="abc"
+    kind="metadata"
+    default="true"/>
+#errors
+/track/@default;boolean:invalid;m

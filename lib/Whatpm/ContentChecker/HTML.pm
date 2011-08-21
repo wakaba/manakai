@@ -6200,20 +6200,20 @@ $Element->{+HTML_NS}->{audio} = {
 $Element->{+HTML_NS}->{source} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_LC,
-  check_attrs => sub {
+  check_attrs => $GetHTMLAttrsChecker->({
+    media => $HTMLMQAttrChecker,
+    pixelratio => $PositiveFloatingPointNumberAttrChecker,
+    src => $HTMLURIAttrChecker,
+    type => $MIMETypeChecker,
+  }, {
+    %HTMLAttrStatus,
+    media => FEATURE_HTML5_LC,
+    pixelratio => FEATURE_OBSVOCAB,
+    src => FEATURE_HTML5_LC,
+    type => FEATURE_HTML5_LC,
+  }), # check_attrs
+  check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
-    $GetHTMLAttrsChecker->({
-      media => $HTMLMQAttrChecker,
-      pixelratio => $PositiveFloatingPointNumberAttrChecker,
-      src => $HTMLURIAttrChecker,
-      type => $MIMETypeChecker,
-    }, {
-      %HTMLAttrStatus,
-      media => FEATURE_HTML5_LC,
-      pixelratio => FEATURE_OBSVOCAB,
-      src => FEATURE_HTML5_LC,
-      type => FEATURE_HTML5_LC,
-    })->(@_);
     unless ($item->{node}->has_attribute_ns (undef, 'src')) {
       $self->{onerror}->(node => $item->{node},
                          type => 'attribute missing',
@@ -6222,12 +6222,72 @@ $Element->{+HTML_NS}->{source} = {
     }
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
-
-    ## NOTE: The |pixelratio| attribute should have been forbidden
-    ## when the parent of the |source| element is an |audio| element,
-    ## but the attribute itself has been dropped from the spec.
-  }, # check_attrs
+  }, # check_attrs2
 }; # source
+
+## XXX there must not be two track element children of the same media
+## element whose kind attributes are in the same state, whose srclang
+## attributes are both missing or have values that represent the same
+## language, and whose label attributes are again both missing or both
+## have the same value.
+
+## XXXThere must not be more than one track element with the same
+## parent node with the default attribute specified.
+
+$Element->{+HTML_NS}->{track} = {
+  %HTMLEmptyChecker,
+  status => FEATURE_HTML5_FD,
+  check_attrs => $GetHTMLAttrsChecker->({
+    default => $GetHTMLBooleanAttrChecker->('default'),
+    kind => $GetHTMLEnumeratedAttrChecker->({
+      subtitles => 1, captions => 1, descriptions => 1,
+      chapters => 1, metadata => 1,
+    }), # kind
+    label => sub {
+      my ($self, $attr) = @_;
+      if ($attr->value eq '') {
+        $self->{onerror}->(node => $attr,
+                           type => 'empty attribute value',
+                           level => $self->{level}->{must});
+      }
+    }, # label
+    src => $HTMLURIAttrChecker,
+    srclang => $HTMLLanguageTagAttrChecker,
+  }, {
+    %HTMLAttrStatus,
+    default => FEATURE_HTML5_FD,
+    kind => FEATURE_HTML5_FD,
+    label => FEATURE_HTML5_FD,
+    src => FEATURE_HTML5_FD,
+    srclang => FEATURE_HTML5_FD,
+  }), # check_attrs
+  check_attrs2 => sub {
+    my ($self, $item, $element_state) = @_;
+    my $el = $item->{node};
+
+    unless ($el->has_attribute_ns (undef, 'src')) {
+      $self->{onerror}->(node => $el,
+                         type => 'attribute missing',
+                         text => 'src',
+                         level => $self->{level}->{must});
+    }
+    $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
+
+    my $kind = $el->get_attribute_ns (undef, 'kind') || '';
+    $kind =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    unless ({
+      captions => 1, descriptions => 1, chapters => 1, metadata => 1,
+    }->{$kind}) { # subtitles
+      unless ($el->has_attribute_ns (undef, 'srclang')) {
+        $self->{onerror}->(node => $el,
+                           type => 'attribute missing',
+                           text => 'srclang',
+                           level => $self->{level}->{must});
+      }
+    }
+
+  }, # check_attrs2
+}; # track
 
 $Element->{+HTML_NS}->{bgsound} = {
   %HTMLEmptyChecker,
@@ -9606,7 +9666,7 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.
