@@ -759,6 +759,8 @@ sub check_element ($$$;$) {
                   #
                 } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'source') {
                   $element_state->{has_source} = 1;
+                } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'track') {
+                  #
                 } else {
                   $content_def = $item->{parent_def} || $content_def;
                   $content_state = $item->{parent_state} || $content_state;

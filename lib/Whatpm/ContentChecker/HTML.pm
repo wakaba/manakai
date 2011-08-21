@@ -6092,6 +6092,7 @@ $Element->{+HTML_NS}->{video} = {
 
     $element_state->{allow_source}
         = not $item->{node}->has_attribute_ns (undef, 'src');
+    $element_state->{allow_track} = 1;
     $element_state->{has_source} ||= $element_state->{allow_source} * -1;
       ## NOTE: It might be set true by |check_element|.
 
@@ -6116,8 +6117,16 @@ $Element->{+HTML_NS}->{video} = {
                            level => $self->{level}->{must});
       }
       $element_state->{has_source} = 1;
+    } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'track') {
+      unless ($element_state->{allow_track}) {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:flow',
+                           level => $self->{level}->{must});
+      }
+      delete $element_state->{allow_source};
     } else {
       delete $element_state->{allow_source};
+      delete $element_state->{allow_track};
       $HTMLFlowContentChecker{check_child_element}->(@_);
     }
   },
@@ -6125,6 +6134,7 @@ $Element->{+HTML_NS}->{video} = {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       delete $element_state->{allow_source};
+      delete $element_state->{allow_track};
     }
     $HTMLFlowContentChecker{check_child_text}->(@_);
   },
