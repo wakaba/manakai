@@ -2020,6 +2020,19 @@ p {color: green}
 /meta;element not allowed:meta charset;m
 
 #data
+<meta http-equiv="Refresh" content="10; url='a.html'"
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;refresh:bad url;m
+
+#data
+<meta http-equiv="Refresh" content='10; url="a.html"'
+    xmlns="http://www.w3.org/1999/xhtml"/>
+#errors
+/meta/@content;refresh:bad url;m
+/meta/@content;syntax error:iriref3987;m
+
+#data
 <meta http-equiv="" content="example.net" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /meta/@http-equiv;enumerated:invalid;m
@@ -2478,6 +2491,7 @@ p {color: green}
 <meta http-equiv="Refresh" content="4; url=&quot;http://&quot;"/>
 </head>
 #errors
+/head/meta/@content;refresh:bad url;m
 /head/meta/@content;syntax error:iriref3987;m
 /head/meta/@content;URL:empty path;w
 /head/meta/@content;URL:non-DNS host;w

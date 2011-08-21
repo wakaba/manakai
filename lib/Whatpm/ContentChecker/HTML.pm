@@ -2574,6 +2574,13 @@ $Element->{+HTML_NS}->{meta} = {
             ## NOTE: Valid non-negative integer.
             #
           } elsif ($content =~ s/\A[0-9]+;[\x09\x0A\x0C\x0D\x20]+[Uu][Rr][Ll]=//) {
+            if ($content =~ m{^[\x22\x27]}) {
+              $self->{onerror}->(node => $content_attr,
+                                 value => $content, 
+                                 type => 'refresh:bad url', # XXXdoc
+                                 level => $self->{level}->{must});
+            }
+
             ## XXXURL
             Whatpm::URIChecker->check_iri_reference ($content, sub {
               $self->{onerror}->(value => $content, @_, node => $content_attr);
