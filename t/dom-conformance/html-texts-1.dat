@@ -2030,6 +2030,27 @@
 /progress/progress;element not allowed:minus;m
 
 #data
+<bdi xmlns="http://www.w3.org/1999/xhtml">x</bdi>
+#errors
+
+#data
+<bdi dir="ltr" xmlns="http://www.w3.org/1999/xhtml">x</bdi>
+#errors
+
+#data
+<bdi dir="rtl" xmlns="http://www.w3.org/1999/xhtml">x</bdi>
+#errors
+
+#data
+<bdi dir="RTL" xmlns="http://www.w3.org/1999/xhtml">x</bdi>
+#errors
+
+#data
+<bdi dir="xxx" xmlns="http://www.w3.org/1999/xhtml">x</bdi>
+#errors
+/bdi/@dir;enumerated:invalid;m
+
+#data
 <bdo xmlns="http://www.w3.org/1999/xhtml">x</bdo>
 #errors
 /bdo;attribute missing;dir;m
