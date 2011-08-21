@@ -727,6 +727,8 @@ sub check_element ($$$;$) {
           my $child_nsuri = $child->namespace_uri;
           $child_nsuri = '' unless defined $child_nsuri;
           my $child_ln = $child->manakai_local_name;
+
+          ## Handle transparent and semi-transparent elements
           if ($HTMLTransparentElements->{$child_nsuri}->{$child_ln} and
               not (($self->{flag}->{in_head} or
                     ($el_nsuri eq HTML_NS and $el_ln eq 'head')) and
@@ -774,7 +776,7 @@ sub check_element ($$$;$) {
                              parent_def => $content_def,
                              real_parent_state => $element_state,
                              parent_state => $content_state};
-          }
+          } # transparent
 
           if ($HTMLEmbeddedContent->{$child_nsuri}->{$child_ln}) {
             $element_state->{has_significant} = 1;
@@ -1023,100 +1025,6 @@ sub _remove_minuses ($$) {
 ## NOTE: Priority for "minuses" and "pluses" are currently left
 ## undefined and implemented inconsistently; it is not a problem for
 ## now, since no element belongs to both lists.
-
-sub _check_get_children ($$$) {
-  my ($self, $node, $parent_todo) = @_;
-  my $new_todos = [];
-  my $sib = [];
-  TP: {
-    my $node_ns = $node->namespace_uri;
-    $node_ns = '' unless defined $node_ns;
-    my $node_ln = $node->manakai_local_name;
-    if ($HTMLTransparentElements->{$node_ns}->{$node_ln}) {
-      if ($node_ns eq HTML_NS and $node_ln eq 'noscript') {
-        if ($parent_todo->{flag}->{in_head}) {
-          #
-        } else {
-          my $end = $self->_add_minuses ({HTML_NS, {noscript => 1}});
-          push @$sib, $end;
-          
-          unshift @$sib, @{$node->child_nodes};
-          push @$new_todos, {type => 'element-attributes', node => $node};
-          last TP;
-        }
-      } elsif ($node_ns eq HTML_NS and $node_ln eq 'del') {
-        my $sig_flag = $parent_todo->{flag}->{has_descendant}->{significant};
-        unshift @$sib, @{$node->child_nodes};
-        push @$new_todos, {type => 'element-attributes', node => $node};
-        push @$new_todos,
-            {type => 'code',
-             code => sub {
-               $parent_todo->{flag}->{has_descendant}->{significant} = 0
-                   if not $sig_flag;
-             }};
-        last TP;
-      } else {
-        unshift @$sib, @{$node->child_nodes};
-        push @$new_todos, {type => 'element-attributes', node => $node};
-        last TP;
-      }
-    }
-    if ($node_ns eq HTML_NS and ($node_ln eq 'video' or $node_ln eq 'audio')) {
-      if ($node->has_attribute_ns (undef, 'src')) {
-        unshift @$sib, @{$node->child_nodes};
-        push @$new_todos, {type => 'element-attributes', node => $node};
-        last TP;
-      } else {
-        my @cn = @{$node->child_nodes};
-        CN: while (@cn) {
-          my $cn = shift @cn;
-          my $cnt = $cn->node_type;
-          if ($cnt == 1) {
-            my $cn_nsuri = $cn->namespace_uri;
-            $cn_nsuri = '' unless defined $cn_nsuri;
-            if ($cn_nsuri eq HTML_NS and $cn->manakai_local_name eq 'source') {
-              #
-            } else {
-              last CN;
-            }
-          } elsif ($cnt == 3 or $cnt == 4) {
-            if ($cn->data =~ /[^\x09\x0A\x0C\x0D\x20]/) {
-              last CN;
-            }
-          }
-        } # CN
-        unshift @$sib, @cn;
-      }
-    } elsif ($node_ns eq HTML_NS and $node_ln eq 'object') {
-      my @cn = @{$node->child_nodes};
-      CN: while (@cn) {
-        my $cn = shift @cn;
-        my $cnt = $cn->node_type;
-        if ($cnt == 1) {
-          my $cn_nsuri = $cn->namespace_uri;
-          $cn_nsuri = '' unless defined $cn_nsuri;
-          if ($cn_nsuri eq HTML_NS and $cn->manakai_local_name eq 'param') {
-            #
-          } else {
-            last CN;
-          }
-        } elsif ($cnt == 3 or $cnt == 4) {
-          if ($cn->data =~ /[^\x09\x0A\x0C\x0D\x20]/) {
-            last CN;
-          }
-        }
-      } # CN
-      unshift @$sib, @cn;
-    }
-    push @$new_todos, {type => 'element', node => $node};
-  } # TP
-  
-  for my $new_todo (@$new_todos) {
-    $new_todo->{flag} = {%{$parent_todo->{flag} or {}}};
-  }
-  
-  return ($sib, $new_todos);
-} # _check_get_children
 
 =head1 LICENSE
 
