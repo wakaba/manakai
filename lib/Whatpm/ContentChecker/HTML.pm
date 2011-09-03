@@ -4043,7 +4043,7 @@ $Element->{+HTML_NS}->{multicol} = {
 }; # multicol
 
 $Element->{+HTML_NS}->{font} = {
-  %HTMLTransparentChecker,
+  %TransparentChecker,
   status => FEATURE_HTML5_OBSOLETE | FEATURE_OBSVOCAB,
   check_attrs => $GetHTMLAttrsChecker->({
     color => $HTMLColorAttrChecker,
@@ -6464,7 +6464,7 @@ $Element->{+HTML_NS}->{bgsound} = {
 }; # bgsound
 
 $Element->{+HTML_NS}->{canvas} = {
-  %HTMLTransparentChecker,
+  %TransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     height => $GetHTMLNonNegativeIntegerAttrChecker->(sub { 1 }),

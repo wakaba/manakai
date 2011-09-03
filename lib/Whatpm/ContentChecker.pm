@@ -386,11 +386,11 @@ my $HTMLTransparentElements = {
   (HTML_NS) => {
     #ins => 1,
     #del => 1,
-    font => 1, ## dropped from the spec
+    #font => 1, ## dropped from the spec
     noscript => 1,
       ## NOTE: |html:noscript| is transparent if scripting is disabled
       ## and not in |head|.
-    canvas => 1,
+    #canvas => 1,
     #a => 1,
     #map => 1,
   },
