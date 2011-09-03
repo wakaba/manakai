@@ -1988,7 +1988,7 @@ my %HTMLPhrasingContentChecker = (
   ## NOTE: The definition for |li| assumes that the only differences
   ## between flow and phrasing content checkers are |check_child_element|
   ## and |check_child_text|.
-);
+); # %HTMLPhrasingContentChecker
 
 my %HTMLTransparentChecker = %HTMLFlowContentChecker;
 ## ISSUE: Significant content rule should be applied to transparent element
@@ -3036,11 +3036,14 @@ $Element->{+HTML_NS}->{noscript} = {
                          level => $self->{level}->{must});
     }
 
-    unless ($self->{flag}->{in_head}) {
+    if ($self->{flag}->{in_head}) {
+      $HTMLChecker{check_start}->(@_);
+    } else {
       $self->_add_minus_elements ($element_state,
                                   {(HTML_NS) => {noscript => 1}});
+      $HTMLPhrasingContentChecker{check_start}->(@_);
     }
-  },
+  }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -3107,7 +3110,7 @@ $Element->{+HTML_NS}->{noscript} = {
     } else {
       $HTMLPhrasingContentChecker{check_end}->(@_);
     }
-  },
+  }, # check_end
 };
 ## ISSUE: Scripting is disabled: <head><noscript><html a></noscript></head>
 
@@ -3272,6 +3275,7 @@ $Element->{+HTML_NS}->{h1} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->{flag}->{has_hn} = 1;
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
 }; # h1
 
@@ -3530,7 +3534,7 @@ $Element->{+HTML_NS}->{pre} = {
     }
 
     $HTMLPhrasingContentChecker{check_end}->(@_);
-  },
+  }, # check_end
 }; # pre
 
 $Element->{+HTML_NS}->{xmp} = {
@@ -4293,7 +4297,8 @@ $Element->{+HTML_NS}->{q} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-  },
+    $HTMLPhrasingContentChecker{check_start}->(@_);
+  }, # check_start
 };
 ## TODO: "Quotation punctuation (such as quotation marks), if any, must be
 ## placed inside the <code>q</code> element."  Though we cannot test the
@@ -4349,7 +4354,9 @@ $Element->{+HTML_NS}->{dfn} = {
     }
     ## ISSUE: The HTML5 definition for the defined term does not work with
     ## |ruby| unless |dfn| has |title|.
-  },
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
@@ -4756,6 +4763,7 @@ $Element->{+HTML_NS}->{ruby} = {
 
     $element_state->{phase} = 'before-rb';
     #$element_state->{has_sig}
+    #$HTMLPhrasingContentChecker{check_start}->(@_);
   },
   ## NOTE: (phrasing, (rt | (rp, rt, rp)))+
   check_child_element => sub {
@@ -5003,7 +5011,9 @@ $Element->{+HTML_NS}->{ruby} = {
     if ($element_state->{has_significant} or $element_state->{has_sig}) {
       $item->{real_parent_state}->{has_significant} = 1;
     }    
-  },
+
+    #$HTMLPhrasingContentChecker{check_end}->(@_);
+  }, # check_end
 }; # ruby
 
 $Element->{+HTML_NS}->{rb} = {
@@ -5164,6 +5174,7 @@ $Element->{+HTML_NS}->{span} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
 }; # span
 
@@ -7231,6 +7242,7 @@ $Element->{+HTML_NS}->{th} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
 }; # th
 
@@ -7424,6 +7436,7 @@ $Element->{+HTML_NS}->{legend} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
 }; # legend
 
@@ -7476,6 +7489,8 @@ $Element->{+HTML_NS}->{label} = {
         = $item->{node}->get_attribute_ns (undef, 'for');
 
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -8363,6 +8378,8 @@ $Element->{+HTML_NS}->{button} = {
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{formaction}->{type}->{action} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
   check_attrs2 => sub {
     my ($self, $item, $element_state) = @_;
@@ -8574,6 +8591,8 @@ $Element->{+HTML_NS}->{datalist} = {
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
 
     $element_state->{id_type} = 'datalist';
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   },
   ## NOTE: phrasing | option*
   check_child_element => sub {
@@ -8642,6 +8661,7 @@ $Element->{+HTML_NS}->{datalist} = {
                            type => 'no significant content',
                            level => $self->{level}->{should});
       }
+      #$HTMLPhrasingContentChecker{check_end}->(@_);
     } else {
       ## NOTE: Since the content model explicitly allows a |datalist| element
       ## being empty, we don't raise "no significant content" error for this
@@ -8652,8 +8672,8 @@ $Element->{+HTML_NS}->{datalist} = {
       ## |any|, no "no significant content" error is raised neither.
       $HTMLChecker{check_end}->(@_);
     }
-  },
-};
+  }, # check_end
+}; # datalist
 
 $Element->{+HTML_NS}->{optgroup} = {
   %HTMLChecker,
@@ -9154,8 +9174,7 @@ $Element->{+HTML_NS}->{meter} = {
                            level => $self->{level}->{must});
       }
     }
-
- }, # check_attrs2
+  }, # check_attrs2
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, {(HTML_NS) => {meter => 1}});
@@ -9378,6 +9397,8 @@ $Element->{+HTML_NS}->{menu} = {
     my ($self, $item, $element_state) = @_;
     $element_state->{phase} = 'li or phrasing';
     $element_state->{id_type} = 'menu';
+
+    $HTMLPhrasingContentChecker{check_start}->(@_);
   }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
