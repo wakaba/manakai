@@ -1214,6 +1214,28 @@
 /p/ruby/rt;no significant content;s
 
 #data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<ruby><ins>a<rp>b</rp><rt>c</rt><rp>d</rp></ins></ruby>
+</p>
+#errors
+/p/ruby;element missing;rt;m
+/p/ruby/ins/rp;element not allowed:phrasing;m
+/p/ruby/ins/rt;element not allowed:phrasing;m
+/p/ruby/ins/rp;element not allowed:phrasing;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+<ruby><del>a<rp>b</rp><rt>c</rt><rp>d</rp></del></ruby>
+</p>
+#errors
+/p;no significant content;s
+/p/ruby;no significant content at the end;s
+/p/ruby;element missing;rt;m
+/p/ruby/del/rp;element not allowed:phrasing;m
+/p/ruby/del/rt;element not allowed:phrasing;m
+/p/ruby/del/rp;element not allowed:phrasing;m
+
+#data
 <p xmlns="http://www.w3.org/1999/xhtml"><rt></rt></p>
 #errors
 /p;no significant content;s
