@@ -6481,8 +6481,8 @@ $Element->{+HTML_NS}->{canvas} = {
 }; # canvas
 
 $Element->{+HTML_NS}->{map} = {
-  %HTMLFlowContentChecker,
-  status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+  %TransparentChecker,
+  status => FEATURE_HTML5_CR | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     my $has_name;
@@ -6551,8 +6551,8 @@ $Element->{+HTML_NS}->{map} = {
         ## element but there is any |area| element with the empty
         ## |alt=""| attribute, then the value contains an array
         ## reference that contains all of such |area| elements.
-    $HTMLFlowContentChecker{check_start}->(@_);
-  },
+    $TransparentChecker{check_start}->(@_);
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     
@@ -6568,8 +6568,8 @@ $Element->{+HTML_NS}->{map} = {
     
     $self->{flag}->{in_map} = $element_state->{in_map_original};
     
-    $HTMLFlowContentChecker{check_end}->(@_);
-  },
+    $TransparentChecker{check_end}->(@_);
+  }, # check_end
 }; # map
 
 $Element->{+HTML_NS}->{area} = {

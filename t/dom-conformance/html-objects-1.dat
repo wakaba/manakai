@@ -2629,6 +2629,7 @@ xxxx
 #errors
 /div/p/object/@usemap;no referenced map;m
 /div/map;attribute missing;name;m
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2636,6 +2637,7 @@ xxxx
 <map name="aa"/>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2643,6 +2645,7 @@ xxxx
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2650,6 +2653,7 @@ xxxx
 <p><object data="http://test/" usemap="#&#x4E00;">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2657,6 +2661,7 @@ xxxx
 <p><object data="http://test/" usemap="#bb">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/p/object/@usemap;no referenced map;m
 
 #data
@@ -2666,6 +2671,7 @@ xxxx
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -2673,6 +2679,7 @@ xxxx
 <p><object data="http://test/" usemap="#AA">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/p/object/@usemap;hashref:wrong case;m
 
 #data
@@ -2681,6 +2688,7 @@ xxxx
 <p><object data="http://test/" usemap="#aa">x</object></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/p/object/@usemap;hashref:wrong case;m
 
 #data

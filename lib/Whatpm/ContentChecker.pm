@@ -392,7 +392,7 @@ my $HTMLTransparentElements = {
       ## and not in |head|.
     canvas => 1,
     #a => 1,
-    map => 1,
+    #map => 1,
   },
 }; # $HTMLTransparentElements
 

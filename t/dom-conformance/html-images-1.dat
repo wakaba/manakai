@@ -59,6 +59,7 @@
 /map/map/p;no significant content;s
 /map;attribute missing;name;m
 /map/map;attribute missing;name;m
+/map/map;no significant content;s
 
 #data
 <map name="map1" xmlns="http://www.w3.org/1999/xhtml">
@@ -66,6 +67,7 @@
 </map>
 #errors
 /map;no significant content;s
+/map/map;no significant content;s
 /map/map/p;no significant content;s
 
 #data
@@ -77,6 +79,8 @@
 #errors
 /div;no significant content;s
 /div/area;element not allowed:area;m
+/div/map;no significant content;s
+/div/map/map;no significant content;s
 
 #data
 <map name="map1" xmlns="http://www.w3.org/1999/xhtml">
@@ -84,6 +88,7 @@
 </map>
 #errors
 /map;no significant content;s
+/map/map;no significant content;s
 /map/p;no significant content;s
 
 #data
@@ -92,6 +97,7 @@
 </div>
 #errors
 /div;no significant content;s
+/div/map;no significant content;s
 /div/p;no significant content;s
 /div/p/area;element not allowed:area;m
 
@@ -145,7 +151,6 @@ aa<map name="x">bbb</map>
 </br>
 #errors
 /br/map;element not allowed:empty;m
-/br/map/"bbb";character not allowed:empty;m
 
 #data
 <br xmlns="http://www.w3.org/1999/xhtml">
@@ -153,13 +158,13 @@ aa<map name="x">bbb</map>
 </br>
 #errors
 /br/map;element not allowed:empty;m
-/br/map/p;element not allowed:empty;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
 aa<map name="x"></map>
 </p>
 #errors
+/p/map;no significant content;s
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -533,8 +538,9 @@ aa<map name="x">b<map name="y">bb</map></map>
 <map id="aa"/>
 </div>
 #errors
-/div/map;attribute missing;name;m
 /div/p/img/@usemap;no referenced map;m
+/div/map;attribute missing;name;m
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -542,6 +548,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -549,6 +556,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -558,6 +566,8 @@ aa<map name="x">b<map name="y">bb</map></map>
 </div>
 #errors
 /div/map;attribute missing;name;m
+/div/map;no significant content;s
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -565,6 +575,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#a a"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map/@id;space in ID;m
 /div/map;attribute missing;name;m
 /div/p/img/@usemap;no referenced map;m
@@ -575,6 +586,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#a a"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map/@name;space in map name;m
 
 #data
@@ -583,6 +595,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#a a"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map/@id;space in ID;m
 /div/map/@name;space in map name;m
 
@@ -592,6 +605,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#a%20a"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map/@id;space in ID;m
 /div/map;attribute missing;name;m
 /div/p/img/@usemap;no referenced map;m
@@ -602,6 +616,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#a%20a"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map/@id;space in ID;m
 /div/map/@name;space in map name;m
 /div/p/img/@usemap;no referenced map;m
@@ -612,6 +627,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#&#x4E00;"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map;attribute missing;name;m
 /div/p/img/@usemap;no referenced map;m
 
@@ -621,6 +637,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#&#x4E00;"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -628,8 +645,9 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#bb"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map;m
+/div/map;no significant content;s
 /div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -637,6 +655,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#bb"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/p/img/@usemap;no referenced map;m
 
 #data
@@ -646,6 +665,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map;attribute missing;name;m
 /div/p/img/@usemap;no referenced map;m
 /div/p/img/@usemap;no referenced map;m
@@ -657,6 +677,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -664,8 +685,9 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#AA"/></p>
 </div>
 #errors
-/div/p/img/@usemap;no referenced map;m
+/div/map;no significant content;s
 /div/map;attribute missing;name;m
+/div/p/img/@usemap;no referenced map;m
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -673,6 +695,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#AA"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/p/img/@usemap;hashref:wrong case;m
 
 #data
@@ -681,6 +704,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/p/img/@usemap;no referenced map;m
 /div/map;attribute missing;name;m
 
@@ -690,6 +714,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <p><img src="http://test/" alt="" usemap="#aa"/></p>
 </div>
 #errors
+/div/map;no significant content;s
 /div/p/img/@usemap;hashref:wrong case;m
 
 #data
@@ -1823,6 +1848,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 </div>
 #errors
 /div/p/@id;duplicate ID;m
+/div/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1830,6 +1856,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 <map id="aa" name="aa"/>
 </div>
 #errors
+/div/map;no significant content;s
 /div/map/@id;duplicate ID;m
 
 #data
@@ -1844,6 +1871,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 </map>
 #errors
 /map;no significant content;s
+/map/map;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -1851,6 +1879,7 @@ aa<map name="x">b<map name="y">bb</map></map>
 </div>
 #errors
 /div;no significant content;s
+/div/map;no significant content;s
 
 #data
 <map xmlns="http://www.w3.org/1999/xhtml"
