@@ -3108,7 +3108,7 @@ $Element->{+HTML_NS}->{script} = {
 
 ## NOTE: When script is disabled.
 $Element->{+HTML_NS}->{noscript} = {
-  %HTMLTransparentChecker,
+  %TransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({}, {
     %HTMLAttrStatus,
@@ -3127,7 +3127,7 @@ $Element->{+HTML_NS}->{noscript} = {
     } else {
       $self->_add_minus_elements ($element_state,
                                   {(HTML_NS) => {noscript => 1}});
-      $HTMLPhrasingContentChecker{check_start}->(@_);
+      $TransparentChecker{check_start}->(@_);
     }
   }, # check_start
   check_child_element => sub {
@@ -3173,7 +3173,7 @@ $Element->{+HTML_NS}->{noscript} = {
                            level => $self->{level}->{must});
       }
     } else {
-      $HTMLTransparentChecker{check_child_element}->(@_);
+      $TransparentChecker{check_child_element}->(@_);
     }
   },
   check_child_text => sub {
@@ -3185,7 +3185,7 @@ $Element->{+HTML_NS}->{noscript} = {
                            level => $self->{level}->{must});
       }
     } else {
-      $HTMLTransparentChecker{check_child_text}->(@_);
+      $TransparentChecker{check_child_text}->(@_);
     }
   },
   check_end => sub {
@@ -3194,11 +3194,10 @@ $Element->{+HTML_NS}->{noscript} = {
     if ($self->{flag}->{in_head}) {
       $HTMLChecker{check_end}->(@_);
     } else {
-      $HTMLPhrasingContentChecker{check_end}->(@_);
+      $TransparentChecker{check_end}->(@_);
     }
   }, # check_end
-};
-## ISSUE: Scripting is disabled: <head><noscript><html a></noscript></head>
+}; # noscript
 
 $Element->{+HTML_NS}->{'event-source'} = {
   %HTMLEmptyChecker,
