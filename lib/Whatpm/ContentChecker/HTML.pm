@@ -283,9 +283,6 @@ my $FAECheckAttrs2 = sub {
 
 our $IsInHTMLInteractiveContent; # See Whatpm::ContentChecker.
 
-## NOTE: $HTMLTransparentElements: See Whatpm::ContentChecker.
-## NOTE: Semi-transparent elements: See Whatpm::ContentChecker.
-
 ## -- Common attribute syntacx checkers
 
 our $AttrChecker;
@@ -2025,8 +2022,6 @@ my %HTMLPhrasingContentChecker = (
     }
   }, # check_end
 ); # %HTMLPhrasingContentChecker
-
-my %HTMLTransparentChecker = %HTMLFlowContentChecker;
 
 my %TransparentChecker = (
   %HTMLFlowContentChecker,
@@ -5985,10 +5980,6 @@ $Element->{+HTML_NS}->{object} = {
     $TransparentChecker{check_child_text}->(@_);
   }, # check_child_text
 }; # object
-## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
-## What about |<section><object data><style scoped></style>x</object></section>|?
-## |<section><ins></ins><object data><style scoped></style>x</object></section>|?
-## <ins xmlns=http://www.w3.org/1999/xhtml><style scoped></style>aa</ins>
 
 $Element->{+HTML_NS}->{applet} = {
   %{$Element->{+HTML_NS}->{object}},

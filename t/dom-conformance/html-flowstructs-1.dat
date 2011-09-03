@@ -865,3 +865,47 @@
 <div xmlns="http://www.w3.org/1999/xhtml"><figcaption>aa</figcaption></div>
 #errors
 /div/figcaption;element not allowed:flow;m
+
+#data
+<menu xmlns="http://www.w3.org/1999/xhtml">
+  <object data="aa">
+    <li>aa</li>
+  </object>
+</menu>
+#errors
+/menu/object/li;element not allowed:phrasing;m
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+  <object data="aa">
+    <style scoped=""/>
+    x
+  </object>
+</section>
+#errors
+/section/object/style;element not allowed:flow style;m
+/section/object/style;SUBDOC;text/css
+
+#data
+<section xmlns="http://www.w3.org/1999/xhtml">
+  <ins/>
+  <object data="aa">
+    <style scoped=""/>
+    x
+  </object>
+</section>
+#errors
+/section/ins;no significant content;s
+/section/object/style;element not allowed:flow style;m
+/section/object/style;SUBDOC;text/css
+
+#data
+<ins xmlns="http://www.w3.org/1999/xhtml"><style scoped=""/>aa</ins>
+#errors
+/ins/style;SUBDOC;text/css
+
+#data
+<div xmlns="http://www.w3.org/1999/xhtml"><ins><style scoped=""/>aa</ins></div>
+#errors
+/div/ins/style;SUBDOC;text/css
+/div/ins/style;element not allowed:flow style;m
