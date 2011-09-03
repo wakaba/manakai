@@ -1951,7 +1951,8 @@ my %HTMLFlowContentChecker = (
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
-    ## NOTE: A modified copy of the code below is in |datagrid| checker.
+    ## NOTE: There are modified copies of the code below in
+    ## |%HTMLPhrasingContentChecker| and |datagrid| checkers.
     if ($element_state->{has_significant}) {
       $item->{real_parent_state}->{has_significant} = 1;
     } elsif ($item->{transparent}) {
@@ -1961,11 +1962,19 @@ my %HTMLFlowContentChecker = (
                          level => $self->{level}->{should},
                          type => 'no significant content');
     }
-  },
-);
+  }, # check_end
+); # %HTMLFlowContentChecker
 
 my %HTMLPhrasingContentChecker = (
   %HTMLChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+
+    ## Will be restored by |check_end| of |%HTMLPhrasingChecker| or
+    ## |menu| element.
+    $element_state->{in_phrasing_original} = $self->{flag}->{in_phrasing};
+    $self->{flag}->{in_phrasing} = 1;
+  }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -1983,11 +1992,25 @@ my %HTMLPhrasingContentChecker = (
                          type => 'element not allowed:phrasing',
                          level => $self->{level}->{must});
     }
-  },
-  check_end => $HTMLFlowContentChecker{check_end},
-  ## NOTE: The definition for |li| assumes that the only differences
-  ## between flow and phrasing content checkers are |check_child_element|
-  ## and |check_child_text|.
+  }, # check_child_element
+  check_end => sub {
+    my ($self, $item, $element_state) = @_;
+
+    delete $self->{flag}->{in_phrasing}
+        unless $element_state->{in_phrasing_original};
+
+    ## NOTE: There are modified copies of the code below in
+    ## |%HTMLFlowContentChecker| and |datagrid| checkers.
+    if ($element_state->{has_significant}) {
+      $item->{real_parent_state}->{has_significant} = 1;
+    } elsif ($item->{transparent}) {
+      #
+    } else {
+      $self->{onerror}->(node => $item->{node},
+                         level => $self->{level}->{should},
+                         type => 'no significant content');
+    }
+  }, # check_end
 ); # %HTMLPhrasingContentChecker
 
 my %HTMLTransparentChecker = %HTMLFlowContentChecker;
@@ -9450,6 +9473,10 @@ $Element->{+HTML_NS}->{menu} = {
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     if ($element_state->{phase} eq 'li') {
+      ## Set by |check_start| of |%HTMLPhrasingContentChecker|.
+      delete $self->{flag}->{in_phrasing}
+          unless $element_state->{in_phrasing_original};
+
       $HTMLChecker{check_end}->(@_);
     } else { # 'phrasing' or 'li or phrasing'
       $HTMLPhrasingContentChecker{check_end}->(@_);
