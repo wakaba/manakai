@@ -385,7 +385,7 @@ our $IsInHTMLInteractiveContent = sub {
 my $HTMLTransparentElements = {
   (HTML_NS) => {
     #ins => 1,
-    del => 1,
+    #del => 1,
     font => 1, ## dropped from the spec
     noscript => 1,
       ## NOTE: |html:noscript| is transparent if scripting is disabled

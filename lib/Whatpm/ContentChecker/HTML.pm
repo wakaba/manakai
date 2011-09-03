@@ -1919,6 +1919,9 @@ my %HTMLFlowContentChecker = (
   %HTMLChecker,
   check_start => sub {
     my ($self, $item, $element_state) = @_;
+
+    ## Will be restored by |check_end| of |%HTMLFlowContentChecker| or
+    ## |del| element.
     $element_state->{in_flow_original} = $self->{flag}->{in_flow};
     $self->{flag}->{in_flow} = 1;
   }, # check_start
@@ -1957,7 +1960,8 @@ my %HTMLFlowContentChecker = (
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     ## NOTE: There are modified copies of the code below in
-    ## |%HTMLPhrasingContentChecker| and |datagrid| checkers.
+    ## |%HTMLPhrasingContentChecker| and |del| and |datagrid| element
+    ## checkers.
     if ($element_state->{has_significant}) {
       $item->{real_parent_state}->{has_significant} = 1;
     } elsif ($item->{transparent}) {
@@ -1978,8 +1982,8 @@ my %HTMLPhrasingContentChecker = (
   check_start => sub {
     my ($self, $item, $element_state) = @_;
 
-    ## Will be restored by |check_end| of |%HTMLPhrasingChecker| or
-    ## |menu| element.
+    ## Will be restored by |check_end| of
+    ## |%HTMLPhrasingContentChecker| or |menu| element.
     $element_state->{in_phrasing_original} = $self->{flag}->{in_phrasing};
     $self->{flag}->{in_phrasing} = 1;
   }, # check_start
@@ -2008,7 +2012,8 @@ my %HTMLPhrasingContentChecker = (
         unless $element_state->{in_phrasing_original};
 
     ## NOTE: There are modified copies of the code below in
-    ## |%HTMLFlowContentChecker| and |datagrid| checkers.
+    ## |%HTMLFlowContentChecker| and |datagrid| and |del| element
+    ## checkers.
     if ($element_state->{has_significant}) {
       $item->{real_parent_state}->{has_significant} = 1;
     } elsif ($item->{transparent}) {
@@ -5311,11 +5316,12 @@ $Element->{+HTML_NS}->{ins} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-  },
+    $TransparentChecker{check_start}->(@_);
+  }, # check_start
 }; # ins
 
 $Element->{+HTML_NS}->{del} = {
-  %HTMLTransparentChecker,
+  %TransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
@@ -5326,8 +5332,14 @@ $Element->{+HTML_NS}->{del} = {
     cite => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
     datetime => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   }), # check_attrs
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
+    $TransparentChecker{check_start}->(@_);
+  }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
+    ## Modified copy of |check_end| for |%HTMLFlowContentChecker|.
     if ($element_state->{has_significant}) {
       ## NOTE: Significantness flag does not propagate.
     } elsif ($item->{transparent}) {
@@ -5337,11 +5349,14 @@ $Element->{+HTML_NS}->{del} = {
                          level => $self->{level}->{should},
                          type => 'no significant content');
     }
-  },
-  check_start => sub {
-    my ($self, $item, $element_state) = @_;
-    $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-  },
+
+    delete $self->{flag}->{in_flow}
+        unless $element_state->{in_flow_original};
+    # "in_phrasing" don't have to be restored here, because of the
+    # "transparent"ness.
+
+    #$TransparentChecker{check_end}->(@_);
+  }, # check_end
 }; # del
 
 # ---- Embedded content ----

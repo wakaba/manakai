@@ -1436,19 +1436,24 @@
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/></del></rule>
 #errors
 /rule;element not defined;m
+/rule/del;no significant content;s
+/rule/del/nest;element not allowed:flow;m
 /rule/del/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/>aa</del></rule>
 #errors
 /rule;element not defined;m
+/rule/del/nest;element not allowed:flow;m
 /rule/del/nest;element not defined;m
 
 #data
 <rule xmlns="http://www.w3.org/1999/xhtml"><del><nest/><p/></del></rule>
 #errors
+/rule/del;no significant content;s
 /rule/del/p;no significant content;s
 /rule;element not defined;m
+/rule/del/nest;element not allowed:flow;m
 /rule/del/nest;element not defined;m
 
 #data
