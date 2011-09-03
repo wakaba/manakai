@@ -82,14 +82,14 @@
   <video src="a"> aa<track src="abc" srclang="ja"/> </video>
 </p>
 #errors
-/p/video/track;element not allowed:flow;m
+/p/video/track;element not allowed:phrasing;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
   <audio src="a"> aa<track src="abc" srclang="ja"/> </audio>
 </p>
 #errors
-/p/audio/track;element not allowed:flow;m
+/p/audio/track;element not allowed:phrasing;m
 
 #data
 <video src="b" xmlns="http://www.w3.org/1999/xhtml">
@@ -169,7 +169,7 @@
 </p>
 #errors
 /p/video;no significant content;s
-/p/video/source;element not allowed:flow;m
+/p/video/source;element not allowed:phrasing;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -177,14 +177,14 @@
 </p>
 #errors
 /p/audio;no significant content;s
-/p/audio/source;element not allowed:flow;m
+/p/audio/source;element not allowed:phrasing;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
   <video src="a"><source src="a"/><track src="abc" srclang="ja"/> <div>a</div></video>
 </p>
 #errors
-/p/video/source;element not allowed:flow;m
+/p/video/source;element not allowed:phrasing;m
 /p/video/div;element not allowed:phrasing;m
 
 #data
@@ -192,7 +192,7 @@
   <audio src="a"><source src="a"/><track src="abc" srclang="ja"/> <div>a</div></audio>
 </p>
 #errors
-/p/audio/source;element not allowed:flow;m
+/p/audio/source;element not allowed:phrasing;m
 /p/audio/div;element not allowed:phrasing;m
 
 #data
@@ -325,7 +325,7 @@
       <source src="a"/></video>
 </p>
 #errors
-/p/video/source;element not allowed:flow;m
+/p/video/source;element not allowed:phrasing;m
 /p/video;no significant content;s
 
 #data
@@ -334,7 +334,7 @@
       <source src="a"/></audio>
 </p>
 #errors
-/p/audio/source;element not allowed:flow;m
+/p/audio/source;element not allowed:phrasing;m
 /p/audio;no significant content;s
 
 #data
@@ -359,7 +359,7 @@
       <source src="a"/></video>
 </p>
 #errors
-/p/video/source;element not allowed:flow;m
+/p/video/source;element not allowed:phrasing;m
 /p/video;no significant content;s
 
 #data
@@ -368,7 +368,7 @@
       <source src="a"/></audio>
 </p>
 #errors
-/p/audio/source;element not allowed:flow;m
+/p/audio/source;element not allowed:phrasing;m
 /p/audio;no significant content;s
 
 #data
@@ -395,8 +395,8 @@
       <source src="a"/></video>
 </p>
 #errors
-/p/video/source;element not allowed:flow;m
-/p/video/source;element not allowed:flow;m
+/p/video/source;element not allowed:phrasing;m
+/p/video/source;element not allowed:phrasing;m
 /p/video;no significant content;s
 
 #data
@@ -405,8 +405,8 @@
       <source src="a"/></audio>
 </p>
 #errors
-/p/audio/source;element not allowed:flow;m
-/p/audio/source;element not allowed:flow;m
+/p/audio/source;element not allowed:phrasing;m
+/p/audio/source;element not allowed:phrasing;m
 /p/audio;no significant content;s
 
 #data

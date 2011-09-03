@@ -5965,8 +5965,11 @@ $Element->{+HTML_NS}->{object} = {
       #
     } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'param') {
       if ($element_state->{has_non_param}) {
+        my $type = $self->{flag}->{in_phrasing}
+            ? 'element not allowed:phrasing'
+            : 'element not allowed:flow';
         $self->{onerror}->(node => $child_el, 
-                           type => 'element not allowed:flow',
+                           type => $type,
                            level => $self->{level}->{must});
       }
     } else {
@@ -6215,15 +6218,21 @@ $Element->{+HTML_NS}->{video} = {
       #
     } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'source') {
       unless ($element_state->{allow_source}) {
+        my $type = $self->{flag}->{in_phrasing}
+            ? 'element not allowed:phrasing'
+            : 'element not allowed:flow';
         $self->{onerror}->(node => $child_el,
-                         type => 'element not allowed:flow',
+                           type => $type,
                            level => $self->{level}->{must});
       }
       $element_state->{has_source} = 1;
     } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'track') {
       unless ($element_state->{allow_track}) {
+        my $type = $self->{flag}->{in_phrasing}
+            ? 'element not allowed:phrasing'
+            : 'element not allowed:flow';
         $self->{onerror}->(node => $child_el,
-                           type => 'element not allowed:flow',
+                           type => $type,
                            level => $self->{level}->{must});
       }
       delete $element_state->{allow_source};

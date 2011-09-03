@@ -396,12 +396,6 @@ my $HTMLTransparentElements = {
   },
 }; # $HTMLTransparentElements
 
-## NOTE: Now that the term "semi-transparent content model" is dropped
-## from the spec, but the concept is not.
-my $HTMLSemiTransparentElements = {
-#  (HTML_NS) => {object => 1, applet => 1, video => 1, audio => 1},
-}; # $HTMLSemiTransparentElements
-
 our $Element = {};
 
 $Element->{q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>}->{RDF} = {
@@ -744,36 +738,10 @@ sub check_element ($$$;$) {
                              real_parent_state => $element_state,
                              transparent => 1};
           } else {
-            if ($item->{parent_def} and # has parent
-                $el_nsuri eq HTML_NS) { ## $HTMLSemiTransparentElements
-              if ($el_ln eq 'object' or $el_ln eq 'applet') {
-                if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-                  #
-                } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'param') {
-                  #
-                } else {
-                  $content_def = $item->{parent_def} || $content_def;
-                  $content_state = $item->{parent_state} || $content_state;
-                }
-              } elsif ($el_ln eq 'video' or $el_ln eq 'audio') {
-                if ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
-                  #
-                } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'source') {
-                  $element_state->{has_source} = 1;
-                } elsif ($child_nsuri eq HTML_NS and $child_ln eq 'track') {
-                  #
-                } else {
-                  $content_def = $item->{parent_def} || $content_def;
-                  $content_state = $item->{parent_state} || $content_state;
-                }
-              }
-            }
-
             push @new_item, [$content_def->{check_child_element},
                              $self, $item, $child,
                              $child_nsuri, $child_ln,
-                             $HTMLSemiTransparentElements
-                                 ->{$child_nsuri}->{$child_ln},
+                             0,
                              $content_state, $element_state];
             push @new_item, {type => 'element', node => $child,
                              parent_def => $content_def,
@@ -791,10 +759,6 @@ sub check_element ($$$;$) {
                            $self, $item, $child, $has_significant,
                            $content_state, $element_state];
           $element_state->{has_significant} ||= $has_significant;
-          if ($has_significant and
-              $HTMLSemiTransparentElements->{$el_nsuri}->{$el_ln}) {
-            $content_def = $item->{parent_def} || $content_def;
-          }
         } elsif ($child_nt == 5) { # ENTITY_REFERENCE_NODE
           push @child, @{$child->child_nodes};
         }
