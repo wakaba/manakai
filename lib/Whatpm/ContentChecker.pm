@@ -391,7 +391,7 @@ my $HTMLTransparentElements = {
       ## NOTE: |html:noscript| is transparent if scripting is disabled
       ## and not in |head|.
     canvas => 1,
-    a => 1,
+    #a => 1,
     map => 1,
   },
 }; # $HTMLTransparentElements

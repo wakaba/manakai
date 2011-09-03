@@ -110,12 +110,14 @@
 <a></a>
 x</span>
 #errors
+/span/a;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
 <a></a>
 x</div>
 #errors
+/div/a;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">XXX<a>YYY</a></a>
@@ -134,7 +136,9 @@ x</div>
 #errors
 /div;no significant content;s
 /div/p;no significant content;s
+/div/p/a;no significant content;s
 /div/ul/li;no significant content;s
+/div/ul/li/a;no significant content;s
 
 #data
 <div xmlns="http://www.w3.org/1999/xhtml">
@@ -143,7 +147,9 @@ x</div>
 #errors
 /div;no significant content;s
 /div/p;no significant content;s
+/div/p/a;no significant content;s
 /div/ol/li;no significant content;s
+/div/ol/li/a;no significant content;s
 
 #data
 <a xmlns="http://www.w3.org/1999/xhtml">
@@ -517,6 +523,7 @@ x</div>
 #errors
 /div;no significant content;s
 /div/p;no significant content;s
+/div/p/a;no significant content;s
 /div/ol/li;no significant content;s
 /div/ol/li/datagrid;no significant content;s
 /div/ol/li/datagrid;element not defined;m
@@ -533,6 +540,7 @@ x</div>
 /details/legend;no significant content;s
 /details/legend;element not allowed:flow;m
 /details/p;no significant content;s
+/details/p/a;no significant content;s
 
 #data
 <details xmlns="http://www.w3.org/1999/xhtml">
@@ -543,6 +551,7 @@ x</div>
 /details;no significant content;s
 /details/legend;no significant content;s
 /details/legend;element not allowed:flow;m
+/details/legend/a;no significant content;s
 
 #data
 <a href="http://test/" xmlns="http://www.w3.org/1999/xhtml"/>

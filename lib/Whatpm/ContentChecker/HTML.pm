@@ -4079,8 +4079,8 @@ $Element->{+HTML_NS}->{nolayer} = {
 # ---- Text-level semantics ----
 
 $Element->{+HTML_NS}->{a} = {
-  %HTMLTransparentChecker,
-  status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
+  %TransparentChecker,
+  status => FEATURE_HTML5_CR | FEATURE_M12N10_REC,
   check_attrs => sub {
     my ($self, $item, $element_state) = @_;
     my %attr;
@@ -4313,6 +4313,7 @@ $Element->{+HTML_NS}->{a} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state, $HTMLInteractiveContent);
+    $TransparentChecker{check_start}->(@_);
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -4321,8 +4322,8 @@ $Element->{+HTML_NS}->{a} = {
         unless $element_state->{in_a_href_original};
 
     $NameAttrCheckEnd->(@_);
-    $HTMLTransparentChecker{check_end}->(@_);
-  },
+    $TransparentChecker{check_end}->(@_);
+  }, # check_end
 }; # a
 
 $Element->{+HTML_NS}->{em} = {
