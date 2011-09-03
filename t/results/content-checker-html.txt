@@ -4118,252 +4118,40 @@ ok 3870
 ok 3871
 ok 3872
 ok 3873
-not ok 3874 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <video><source src="a"/><track src="abc" srclang="ja"/> </video>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <video><source src="a"/><track src="abc" srclang="ja"/> </video>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/p/video;no significant content;s  *
-# +---+-----+---+-----------------------------------+
-not ok 3875 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio><source src="a"/><track src="abc" srclang="ja"/> </audio>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio><source src="a"/><track src="abc" srclang="ja"/> </audio>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/p/audio;no significant content;s  *
-# +---+-----+---+-----------------------------------+
+ok 3874
+ok 3875
 ok 3876
 ok 3877
-not ok 3878 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><source src="a"/><track src="abc" srclang="ja"/> </video>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><source src="a"/><track src="abc" srclang="ja"/> </video>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+----------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                      |
-# +---+--------------------------------------------+---+----------------------------------------------+
-# *  1|/p/video/source;element not allowed:flow;m  *  1|/p/video/source;element not allowed:flow;m\n  *
-# |   |                                            *  2|/p/video;no significant content;s             *
-# +---+--------------------------------------------+---+----------------------------------------------+
-not ok 3879 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><source src="a"/><track src="abc" srclang="ja"/> </audio>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><source src="a"/><track src="abc" srclang="ja"/> </audio>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+----------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                      |
-# +---+--------------------------------------------+---+----------------------------------------------+
-# *  1|/p/audio/source;element not allowed:flow;m  *  1|/p/audio/source;element not allowed:flow;m\n  *
-# |   |                                            *  2|/p/audio;no significant content;s             *
-# +---+--------------------------------------------+---+----------------------------------------------+
+ok 3878
+ok 3879
 ok 3880
 ok 3881
 ok 3882
 ok 3883
-not ok 3884 - <div xmlns="http://www.w3.org/1999/xhtml">
-#   <video><source src="a"/><track src="abc" srclang="ja"/> </video>
-#   <p>abc</p>
-# </div>
-#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
-#   <video><source src="a"/><track src="abc" srclang="ja"/> </video>
-#   <p>abc</p>
-# </div>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-------------------------------------+
-# | Ln|Got  | Ln|Expected                             |
-# +---+-----+---+-------------------------------------+
-# |   |     *  1|/div/video;no significant content;s  *
-# +---+-----+---+-------------------------------------+
-not ok 3885 - <div xmlns="http://www.w3.org/1999/xhtml">
-#   <audio><source src="a"/><track src="abc" srclang="ja"/> </audio>
-#   <p>abv</p>
-# </div>
-#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
-#   <audio><source src="a"/><track src="abc" srclang="ja"/> </audio>
-#   <p>abv</p>
-# </div>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-------------------------------------+
-# | Ln|Got  | Ln|Expected                             |
-# +---+-----+---+-------------------------------------+
-# |   |     *  1|/div/audio;no significant content;s  *
-# +---+-----+---+-------------------------------------+
+ok 3884
+ok 3885
 ok 3886
 ok 3887
-not ok 3888 - <div xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><source src="a"/><track src="abc" srclang="ja"/> </video>
-#   <p>abc</p>
-# </div>
-#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><source src="a"/><track src="abc" srclang="ja"/> </video>
-#   <p>abc</p>
-# </div>'
-#   at content-checker-test-ok line 1.
-# +---+----------------------------------------------+---+------------------------------------------------+
-# | Ln|Got                                           | Ln|Expected                                        |
-# +---+----------------------------------------------+---+------------------------------------------------+
-# *  1|/div/video/source;element not allowed:flow;m  *  1|/div/video/source;element not allowed:flow;m\n  *
-# |   |                                              *  2|/div/video;no significant content;s             *
-# +---+----------------------------------------------+---+------------------------------------------------+
-not ok 3889 - <div xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><source src="a"/><track src="abc" srclang="ja"/> </audio>
-#   <p>abv</p>
-# </div>
-#   Failed test '<div xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><source src="a"/><track src="abc" srclang="ja"/> </audio>
-#   <p>abv</p>
-# </div>'
-#   at content-checker-test-ok line 1.
-# +---+----------------------------------------------+---+------------------------------------------------+
-# | Ln|Got                                           | Ln|Expected                                        |
-# +---+----------------------------------------------+---+------------------------------------------------+
-# *  1|/div/audio/source;element not allowed:flow;m  *  1|/div/audio/source;element not allowed:flow;m\n  *
-# |   |                                              *  2|/div/audio;no significant content;s             *
-# +---+----------------------------------------------+---+------------------------------------------------+
+ok 3888
+ok 3889
 ok 3890
 ok 3891
 ok 3892
 ok 3893
-not ok 3894 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <video ><source src="a"/><source src="a"/>
-#       <track src="abc" srclang="ja"/> </video>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <video ><source src="a"/><source src="a"/>
-#       <track src="abc" srclang="ja"/> </video>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/p/video;no significant content;s  *
-# +---+-----+---+-----------------------------------+
-not ok 3895 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio ><source src="a"/><source src="a"/>
-#       <track src="abc" srclang="ja"/> </audio>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio ><source src="a"/><source src="a"/>
-#       <track src="abc" srclang="ja"/> </audio>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+-----+---+-----------------------------------+
-# | Ln|Got  | Ln|Expected                           |
-# +---+-----+---+-----------------------------------+
-# |   |     *  1|/p/audio;no significant content;s  *
-# +---+-----+---+-----------------------------------+
+ok 3894
+ok 3895
 ok 3896
 ok 3897
-not ok 3898 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <video><track src="abc" srclang="ja"/>
-#       <source src="a"/></video>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <video><track src="abc" srclang="ja"/>
-#       <source src="a"/></video>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                          |
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# *  1|/p/video/source;element not allowed:flow;m  *  1|/p/video/source;element not allowed:phrasing;m\n  *
-# |   |                                            *  2|/p/video;no significant content;s                 *
-# +---+--------------------------------------------+---+--------------------------------------------------+
-not ok 3899 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio><track src="abc" srclang="ja"/>
-#       <source src="a"/></audio>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio><track src="abc" srclang="ja"/>
-#       <source src="a"/></audio>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                          |
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# *  1|/p/audio/source;element not allowed:flow;m  *  1|/p/audio/source;element not allowed:phrasing;m\n  *
-# |   |                                            *  2|/p/audio;no significant content;s                 *
-# +---+--------------------------------------------+---+--------------------------------------------------+
+ok 3898
+ok 3899
 ok 3900
 ok 3901
-not ok 3902 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><track src="abc" srclang="ja"/>
-#       <source src="a"/></video>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><track src="abc" srclang="ja"/>
-#       <source src="a"/></video>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                          |
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# *  1|/p/video/source;element not allowed:flow;m  *  1|/p/video/source;element not allowed:phrasing;m\n  *
-# |   |                                            *  2|/p/video;no significant content;s                 *
-# +---+--------------------------------------------+---+--------------------------------------------------+
-not ok 3903 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><track src="abc" srclang="ja"/>
-#       <source src="a"/></audio>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><track src="abc" srclang="ja"/>
-#       <source src="a"/></audio>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                          |
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# *  1|/p/audio/source;element not allowed:flow;m  *  1|/p/audio/source;element not allowed:phrasing;m\n  *
-# |   |                                            *  2|/p/audio;no significant content;s                 *
-# +---+--------------------------------------------+---+--------------------------------------------------+
+ok 3902
+ok 3903
 ok 3904
 ok 3905
-not ok 3906 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><source src="a"/><track src="abc" srclang="ja"/>
-#       <source src="a"/></video>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <video src="a"><source src="a"/><track src="abc" srclang="ja"/>
-#       <source src="a"/></video>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                          |
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# *  1|/p/video/source;element not allowed:flow;m  *  1|/p/video/source;element not allowed:phrasing;m    *
-# *  2|/p/video/source;element not allowed:flow;m  *  2|/p/video/source;element not allowed:phrasing;m\n  *
-# |   |                                            *  3|/p/video;no significant content;s                 *
-# +---+--------------------------------------------+---+--------------------------------------------------+
-not ok 3907 - <p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><source src="a"/><track src="abc" srclang="ja"/>
-#       <source src="a"/></audio>
-# </p>
-#   Failed test '<p xmlns="http://www.w3.org/1999/xhtml">
-#   <audio src="a"><source src="a"/><track src="abc" srclang="ja"/>
-#       <source src="a"/></audio>
-# </p>'
-#   at content-checker-test-ok line 1.
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                          |
-# +---+--------------------------------------------+---+--------------------------------------------------+
-# *  1|/p/audio/source;element not allowed:flow;m  *  1|/p/audio/source;element not allowed:phrasing;m    *
-# *  2|/p/audio/source;element not allowed:flow;m  *  2|/p/audio/source;element not allowed:phrasing;m\n  *
-# |   |                                            *  3|/p/audio;no significant content;s                 *
-# +---+--------------------------------------------+---+--------------------------------------------------+
+ok 3906
+ok 3907
 ok 3908
 ok 3909
 ok 3910
@@ -10592,4 +10380,4 @@ ok 10029
 ok 10030
 ok 10031
 1..10031
-# Looks like you failed 41 tests of 10031.
+# Looks like you failed 25 tests of 10031.

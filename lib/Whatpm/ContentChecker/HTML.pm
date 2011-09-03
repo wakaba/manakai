@@ -2048,7 +2048,7 @@ my %TransparentChecker = (
                            type => 'element not allowed:phrasing',
                            level => $self->{level}->{must});
       }
-    } elsif ($self->{flag}->{in_flow}) {
+    } elsif ($self->{flag}->{in_flow} and $element_state->{in_flow_original}) {
       if ($child_nsuri eq HTML_NS and $child_ln eq 'style') {
         $self->{onerror}->(node => $child_el,
                            type => 'element not allowed:flow style',
@@ -5830,7 +5830,7 @@ $Element->{+HTML_NS}->{noembed} = {
 }; # noembed
 
 $Element->{+HTML_NS}->{object} = {
-  %HTMLTransparentChecker,
+  %TransparentChecker,
   status => FEATURE_HTML5_LC | FEATURE_M12N10_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     align => $EmbeddedAlignChecker,
@@ -5949,8 +5949,9 @@ $Element->{+HTML_NS}->{object} = {
     $element_state->{uri_info}->{codebase}->{type}->{base} = 1;
     $element_state->{uri_info}->{archive}->{type}->{resource} = 1;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+
+    $TransparentChecker{check_start}->(@_);
   }, # check_start
-  ## NOTE: param*, transparent (Flow)
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -5969,32 +5970,22 @@ $Element->{+HTML_NS}->{object} = {
                            level => $self->{level}->{must});
       }
     } else {
-      $HTMLFlowContentChecker{check_child_element}->(@_);
       $element_state->{has_non_param} = 1;
+      $TransparentChecker{check_child_element}->(@_);
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       $element_state->{has_non_param} = 1;
     }
-  },   
-  check_end => sub {
-    my ($self, $item, $element_state) = @_;
-    if ($element_state->{has_significant}) {
-      $item->{real_parent_state}->{has_significant} = 1;
-    } elsif ($item->{node}->manakai_parent_element) {
-      ## NOTE: Transparent.
-    } else {
-      $self->{onerror}->(node => $item->{node},
-                         level => $self->{level}->{should},
-                         type => 'no significant content');
-    }
-  }, # check_end
+    $TransparentChecker{check_child_text}->(@_);
+  }, # check_child_text
 }; # object
 ## ISSUE: Is |<menu><object data><li>aa</li></object></menu>| conforming?
 ## What about |<section><object data><style scoped></style>x</object></section>|?
 ## |<section><ins></ins><object data><style scoped></style>x</object></section>|?
+## <ins xmlns=http://www.w3.org/1999/xhtml><style scoped></style>aa</ins>
 
 $Element->{+HTML_NS}->{applet} = {
   %{$Element->{+HTML_NS}->{object}},
@@ -6137,7 +6128,7 @@ $Element->{+HTML_NS}->{param} = {
 }; # param
 
 $Element->{+HTML_NS}->{video} = {
-  %HTMLTransparentChecker,
+  %TransparentChecker,
   status => FEATURE_HTML5_LC,
   check_attrs => $GetHTMLAttrsChecker->({
     autobuffer => $GetHTMLBooleanAttrChecker->('autobuffer'),
@@ -6208,6 +6199,8 @@ $Element->{+HTML_NS}->{video} = {
 
     $element_state->{uri_info}->{src}->{type}->{embedded} = 1;
     $element_state->{uri_info}->{poster}->{type}->{embedded} = 1;
+
+    $TransparentChecker{check_start}->(@_);
   }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
@@ -6237,17 +6230,17 @@ $Element->{+HTML_NS}->{video} = {
     } else {
       delete $element_state->{allow_source};
       delete $element_state->{allow_track};
-      $HTMLFlowContentChecker{check_child_element}->(@_);
+      $TransparentChecker{check_child_element}->(@_);
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
       delete $element_state->{allow_source};
       delete $element_state->{allow_track};
     }
-    $HTMLFlowContentChecker{check_child_text}->(@_);
-  },
+    $TransparentChecker{check_child_text}->(@_);
+  }, # check_child_text
   check_end => sub {
     my ($self, $item, $element_state) = @_;
     $self->_remove_minus_elements ($element_state);
@@ -6259,8 +6252,8 @@ $Element->{+HTML_NS}->{video} = {
                          level => $self->{level}->{warn});
     }
 
-    $Element->{+HTML_NS}->{object}->{check_end}->(@_);
-  },
+    $TransparentChecker{check_end}->(@_);
+  }, # check_end
 }; # video
 
 $Element->{+HTML_NS}->{audio} = {

@@ -399,7 +399,7 @@ my $HTMLTransparentElements = {
 ## NOTE: Now that the term "semi-transparent content model" is dropped
 ## from the spec, but the concept is not.
 my $HTMLSemiTransparentElements = {
-  (HTML_NS) => {object => 1, applet => 1, video => 1, audio => 1},
+#  (HTML_NS) => {object => 1, applet => 1, video => 1, audio => 1},
 }; # $HTMLSemiTransparentElements
 
 our $Element = {};
