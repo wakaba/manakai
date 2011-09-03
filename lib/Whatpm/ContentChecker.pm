@@ -1,7 +1,7 @@
 package Whatpm::ContentChecker;
 use strict;
 use warnings;
-our $VERSION = '1.111';
+our $VERSION = '1.112';
 
 require Whatpm::URIChecker;
 
@@ -382,20 +382,6 @@ our $IsInHTMLInteractiveContent = sub {
   }
 }; # $IsInHTMLInteractiveContent
 
-my $HTMLTransparentElements = {
-  (HTML_NS) => {
-    #ins => 1,
-    #del => 1,
-    #font => 1, ## dropped from the spec
-    #noscript => 1,
-      ## NOTE: |html:noscript| is transparent if scripting is disabled
-      ## and not in |head|.
-    #canvas => 1,
-    #a => 1,
-    #map => 1,
-  },
-}; # $HTMLTransparentElements
-
 our $Element = {};
 
 $Element->{q<http://www.w3.org/1999/02/22-rdf-syntax-ns#>}->{RDF} = {
@@ -723,31 +709,15 @@ sub check_element ($$$;$) {
           $child_nsuri = '' unless defined $child_nsuri;
           my $child_ln = $child->manakai_local_name;
 
-          ## Handle transparent and semi-transparent elements
-          if ($HTMLTransparentElements->{$child_nsuri}->{$child_ln} and
-              not (($self->{flag}->{in_head} or
-                    ($el_nsuri eq HTML_NS and $el_ln eq 'head')) and
-                   $child_nsuri eq HTML_NS and $child_ln eq 'noscript')) {
-            push @new_item, [$content_def->{check_child_element},
-                             $self, $item, $child,
-                             $child_nsuri, $child_ln, 1,
-                             $content_state, $element_state];
-            push @new_item, {type => 'element', node => $child,
-                             parent_state => $content_state,
-                             parent_def => $content_def,
-                             real_parent_state => $element_state,
-                             transparent => 1};
-          } else {
-            push @new_item, [$content_def->{check_child_element},
-                             $self, $item, $child,
-                             $child_nsuri, $child_ln,
-                             0,
-                             $content_state, $element_state];
-            push @new_item, {type => 'element', node => $child,
-                             parent_def => $content_def,
-                             real_parent_state => $element_state,
-                             parent_state => $content_state};
-          } # transparent
+          push @new_item, [$content_def->{check_child_element},
+                           $self, $item, $child,
+                           $child_nsuri, $child_ln,
+                           0,
+                           $content_state, $element_state];
+          push @new_item, {type => 'element', node => $child,
+                           parent_def => $content_def,
+                           real_parent_state => $element_state,
+                           parent_state => $content_state};
 
           if ($HTMLEmbeddedContent->{$child_nsuri}->{$child_ln}) {
             $element_state->{has_significant} = 1;
