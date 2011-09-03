@@ -180,11 +180,13 @@
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml"><ins><legend>y</legend>x</ins></fieldset>
 #errors
+/fieldset/ins/legend;element not allowed:flow;m
 
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml"><del><legend>y</legend></del><ins><legend>z</legend></ins>x</fieldset>
 #errors
-/fieldset/ins/legend;element not allowed:fieldset legend;m
+/fieldset/del/legend;element not allowed:flow;m
+/fieldset/ins/legend;element not allowed:flow;m
 
 #data
 <fieldset xmlns="http://www.w3.org/1999/xhtml"><lengend>y</lengend>x</fieldset>
@@ -2651,7 +2653,6 @@ x<br autofocus=""/>
 #errors
 /isindex;element not defined;m
 /isindex/ins;element not allowed:empty;m
-/isindex/ins/p;element not allowed:empty;m
 
 #data
 <isindex xmlns="http://www.w3.org/1999/xhtml"

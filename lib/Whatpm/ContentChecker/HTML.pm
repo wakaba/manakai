@@ -1917,6 +1917,11 @@ my %HTMLTextChecker = (
 
 my %HTMLFlowContentChecker = (
   %HTMLChecker,
+  check_start => sub {
+    my ($self, $item, $element_state) = @_;
+    $element_state->{in_flow_original} = $self->{flag}->{in_flow};
+    $self->{flag}->{in_flow} = 1;
+  }, # check_start
   check_child_element => sub {
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
@@ -1942,7 +1947,7 @@ my %HTMLFlowContentChecker = (
                          type => 'element not allowed:flow',
                          level => $self->{level}->{must})
     }
-  },
+  }, # check_child_element
   check_child_text => sub {
     my ($self, $item, $child_node, $has_significant, $element_state) = @_;
     if ($has_significant) {
@@ -1962,6 +1967,9 @@ my %HTMLFlowContentChecker = (
                          level => $self->{level}->{should},
                          type => 'no significant content');
     }
+
+    delete $self->{flag}->{in_flow}
+        unless $element_state->{in_flow_original};
   }, # check_end
 ); # %HTMLFlowContentChecker
 
@@ -2014,8 +2022,58 @@ my %HTMLPhrasingContentChecker = (
 ); # %HTMLPhrasingContentChecker
 
 my %HTMLTransparentChecker = %HTMLFlowContentChecker;
-## ISSUE: Significant content rule should be applied to transparent element
-## with parent?
+
+my %TransparentChecker = (
+  %HTMLFlowContentChecker,
+  check_child_element => sub {
+    my ($self, $item, $child_el, $child_nsuri, $child_ln,
+        $child_is_transparent, $element_state) = @_;
+    if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
+        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+      $self->{onerror}->(node => $child_el,
+                         type => 'element not allowed:minus',
+                         level => $self->{level}->{must});
+    } elsif ($self->{plus_elements}->{$child_nsuri}->{$child_ln}) {
+      #
+    } elsif ($self->{flag}->{in_phrasing}) {
+      if ($HTMLPhrasingContent->{$child_nsuri}->{$child_ln}) {
+        #
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:phrasing',
+                           level => $self->{level}->{must});
+      }
+    } elsif ($self->{flag}->{in_flow}) {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'style') {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:flow style',
+                           level => $self->{level}->{must});
+      } elsif ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
+        #
+      } else {
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:flow',
+                           level => $self->{level}->{must});
+      }
+    } else {
+      if ($child_nsuri eq HTML_NS and $child_ln eq 'style') {
+        if ($element_state->{has_non_style} or
+            not $child_el->has_attribute_ns (undef, 'scoped')) {
+          $self->{onerror}->(node => $child_el,
+                             type => 'element not allowed:flow style',
+                             level => $self->{level}->{must});
+        }
+      } elsif ($HTMLFlowContent->{$child_nsuri}->{$child_ln}) {
+        $element_state->{has_non_style} = 1 unless $child_is_transparent;
+      } else {
+        $element_state->{has_non_style} = 1;
+        $self->{onerror}->(node => $child_el,
+                           type => 'element not allowed:flow',
+                           level => $self->{level}->{must})
+      }
+    }
+  }, # check_child_element
+); # %TransparentChecker
 
 # ------ Elements ------
 
@@ -3233,6 +3291,7 @@ $Element->{+HTML_NS}->{body} = {
     my ($self, $item, $element_state) = @_;
 
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+    $HTMLFlowContentChecker{check_start}->(@_);
   }, # check_start
 }; # body
 
@@ -3368,6 +3427,7 @@ $Element->{+HTML_NS}->{header} = {
                                 {(HTML_NS) => {qw/header 1 footer 1/}});
     $element_state->{has_hn_original} = $self->{flag}->{has_hn};
     $self->{flag}->{has_hn} = 0;
+    $HTMLFlowContentChecker{check_start}->(@_);
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3390,6 +3450,7 @@ $Element->{+HTML_NS}->{footer} = {
     my ($self, $item, $element_state) = @_;
     $self->_add_minus_elements ($element_state,
                                 {(HTML_NS) => {header => 1, footer => 1}});
+    $HTMLFlowContentChecker{check_start}->(@_);
   }, # check_start
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3421,6 +3482,7 @@ $Element->{+HTML_NS}->{address} = {
         ($element_state,
          {(HTML_NS) => {header => 1, footer => 1, address => 1}},
          $HTMLSectioningContent, $HTMLHeadingContent);
+    $HTMLFlowContentChecker{check_start}->(@_);
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -3620,7 +3682,8 @@ $Element->{+HTML_NS}->{blockquote} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{cite}->{type}->{cite} = 1;
-  },
+    $HTMLFlowContentChecker{check_start}->(@_);
+  }, # check_start
 };
 
 $Element->{+HTML_NS}->{ol} = {
@@ -3897,6 +3960,7 @@ $Element->{+HTML_NS}->{div} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $HTMLFlowContentChecker{check_start}->(@_);
   }, # check_start
 }; # div
 
@@ -3964,6 +4028,7 @@ $Element->{+HTML_NS}->{marquee} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{datasrc}->{type}->{resource} = 1;
+    $HTMLFlowContentChecker{check_start}->(@_);
   }, # check_start
 }; # marquee
 
@@ -5232,7 +5297,7 @@ $Element->{+HTML_NS}->{comment} = {
 =cut
 
 $Element->{+HTML_NS}->{ins} = {
-  %HTMLTransparentChecker,
+  %TransparentChecker,
   status => FEATURE_HTML5_REC,
   check_attrs => $GetHTMLAttrsChecker->({
     cite => $HTMLURIAttrChecker,
@@ -6470,6 +6535,7 @@ $Element->{+HTML_NS}->{map} = {
         ## element but there is any |area| element with the empty
         ## |alt=""| attribute, then the value contains an array
         ## reference that contains all of such |area| elements.
+    $HTMLFlowContentChecker{check_start}->(@_);
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;
@@ -7210,6 +7276,7 @@ $Element->{+HTML_NS}->{td} = {
   check_start => sub {
     my ($self, $item, $element_state) = @_;
     $element_state->{uri_info}->{background}->{type}->{embedded} = 1;
+    $HTMLFlowContentChecker{check_start}->(@_);
   }, # check_start
 }; # td
 
@@ -7368,6 +7435,7 @@ $Element->{+HTML_NS}->{form} = {
     $element_state->{uri_info}->{action}->{type}->{action} = 1;
     $element_state->{uri_info}->{data}->{type}->{resource} = 1;
     $element_state->{id_type} = 'form';
+    $HTMLFlowContentChecker{check_start}->(@_);
   },
   check_end => sub {
     my ($self, $item, $element_state) = @_;

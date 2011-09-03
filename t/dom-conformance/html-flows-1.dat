@@ -193,6 +193,7 @@ para</ins>
 </body>
 #errors
 /body/ins/style;SUBDOC;text/css
+/body/ins/style;element not allowed:flow style;m
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -201,6 +202,7 @@ para</del>
 </body>
 #errors
 /body/del/style;SUBDOC;text/css
+/body/del/style;element not allowed:flow style;m
 /body;no significant content;s
 
 #data
@@ -210,7 +212,9 @@ para</del>
 para
 </body>
 #errors
+/body/ins;no significant content;s
 /body/style;SUBDOC;text/css
+/body/style;element not allowed:flow style;m
 
 #data
 <body xmlns="http://www.w3.org/1999/xhtml">
@@ -219,8 +223,11 @@ para
 para
 </body>
 #errors
+/body/ins;no significant content;s
 /body/ins/style;SUBDOC;text/css
+/body/ins/style;element not allowed:flow style;m
 /body/style;SUBDOC;text/css
+/body/style;element not allowed:flow style;m
 
 #data
 <section xmlns="http://www.w3.org/1999/xhtml"></section>

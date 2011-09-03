@@ -1050,7 +1050,22 @@ ok 941
 ok 942
 ok 943
 ok 944
-ok 945
+not ok 945 - <body xmlns="http://www.w3.org/1999/xhtml">
+# <del><style scoped="scoped"/>
+# para</del>
+# </body>
+#   Failed test '<body xmlns="http://www.w3.org/1999/xhtml">
+# <del><style scoped="scoped"/>
+# para</del>
+# </body>'
+#   at content-checker-test-ok line 1.
+# +---+---------------------------------+---+--------------------------------------------------+
+# | Ln|Got                              | Ln|Expected                                          |
+# +---+---------------------------------+---+--------------------------------------------------+
+# |  1|/body/del/style;SUBDOC;text/css  |  1|/body/del/style;SUBDOC;text/css                   |
+# |   |                                 *  2|/body/del/style;element not allowed:flow style;m  *
+# |  2|/body;no significant content;s   |  3|/body;no significant content;s                    |
+# +---+---------------------------------+---+--------------------------------------------------+
 ok 946
 ok 947
 ok 948
@@ -2295,7 +2310,15 @@ ok 2184
 ok 2185
 ok 2186
 ok 2187
-ok 2188
+not ok 2188 - <mark xmlns="http://www.w3.org/1999/xhtml"><del></del></mark>
+#   Failed test '<mark xmlns="http://www.w3.org/1999/xhtml"><del></del></mark>'
+#   at content-checker-test-ok line 1.
+# +---+--------------------------------+---+------------------------------------+
+# | Ln|Got                             | Ln|Expected                            |
+# +---+--------------------------------+---+------------------------------------+
+# |   |                                *  1|/mark/del;no significant content;s  *
+# |  1|/mark;no significant content;s  |  2|/mark;no significant content;s      |
+# +---+--------------------------------+---+------------------------------------+
 ok 2189
 ok 2190
 ok 2191
@@ -5517,7 +5540,15 @@ ok 5031
 ok 5032
 ok 5033
 ok 5034
-ok 5035
+not ok 5035 - <fieldset xmlns="http://www.w3.org/1999/xhtml"><del><legend>y</legend></del><ins><legend>z</legend></ins>x</fieldset>
+#   Failed test '<fieldset xmlns="http://www.w3.org/1999/xhtml"><del><legend>y</legend></del><ins><legend>z</legend></ins>x</fieldset>'
+#   at content-checker-test-ok line 1.
+# +---+-------------------------------------------------+---+-------------------------------------------------+
+# | Ln|Got                                              | Ln|Expected                                         |
+# +---+-------------------------------------------------+---+-------------------------------------------------+
+# |   |                                                 *  1|/fieldset/del/legend;element not allowed:flow;m  *
+# |  1|/fieldset/ins/legend;element not allowed:flow;m  |  2|/fieldset/ins/legend;element not allowed:flow;m  |
+# +---+-------------------------------------------------+---+-------------------------------------------------+
 ok 5036
 ok 5037
 ok 5038
@@ -10592,4 +10623,4 @@ ok 10029
 ok 10030
 ok 10031
 1..10031
-# Looks like you failed 41 tests of 10031.
+# Looks like you failed 44 tests of 10031.

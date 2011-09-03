@@ -935,6 +935,8 @@
 <rule xmlns="http://www.w3.org/1999/xhtml"><ins><nest/></ins></rule>
 #errors
 /rule;element not defined;m
+/rule/ins;no significant content;s
+/rule/ins/nest;element not allowed:flow;m
 /rule/ins/nest;element not defined;m
 
 #data
@@ -942,6 +944,7 @@
 #errors
 /rule/p;no significant content;s
 /rule;element not defined;m
+/rule/p/ins;no significant content;s
 /rule/p/ins/nest;element not defined;m
 /rule/p/ins/nest;element not allowed:phrasing;m
 
@@ -1964,6 +1967,7 @@
 <rule xmlns="http://www.w3.org/1999/xhtml"><ins><bb>x</bb></ins></rule>
 #errors
 /rule;element not defined;m
+/rule/ins/bb;element not allowed:flow;m
 /rule/ins/bb;element not defined;m
 
 #data
