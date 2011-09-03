@@ -353,7 +353,7 @@ our $HTMLEmbeddedContent = {
 };  
 
 our $IsInHTMLInteractiveContent = sub {
-  my ($el, $nsuri, $ln) = @_;
+  my ($self, $el, $nsuri, $ln) = @_;
 
   ## NOTE: This CODE returns whether an element that is conditionally
   ## categorizzed as an interactive content is currently in that
@@ -365,21 +365,40 @@ our $IsInHTMLInteractiveContent = sub {
   ## true for non-interactive content as long as the element cannot be
   ## interactive content.
 
-  if ($nsuri eq HTML_NS and $ln eq 'input') {
-    my $value = $el->get_attribute_ns (undef, 'type') || '';
-    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-    return ($value ne 'hidden');
-  } elsif ($nsuri eq HTML_NS and ($ln eq 'img' or $ln eq 'object')) {
-    return $el->has_attribute_ns (undef, 'usemap');
-  } elsif ($nsuri eq HTML_NS and ($ln eq 'video' or $ln eq 'audio')) {
-    return $el->has_attribute_ns (undef, 'controls');
-  } elsif ($nsuri eq HTML_NS and $ln eq 'menu') {
-    my $value = $el->get_attribute_ns (undef, 'type') || '';
-    $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-    return ($value eq 'toolbar');
-  } else {
+  ## Flags |no_interactive| and |in_canvas| are used to allow some
+  ## kinds of interactive content that are descendant of |canvas|
+  ## elements but not descendant of |a| or |button| elements.
+
+  if ($nsuri ne HTML_NS) {
     return 1;
-  }
+  } else {
+    if ($ln eq 'input') {
+      my $value = $el->get_attribute_ns (undef, 'type') || '';
+      $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+      if ($self->{flag}->{no_interactive} or not $self->{flag}->{in_canvas}) {
+        return ($value ne 'hidden');
+      } else {
+        return not {
+          hidden => 1,
+          checkbox => 1,
+          radio => 1,
+          submit => 1, image => 1, reset => 1, button => 1,
+        }->{$value};
+      }
+    } elsif ($ln eq 'img' or $ln eq 'object') {
+      return $el->has_attribute_ns (undef, 'usemap');
+    } elsif ($ln eq 'video' or $ln eq 'audio') {
+      return $el->has_attribute_ns (undef, 'controls');
+    } elsif ($ln eq 'menu') {
+      my $value = $el->get_attribute_ns (undef, 'type') || '';
+      $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+      return ($value eq 'toolbar');
+    } elsif ($ln eq 'a' or $ln eq 'button') {
+      return $self->{flag}->{no_interactive} || !$self->{flag}->{in_canvas};
+    } else {
+      return 1;
+    }
+  } # ns
 }; # $IsInHTMLInteractiveContent
 
 our $Element = {};

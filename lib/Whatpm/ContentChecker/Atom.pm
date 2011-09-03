@@ -115,7 +115,7 @@ my %AtomTextConstruct = (
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $IsInHTMLInteractiveContent->($self, $child_el, $child_nsuri, $child_ln)) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
@@ -195,7 +195,7 @@ my %AtomPersonConstruct = (
     my ($self, $item, $child_el, $child_nsuri, $child_ln,
         $child_is_transparent, $element_state) = @_;
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $IsInHTMLInteractiveContent->($self, $child_el, $child_nsuri, $child_ln)) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
@@ -399,7 +399,7 @@ $Element->{+ATOM_NS}->{entry} = {
     ## NOTE: metadata elements, followed by atom:entry* (no explicit MAY)
 
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $IsInHTMLInteractiveContent->($self, $child_el, $child_nsuri, $child_ln)) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
@@ -561,7 +561,7 @@ $Element->{+ATOM_NS}->{feed} = {
     ## NOTE: metadata elements, followed by atom:entry* (no explicit MAY)
 
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $IsInHTMLInteractiveContent->($self, $child_el, $child_nsuri, $child_ln)) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
@@ -735,7 +735,7 @@ $Element->{+ATOM_NS}->{content} = {
         $child_is_transparent, $element_state) = @_;
 
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $IsInHTMLInteractiveContent->($self, $child_el, $child_nsuri, $child_ln)) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
@@ -1079,7 +1079,7 @@ $Element->{+ATOM_NS}->{source} = {
         $child_is_transparent, $element_state) = @_;
 
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $IsInHTMLInteractiveContent->($self, $child_el, $child_nsuri, $child_ln)) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});
@@ -1227,7 +1227,7 @@ $Element->{+THR_NS}->{total} = {
         $child_is_transparent, $element_state) = @_;
 
     if ($self->{minus_elements}->{$child_nsuri}->{$child_ln} and
-        $IsInHTMLInteractiveContent->($child_el, $child_nsuri, $child_ln)) {
+        $IsInHTMLInteractiveContent->($self, $child_el, $child_nsuri, $child_ln)) {
       $self->{onerror}->(node => $child_el,
                          type => 'element not allowed:minus',
                          level => $self->{level}->{must});

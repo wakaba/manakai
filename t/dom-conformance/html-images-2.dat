@@ -87,3 +87,296 @@
 <canvas width="44" height="14" xmlns="http://www.w3.org/1999/xhtml"/>
 #errors
 /canvas;no significant content;s
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <a href="b">c</a>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <a href="b">c<a href="e#">d</a></a>
+</canvas>
+#errors
+/canvas/a/a;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <a href="b">c<button>d</button></a>
+</canvas>
+#errors
+/canvas/a/button;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <button>d</button>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <button><a href="x">d</a></button>
+</canvas>
+#errors
+/canvas/button/a;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <a href="a">b</a>
+  <button>x</button>
+  <input type="hidden" name="x" value="y"/>
+  <input type="button" name="a" value="b"/>
+  <input type="submit" name="a"/>
+  <input type="reset" name="a"/>
+  <input type="reseT" name="a"/>
+  <input type="image" alt="a" src="b" name="a"/>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <a href="a">b</a>
+  <button>x</button>
+  <input type="hidden" name="x" value="y"/>
+  <input name="x"/>
+  <input type="text" name="a"/>
+  <input type="color" name="a"/>
+  <input type="range" name="a"/>
+</canvas>
+#errors
+/canvas/input;element not allowed:minus;m
+/canvas/input;element not allowed:minus;m
+/canvas/input;element not allowed:minus;m
+/canvas/input;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="submit" name="x" value="y"/>a
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="radio" name="x" value="y"/>a
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="checkbox" name="x" value="y"/>a
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="image" src="a" alt="b" name="x" />a
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="button" name="x" value="y"/>a
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="reset" name="x" value="y"/>a
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input name="x" value="y"/>a
+</canvas>
+#errors
+/canvas/input;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="text" name="x" value="y"/>a
+</canvas>
+#errors
+/canvas/input;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="NUMBER" name="x" value="12.2"/>a
+</canvas>
+#errors
+/canvas/input;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="color" name="x" value="#C0CC00"/>a
+</canvas>
+#errors
+/canvas/input;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <input type="unknown" name="x" value="y"/>a
+</canvas>
+#errors
+/canvas/input;element not allowed:minus;m
+/canvas/input/@type;enumerated:invalid;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <textarea>aa</textarea>
+</canvas>
+#errors
+/canvas/textarea;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <details><summary>bb</summary>aa</details>
+</canvas>
+#errors
+/canvas/details;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <embed src="aa"/>a
+</canvas>
+#errors
+/canvas/embed;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <iframe src="aa">aa</iframe>
+</canvas>
+#errors
+/canvas/iframe;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <keygen name="a"/>a
+</canvas>
+#errors
+/canvas/keygen;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <label>aa<input type="button" name="a" value="b"/></label>
+</canvas>
+#errors
+/canvas/label;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <select name="a"><option>a</option></select>
+</canvas>
+#errors
+/canvas/select;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <audio controls="" src="a">aa</audio>
+</canvas>
+#errors
+/canvas/audio;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <video controls="" src="a">aa</video>
+</canvas>
+#errors
+/canvas/video;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">aa</audio>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <video src="a">aa</video>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <img src="a" alt="b"/>
+  <map name="c">aa</map>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <img src="a" alt="b" usemap="#c"/>
+  <map name="c">aa</map>
+</canvas>
+#errors
+/canvas/img;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <menu>aaa</menu>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <menu type="toolbar">aaa</menu>
+</canvas>
+#errors
+/canvas/menu;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="a">
+  <canvas>
+    <button>aa</button>
+  </canvas>
+</a>
+#errors
+/a/canvas/button;element not allowed:minus;m
+
+#data
+<button xmlns="http://www.w3.org/1999/xhtml">
+  <canvas>
+    <button>aa</button>
+  </canvas>
+</button>
+#errors
+/button/canvas/button;element not allowed:minus;m
+
+#data
+<a xmlns="http://www.w3.org/1999/xhtml" href="a">
+  <canvas>
+    <input type="submit" name="a" value="b"/>a
+  </canvas>
+</a>
+#errors
+/a/canvas/input;element not allowed:minus;m
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <canvas>
+    <a href="a">bb</a>
+  </canvas>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <canvas>
+    <a href="a">bb</a>
+  </canvas>
+  <a href="a">bb</a>
+</canvas>
+#errors
+
+#data
+<canvas xmlns="http://www.w3.org/1999/xhtml">
+  <canvas>
+    <input name="a"/>x
+  </canvas>
+  <input name="a"/>
+  <a href="b">c</a>
+</canvas>
+#errors
+/canvas/canvas/input;element not allowed:minus;m
+/canvas/input;element not allowed:minus;m
