@@ -22,28 +22,24 @@ Whatpm::ContentChecker - DOM Conformance Checker
 
 =head1 DESCRIPTION
 
-The C<Whatpm::ContentChecker> Perl module contains two methods
-to validate DOM tree for its conformance to the markup language
-in use.
-
-This module is part of Whatpm, Perl Modules for
-Web Hypertext Application Technologies, which is a subproject
-of manakai.
+The Perl module C<Whatpm::ContentChecker> contains methods for
+validation of entire or part of DOM tree with regard to relevant Web
+standards such as HTML.
 
 =head1 METHODS
 
-This module contains two static methods:
+This module contains two class methods:
 
 =over 4
 
-=item Whatpm::ContentChecker->check_document (I<$document>, I<$onerror>);
+=item Whatpm::ContentChecker->check_document (I<$document>, I<$onerror>)
 
 Checks a document, I<$document>, and its descendant for their
 conformance.  If there is an error or a warnign, then the
 I<$onerror> C<CODE> is invoked with named arguments same
 as ones for the method C<check_element>.
 
-=item Whatpm::ContentChecker->check_element (I<$element>, I<$onerror>);
+=item Whatpm::ContentChecker->check_element (I<$element>, I<$onerror>)
 
 Checks an element, I<$element>, and its descendant for their conformance.
 If there is an error or a warning, then the I<$onerror> C<CODE>
@@ -67,9 +63,34 @@ A string which describes the type of the error or warning.
 For the list of the errors and warnings, see
 <http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
 
+=item text (Sometimes specified)
+
+An optional string argumenting the type of the error, e.g. an element
+name.
+
+=item value (Sometimes specified)
+
+An optional string in which the error occurs.  For example, a URL
+extracted from a complex attribute value, in whcih a conformance error
+is detected.
+
 =back
 
 =back
+
+=head1 SUPPORTED STANDARDS
+
+L<Whatpm::ContentChecker> - XML 1.0, XML 1.1, XML Namespaces 1.0, XML
+Namespaces 1.1, C<xml:base>, C<xml:id>.
+
+L<Whatpm::ContentChecker::HTML> - Web Applications 1.0 (including HTML
+Living Standard and HTML5), manakai's Conformance Checking Guideline
+for Obsolete HTML Elements and Attributes.
+
+L<Whatpm::ContentChecker::Atom> - Atom 1.0, Atom Threading Extension.
+
+For more information, see
+<http://suika.fam.cx/gate/2007/html/standards>.
 
 =head1 BUGS
 
@@ -144,7 +165,7 @@ Wakaba <w@suika.fam.cx>
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
