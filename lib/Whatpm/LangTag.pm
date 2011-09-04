@@ -229,6 +229,7 @@ sub check_rfc4646_langtag ($$$;$) {
   my $check_case = sub ($$$) {
     my ($type, $actual, $expected) = @_;
     
+    $expected ||= '_lowercase';
     if ($expected eq '_lowercase' and $actual !~ /[A-Z]/) {
       #
     } elsif ($expected eq '_uppercase' and $actual !~ /[a-z]/) {
