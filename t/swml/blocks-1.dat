@@ -1061,6 +1061,27 @@
 | -b"
 
 #data
+| [REFS[
+|  a
+| >
+| -b
+| ]REFS]
+| abc
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <sw refs>
+|       <pre>
+|         " a
+| >
+| -b"
+|     <p>
+|       "abc"
+
+#data
 | [PRE[
 | [INS[
 | ]INS]
@@ -1075,6 +1096,22 @@
 |       <ins>
 |         "
 | ]INS]"
+
+#data
+| [PRE[
+| [REFS[
+| ]REFS]
+| ]PRE]
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <pre>
+|       <sw10 REFS>
+|         "
+| ]REFS]"
 
 #data
 | [PRE[
@@ -1154,6 +1191,26 @@
 |       <dt>
 |       <dd>
 |         <sw insert>
+|           <p>
+|             "a"
+|         "b"
+
+#data
+| ::
+| [REFS[
+| a
+| ]REFS]
+| b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|       <dd>
+|         <sw refs>
 |           <p>
 |             "a"
 |         "b"
@@ -1344,3 +1401,47 @@
 |       <ul>
 |         <li>
 |           "b"
+
+#data
+| [REFS[
+| - abc
+| - xyz
+| ]REFS]
+| --
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <sw refs>
+|       <ul>
+|         <li>
+|           "abc"
+|         <li>
+|           "xyz"
+|     <ul>
+|       <li>
+|         <ul>
+|           <li>
+
+#data
+| [REFS[
+| - abc
+| - xyz
+| ]INS]
+| --
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <sw refs>
+|       <ul>
+|         <li>
+|           "abc"
+|         <li>
+|           "xyz"
+|           <ul>
+|             <li>

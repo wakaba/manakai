@@ -73,7 +73,7 @@ my @FILES = map { $test_d->file ($_)->stringify } qw[
 
 require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
 
-sub _test : Test(288) {
+sub _test : Tests {
   execute_test ($_, {
     data => {is_prefixed => 1},
     errors => {is_list => 1},
