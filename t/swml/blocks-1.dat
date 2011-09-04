@@ -1216,6 +1216,26 @@
 |         "b"
 
 #data
+| ::
+| [FIGCAPTION[
+| a
+| ]FIGCAPTION]
+| b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|       <dd>
+|         <figcaption>
+|           <p>
+|             "a"
+|         "b"
+
+#data
 | @@
 | [INS[
 | a
@@ -1445,3 +1465,32 @@
 |           "xyz"
 |           <ul>
 |             <li>
+
+#data
+| [FIG[
+| - abc
+| - xyz
+| [FIGCAPTION[
+| hoge
+| ]FIGCAPTION]
+| ]FIG]
+| --
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <figure>
+|       <ul>
+|         <li>
+|           "abc"
+|         <li>
+|           "xyz"
+|           <figcaption>
+|             <p>
+|               "hoge"
+|     <ul>
+|       <li>
+|         <ul>
+|           <li>

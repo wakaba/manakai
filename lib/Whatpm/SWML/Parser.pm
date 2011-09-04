@@ -42,13 +42,16 @@ sub TABLE_CELL_END_TOKEN () { 26 }
 sub TABLE_COLSPAN_CELL_TOKEN () { 27 }
 
 my %block_elements = (
-  insert => 1, delete => 1, refs => 1,
+  insert => SW09_NS, delete => SW09_NS, refs => SW09_NS,
+  figure => HTML_NS, figcaption => HTML_NS,
 );
 
 my $tag_name_to_block_element_name = {
   INS => 'insert',
   DEL => 'delete',
   REFS => 'refs',
+  FIG => 'figure',
+  FIGCAPTION => 'figcaption',
 };
 
 sub new ($) {
@@ -265,7 +268,7 @@ sub parse_char_string ($$$;$) {
           unshift @s, $s;
           $line--;
           last;
-        } elsif ($s =~ /\A\](INS|DEL|REFS)\][\x09\x20]*\z/) {
+        } elsif ($s =~ /\A\](INS|DEL|REFS|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
           push @nt, {type => PREFORMATTED_END_TOKEN,
                      line => $line, column => $column};
           push @nt, {type => BLOCK_END_TAG_TOKEN, tag_name => $1,
@@ -349,7 +352,7 @@ sub parse_char_string ($$$;$) {
         $tokenize_text->(\$s);
       }
       return shift @nt;
-    } elsif ($s =~ /\A\[(INS|DEL|REFS)(?>\(([^()\\]*)\))?\[[\x09\x20]*\z/) {
+    } elsif ($s =~ /\A\[(INS|DEL|REFS|FIG(?:CAPTION)?)(?>\(([^()\\]*)\))?\[[\x09\x20]*\z/) {
       undef $continuous_line;
       return {type => BLOCK_START_TAG_TOKEN, tag_name => $1,
               classes => $2,
@@ -390,7 +393,7 @@ sub parse_char_string ($$$;$) {
       $tokenize_text->(\$s);
       $continuous_line = 1;
       return shift @nt;
-    } elsif ($s =~ /\A\](INS|DEL|REFS)\][\x09\x20]*\z/) {
+    } elsif ($s =~ /\A\](INS|DEL|REFS|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
       $continuous_line = 1;
       return {type => BLOCK_END_TAG_TOKEN, tag_name => $1,
               line => $line, column => $column};
@@ -806,12 +809,10 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == BLOCK_START_TAG_TOKEN and
-               ($token->{tag_name} eq 'INS' or
-                $token->{tag_name} eq 'DEL' or
-                $token->{tag_name} eq 'REFS')) {
+               $tag_name_to_block_element_name->{$token->{tag_name}}) {
+        my $ln = $tag_name_to_block_element_name->{$token->{tag_name}};
         my $el = $doc->create_element_ns
-            (SW09_NS,
-             [undef, $tag_name_to_block_element_name->{$token->{tag_name}}]);
+            ($block_elements{$ln}, [undef, $ln]);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {node => $el, section_depth => 0,
                     quotation_depth => 0, list_depth => 0};
