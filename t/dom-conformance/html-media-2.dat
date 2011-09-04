@@ -655,6 +655,8 @@
   </audio>
 </p>
 #errors
+/p/audio/track;duplicate track;m
+/p/audio/track;duplicate track;m
 /p/audio/track;duplicate default track;m
 /p/audio/track;duplicate default track;m
 
@@ -667,6 +669,8 @@
   </video>
 </p>
 #errors
+/p/video/track;duplicate track;m
+/p/video/track;duplicate track;m
 /p/video/track;duplicate default track;m
 /p/video/track;duplicate default track;m
 
@@ -679,6 +683,8 @@
   </audio>
 </p>
 #errors
+/p/audio/track;duplicate track;m
+/p/audio/track;duplicate track;m
 
 #data
 <p xmlns="http://www.w3.org/1999/xhtml">
@@ -693,4 +699,163 @@
 #errors
 /p/audio/ins/track;element not allowed:phrasing;m
 /p/audio/ins/track;element not allowed:phrasing;m
+/p/audio/ins/track;duplicate track;m
 /p/audio/ins/track;duplicate default track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" srclang="ja"/>
+    <track src="a" srclang="en"/>x
+  </audio>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" srclang="ja"/>
+    <track src="a" srclang="ja"/>
+    <track src="a" srclang="ja"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="subtitles" srclang="ja"/>
+    <track src="a" kind="subtitles" srclang="ja"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="captions" srclang="ja"/>
+    <track src="a" kind="Captions" srclang="ja"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="descriptions" srclang="ja"/>
+    <track src="a" kind="descriptions" srclang="ja"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="chapters" srclang="ja"/>
+    <track src="a" kind="chapters" srclang="ja"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata" srclang="ja"/>
+    <track src="a" kind="metadata" srclang="ja"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata"/>
+    <track src="a" kind="metadata"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata"/>
+    <track src="a" kind="metadata" srclang="fr"/>x
+  </audio>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata" label="a"/>
+    <track src="a" kind="metadata"/>x
+  </audio>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata" label="a"/>
+    <track src="a" kind="metadata" label="A"/>x
+  </audio>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata" label="a"/>
+    <track src="a" kind="metadata" label="a"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata" srclang="ja"/>
+    <track src="a" kind="metadata" srclang="JA"/>x
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate track;m
+/p/audio/track/@srclang;langtag:language:case;w
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata" label="a"/>
+    <track src="a" kind="metadata" label="a "/>x
+  </audio>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata" label="a"/>
+    <track src="a" kind="metadata" label=""/>x
+  </audio>
+</p>
+#errors
+/p/audio/track/@label;empty attribute value;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track src="a" kind="metadata"/>
+    <track src="a" kind="metadata" label=""/>x
+  </audio>
+</p>
+#errors
+/p/audio/track/@label;empty attribute value;m

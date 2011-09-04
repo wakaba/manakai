@@ -6343,12 +6343,6 @@ $Element->{+HTML_NS}->{source} = {
   }, # check_attrs2
 }; # source
 
-## XXX there must not be two track element children of the same media
-## element whose kind attributes are in the same state, whose srclang
-## attributes are both missing or have values that represent the same
-## language, and whose label attributes are again both missing or both
-## have the same value.
-
 $Element->{+HTML_NS}->{track} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_FD,
@@ -6399,6 +6393,22 @@ $Element->{+HTML_NS}->{track} = {
                            text => 'srclang',
                            level => $self->{level}->{must});
       }
+      $kind = 'subtitles';
+    }
+
+    my $srclang = $el->get_attribute_ns (undef, 'srclang');
+    $srclang = defined $srclang ? ':' . $srclang : '';
+    $srclang =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+
+    my $label = $el->get_attribute_ns (undef, 'label');
+    $label = defined $label ? ':' . $label : '';
+    
+    if ($item->{parent_state}->{has_track_kind}->{$kind}->{$srclang}->{$label}) {
+      $self->{onerror}->(node => $el,
+                         type => 'duplicate track', # XXXdoc
+                         level => $self->{level}->{must});
+    } else {
+      $item->{parent_state}->{has_track_kind}->{$kind}->{$srclang}->{$label} = 1;
     }
 
     if ($el->has_attribute_ns (undef, 'default')) {
