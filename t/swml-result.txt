@@ -1,300 +1,295 @@
-1..1573
-# Running under perl version 5.008008 for linux
-# Current time local: Mon Oct 12 17:06:19 2009
-# Current time GMT:   Mon Oct 12 08:06:19 2009
-# Using Test.pm version 1.25
-Subroutine Data::Dumper::qquote redefined at t/SWML-Parser.t line 14.
+1..288
 # t/swml/structs-1.dat
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-ok 8
-ok 9
-ok 10
-ok 11
-ok 12
-ok 13
-ok 14
-ok 15
-ok 16
-ok 17
-ok 18
-ok 19
-ok 20
-ok 21
-ok 22
-ok 23
-ok 24
-ok 25
-ok 26
-ok 27
-ok 28
-ok 29
-ok 30
-ok 31
-ok 32
-ok 33
-ok 34
-ok 35
-ok 36
-ok 37
-ok 38
+ok 1 - Parse error: qq''
+ok 2 - Document tree: qq''
+ok 3 - Parse error: qq'\#?SuikaWiki/0.9'
+ok 4 - Document tree: qq'\#?SuikaWiki/0.9'
+ok 5 - Parse error: qq'\#?SuikaWikiImage/0.9'
+ok 6 - Document tree: qq'\#?SuikaWikiImage/0.9'
+ok 7 - Parse error: qq'\#?SuikaWiki_0.9'
+ok 8 - Document tree: qq'\#?SuikaWiki_0.9'
+ok 9 - Parse error: qq'\#?SuikaWiki/'
+ok 10 - Document tree: qq'\#?SuikaWiki/'
+ok 11 - Parse error: qq'\#?/0.9'
+ok 12 - Document tree: qq'\#?/0.9'
+ok 13 - Parse error: qq'\#?/'
+ok 14 - Document tree: qq'\#?/'
+ok 15 - Parse error: qq'\#?A/B/C/D/E'
+ok 16 - Document tree: qq'\#?A/B/C/D/E'
+ok 17 - Parse error: qq'\#?SuikaWiki/0.9     '
+ok 18 - Document tree: qq'\#?SuikaWiki/0.9     '
+ok 19 - Parse error: qq'\#? SuikaWiki/0.9'
+ok 20 - Document tree: qq'\#? SuikaWiki/0.9'
+ok 21 - Parse error: qq'\#?SuikaWiki/0.9   abc'
+ok 22 - Document tree: qq'\#?SuikaWiki/0.9   abc'
+ok 23 - Parse error: qq' \#?SuikaWiki/0.9'
+ok 24 - Document tree: qq' \#?SuikaWiki/0.9'
+ok 25 - Parse error: qq'\#?SuikaWiki/0.9 page-icon=""'
+ok 26 - Document tree: qq'\#?SuikaWiki/0.9 page-icon=""'
+ok 27 - Parse error: qq'\#?SuikaWiki/0.9 page-icon="xxx"'
+ok 28 - Document tree: qq'\#?SuikaWiki/0.9 page-icon="xxx"'
+ok 29 - Parse error: qq'\#?SuikaWiki/0.9 page-icon=",xx,,yy,"'
+ok 30 - Document tree: qq'\#?SuikaWiki/0.9 page-icon=",xx,,yy,"'
+ok 31 - Parse error: qq'\#?SuikaWiki/0.9 page-icon="a" obsoleted="yes"'
+ok 32 - Document tree: qq'\#?SuikaWiki/0.9 page-icon="a" obsoleted="yes"'
+ok 33 - Parse error: qq'\#?SuikaWiki/0.9 page-icon=abc'
+ok 34 - Document tree: qq'\#?SuikaWiki/0.9 page-icon=abc'
+ok 35 - Parse error: qq'\#?SuikaWiki/0.9 import="abc\x{5C},def\x{5C}g,hij"'
+ok 36 - Document tree: qq'\#?SuikaWiki/0.9 import="abc\x{5C},def\x{5C}g,hij"'
+ok 37 - Parse error: qq'def\x{0A}__IMAGE__\x{0A}abc\x{0A}xyz'
+ok 38 - Document tree: qq'def\x{0A}__IMAGE__\x{0A}abc\x{0A}xyz'
 # t/swml/blocks-1.dat
-ok 39
-ok 40
-ok 41
-ok 42
-ok 43
-ok 44
-ok 45
-ok 46
-ok 47
-ok 48
-ok 49
-ok 50
-ok 51
-ok 52
-ok 53
-ok 54
-ok 55
-ok 56
-ok 57
-ok 58
-ok 59
-ok 60
-ok 61
-ok 62
-ok 63
-ok 64
-ok 65
-ok 66
-ok 67
-ok 68
-ok 69
-ok 70
-ok 71
-ok 72
-ok 73
-ok 74
-ok 75
-ok 76
-ok 77
-ok 78
-ok 79
-ok 80
-ok 81
-ok 82
-ok 83
-ok 84
-ok 85
-ok 86
-ok 87
-ok 88
-ok 89
-ok 90
-ok 91
-ok 92
-ok 93
-ok 94
-ok 95
-ok 96
-ok 97
-ok 98
-ok 99
-ok 100
-ok 101
-ok 102
-ok 103
-ok 104
-ok 105
-ok 106
-ok 107
-ok 108
-ok 109
-ok 110
-ok 111
-ok 112
-ok 113
-ok 114
-ok 115
-ok 116
-ok 117
-ok 118
-ok 119
-ok 120
-ok 121
-ok 122
-ok 123
-ok 124
-ok 125
-ok 126
-ok 127
-ok 128
-ok 129
-ok 130
-ok 131
-ok 132
-ok 133
-ok 134
-ok 135
-ok 136
-ok 137
-ok 138
-ok 139
-ok 140
-ok 141
-ok 142
-ok 143
-ok 144
-ok 145
-ok 146
-ok 147
-ok 148
-ok 149
-ok 150
-ok 151
-ok 152
-ok 153
-ok 154
-ok 155
-ok 156
-ok 157
-ok 158
-ok 159
-ok 160
-ok 161
-ok 162
-ok 163
-ok 164
-ok 165
-ok 166
-ok 167
-ok 168
-ok 169
-ok 170
-ok 171
-ok 172
-ok 173
-ok 174
-ok 175
-ok 176
-ok 177
-ok 178
-ok 179
-ok 180
-ok 181
-ok 182
-ok 183
-ok 184
-ok 185
-ok 186
-ok 187
-ok 188
-ok 189
-ok 190
-ok 191
-ok 192
-ok 193
-ok 194
-ok 195
-ok 196
-ok 197
-ok 198
-ok 199
-ok 200
-ok 201
-ok 202
-ok 203
-ok 204
-ok 205
-ok 206
+ok 39 - Parse error: qq'a'
+ok 40 - Document tree: qq'a'
+ok 41 - Parse error: qq'abce'
+ok 42 - Document tree: qq'abce'
+ok 43 - Parse error: qq'a\x{0A}b'
+ok 44 - Document tree: qq'a\x{0A}b'
+ok 45 - Parse error: qq'[01] a\x{0A}[02] b'
+ok 46 - Document tree: qq'[01] a\x{0A}[02] b'
+ok 47 - Parse error: qq'a\x{0A}\x{0A}b'
+ok 48 - Document tree: qq'a\x{0A}\x{0A}b'
+ok 49 - Parse error: qq'[1] a'
+ok 50 - Document tree: qq'[1] a'
+ok 51 - Parse error: qq'\x{0A}a'
+ok 52 - Document tree: qq'\x{0A}a'
+ok 53 - Parse error: qq'\x{0A}a\x{0A}'
+ok 54 - Document tree: qq'\x{0A}a\x{0A}'
+ok 55 - Parse error: qq'a\x{0A}-b'
+ok 56 - Document tree: qq'a\x{0A}-b'
+ok 57 - Parse error: qq'a\x{0A}\x{0A}-b'
+ok 58 - Document tree: qq'a\x{0A}\x{0A}-b'
+ok 59 - Parse error: qq'a\x{0A}=b'
+ok 60 - Document tree: qq'a\x{0A}=b'
+ok 61 - Parse error: qq'a\x{0A}\x{0A}=b'
+ok 62 - Document tree: qq'a\x{0A}\x{0A}=b'
+ok 63 - Parse error: qq'a\x{0A}:b:c'
+ok 64 - Document tree: qq'a\x{0A}:b:c'
+ok 65 - Parse error: qq'a\x{0A}\x{0A}:b:c'
+ok 66 - Document tree: qq'a\x{0A}\x{0A}:b:c'
+ok 67 - Parse error: qq'a\x{0A}[PRE[\x{0A}b\x{0A}]PRE]'
+ok 68 - Document tree: qq'a\x{0A}[PRE[\x{0A}b\x{0A}]PRE]'
+ok 69 - Parse error: qq'a\x{0A} b'
+ok 70 - Document tree: qq'a\x{0A} b'
+ok 71 - Parse error: qq'a\x{0A}[INS[\x{0A}b\x{0A}]INS]'
+ok 72 - Document tree: qq'a\x{0A}[INS[\x{0A}b\x{0A}]INS]'
+ok 73 - Parse error: qq'a\x{0A}[DEL[\x{0A}b\x{0A}]DEL]'
+ok 74 - Document tree: qq'a\x{0A}[DEL[\x{0A}b\x{0A}]DEL]'
+ok 75 - Parse error: qq'a\x{0A},b'
+ok 76 - Document tree: qq'a\x{0A},b'
+ok 77 - Parse error: qq'a\x{0A};;b'
+ok 78 - Document tree: qq'a\x{0A};;b'
+ok 79 - Parse error: qq'a\x{0A}@@b'
+ok 80 - Document tree: qq'a\x{0A}@@b'
+ok 81 - Parse error: qq'a\x{0A}>b'
+ok 82 - Document tree: qq'a\x{0A}>b'
+ok 83 - Parse error: qq'a\x{0A}*b'
+ok 84 - Document tree: qq'a\x{0A}*b'
+ok 85 - Parse error: qq'a\x{0A}[[\#comment]]'
+ok 86 - Document tree: qq'a\x{0A}[[\#comment]]'
+ok 87 - Parse error: qq'a\x{0A}__&&b&&__'
+ok 88 - Document tree: qq'a\x{0A}__&&b&&__'
+ok 89 - Parse error: qq'*a\x{0A}* b'
+ok 90 - Document tree: qq'*a\x{0A}* b'
+ok 91 - Parse error: qq'a\x{0A}\x{0A}*b\x{0A}**c\x{0A}***d\x{0A}e'
+ok 92 - Document tree: qq'a\x{0A}\x{0A}*b\x{0A}**c\x{0A}***d\x{0A}e'
+ok 93 - Parse error: qq'***a\x{0A}b'
+ok 94 - Document tree: qq'***a\x{0A}b'
+ok 95 - Parse error: qq'***a\x{0A}*b\x{0A}c'
+ok 96 - Document tree: qq'***a\x{0A}*b\x{0A}c'
+ok 97 - Parse error: qq'* [[a]]'
+ok 98 - Document tree: qq'* [[a]]'
+ok 99 - Parse error: qq'* [4] a'
+ok 100 - Document tree: qq'* [4] a'
+ok 101 - Parse error: qq'-[[a]]\x{0A}-b'
+ok 102 - Document tree: qq'-[[a]]\x{0A}-b'
+ok 103 - Parse error: qq'*\x{0A}-a\x{0A}=b'
+ok 104 - Document tree: qq'*\x{0A}-a\x{0A}=b'
+ok 105 - Parse error: qq'*\x{0A}-a\x{0A}-=b'
+ok 106 - Document tree: qq'*\x{0A}-a\x{0A}-=b'
+ok 107 - Parse error: qq'*\x{0A}-a\x{0A}--c\x{0A}-b'
+ok 108 - Document tree: qq'*\x{0A}-a\x{0A}--c\x{0A}-b'
+ok 109 - Parse error: qq'*\x{0A}-a\x{0A}b'
+ok 110 - Document tree: qq'*\x{0A}-a\x{0A}b'
+ok 111 - Parse error: qq'*\x{0A}:a:b\x{0A}:c:d'
+ok 112 - Document tree: qq'*\x{0A}:a:b\x{0A}:c:d'
+ok 113 - Parse error: qq'*\x{0A}:c:d\x{0A}-a'
+ok 114 - Document tree: qq'*\x{0A}:c:d\x{0A}-a'
+ok 115 - Parse error: qq'-a\x{0A}:c:\x{0A}-b\x{0A}:d:'
+ok 116 - Document tree: qq'-a\x{0A}:c:\x{0A}-b\x{0A}:d:'
+ok 117 - Parse error: qq'-  [5]  a'
+ok 118 - Document tree: qq'-  [5]  a'
+ok 119 - Parse error: qq': [4] d : [5] e'
+ok 120 - Document tree: qq': [4] d : [5] e'
+ok 121 - Parse error: qq'>'
+ok 122 - Document tree: qq'>'
+ok 123 - Parse error: qq'>  \x{09}'
+ok 124 - Document tree: qq'>  \x{09}'
+ok 125 - Parse error: qq'> aaa'
+ok 126 - Document tree: qq'> aaa'
+ok 127 - Parse error: qq'>;;abc'
+ok 128 - Document tree: qq'>;;abc'
+ok 129 - Parse error: qq'> @@ bb'
+ok 130 - Document tree: qq'> @@ bb'
+ok 131 - Parse error: qq'>[1]'
+ok 132 - Document tree: qq'>[1]'
+ok 133 - Parse error: qq'>\x{0A}a\x{0A}>\x{0A}b\x{0A}c'
+ok 134 - Document tree: qq'>\x{0A}a\x{0A}>\x{0A}b\x{0A}c'
+ok 135 - Parse error: qq'>>1'
+ok 136 - Document tree: qq'>>1'
+ok 137 - Parse error: qq'>>>1'
+ok 138 - Document tree: qq'>>>1'
+ok 139 - Parse error: qq'>> 1'
+ok 140 - Document tree: qq'>> 1'
+ok 141 - Parse error: qq'>\x{0A}-a'
+ok 142 - Document tree: qq'>\x{0A}-a'
+ok 143 - Parse error: qq'>\x{0A}\x{0A}>'
+ok 144 - Document tree: qq'>\x{0A}\x{0A}>'
+ok 145 - Parse error: qq'>\x{0A}*a\x{0A}b'
+ok 146 - Document tree: qq'>\x{0A}*a\x{0A}b'
+ok 147 - Parse error: qq'>\x{0A} a'
+ok 148 - Document tree: qq'>\x{0A} a'
+ok 149 - Parse error: qq'> \x{0A}>>\x{0A}>'
+ok 150 - Document tree: qq'> \x{0A}>>\x{0A}>'
+ok 151 - Parse error: qq'>a\x{0A}>>b\x{0A}>c'
+ok 152 - Document tree: qq'>a\x{0A}>>b\x{0A}>c'
+ok 153 - Parse error: qq'>\x{0A}-a\x{0A}>\x{0A}-b'
+ok 154 - Document tree: qq'>\x{0A}-a\x{0A}>\x{0A}-b'
+ok 155 - Parse error: qq'[PRE[\x{0A}aa\x{0A}]PRE]'
+ok 156 - Document tree: qq'[PRE[\x{0A}aa\x{0A}]PRE]'
+ok 157 - Parse error: qq'[PRE[\x{0A}\x{0A}aa\x{0A}\x{0A}]PRE]'
+ok 158 - Document tree: qq'[PRE[\x{0A}\x{0A}aa\x{0A}\x{0A}]PRE]'
+ok 159 - Parse error: qq'[PRE[\x{0A}a\x{0A}]PRE]\x{0A}b'
+ok 160 - Document tree: qq'[PRE[\x{0A}a\x{0A}]PRE]\x{0A}b'
+ok 161 - Parse error: qq'>\x{0A}[PRE[\x{0A}>\x{0A}]PRE]'
+ok 162 - Document tree: qq'>\x{0A}[PRE[\x{0A}>\x{0A}]PRE]'
+ok 163 - Parse error: qq'-a\x{0A}[PRE[\x{0A}]PRE]\x{0A}-b'
+ok 164 - Document tree: qq'-a\x{0A}[PRE[\x{0A}]PRE]\x{0A}-b'
+ok 165 - Parse error: qq'-a\x{0A}[PRE[\x{0A}]PRE]\x{0A}b'
+ok 166 - Document tree: qq'-a\x{0A}[PRE[\x{0A}]PRE]\x{0A}b'
+ok 167 - Parse error: qq'[PRE[\x{0A}[1]a\x{0A}]PRE]'
+ok 168 - Document tree: qq'[PRE[\x{0A}[1]a\x{0A}]PRE]'
+ok 169 - Parse error: qq' a\x{0A} b\x{0A}c'
+ok 170 - Document tree: qq' a\x{0A} b\x{0A}c'
+ok 171 - Parse error: qq'[INS[\x{0A} a\x{0A}>\x{0A}-b\x{0A}]INS]'
+ok 172 - Document tree: qq'[INS[\x{0A} a\x{0A}>\x{0A}-b\x{0A}]INS]'
+ok 173 - Parse error: qq'[PRE[\x{0A}[INS[\x{0A}]INS]\x{0A}]PRE]'
+ok 174 - Document tree: qq'[PRE[\x{0A}[INS[\x{0A}]INS]\x{0A}]PRE]'
+ok 175 - Parse error: qq'[PRE[\x{0A}[PRE[\x{0A}]PRE]\x{0A}]PRE]'
+ok 176 - Document tree: qq'[PRE[\x{0A}[PRE[\x{0A}]PRE]\x{0A}]PRE]'
+ok 177 - Parse error: qq'[PRE[\x{0A}[INS[a]]\x{0A}]PRE]'
+ok 178 - Document tree: qq'[PRE[\x{0A}[INS[a]]\x{0A}]PRE]'
+ok 179 - Parse error: qq'[PRE(a b )[\x{0A}]PRE]'
+ok 180 - Document tree: qq'[PRE(a b )[\x{0A}]PRE]'
+ok 181 - Parse error: qq'-a\x{0A}[INS[\x{0A}b\x{0A}]INS]\x{0A}c'
+ok 182 - Document tree: qq'-a\x{0A}[INS[\x{0A}b\x{0A}]INS]\x{0A}c'
+ok 183 - Parse error: qq'::\x{0A}[INS[\x{0A}a\x{0A}]INS]\x{0A}b'
+ok 184 - Document tree: qq'::\x{0A}[INS[\x{0A}a\x{0A}]INS]\x{0A}b'
+ok 185 - Parse error: qq'@@\x{0A}[INS[\x{0A}a\x{0A}]INS]\x{0A}b'
+ok 186 - Document tree: qq'@@\x{0A}[INS[\x{0A}a\x{0A}]INS]\x{0A}b'
+ok 187 - Parse error: qq';;\x{0A}[INS[\x{0A}a\x{0A}]INS]\x{0A}b'
+ok 188 - Document tree: qq';;\x{0A}[INS[\x{0A}a\x{0A}]INS]\x{0A}b'
+ok 189 - Parse error: qq';;\x{0A}[DEL[\x{0A}a\x{0A}]DEL]\x{0A}b'
+ok 190 - Document tree: qq';;\x{0A}[DEL[\x{0A}a\x{0A}]DEL]\x{0A}b'
+ok 191 - Parse error: qq';;\x{0A}a\x{0A}@@\x{0A}b'
+ok 192 - Document tree: qq';;\x{0A}a\x{0A}@@\x{0A}b'
+ok 193 - Parse error: qq'@@\x{0A}a\x{0A};;\x{0A}b'
+ok 194 - Document tree: qq'@@\x{0A}a\x{0A};;\x{0A}b'
+ok 195 - Parse error: qq'a\x{0A};;\x{0A}b'
+ok 196 - Document tree: qq'a\x{0A};;\x{0A}b'
+ok 197 - Parse error: qq'a\x{0A}@@\x{0A}b'
+ok 198 - Document tree: qq'a\x{0A}@@\x{0A}b'
+ok 199 - Parse error: qq'>a\x{0A}>;;\x{0A}b'
+ok 200 - Document tree: qq'>a\x{0A}>;;\x{0A}b'
+ok 201 - Parse error: qq'-a\x{0A}[PRE[\x{0A}b\x{0A}c\x{0A}]PRE]'
+ok 202 - Document tree: qq'-a\x{0A}[PRE[\x{0A}b\x{0A}c\x{0A}]PRE]'
+ok 203 - Parse error: qq'@@\x{0A}-b'
+ok 204 - Document tree: qq'@@\x{0A}-b'
+ok 205 - Parse error: qq'@@a\x{0A}-b'
+ok 206 - Document tree: qq'@@a\x{0A}-b'
 # t/swml/tables-1.dat
-ok 207
-ok 208
-ok 209
-ok 210
-ok 211
-ok 212
-ok 213
-ok 214
-ok 215
-ok 216
-ok 217
-ok 218
-ok 219
-ok 220
-ok 221
-ok 222
+ok 207 - Parse error: qq','
+ok 208 - Document tree: qq','
+ok 209 - Parse error: qq',=='
+ok 210 - Document tree: qq',=='
+ok 211 - Parse error: qq',a,=='
+ok 212 - Document tree: qq',a,=='
+ok 213 - Parse error: qq',==,=='
+ok 214 - Document tree: qq',==,=='
+ok 215 - Parse error: qq',a,==,=='
+ok 216 - Document tree: qq',a,==,=='
+ok 217 - Parse error: qq',==,==,a,=='
+ok 218 - Document tree: qq',==,==,a,=='
+ok 219 - Parse error: qq',"a\x{5C}"b","c\x{5C}\x{5C}d"'
+ok 220 - Document tree: qq',"a\x{5C}"b","c\x{5C}\x{5C}d"'
+ok 221 - Parse error: qq',"a\x{5C}"b\x{5C}"cd\x{5C}E\x{5C}f","c\x{5C}\x{5C}\x{5C}\x{5C}d"'
+ok 222 - Document tree: qq',"a\x{5C}"b\x{5C}"cd\x{5C}E\x{5C}f","c\x{5C}\x{5C}\x{5C}\x{5C}d"'
 # t/swml/inlines-1.dat
-ok 223
-ok 224
-ok 225
-ok 226
-ok 227
-ok 228
-ok 229
-ok 230
-ok 231
-ok 232
-ok 233
-ok 234
-ok 235
-ok 236
-ok 237
-ok 238
-ok 239
-ok 240
-ok 241
-ok 242
-ok 243
-ok 244
-ok 245
-ok 246
-ok 247
-ok 248
-ok 249
-ok 250
-ok 251
-ok 252
-ok 253
-ok 254
-ok 255
-ok 256
-ok 257
-ok 258
-ok 259
-ok 260
-ok 261
-ok 262
-ok 263
-ok 264
-ok 265
-ok 266
-ok 267
-ok 268
-ok 269
-ok 270
-ok 271
-ok 272
-ok 273
-ok 274
-ok 275
-ok 276
+ok 223 - Parse error: qq']]'
+ok 224 - Document tree: qq']]'
+ok 225 - Parse error: qq']]'
+ok 226 - Document tree: qq']]'
+ok 227 - Parse error: qq']>>1]'
+ok 228 - Document tree: qq']>>1]'
+ok 229 - Parse error: qq']<http://>]'
+ok 230 - Document tree: qq']<http://>]'
+ok 231 - Parse error: qq'[CODE@en[x]]'
+ok 232 - Document tree: qq'[CODE@en[x]]'
+ok 233 - Parse error: qq'a]]b'
+ok 234 - Document tree: qq'a]]b'
+ok 235 - Parse error: qq'a][b'
+ok 236 - Document tree: qq'a][b'
+ok 237 - Parse error: qq'a]  [b'
+ok 238 - Document tree: qq'a]  [b'
+ok 239 - Parse error: qq'[[c]] a]  [b'
+ok 240 - Document tree: qq'[[c]] a]  [b'
+ok 241 - Parse error: qq'[CODE[[INS[[DEL[]]]]]]a]  [b'
+ok 242 - Document tree: qq'[CODE[[INS[[DEL[]]]]]]a]  [b'
+ok 243 - Parse error: qq'[RUBY[a]  [b]]'
+ok 244 - Document tree: qq'[RUBY[a]  [b]]'
+ok 245 - Parse error: qq'[RUBYB[a]  [b]]'
+ok 246 - Document tree: qq'[RUBYB[a]  [b]]'
+ok 247 - Parse error: qq'[ABBR[a]  [b]]c][d'
+ok 248 - Document tree: qq'[ABBR[a]  [b]]c][d'
+ok 249 - Parse error: qq'[[WEAK[abcde]]fg'
+ok 250 - Document tree: qq'[[WEAK[abcde]]fg'
+ok 251 - Parse error: qq'\x{27}\x{27}\x{27}'
+ok 252 - Document tree: qq'\x{27}\x{27}\x{27}'
+ok 253 - Parse error: qq'\x{27}\x{27}'
+ok 254 - Document tree: qq'\x{27}\x{27}'
+ok 255 - Parse error: qq'\x{27}\x{27}\x{27}\x{27}\x{27}'
+ok 256 - Document tree: qq'\x{27}\x{27}\x{27}\x{27}\x{27}'
+ok 257 - Parse error: qq'\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}'
+ok 258 - Document tree: qq'\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}'
+ok 259 - Parse error: qq'\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}'
+ok 260 - Document tree: qq'\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}\x{27}'
+ok 261 - Parse error: qq'\x{27}\x{27}\x{27}\x{27}'
+ok 262 - Document tree: qq'\x{27}\x{27}\x{27}\x{27}'
+ok 263 - Parse error: qq'\x{27}'
+ok 264 - Document tree: qq'\x{27}'
+ok 265 - Parse error: qq'\x{27}\x{27}aa\x{27}\x{27}'
+ok 266 - Document tree: qq'\x{27}\x{27}aa\x{27}\x{27}'
+ok 267 - Parse error: qq'a\x{27}\x{27}bb\x{27}\x{27}\x{27}cc\x{27}\x{27}\x{27}dd\x{27}\x{27}ee'
+ok 268 - Document tree: qq'a\x{27}\x{27}bb\x{27}\x{27}\x{27}cc\x{27}\x{27}\x{27}dd\x{27}\x{27}ee'
+ok 269 - Parse error: qq'aa\x{27}\x{27}\x{27}bb\x{27}\x{27}cc\x{27}\x{27}\x{27}dd\x{27}\x{27}ee'
+ok 270 - Document tree: qq'aa\x{27}\x{27}\x{27}bb\x{27}\x{27}cc\x{27}\x{27}\x{27}dd\x{27}\x{27}ee'
+ok 271 - Parse error: qq'<IW:SuikaCVS:"messaging/manakai/">'
+ok 272 - Document tree: qq'<IW:SuikaCVS:"messaging/manakai/">'
+ok 273 - Parse error: qq'a >>1'
+ok 274 - Document tree: qq'a >>1'
+ok 275 - Parse error: qq'aa[CODE@en[[[bbb]]]ccc'
+ok 276 - Document tree: qq'aa[CODE@en[[[bbb]]]ccc'
 # t/swml/forms-specific-1.dat
-ok 277
-ok 278
-ok 279
-ok 280
-ok 281
-ok 282
-ok 283
-ok 284
+ok 277 - Parse error: qq'[[\#comment]]'
+ok 278 - Document tree: qq'[[\#comment]]'
+ok 279 - Parse error: qq'a[[\#comment]]'
+ok 280 - Document tree: qq'a[[\#comment]]'
+ok 281 - Parse error: qq'[[\#comment:arg]]'
+ok 282 - Document tree: qq'[[\#comment:arg]]'
+ok 283 - Parse error: qq'a[[\#comment:arg]]'
+ok 284 - Document tree: qq'a[[\#comment:arg]]'
 # t/swml/forms-generic-1.dat
-ok 285
-ok 286
-ok 287
-ok 288
+ok 285 - Parse error: qq'[[\#form:\x{27}\x{27}:\x{27}\x{27}:\x{27}\x{27}]]'
+ok 286 - Document tree: qq'[[\#form:\x{27}\x{27}:\x{27}\x{27}:\x{27}\x{27}]]'
+ok 287 - Parse error: qq'a[[\#form:\x{27}\x{27}:\x{27}\x{27}:\x{27}\x{27}]]'
+ok 288 - Document tree: qq'a[[\#form:\x{27}\x{27}:\x{27}\x{27}:\x{27}\x{27}]]'

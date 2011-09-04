@@ -1,21 +1,23 @@
-#!/usr/bin/perl
+package test::Whatpm::SWML::Parser;
 use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use base qw(Test::Class);
+use Test::Differences;
 
-my $test_dir_name = 't/swml/';
+my $test_d = file (__FILE__)->dir->subdir ('swml');
 
-use Test;
-BEGIN { plan tests => 1573 }
-
-use Data::Dumper;
-$Data::Dumper::Useqq = 1;
-sub Data::Dumper::qquote {
-  my $s = shift;
-  $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
-  return q<qq'> . $s . q<'>;
-} # Data::Dumper::qquote
+{
+  no warnings 'redefine';
+  use Data::Dumper;
+  $Data::Dumper::Useqq = 1;
+  sub Data::Dumper::qquote {
+    my $s = shift;
+    $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
+    return q<qq'> . $s . q<'>;
+  } # Data::Dumper::qquote
+}
 
 use Whatpm::SWML::Parser;
 use Whatpm::NanoDOM;
@@ -52,29 +54,35 @@ sub test ($) {
   @errors = sort {$a cmp $b} @errors;
   @{$test->{errors}->[0]} = sort {$a cmp $b} @{$test->{errors}->[0] ||= []};
   
-  ok join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
+  eq_or_diff join ("\n", @errors), join ("\n", @{$test->{errors}->[0] or []}),
     'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]);
   
   $test->{document}->[0] .= "\x0A" if length $test->{document}->[0];
-  ok $result, $test->{document}->[0],
+  eq_or_diff $result, $test->{document}->[0],
       'Document tree: ' . Data::Dumper::qquote ($test->{data}->[0]);
 } # test
 
-my @FILES = grep {$_} split /\s+/, qq[
-  ${test_dir_name}structs-1.dat
-  ${test_dir_name}blocks-1.dat
-  ${test_dir_name}tables-1.dat
-  ${test_dir_name}inlines-1.dat
-  ${test_dir_name}forms-specific-1.dat
-  ${test_dir_name}forms-generic-1.dat
+my @FILES = map { $test_d->file ($_)->stringify } qw[
+  structs-1.dat
+  blocks-1.dat
+  tables-1.dat
+  inlines-1.dat
+  forms-specific-1.dat
+  forms-generic-1.dat
 ];
 
-require 't/testfiles.pl';
-execute_test ($_, {
-  data => {is_prefixed => 1},
-  errors => {is_list => 1},
-  document => {is_prefixed => 1},
-}, \&test) for @FILES;
+require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
+
+sub _test : Test(288) {
+  execute_test ($_, {
+    data => {is_prefixed => 1},
+    errors => {is_list => 1},
+    document => {is_prefixed => 1},
+  }, \&test) for @FILES;
+} # _test
+
+__PACKAGE__->runtests;
+
+1;
 
 ## License: Public Domain.
-## $Date: 2008/11/07 12:35:39 $
