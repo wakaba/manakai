@@ -1,5 +1,7 @@
 POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
   --htmlroot ".."
+POD2HTML_SUB = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
+  --htmlroot "../.."
 WGET = wget
 CP = cp
 RM = rm
@@ -55,8 +57,11 @@ HTML/Tokenizer.pm: HTML/Tokenizer.pm.src mkhtmlparser.pl
 %.html: %.pm
 	$(POD2HTML) $< > $@
 
-HTML.html ContentChecker.html CacheManifest.html WebIDL.html SWML/Parser.html:: %.html: %.pod
+HTML.html ContentChecker.html CacheManifest.html WebIDL.html:: %.html: %.pod
 	$(POD2HTML) $< > $@
+
+SWML/Parser.html:: %.html: %.pod
+	$(POD2HTML_SUB) $< > $@
 
 mklinktypelist.html: mklinktypelist.pl
 	$(POD2HTML) $< > $@
