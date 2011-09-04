@@ -6349,9 +6349,6 @@ $Element->{+HTML_NS}->{source} = {
 ## language, and whose label attributes are again both missing or both
 ## have the same value.
 
-## XXXThere must not be more than one track element with the same
-## parent node with the default attribute specified.
-
 $Element->{+HTML_NS}->{track} = {
   %HTMLEmptyChecker,
   status => FEATURE_HTML5_FD,
@@ -6404,6 +6401,15 @@ $Element->{+HTML_NS}->{track} = {
       }
     }
 
+    if ($el->has_attribute_ns (undef, 'default')) {
+      if ($item->{parent_state}->{has_default_track}) {
+        $self->{onerror}->(node => $el,
+                           type => 'duplicate default track', ##XXXdoc
+                           level => $self->{level}->{must});
+      } else {
+        $item->{parent_state}->{has_default_track} = 1;
+      }
+    }
   }, # check_attrs2
 }; # track
 

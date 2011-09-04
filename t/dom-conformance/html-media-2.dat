@@ -645,3 +645,52 @@
     default="true"/>
 #errors
 /track/@default;boolean:invalid;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track srclang="ja" src="a" default=""/>
+    <track srclang="ja" src="a" default=""/>
+    <track srclang="ja" src="a" default=""/>aa
+  </audio>
+</p>
+#errors
+/p/audio/track;duplicate default track;m
+/p/audio/track;duplicate default track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <video src="a">
+    <track srclang="ja" src="a" default=""/>
+    <track srclang="ja" src="a" default=""/>
+    <track srclang="ja" src="a" default=""/>aa
+  </video>
+</p>
+#errors
+/p/video/track;duplicate default track;m
+/p/video/track;duplicate default track;m
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track srclang="ja" src="a" default=""/>
+    <track srclang="ja" src="a"/>
+    <track srclang="ja" src="a"/>aa
+  </audio>
+</p>
+#errors
+
+#data
+<p xmlns="http://www.w3.org/1999/xhtml">
+  <audio src="a">
+    <track srclang="ja" src="a" default=""/>
+    <ins>
+      <track srclang="ja" src="a" default=""/>
+      <track srclang="ja" src="a" default=""/>aa
+    </ins>
+  </audio>
+</p>
+#errors
+/p/audio/ins/track;element not allowed:phrasing;m
+/p/audio/ins/track;element not allowed:phrasing;m
+/p/audio/ins/track;duplicate default track;m
