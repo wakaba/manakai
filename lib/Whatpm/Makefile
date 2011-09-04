@@ -14,7 +14,8 @@ all: \
   HTML/Tokenizer.pm \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
-  CacheManifest.html WebIDL.html mklinktypelist.html
+  CacheManifest.html WebIDL.html mklinktypelist.html \
+  SWML/Parser.html
 
 Atom-all:
 	cd Atom && make all
@@ -54,7 +55,7 @@ HTML/Tokenizer.pm: HTML/Tokenizer.pm.src mkhtmlparser.pl
 %.html: %.pm
 	$(POD2HTML) $< > $@
 
-HTML.html ContentChecker.html CacheManifest.html WebIDL.html:: %.html: %.pod
+HTML.html ContentChecker.html CacheManifest.html WebIDL.html SWML/Parser.html:: %.html: %.pod
 	$(POD2HTML) $< > $@
 
 mklinktypelist.html: mklinktypelist.pl

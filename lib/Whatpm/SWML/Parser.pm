@@ -1,5 +1,7 @@
 package Whatpm::SWML::Parser;
 use strict;
+use warnings;
+our $VERSION = '1.0';
 
 sub AA_NS () { q<http://pc5.2ch.net/test/read.cgi/hp/1096723178/aavocab#> }
 sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
@@ -467,7 +469,7 @@ sub parse_char_string ($$$;$) {
       my $name = '';
       if ($s =~ s/^([^=]*)=//) {
         $name = $1;
-        $column += length $name + 1;
+        $column += (length $name) + 1;
       }
       my $param = $doc->create_element_ns (SW09_NS, [undef, 'parameter']);
       $param->set_attribute_ns (undef, [undef, 'name'] => $name);
@@ -1077,5 +1079,14 @@ sub parse_char_string ($$$;$) {
     }
   } # A
 } # parse_char_string
+
+=head1 LICENSE
+
+Copyright 2008-2011 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;
