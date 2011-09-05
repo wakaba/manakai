@@ -159,9 +159,9 @@ content-checker-atom-result.txt: always
 content-checker-xml-result.txt: always
 	-$(PERL_) ContentChecker-XML.t &> $@
 
-langtag-files: langtag-result.txt
+langtag-files: results/LangTag.txt
 
-langtag-result.txt: always
+results/LangTag.txt: always
 	-cd .. && $(PERL_) t/LangTag.t &> t/$@
 
 clean: clean-dom1core-perl
