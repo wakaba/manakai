@@ -1,139 +1,195 @@
-1..133
-# Running under perl version 5.008008 for linux
-# Current time local: Mon Oct 12 17:06:30 2009
-# Current time GMT:   Mon Oct 12 08:06:30 2009
-# Using Test.pm version 1.25
 # t/langtag-1.dat
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-ok 6
-ok 7
-ok 8
-ok 9
-ok 10
-ok 11
-ok 12
-ok 13
-ok 14
-ok 15
-ok 16
-ok 17
-ok 18
-ok 19
-ok 20
-ok 21
-ok 22
-ok 23
-ok 24
-ok 25
-ok 26
-ok 27
-ok 28
-ok 29
-ok 30
-ok 31
-ok 32
-ok 33
-ok 34
-ok 35
-ok 36
-ok 37
-ok 38
-ok 39
-ok 40
-ok 41
-ok 42
-ok 43
-ok 44
-ok 45
-ok 46
-ok 47
-ok 48
-ok 49
-ok 50
-ok 51
-ok 52
-ok 53
-ok 54
-ok 55
-ok 56
-ok 57
-ok 58
-ok 59
-ok 60
-ok 61
-ok 62
-ok 63
-ok 64
-ok 65
-ok 66
-ok 67
-ok 68
-ok 69
-ok 70
-ok 71
-ok 72
-ok 73
-ok 74
-ok 75
-ok 76
-ok 77
-ok 78
-ok 79
-ok 80
-ok 81
-ok 82
-ok 83
-ok 84
-ok 85
-ok 86
-ok 87
-ok 88
-ok 89
-ok 90
-ok 91
-ok 92
-ok 93
-ok 94
-ok 95
-ok 96
-ok 97
-ok 98
-ok 99
-ok 100
-ok 101
-ok 102
-ok 103
-ok 104
-ok 105
-ok 106
-ok 107
-ok 108
-ok 109
-ok 110
-ok 111
-ok 112
-ok 113
-ok 114
-ok 115
-ok 116
-ok 117
-ok 118
-ok 119
-ok 120
-ok 121
-ok 122
-ok 123
-ok 124
-ok 125
-ok 126
-ok 127
-ok 128
-ok 129
-ok 130
-ok 131
-ok 132
-ok 133
+ok 1 - en
+ok 2 - en-US
+ok 3 - en-GB
+ok 4 - ja
+ok 5 - mn-Cyrl-MN
+ok 6 - MN-cYRL-mn
+ok 7 - mN-cYrL-Mn
+ok 8 - frm-1606nicT
+ok 9 - sl-rozaj
+ok 10 - sl-rozaJ-bIske
+ok 11 - sl-X-mytype
+ok 12 - X-mYtype
+ok 13 - sl-x-my-lang
+ok 14 - en-scousE
+ok 15 - iu-LatN
+not ok 16 - ZH-gan
+#   Failed test 'ZH-gan'
+#   at t/LangTag.t line 31.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------------------+---+--------------------------------------+
+# | Ln|Got                                        | Ln|Expected                              |
+# +---+-------------------------------------------+---+--------------------------------------+
+# *  1|langtag:redundant:case;;ZH-gan;s\n         *  1|langtag:grandfathered:case;;ZH-gan;s  *
+# *  2|langtag:redundant:deprecated;gan;ZH-gan;s  *   |                                      |
+# +---+-------------------------------------------+---+--------------------------------------+
+not ok 17 - I-Tsu
+#   Failed test 'I-Tsu'
+#   at t/LangTag.t line 31.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+----------------------------------------------+---+-------------------------------------+
+# | Ln|Got                                           | Ln|Expected                             |
+# +---+----------------------------------------------+---+-------------------------------------+
+# *  1|langtag:grandfathered:case;;I-Tsu;s\n         *  1|langtag:grandfathered:case;;I-Tsu;s  *
+# *  2|langtag:grandfathered:deprecated;tsu;I-Tsu;s  *   |                                     |
+# +---+----------------------------------------------+---+-------------------------------------+
+ok 18 - fr-Latn-CA
+ok 19 - qaa
+ok 20 - qrx
+ok 21 - qtz
+ok 22 - x-fr-CH
+ok 23 - i-klingon
+not ok 24 - i-bnn
+#   Failed test 'i-bnn'
+#   at t/LangTag.t line 31.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+----------------------------------------------+---+----------+
+# | Ln|Got                                           | Ln|Expected  |
+# +---+----------------------------------------------+---+----------+
+# *  1|langtag:grandfathered:deprecated;bnn;i-bnn;s  *   |          |
+# +---+----------------------------------------------+---+----------+
+ok 25 - haw
+ok 26 - i-enochian
+ok 27 - enochian-AQ
+ok 28 - enochian-Latn
+not ok 29 - zh-gan
+#   Failed test 'zh-gan'
+#   at t/LangTag.t line 31.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------------------+---+----------+
+# | Ln|Got                                        | Ln|Expected  |
+# +---+-------------------------------------------+---+----------+
+# *  1|langtag:redundant:deprecated;gan;zh-gan;s  *   |          |
+# +---+-------------------------------------------+---+----------+
+ok 30 - sr-Latn
+ok 31 - ja-Jpan
+ok 32 - ja-Latn
+ok 33 - de
+ok 34 - de-CH
+ok 35 - de-CH-1996
+ok 36 - de-CH-x-phonebk
+ok 37 - de-DE
+ok 38 - de-DE-1901
+ok 39 - es-419
+ok 40 - sl-IT-nedis
+ok 41 - sr-Latn
+ok 42 - sr-Latn-CS
+ok 43 - sr-Cyrl
+ok 44 - en-US-boont
+ok 45 - en-AA
+ok 46 - en-Qm
+ok 47 - en-QS
+ok 48 - en-QZ
+ok 49 - en-xa
+ok 50 - en-XG
+ok 51 - en-XZ
+ok 52 - en-ZZ
+ok 53 - sl-nedis
+ok 54 - sl-IT-nedis
+ok 55 - zh-nedis
+ok 56 - it-IT-nedis
+ok 57 - is-nedis
+ok 58 - de-1996-1901
+ok 59 - de-1901-1996
+ok 60 - de-1996
+ok 61 - de-Latg-1996
+ok 62 - de-a-value
+ok 63 - en-a-bbb-a-ccc
+ok 64 - en-a-bbb-x-a-ccc
+ok 65 - fr-a-Latn
+ok 66 - en-Latn-GB-boont-r-extended-sequence-x-private
+ok 67 - en-x-US
+ok 68 - az-Arab-x-AZE-derbend
+ok 69 - es-CO
+ok 70 - es-Latn-CO-x-private
+ok 71 - no-nyn
+ok 72 - fr-1996
+ok 73 - is-Latn
+ok 74 - art-lojban
+ok 75 - en-Latn
+ok 76 - en-Latn-US
+ok 77 - fr
+ok 78 - en-TL
+ok 79 - en-TP
+ok 80 - en-276
+ok 81 - en-830
+ok 82 - en-831
+ok 83 - en-832
+ok 84 - en-833
+ok 85 - en-UK
+ok 86 - sl
+ok 87 - sl-Latn-rozaj
+ok 88 - sl-Latn-IT-nedis
+ok 89 - sl-IT-rozaj
+ok 90 - de-nedis
+ok 91 - en-Brai
+ok 92 - iw
+ok 93 - und
+ok 94 - mul
+ok 95 - de-DE-1901-1901
+ok 96 - zh-Hant-TW
+ok 97 - zh-Hant
+ok 98 - zh-Hans
+ok 99 - zh-Hans-CN
+ok 100 - az
+ok 101 - az-Latn
+ok 102 - az-Cyrl
+ok 103 - zh-Latn-CN-variant1-a-extend1-x-wadegile-private1
+ok 104 - zh-Latn-CN-variant1-a-extend1-x-wadegile
+ok 105 - zh-Latn-CN-variant1-a-extend1
+ok 106 - zh-Latn-CN-variant1
+ok 107 - zh-Latn-CN
+ok 108 - zh-Latn
+ok 109 - zh
+not ok 110 - zh-guoyu
+#   Failed test 'zh-guoyu'
+#   at t/LangTag.t line 31.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------------------------+----------------------------------------------------+
+# | Ln|Got                                              |Expected                                            |
+# +---+-------------------------------------------------+----------------------------------------------------+
+# *  1|langtag:grandfathered:deprecated;cmn;zh-guoyu;s  |langtag:grandfathered:deprecated;zh-cmn;zh-guoyu;s  *
+# +---+-------------------------------------------------+----------------------------------------------------+
+ok 111 - en-A-aaa-B-ccc-bbb-x-xyz
+ok 112 - en-B-ccc-bbb-A-aaa-X-xyz
+ok 113 - en-BU
+ok 114 - en-MM
+ok 115 - en-a-aaa-bbb-ccc
+ok 116 - en-a-ccc-bbb-aaa
+ok 117 - en-b-ccc-bbb-aaa
+ok 118 - en-b-aaa-bbb-ccc
+ok 119 - zh-Hans-XQ
+ok 120 - x-someLang
+not ok 121 - zh-min
+#   Failed test 'zh-min'
+#   at t/LangTag.t line 31.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+--------------------------------------------+---+----------+
+# | Ln|Got                                         | Ln|Expected  |
+# +---+--------------------------------------------+---+----------+
+# *  1|langtag:grandfathered:deprecated;;zh-min;s  *   |          |
+# +---+--------------------------------------------+---+----------+
+not ok 122 - zh-min-nan-Hant-CN
+#   Failed test 'zh-min-nan-Hant-CN'
+#   at t/LangTag.t line 31.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------+---+----------------------------------+
+# | Ln|Got                            | Ln|Expected                          |
+# +---+-------------------------------+---+----------------------------------+
+# *  1|langtag:extlang:prefix;;min;m  *  1|langtag:extlang:invalid;;min;m\n  *
+# |   |                               *  2|langtag:extlang:invalid;;nan;m    *
+# +---+-------------------------------+---+----------------------------------+
+ok 123 - x-whatever
+ok 124 - qaa-Qaaa-QM-x-southern
+ok 125 - de-Qaaa
+ok 126 - sr-Latn-QM
+ok 127 - sr-Qaaa-CS
+ok 128 - en-US-u-islamCal
+ok 129 - zh-CN-a-myExt-x-private
+ok 130 - en-a-myExt-b-another
+ok 131 - de-419-DE
+ok 132 - a-DE
+ok 133 - ar-a-aaa-b-bbb-a-ccc
+1..133
+# Looks like you failed 7 tests of 133.
