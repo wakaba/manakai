@@ -11,6 +11,21 @@ my $default_error_levels = {
   info => 'i',
 };
 
+## NOTE: RFC 5646 2.1.
+sub normalize_rfc5646_langtag ($$) {
+  my @tag = map { tr/A-Z/a-z/; $_ } split /-/, $_[1], -1;
+  for my $i (1..$#tag) {
+    if (1 == length $tag[$i - 1]) {
+      #
+    } elsif ($tag[$i] =~ /\A(..)\z/s) {
+      $tag[$i] =~ tr/a-z/A-Z/;
+    } elsif ($tag[$i] =~ /\A([a-z])(.{3})\z/s) {
+      $tag[$i] = (uc $1) . $2;
+    }
+  }
+  return join '-', @tag;
+} # normalize_rfc5646_langtag
+
 ## NOTE: This method, with appropriate $onerror handler, is a
 ## "well-formed" processor [RFC 4646].
 sub parse_rfc4646_langtag ($$;$$) {

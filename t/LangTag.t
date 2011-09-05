@@ -6,7 +6,25 @@ use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use base qw(Test::Class);
 require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
 require Whatpm::LangTag;
+use Test::More;
 use Test::Differences;
+
+sub _normalize : Tests {
+  for (
+    ['', ''],
+    ['ja', 'ja'],
+    ['ja-jp', 'ja-JP'],
+    ['ja-JP', 'ja-JP'],
+    ['en-CA-x-ca', 'en-CA-x-ca'],
+    ['sgn-BE-FR', 'sgn-BE-FR'],
+    ['az-Latn-x-latn', 'az-Latn-x-latn'],
+    ['in-in', 'in-IN'],
+    ["\x{0130}n-\x{0130}n", "\x{0130}n-\x{0130}N"],
+    ["\x{0131}n-\x{0131}n", "\x{0131}n-\x{0131}N"],
+  ) {
+    is +Whatpm::LangTag->normalize_rfc5646_langtag ($_->[0]), $_->[1];
+  }
+} # _normalize
 
 sub _parse : Tests {
   execute_test ($_, {
@@ -35,8 +53,8 @@ sub _parse : Tests {
     } else {
       warn qq[No test item: "$test->{data}->[0]];
     }
-  }) for qw[
-    t/langtag-1.dat
+  }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[
+    langtag-1.dat
   ];
 } # _parse
 
