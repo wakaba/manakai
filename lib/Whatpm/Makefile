@@ -1,5 +1,7 @@
 POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
   --htmlroot ".."
+POD2HTML_SUB = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
+  --htmlroot "../.."
 WGET = wget
 CP = cp
 RM = rm
@@ -14,7 +16,8 @@ all: \
   HTML/Tokenizer.pm \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
-  CacheManifest.html WebIDL.html mklinktypelist.html
+  CacheManifest.html WebIDL.html mklinktypelist.html \
+  SWML/Parser.html
 
 Atom-all:
 	cd Atom && make all
@@ -56,6 +59,9 @@ HTML/Tokenizer.pm: HTML/Tokenizer.pm.src mkhtmlparser.pl
 
 HTML.html ContentChecker.html CacheManifest.html WebIDL.html:: %.html: %.pod
 	$(POD2HTML) $< > $@
+
+SWML/Parser.html:: %.html: %.pod
+	$(POD2HTML_SUB) $< > $@
 
 mklinktypelist.html: mklinktypelist.pl
 	$(POD2HTML) $< > $@

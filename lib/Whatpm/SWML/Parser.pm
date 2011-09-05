@@ -1,5 +1,7 @@
 package Whatpm::SWML::Parser;
 use strict;
+use warnings;
+our $VERSION = '1.0';
 
 sub AA_NS () { q<http://pc5.2ch.net/test/read.cgi/hp/1096723178/aavocab#> }
 sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
@@ -38,6 +40,19 @@ sub TABLE_ROW_END_TOKEN () { 24 }
 sub TABLE_CELL_START_TOKEN () { 25 }
 sub TABLE_CELL_END_TOKEN () { 26 }
 sub TABLE_COLSPAN_CELL_TOKEN () { 27 }
+
+my %block_elements = (
+  insert => SW09_NS, delete => SW09_NS, refs => SW09_NS,
+  figure => HTML_NS, figcaption => HTML_NS,
+);
+
+my $tag_name_to_block_element_name = {
+  INS => 'insert',
+  DEL => 'delete',
+  REFS => 'refs',
+  FIG => 'figure',
+  FIGCAPTION => 'figcaption',
+};
 
 sub new ($) {
   my $self = bless {
@@ -253,7 +268,7 @@ sub parse_char_string ($$$;$) {
           unshift @s, $s;
           $line--;
           last;
-        } elsif ($s =~ /\A\](INS|DEL)\][\x09\x20]*\z/) {
+        } elsif ($s =~ /\A\](INS|DEL|REFS|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
           push @nt, {type => PREFORMATTED_END_TOKEN,
                      line => $line, column => $column};
           push @nt, {type => BLOCK_END_TAG_TOKEN, tag_name => $1,
@@ -337,7 +352,7 @@ sub parse_char_string ($$$;$) {
         $tokenize_text->(\$s);
       }
       return shift @nt;
-    } elsif ($s =~ /\A\[(INS|DEL)(?>\(([^()\\]*)\))?\[[\x09\x20]*\z/) {
+    } elsif ($s =~ /\A\[(INS|DEL|REFS|FIG(?:CAPTION)?)(?>\(([^()\\]*)\))?\[[\x09\x20]*\z/) {
       undef $continuous_line;
       return {type => BLOCK_START_TAG_TOKEN, tag_name => $1,
               classes => $2,
@@ -378,7 +393,7 @@ sub parse_char_string ($$$;$) {
       $tokenize_text->(\$s);
       $continuous_line = 1;
       return shift @nt;
-    } elsif ($s =~ /\A\](INS|DEL)\][\x09\x20]*\z/) {
+    } elsif ($s =~ /\A\](INS|DEL|REFS|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
       $continuous_line = 1;
       return {type => BLOCK_END_TAG_TOKEN, tag_name => $1,
               line => $line, column => $column};
@@ -467,7 +482,7 @@ sub parse_char_string ($$$;$) {
       my $name = '';
       if ($s =~ s/^([^=]*)=//) {
         $name = $1;
-        $column += length $name + 1;
+        $column += (length $name) + 1;
       }
       my $param = $doc->create_element_ns (SW09_NS, [undef, 'parameter']);
       $param->set_attribute_ns (undef, [undef, 'name'] => $name);
@@ -504,7 +519,8 @@ sub parse_char_string ($$$;$) {
              quotation_depth => 0,
              list_depth => 0}];
   my $structural_elements = {
-    body => 1, section => 1, insert => 1, delete => 1, blockquote => 1,
+    %block_elements,
+    body => 1, section => 1, blockquote => 1,
     h1 => 1, ul => 1, ol => 1, dl => 1, li => 1, dt => 1, dd => 1,
     table => 1, tbody => 1, tr => 1, td => 1, p => 1, 'comment-p' => 1,
     ed => 1, pre => 1,
@@ -766,7 +782,7 @@ sub parse_char_string ($$$;$) {
       if ($token->{type} == HEADING_START_TOKEN) {
         B: {
           pop @$oe and redo B
-              if not {body => 1, section => 1, insert => 1, delete => 1}
+              if not {body => 1, section => 1, %block_elements}
                   ->{$oe->[-1]->{node}->manakai_local_name} or
                  $token->{depth} <= $oe->[-1]->{section_depth};
           if ($token->{depth} > $oe->[-1]->{section_depth} + 1) {
@@ -793,11 +809,10 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == BLOCK_START_TAG_TOKEN and
-               ($token->{tag_name} eq 'INS' or
-                $token->{tag_name} eq 'DEL')) {
+               $tag_name_to_block_element_name->{$token->{tag_name}}) {
+        my $ln = $tag_name_to_block_element_name->{$token->{tag_name}};
         my $el = $doc->create_element_ns
-            (SW09_NS,
-             [undef, $token->{tag_name} eq 'INS' ? 'insert' : 'delete']);
+            ($block_elements{$ln}, [undef, $ln]);
         $oe->[-1]->{node}->append_child ($el);
         push @$oe, {node => $el, section_depth => 0,
                     quotation_depth => 0, list_depth => 0};
@@ -808,7 +823,7 @@ sub parse_char_string ($$$;$) {
       } elsif ($token->{type} == QUOTATION_START_TOKEN) {
         B: {
           pop @$oe and redo B
-              if not {body => 1, section => 1, insert => 1, delete => 1,
+              if not {body => 1, section => 1, %block_elements,
                   blockquote => 1}
                   ->{$oe->[-1]->{node}->manakai_local_name} or
                  $token->{depth} < $oe->[-1]->{quotation_depth};
@@ -915,27 +930,21 @@ sub parse_char_string ($$$;$) {
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == EMPTY_LINE_TOKEN) {
-        pop @$oe while not {body => 1, section => 1, insert => 1, delete => 1}
+        pop @$oe while not {body => 1, section => 1, %block_elements}
             ->{$oe->[-1]->{node}->manakai_local_name};
         $token = $get_next_token->();
         redo A;
       } elsif ($token->{type} == BLOCK_END_TAG_TOKEN) {
-        if ($token->{tag_name} eq 'INS') {
-          for (reverse 1..$#$oe) {
-            if ($oe->[$_]->{node}->manakai_local_name eq 'insert') {
-              splice @$oe, $_;
-              last;
-            }
-          }
-        } elsif ($token->{tag_name} eq 'DEL') {
-          for (reverse 1..$#$oe) {
-            if ($oe->[$_]->{node}->manakai_local_name eq 'delete') {
-              splice @$oe, $_;
-              last;
-            }
-          }
-        } else {
+        my $name = $tag_name_to_block_element_name->{$token->{tag_name}};
+        if (not $name) {
           ## NOTE: Ignore the token.
+        } else {
+          for (reverse 1..$#$oe) {
+            if ($oe->[$_]->{node}->manakai_local_name eq $name) {
+              splice @$oe, $_;
+              last;
+            }
+          }
         }
         undef $continuous_line;
         $token = $get_next_token->();
@@ -1077,5 +1086,14 @@ sub parse_char_string ($$$;$) {
     }
   } # A
 } # parse_char_string
+
+=head1 LICENSE
+
+Copyright 2008-2011 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 
 1;

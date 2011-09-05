@@ -47,7 +47,7 @@ whatpm: \
   tokenizer-files \
   tree-construction-files \
   xml-result.txt \
-  swml-result.txt \
+  results/SWML-Parser.txt \
   content-checker-files \
   langtag-files
 
@@ -142,7 +142,7 @@ tree-construction-result.txt: always
 xml-result.txt: always
 	-cd .. && $(PERL_) t/XML-Parser.t &> t/$@
 
-swml-result.txt: always
+results/SWML-Parser.txt: always
 	-cd .. && $(PERL_) t/SWML-Parser.t &> t/$@
 
 content-checker-files: \
