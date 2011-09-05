@@ -1,0 +1,113 @@
+=head1 NAME
+
+Whatpm::LangTag - Language Tag Parsing, Conformance Checking, and Normalization
+
+=head1 SYNOPSIS
+
+  use Whatpm::LangTag;
+
+  $tag = Whatpm::LangTag->normalize_rfc5646_langtag ($tag);
+  $parsed = Whatpm::LangTag->parse_rfc4646_langtag ($tag, $onerror);
+  Whatpm::LangTag->check_rfc4646_langtag ($parsed, $onerror);
+  Whatpm::LangTag->check_rfc3066_language_tag ($tag, $onerror);
+
+=head1 DESCRIPTION
+
+The L<Whatpm::LangTag> module contains methods to handle language tags
+as defined by BCP 47.  It can be used to parse, validate, or normalize
+language tags according to relevant standard.
+
+=head1 METHODS
+
+=over 4
+
+=item $tag = Whatpm::LangTag->normalize_rfc5646_langtag ($tag_orig)
+
+Normalize a language tag by folding cases, following RFC 5646 2.1.
+Note that this method does not replace any subtag into its preferred
+alternative.
+
+=item $parsed = Whatpm::LangTag->parse_rfc4646_langtag ($tag, $onerror)
+
+Parses a language tag into subtags.  This method interprets a language
+tag using the definition in RFC 4646.  Note that RFC 4646 is obsoleted
+by RFC 5646.
+
+Any parse errors and warnings are reported to the second argument,
+i.e. the I<$onerror> code reference.  Errors are reported in the
+format similar to L<Whatpm::HTML>'s I<$onerror> callbacks.
+
+The method returns a hash reference, which contains one or more
+key-value pairs from the following list:
+
+=over 4
+
+=item language
+
+The language subtag.
+
+=item extlang
+
+The extlang subtags.
+
+=item script
+
+The script subtag.
+
+=item region
+
+The region subtag.
+
+=item variant
+
+The variant subtags.
+
+=item extension
+
+The extension subtags.
+
+=item privateuse
+
+The privateuse subtags.
+
+=item illegal
+
+Illegal (syntactically non-conforming) string fragments.
+
+=item grandfathered
+
+"Grandfathered" language tag.
+
+=back
+
+=item Whatpm::LangTag->check_rfc4646_langtag ($parsed, $onerror)
+
+Finds conformance errors from a parsed langauge tag with regard to RFC
+4646.  Note that RFC 4646 is obsoleted by RFC 5646.
+
+Any errors and warnings are reported to the second argument, i.e. the
+I<$onerror> code reference.  Errors are reported in the format similar
+to L<Whatpm::HTML>'s I<$onerror> callbacks.
+
+This method does not report any parse erros, as this method receives a
+B<parsed> langauge tag.
+
+=item Whatpm::LangTag->check_rfc3066_language_tag ($tag, $onerror)
+
+Parses and finds conformance errors in a language tag (a string) with
+regard to RFC 3066.  Note that RFC 3066 is obsoleted by RFC 4646.
+
+Any errors and warnings are reported to the second argument, i.e. the
+I<$onerror> code reference.  Errors are reported in the format similar
+to L<Whatpm::HTML>'s I<$onerror> callbacks.
+
+=back
+
+=head1 LICENSE
+
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

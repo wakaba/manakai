@@ -1,5 +1,7 @@
 package Whatpm::LangTag;
 use strict;
+use warnings;
+our $VERSION = '1.0';
 
 my $default_error_levels = {
   langtag_fact => 'm',
@@ -772,4 +774,14 @@ sub check_rfc3066_language_tag ($$;$$) {
   ## TODO: Non-registered tags should be warned.
   ## $fact_level for i-*, $good_level for others.
 } # check_rfc3066_language_tag
+
+=head1 LICENSE
+
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;
