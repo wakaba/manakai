@@ -1,5 +1,1357 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2008-08-18',
+          '_file_date' => '2011-08-25',
+          'extlang' => {
+                         'aao' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'aao'
+                                  },
+                         'abh' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'abh'
+                                  },
+                         'abv' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'abv'
+                                  },
+                         'acm' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'acm'
+                                  },
+                         'acq' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'acq'
+                                  },
+                         'acw' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'acw'
+                                  },
+                         'acx' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'acx'
+                                  },
+                         'acy' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'acy'
+                                  },
+                         'adf' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'adf'
+                                  },
+                         'ads' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ads'
+                                  },
+                         'aeb' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'aeb'
+                                  },
+                         'aec' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'aec'
+                                  },
+                         'aed' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'aed'
+                                  },
+                         'aen' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'aen'
+                                  },
+                         'afb' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'afb'
+                                  },
+                         'afg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'afg'
+                                  },
+                         'ajp' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ajp'
+                                  },
+                         'apc' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'apc'
+                                  },
+                         'apd' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'apd'
+                                  },
+                         'arb' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'arb'
+                                  },
+                         'arq' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'arq'
+                                  },
+                         'ars' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ars'
+                                  },
+                         'ary' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ary'
+                                  },
+                         'arz' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'arz'
+                                  },
+                         'ase' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ase'
+                                  },
+                         'asf' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'asf'
+                                  },
+                         'asp' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'asp'
+                                  },
+                         'asq' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'asq'
+                                  },
+                         'asw' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'asw'
+                                  },
+                         'auz' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'auz'
+                                  },
+                         'avl' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'avl'
+                                  },
+                         'ayh' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ayh'
+                                  },
+                         'ayl' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ayl'
+                                  },
+                         'ayn' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ayn'
+                                  },
+                         'ayp' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ayp'
+                                  },
+                         'bbz' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'bbz'
+                                  },
+                         'bfi' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'bfi'
+                                  },
+                         'bfk' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'bfk'
+                                  },
+                         'bjn' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'bjn'
+                                  },
+                         'bog' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'bog'
+                                  },
+                         'bqn' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'bqn'
+                                  },
+                         'bqy' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'bqy'
+                                  },
+                         'btj' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'btj'
+                                  },
+                         'bve' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'bve'
+                                  },
+                         'bvl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'bvl'
+                                  },
+                         'bvu' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'bvu'
+                                  },
+                         'bzs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'bzs'
+                                  },
+                         'cdo' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'cdo'
+                                  },
+                         'cds' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'cds'
+                                  },
+                         'cjy' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'cjy'
+                                  },
+                         'cmn' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'cmn'
+                                  },
+                         'coa' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'coa'
+                                  },
+                         'cpx' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'cpx'
+                                  },
+                         'csc' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csc'
+                                  },
+                         'csd' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csd'
+                                  },
+                         'cse' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'cse'
+                                  },
+                         'csf' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csf'
+                                  },
+                         'csg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csg'
+                                  },
+                         'csl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csl'
+                                  },
+                         'csn' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csn'
+                                  },
+                         'csq' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csq'
+                                  },
+                         'csr' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'csr'
+                                  },
+                         'czh' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'czh'
+                                  },
+                         'czo' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'czo'
+                                  },
+                         'doq' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'doq'
+                                  },
+                         'dse' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'dse'
+                                  },
+                         'dsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'dsl'
+                                  },
+                         'dup' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'dup'
+                                  },
+                         'ecs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ecs'
+                                  },
+                         'esl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'esl'
+                                  },
+                         'esn' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'esn'
+                                  },
+                         'eso' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'eso'
+                                  },
+                         'eth' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'eth'
+                                  },
+                         'fcs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'fcs'
+                                  },
+                         'fse' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'fse'
+                                  },
+                         'fsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'fsl'
+                                  },
+                         'fss' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'fss'
+                                  },
+                         'gan' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'gan'
+                                  },
+                         'gom' => {
+                                    'Prefix' => [
+                                                  'kok'
+                                                ],
+                                    '_preferred' => 'gom'
+                                  },
+                         'gse' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'gse'
+                                  },
+                         'gsg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'gsg'
+                                  },
+                         'gsm' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'gsm'
+                                  },
+                         'gss' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'gss'
+                                  },
+                         'gus' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'gus'
+                                  },
+                         'hab' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'hab'
+                                  },
+                         'haf' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'haf'
+                                  },
+                         'hak' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'hak'
+                                  },
+                         'hds' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'hds'
+                                  },
+                         'hji' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'hji'
+                                  },
+                         'hks' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'hks'
+                                  },
+                         'hos' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'hos'
+                                  },
+                         'hps' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'hps'
+                                  },
+                         'hsh' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'hsh'
+                                  },
+                         'hsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'hsl'
+                                  },
+                         'hsn' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'hsn'
+                                  },
+                         'icl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'icl'
+                                  },
+                         'ils' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ils'
+                                  },
+                         'inl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'inl'
+                                  },
+                         'ins' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ins'
+                                  },
+                         'ise' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ise'
+                                  },
+                         'isg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'isg'
+                                  },
+                         'isr' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'isr'
+                                  },
+                         'jak' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'jak'
+                                  },
+                         'jax' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'jax'
+                                  },
+                         'jcs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'jcs'
+                                  },
+                         'jhs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'jhs'
+                                  },
+                         'jls' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'jls'
+                                  },
+                         'jos' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'jos'
+                                  },
+                         'jsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'jsl'
+                                  },
+                         'jus' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'jus'
+                                  },
+                         'kgi' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'kgi'
+                                  },
+                         'knn' => {
+                                    'Prefix' => [
+                                                  'kok'
+                                                ],
+                                    '_preferred' => 'knn'
+                                  },
+                         'kvb' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'kvb'
+                                  },
+                         'kvk' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'kvk'
+                                  },
+                         'kvr' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'kvr'
+                                  },
+                         'kxd' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'kxd'
+                                  },
+                         'lbs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lbs'
+                                  },
+                         'lce' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'lce'
+                                  },
+                         'lcf' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'lcf'
+                                  },
+                         'liw' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'liw'
+                                  },
+                         'lls' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lls'
+                                  },
+                         'lsg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lsg'
+                                  },
+                         'lsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lsl'
+                                  },
+                         'lso' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lso'
+                                  },
+                         'lsp' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lsp'
+                                  },
+                         'lst' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lst'
+                                  },
+                         'lsy' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'lsy'
+                                  },
+                         'ltg' => {
+                                    'Prefix' => [
+                                                  'lv'
+                                                ],
+                                    '_preferred' => 'ltg'
+                                  },
+                         'lvs' => {
+                                    'Prefix' => [
+                                                  'lv'
+                                                ],
+                                    '_preferred' => 'lvs'
+                                  },
+                         'lzh' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'lzh'
+                                  },
+                         'max' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'max'
+                                  },
+                         'mdl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'mdl'
+                                  },
+                         'meo' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'meo'
+                                  },
+                         'mfa' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'mfa'
+                                  },
+                         'mfb' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'mfb'
+                                  },
+                         'mfs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'mfs'
+                                  },
+                         'min' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'min'
+                                  },
+                         'mnp' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'mnp'
+                                  },
+                         'mqg' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'mqg'
+                                  },
+                         'mre' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'mre'
+                                  },
+                         'msd' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'msd'
+                                  },
+                         'msi' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'msi'
+                                  },
+                         'msr' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'msr'
+                                  },
+                         'mui' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'mui'
+                                  },
+                         'mzc' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'mzc'
+                                  },
+                         'mzg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'mzg'
+                                  },
+                         'mzy' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'mzy'
+                                  },
+                         'nan' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'nan'
+                                  },
+                         'nbs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'nbs'
+                                  },
+                         'ncs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ncs'
+                                  },
+                         'nsi' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'nsi'
+                                  },
+                         'nsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'nsl'
+                                  },
+                         'nsp' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'nsp'
+                                  },
+                         'nsr' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'nsr'
+                                  },
+                         'nzs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'nzs'
+                                  },
+                         'okl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'okl'
+                                  },
+                         'orn' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'orn'
+                                  },
+                         'ors' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'ors'
+                                  },
+                         'pel' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'pel'
+                                  },
+                         'pga' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'pga'
+                                  },
+                         'pks' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'pks'
+                                  },
+                         'prl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'prl'
+                                  },
+                         'prz' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'prz'
+                                  },
+                         'psc' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'psc'
+                                  },
+                         'psd' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'psd'
+                                  },
+                         'pse' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'pse'
+                                  },
+                         'psg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'psg'
+                                  },
+                         'psl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'psl'
+                                  },
+                         'pso' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'pso'
+                                  },
+                         'psp' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'psp'
+                                  },
+                         'psr' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'psr'
+                                  },
+                         'pys' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'pys'
+                                  },
+                         'rms' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'rms'
+                                  },
+                         'rsi' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'rsi'
+                                  },
+                         'rsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'rsl'
+                                  },
+                         'sdl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'sdl'
+                                  },
+                         'sfb' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'sfb'
+                                  },
+                         'sfs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'sfs'
+                                  },
+                         'sgg' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'sgg'
+                                  },
+                         'sgx' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'sgx'
+                                  },
+                         'shu' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'shu'
+                                  },
+                         'slf' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'slf'
+                                  },
+                         'sls' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'sls'
+                                  },
+                         'sqs' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'sqs'
+                                  },
+                         'ssh' => {
+                                    'Prefix' => [
+                                                  'ar'
+                                                ],
+                                    '_preferred' => 'ssh'
+                                  },
+                         'ssp' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ssp'
+                                  },
+                         'ssr' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ssr'
+                                  },
+                         'svk' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'svk'
+                                  },
+                         'swc' => {
+                                    'Prefix' => [
+                                                  'sw'
+                                                ],
+                                    '_preferred' => 'swc'
+                                  },
+                         'swh' => {
+                                    'Prefix' => [
+                                                  'sw'
+                                                ],
+                                    '_preferred' => 'swh'
+                                  },
+                         'swl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'swl'
+                                  },
+                         'syy' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'syy'
+                                  },
+                         'tmw' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'tmw'
+                                  },
+                         'tse' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'tse'
+                                  },
+                         'tsm' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'tsm'
+                                  },
+                         'tsq' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'tsq'
+                                  },
+                         'tss' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'tss'
+                                  },
+                         'tsy' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'tsy'
+                                  },
+                         'tza' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'tza'
+                                  },
+                         'ugn' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ugn'
+                                  },
+                         'ugy' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ugy'
+                                  },
+                         'ukl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ukl'
+                                  },
+                         'uks' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'uks'
+                                  },
+                         'urk' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'urk'
+                                  },
+                         'uzn' => {
+                                    'Prefix' => [
+                                                  'uz'
+                                                ],
+                                    '_preferred' => 'uzn'
+                                  },
+                         'uzs' => {
+                                    'Prefix' => [
+                                                  'uz'
+                                                ],
+                                    '_preferred' => 'uzs'
+                                  },
+                         'vgt' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'vgt'
+                                  },
+                         'vkk' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'vkk'
+                                  },
+                         'vkt' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'vkt'
+                                  },
+                         'vsi' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'vsi'
+                                  },
+                         'vsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'vsl'
+                                  },
+                         'vsv' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'vsv'
+                                  },
+                         'wuu' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'wuu'
+                                  },
+                         'xki' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'xki'
+                                  },
+                         'xml' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'xml'
+                                  },
+                         'xmm' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'xmm'
+                                  },
+                         'xms' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'xms'
+                                  },
+                         'yds' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'yds'
+                                  },
+                         'ysl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'ysl'
+                                  },
+                         'yue' => {
+                                    'Prefix' => [
+                                                  'zh'
+                                                ],
+                                    '_preferred' => 'yue'
+                                  },
+                         'zib' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'zib'
+                                  },
+                         'zlm' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'zlm'
+                                  },
+                         'zmi' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'zmi'
+                                  },
+                         'zsl' => {
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_preferred' => 'zsl'
+                                  },
+                         'zsm' => {
+                                    'Prefix' => [
+                                                  'ms'
+                                                ],
+                                    '_preferred' => 'zsm'
+                                  }
+                       },
           'grandfathered' => {
                                'art-lojban' => {
                                                  '_canon' => 'art-lojban',
@@ -13,10 +1365,14 @@ $Whatpm::LangTag::Registry = {
                                                 '_canon' => 'en-GB-oed'
                                               },
                                'i-ami' => {
-                                            '_canon' => 'i-ami'
+                                            '_canon' => 'i-ami',
+                                            '_deprecated' => 1,
+                                            '_preferred' => 'ami'
                                           },
                                'i-bnn' => {
-                                            '_canon' => 'i-bnn'
+                                            '_canon' => 'i-bnn',
+                                            '_deprecated' => 1,
+                                            '_preferred' => 'bnn'
                                           },
                                'i-default' => {
                                                 '_canon' => 'i-default'
@@ -27,7 +1383,7 @@ $Whatpm::LangTag::Registry = {
                                'i-hak' => {
                                             '_canon' => 'i-hak',
                                             '_deprecated' => 1,
-                                            '_preferred' => 'zh-hakka'
+                                            '_preferred' => 'hak'
                                           },
                                'i-klingon' => {
                                                 '_canon' => 'i-klingon',
@@ -48,16 +1404,24 @@ $Whatpm::LangTag::Registry = {
                                                '_preferred' => 'nv'
                                              },
                                'i-pwn' => {
-                                            '_canon' => 'i-pwn'
+                                            '_canon' => 'i-pwn',
+                                            '_deprecated' => 1,
+                                            '_preferred' => 'pwn'
                                           },
                                'i-tao' => {
-                                            '_canon' => 'i-tao'
+                                            '_canon' => 'i-tao',
+                                            '_deprecated' => 1,
+                                            '_preferred' => 'tao'
                                           },
                                'i-tay' => {
-                                            '_canon' => 'i-tay'
+                                            '_canon' => 'i-tay',
+                                            '_deprecated' => 1,
+                                            '_preferred' => 'tay'
                                           },
                                'i-tsu' => {
-                                            '_canon' => 'i-tsu'
+                                            '_canon' => 'i-tsu',
+                                            '_deprecated' => 1,
+                                            '_preferred' => 'tsu'
                                           },
                                'no-bok' => {
                                              '_canon' => 'no-bok',
@@ -70,1226 +1434,5784 @@ $Whatpm::LangTag::Registry = {
                                              '_preferred' => 'nn'
                                            },
                                'sgn-be-fr' => {
-                                                '_canon' => 'sgn-BE-fr'
+                                                '_canon' => 'sgn-BE-FR',
+                                                '_deprecated' => 1,
+                                                '_preferred' => 'sfb'
                                               },
                                'sgn-be-nl' => {
-                                                '_canon' => 'sgn-BE-nl'
+                                                '_canon' => 'sgn-BE-NL',
+                                                '_deprecated' => 1,
+                                                '_preferred' => 'vgt'
                                               },
                                'sgn-ch-de' => {
-                                                '_canon' => 'sgn-CH-de'
+                                                '_canon' => 'sgn-CH-DE',
+                                                '_deprecated' => 1,
+                                                '_preferred' => 'sgg'
                                               },
-                               'zh-cmn' => {
-                                             '_canon' => 'zh-cmn'
-                                           },
-                               'zh-cmn-hans' => {
-                                                  '_canon' => 'zh-cmn-Hans'
-                                                },
-                               'zh-cmn-hant' => {
-                                                  '_canon' => 'zh-cmn-Hant'
-                                                },
-                               'zh-gan' => {
-                                             '_canon' => 'zh-gan'
-                                           },
                                'zh-guoyu' => {
                                                '_canon' => 'zh-guoyu',
                                                '_deprecated' => 1,
-                                               '_preferred' => 'zh-cmn'
+                                               '_preferred' => 'cmn'
                                              },
                                'zh-hakka' => {
-                                               '_canon' => 'zh-hakka'
+                                               '_canon' => 'zh-hakka',
+                                               '_deprecated' => 1,
+                                               '_preferred' => 'hak'
                                              },
                                'zh-min' => {
-                                             '_canon' => 'zh-min'
+                                             '_canon' => 'zh-min',
+                                             '_deprecated' => 1
                                            },
                                'zh-min-nan' => {
-                                                 '_canon' => 'zh-min-nan'
+                                                 '_canon' => 'zh-min-nan',
+                                                 '_deprecated' => 1,
+                                                 '_preferred' => 'nan'
                                                },
-                               'zh-wuu' => {
-                                             '_canon' => 'zh-wuu'
-                                           },
                                'zh-xiang' => {
-                                               '_canon' => 'zh-xiang'
-                                             },
-                               'zh-yue' => {
-                                             '_canon' => 'zh-yue'
-                                           }
+                                               '_canon' => 'zh-xiang',
+                                               '_deprecated' => 1,
+                                               '_preferred' => 'hsn'
+                                             }
                              },
           'language' => {
-                          'aa' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'aa' => {},
+                          'aaa' => {},
+                          'aab' => {},
+                          'aac' => {},
+                          'aad' => {},
+                          'aae' => {},
+                          'aaf' => {},
+                          'aag' => {},
+                          'aah' => {},
+                          'aai' => {},
+                          'aak' => {},
+                          'aal' => {},
+                          'aam' => {},
+                          'aan' => {},
+                          'aao' => {},
+                          'aap' => {},
+                          'aaq' => {},
+                          'aas' => {},
+                          'aat' => {},
+                          'aau' => {},
+                          'aav' => {},
+                          'aaw' => {},
+                          'aax' => {},
+                          'aaz' => {},
                           'ab' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'cyrl'
                                   },
-                          'ace' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ach' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ada' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ady' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ae' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'aba' => {},
+                          'abb' => {},
+                          'abc' => {},
+                          'abd' => {},
+                          'abe' => {},
+                          'abf' => {},
+                          'abg' => {},
+                          'abh' => {},
+                          'abi' => {},
+                          'abj' => {},
+                          'abl' => {},
+                          'abm' => {},
+                          'abn' => {},
+                          'abo' => {},
+                          'abp' => {},
+                          'abq' => {},
+                          'abr' => {},
+                          'abs' => {},
+                          'abt' => {},
+                          'abu' => {},
+                          'abv' => {},
+                          'abw' => {},
+                          'abx' => {},
+                          'aby' => {},
+                          'abz' => {},
+                          'aca' => {},
+                          'acb' => {},
+                          'acd' => {},
+                          'ace' => {},
+                          'acf' => {},
+                          'ach' => {},
+                          'aci' => {},
+                          'ack' => {},
+                          'acl' => {},
+                          'acm' => {},
+                          'acn' => {},
+                          'acp' => {},
+                          'acq' => {},
+                          'acr' => {},
+                          'acs' => {},
+                          'act' => {},
+                          'acu' => {},
+                          'acv' => {},
+                          'acw' => {},
+                          'acx' => {},
+                          'acy' => {},
+                          'acz' => {},
+                          'ada' => {},
+                          'adb' => {},
+                          'add' => {},
+                          'ade' => {},
+                          'adf' => {},
+                          'adg' => {},
+                          'adh' => {},
+                          'adi' => {},
+                          'adj' => {},
+                          'adl' => {},
+                          'adn' => {},
+                          'ado' => {},
+                          'adp' => {},
+                          'adq' => {},
+                          'adr' => {},
+                          'ads' => {},
+                          'adt' => {},
+                          'adu' => {},
+                          'adw' => {},
+                          'adx' => {},
+                          'ady' => {},
+                          'adz' => {},
+                          'ae' => {},
+                          'aea' => {},
+                          'aeb' => {},
+                          'aec' => {},
+                          'aed' => {},
+                          'aee' => {},
+                          'aek' => {},
+                          'ael' => {},
+                          'aem' => {},
+                          'aen' => {},
+                          'aeq' => {},
+                          'aer' => {},
+                          'aes' => {},
+                          'aeu' => {},
+                          'aew' => {},
+                          'aey' => {},
+                          'aez' => {},
                           'af' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'afa' => {
-                                     '_canon' => '_lowercase'
+                          'afa' => {},
+                          'afb' => {},
+                          'afd' => {},
+                          'afe' => {},
+                          'afg' => {},
+                          'afh' => {},
+                          'afi' => {},
+                          'afk' => {},
+                          'afn' => {},
+                          'afo' => {},
+                          'afp' => {},
+                          'afs' => {},
+                          'aft' => {},
+                          'afu' => {},
+                          'afz' => {},
+                          'aga' => {},
+                          'agb' => {},
+                          'agc' => {},
+                          'agd' => {},
+                          'age' => {},
+                          'agf' => {},
+                          'agg' => {},
+                          'agh' => {},
+                          'agi' => {},
+                          'agj' => {},
+                          'agk' => {},
+                          'agl' => {},
+                          'agm' => {},
+                          'agn' => {},
+                          'ago' => {},
+                          'agp' => {
+                                     '_deprecated' => 1
                                    },
-                          'afh' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ain' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ak' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'akk' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ale' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'alg' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'alt' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'agq' => {},
+                          'agr' => {},
+                          'ags' => {},
+                          'agt' => {},
+                          'agu' => {},
+                          'agv' => {},
+                          'agw' => {},
+                          'agx' => {},
+                          'agy' => {},
+                          'agz' => {},
+                          'aha' => {},
+                          'ahb' => {},
+                          'ahg' => {},
+                          'ahh' => {},
+                          'ahi' => {},
+                          'ahk' => {},
+                          'ahl' => {},
+                          'ahm' => {},
+                          'ahn' => {},
+                          'aho' => {},
+                          'ahp' => {},
+                          'ahr' => {},
+                          'ahs' => {},
+                          'aht' => {},
+                          'aia' => {},
+                          'aib' => {},
+                          'aic' => {},
+                          'aid' => {},
+                          'aie' => {},
+                          'aif' => {},
+                          'aig' => {},
+                          'aih' => {},
+                          'aii' => {},
+                          'aij' => {},
+                          'aik' => {},
+                          'ail' => {},
+                          'aim' => {},
+                          'ain' => {},
+                          'aio' => {},
+                          'aip' => {},
+                          'aiq' => {},
+                          'air' => {},
+                          'ais' => {},
+                          'ait' => {},
+                          'aiw' => {},
+                          'aix' => {},
+                          'aiy' => {},
+                          'aja' => {},
+                          'ajg' => {},
+                          'aji' => {},
+                          'ajp' => {},
+                          'ajt' => {},
+                          'aju' => {},
+                          'ajw' => {},
+                          'ajz' => {},
+                          'ak' => {},
+                          'akb' => {},
+                          'akc' => {},
+                          'akd' => {},
+                          'ake' => {},
+                          'akf' => {},
+                          'akg' => {},
+                          'akh' => {},
+                          'aki' => {},
+                          'akj' => {},
+                          'akk' => {},
+                          'akl' => {},
+                          'akm' => {},
+                          'ako' => {},
+                          'akp' => {},
+                          'akq' => {},
+                          'akr' => {},
+                          'aks' => {},
+                          'akt' => {},
+                          'aku' => {},
+                          'akv' => {},
+                          'akw' => {},
+                          'akx' => {},
+                          'aky' => {},
+                          'akz' => {},
+                          'ala' => {},
+                          'alc' => {},
+                          'ald' => {},
+                          'ale' => {},
+                          'alf' => {},
+                          'alg' => {},
+                          'alh' => {},
+                          'ali' => {},
+                          'alj' => {},
+                          'alk' => {},
+                          'all' => {},
+                          'alm' => {},
+                          'aln' => {},
+                          'alo' => {},
+                          'alp' => {},
+                          'alq' => {},
+                          'alr' => {},
+                          'als' => {},
+                          'alt' => {},
+                          'alu' => {},
+                          'alv' => {},
+                          'alw' => {},
+                          'alx' => {},
+                          'aly' => {},
+                          'alz' => {},
                           'am' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'ethi'
                                   },
-                          'an' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ang' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'anp' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'apa' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ama' => {},
+                          'amb' => {},
+                          'amc' => {},
+                          'ame' => {},
+                          'amf' => {},
+                          'amg' => {},
+                          'ami' => {},
+                          'amj' => {},
+                          'amk' => {},
+                          'aml' => {},
+                          'amm' => {},
+                          'amn' => {},
+                          'amo' => {},
+                          'amp' => {},
+                          'amq' => {},
+                          'amr' => {},
+                          'ams' => {},
+                          'amt' => {},
+                          'amu' => {},
+                          'amv' => {},
+                          'amw' => {},
+                          'amx' => {},
+                          'amy' => {},
+                          'amz' => {},
+                          'an' => {},
+                          'ana' => {},
+                          'anb' => {},
+                          'anc' => {},
+                          'and' => {},
+                          'ane' => {},
+                          'anf' => {},
+                          'ang' => {},
+                          'anh' => {},
+                          'ani' => {},
+                          'anj' => {},
+                          'ank' => {},
+                          'anl' => {},
+                          'anm' => {},
+                          'ann' => {},
+                          'ano' => {},
+                          'anp' => {},
+                          'anq' => {},
+                          'anr' => {},
+                          'ans' => {},
+                          'ant' => {},
+                          'anu' => {},
+                          'anv' => {},
+                          'anw' => {},
+                          'anx' => {},
+                          'any' => {},
+                          'anz' => {},
+                          'aoa' => {},
+                          'aob' => {},
+                          'aoc' => {},
+                          'aod' => {},
+                          'aoe' => {},
+                          'aof' => {},
+                          'aog' => {},
+                          'aoh' => {},
+                          'aoi' => {},
+                          'aoj' => {},
+                          'aok' => {},
+                          'aol' => {},
+                          'aom' => {},
+                          'aon' => {},
+                          'aor' => {},
+                          'aos' => {},
+                          'aot' => {},
+                          'aox' => {},
+                          'aoz' => {},
+                          'apa' => {},
+                          'apb' => {},
+                          'apc' => {},
+                          'apd' => {},
+                          'ape' => {},
+                          'apf' => {},
+                          'apg' => {},
+                          'aph' => {},
+                          'api' => {},
+                          'apj' => {},
+                          'apk' => {},
+                          'apl' => {},
+                          'apm' => {},
+                          'apn' => {},
+                          'apo' => {},
+                          'app' => {},
+                          'apq' => {},
+                          'apr' => {},
+                          'aps' => {},
+                          'apt' => {},
+                          'apu' => {},
+                          'apv' => {},
+                          'apw' => {},
+                          'apx' => {},
+                          'apy' => {},
+                          'apz' => {},
+                          'aqa' => {},
+                          'aqc' => {},
+                          'aqd' => {},
+                          'aqg' => {},
+                          'aql' => {},
+                          'aqm' => {},
+                          'aqn' => {},
+                          'aqp' => {},
+                          'aqr' => {},
+                          'aqz' => {},
                           'ar' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'arab'
                                   },
-                          'arc' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'arn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'arp' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'art' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'arw' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'arb' => {},
+                          'arc' => {},
+                          'ard' => {},
+                          'are' => {},
+                          'arh' => {},
+                          'ari' => {},
+                          'arj' => {},
+                          'ark' => {},
+                          'arl' => {},
+                          'arn' => {},
+                          'aro' => {},
+                          'arp' => {},
+                          'arq' => {},
+                          'arr' => {},
+                          'ars' => {},
+                          'art' => {},
+                          'aru' => {},
+                          'arv' => {},
+                          'arw' => {},
+                          'arx' => {},
+                          'ary' => {},
+                          'arz' => {},
                           'as' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'beng'
                                   },
-                          'ast' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ath' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'aus' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'av' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'awa' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'asa' => {},
+                          'asb' => {},
+                          'asc' => {},
+                          'asd' => {},
+                          'ase' => {},
+                          'asf' => {},
+                          'asg' => {},
+                          'ash' => {},
+                          'asi' => {},
+                          'asj' => {},
+                          'ask' => {},
+                          'asl' => {},
+                          'asn' => {},
+                          'aso' => {},
+                          'asp' => {},
+                          'asq' => {},
+                          'asr' => {},
+                          'ass' => {},
+                          'ast' => {},
+                          'asu' => {},
+                          'asv' => {},
+                          'asw' => {},
+                          'asx' => {},
+                          'asy' => {},
+                          'asz' => {},
+                          'ata' => {},
+                          'atb' => {},
+                          'atc' => {},
+                          'atd' => {},
+                          'ate' => {},
+                          'atg' => {},
+                          'ath' => {},
+                          'ati' => {},
+                          'atj' => {},
+                          'atk' => {},
+                          'atl' => {},
+                          'atm' => {},
+                          'atn' => {},
+                          'ato' => {},
+                          'atp' => {},
+                          'atq' => {},
+                          'atr' => {},
+                          'ats' => {},
+                          'att' => {},
+                          'atu' => {},
+                          'atv' => {},
+                          'atw' => {},
+                          'atx' => {},
+                          'aty' => {},
+                          'atz' => {},
+                          'aua' => {},
+                          'aub' => {},
+                          'auc' => {},
+                          'aud' => {},
+                          'aue' => {},
+                          'auf' => {},
+                          'aug' => {},
+                          'auh' => {},
+                          'aui' => {},
+                          'auj' => {},
+                          'auk' => {},
+                          'aul' => {},
+                          'aum' => {},
+                          'aun' => {},
+                          'auo' => {},
+                          'aup' => {},
+                          'auq' => {},
+                          'aur' => {},
+                          'aus' => {},
+                          'aut' => {},
+                          'auu' => {},
+                          'auw' => {},
+                          'aux' => {},
+                          'auy' => {},
+                          'auz' => {},
+                          'av' => {},
+                          'avb' => {},
+                          'avd' => {},
+                          'avi' => {},
+                          'avk' => {},
+                          'avl' => {},
+                          'avn' => {},
+                          'avo' => {},
+                          'avs' => {},
+                          'avt' => {},
+                          'avu' => {},
+                          'avv' => {},
+                          'awa' => {},
+                          'awb' => {},
+                          'awc' => {},
+                          'awd' => {},
+                          'awe' => {},
+                          'awh' => {},
+                          'awi' => {},
+                          'awk' => {},
+                          'awm' => {},
+                          'awn' => {},
+                          'awo' => {},
+                          'awr' => {},
+                          'aws' => {},
+                          'awt' => {},
+                          'awu' => {},
+                          'awv' => {},
+                          'aww' => {},
+                          'awx' => {},
+                          'awy' => {},
+                          'axb' => {},
+                          'axg' => {},
+                          'axk' => {},
+                          'axm' => {},
+                          'axx' => {},
                           'ay' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'az' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ba' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'bad' => {
-                                     '_canon' => '_lowercase'
+                          'aya' => {},
+                          'ayb' => {},
+                          'ayc' => {},
+                          'ayd' => {},
+                          'aye' => {},
+                          'ayg' => {},
+                          'ayh' => {},
+                          'ayi' => {},
+                          'ayk' => {},
+                          'ayl' => {},
+                          'ayn' => {},
+                          'ayo' => {},
+                          'ayp' => {},
+                          'ayq' => {},
+                          'ayr' => {},
+                          'ays' => {},
+                          'ayt' => {},
+                          'ayu' => {},
+                          'ayx' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'nun'
                                    },
-                          'bai' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'bal' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ban' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'bas' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'bat' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ayy' => {},
+                          'ayz' => {},
+                          'az' => {},
+                          'aza' => {},
+                          'azb' => {},
+                          'azc' => {},
+                          'azg' => {},
+                          'azj' => {},
+                          'azm' => {},
+                          'azo' => {},
+                          'azt' => {},
+                          'azz' => {},
+                          'ba' => {},
+                          'baa' => {},
+                          'bab' => {},
+                          'bac' => {},
+                          'bad' => {},
+                          'bae' => {},
+                          'baf' => {},
+                          'bag' => {},
+                          'bah' => {},
+                          'bai' => {},
+                          'baj' => {},
+                          'bal' => {},
+                          'ban' => {},
+                          'bao' => {},
+                          'bap' => {},
+                          'bar' => {},
+                          'bas' => {},
+                          'bat' => {},
+                          'bau' => {},
+                          'bav' => {},
+                          'baw' => {},
+                          'bax' => {},
+                          'bay' => {},
+                          'baz' => {},
+                          'bba' => {},
+                          'bbb' => {},
+                          'bbc' => {},
+                          'bbd' => {},
+                          'bbe' => {},
+                          'bbf' => {},
+                          'bbg' => {},
+                          'bbh' => {},
+                          'bbi' => {},
+                          'bbj' => {},
+                          'bbk' => {},
+                          'bbl' => {},
+                          'bbm' => {},
+                          'bbn' => {},
+                          'bbo' => {},
+                          'bbp' => {},
+                          'bbq' => {},
+                          'bbr' => {},
+                          'bbs' => {},
+                          'bbt' => {},
+                          'bbu' => {},
+                          'bbv' => {},
+                          'bbw' => {},
+                          'bbx' => {},
+                          'bby' => {},
+                          'bbz' => {},
+                          'bca' => {},
+                          'bcb' => {},
+                          'bcc' => {},
+                          'bcd' => {},
+                          'bce' => {},
+                          'bcf' => {},
+                          'bcg' => {},
+                          'bch' => {},
+                          'bci' => {},
+                          'bcj' => {},
+                          'bck' => {},
+                          'bcl' => {},
+                          'bcm' => {},
+                          'bcn' => {},
+                          'bco' => {},
+                          'bcp' => {},
+                          'bcq' => {},
+                          'bcr' => {},
+                          'bcs' => {},
+                          'bct' => {},
+                          'bcu' => {},
+                          'bcv' => {},
+                          'bcw' => {},
+                          'bcy' => {},
+                          'bcz' => {},
+                          'bda' => {},
+                          'bdb' => {},
+                          'bdc' => {},
+                          'bdd' => {},
+                          'bde' => {},
+                          'bdf' => {},
+                          'bdg' => {},
+                          'bdh' => {},
+                          'bdi' => {},
+                          'bdj' => {},
+                          'bdk' => {},
+                          'bdl' => {},
+                          'bdm' => {},
+                          'bdn' => {},
+                          'bdo' => {},
+                          'bdp' => {},
+                          'bdq' => {},
+                          'bdr' => {},
+                          'bds' => {},
+                          'bdt' => {},
+                          'bdu' => {},
+                          'bdv' => {},
+                          'bdw' => {},
+                          'bdx' => {},
+                          'bdy' => {},
+                          'bdz' => {},
                           'be' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'cyrl'
                                   },
-                          'bej' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'bem' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ber' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'bea' => {},
+                          'beb' => {},
+                          'bec' => {},
+                          'bed' => {},
+                          'bee' => {},
+                          'bef' => {},
+                          'beg' => {},
+                          'beh' => {},
+                          'bei' => {},
+                          'bej' => {},
+                          'bek' => {},
+                          'bem' => {},
+                          'beo' => {},
+                          'bep' => {},
+                          'beq' => {},
+                          'ber' => {},
+                          'bes' => {},
+                          'bet' => {},
+                          'beu' => {},
+                          'bev' => {},
+                          'bew' => {},
+                          'bex' => {},
+                          'bey' => {},
+                          'bez' => {},
+                          'bfa' => {},
+                          'bfb' => {},
+                          'bfc' => {},
+                          'bfd' => {},
+                          'bfe' => {},
+                          'bff' => {},
+                          'bfg' => {},
+                          'bfh' => {},
+                          'bfi' => {},
+                          'bfj' => {},
+                          'bfk' => {},
+                          'bfl' => {},
+                          'bfm' => {},
+                          'bfn' => {},
+                          'bfo' => {},
+                          'bfp' => {},
+                          'bfq' => {},
+                          'bfr' => {},
+                          'bfs' => {},
+                          'bft' => {},
+                          'bfu' => {},
+                          'bfw' => {},
+                          'bfx' => {},
+                          'bfy' => {},
+                          'bfz' => {},
                           'bg' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'cyrl'
                                   },
-                          'bh' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'bho' => {
-                                     '_canon' => '_lowercase'
+                          'bga' => {},
+                          'bgb' => {},
+                          'bgc' => {},
+                          'bgd' => {},
+                          'bge' => {},
+                          'bgf' => {},
+                          'bgg' => {},
+                          'bgi' => {},
+                          'bgj' => {},
+                          'bgk' => {},
+                          'bgl' => {},
+                          'bgm' => {},
+                          'bgn' => {},
+                          'bgo' => {},
+                          'bgp' => {},
+                          'bgq' => {},
+                          'bgr' => {},
+                          'bgs' => {},
+                          'bgt' => {},
+                          'bgu' => {},
+                          'bgv' => {},
+                          'bgw' => {},
+                          'bgx' => {},
+                          'bgy' => {},
+                          'bgz' => {},
+                          'bh' => {},
+                          'bha' => {},
+                          'bhb' => {},
+                          'bhc' => {},
+                          'bhd' => {},
+                          'bhe' => {},
+                          'bhf' => {},
+                          'bhg' => {},
+                          'bhh' => {},
+                          'bhi' => {},
+                          'bhj' => {},
+                          'bhk' => {
+                                     '_deprecated' => 1
                                    },
-                          'bi' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'bik' => {
-                                     '_canon' => '_lowercase'
+                          'bhl' => {},
+                          'bhm' => {},
+                          'bhn' => {},
+                          'bho' => {},
+                          'bhp' => {},
+                          'bhq' => {},
+                          'bhr' => {},
+                          'bhs' => {},
+                          'bht' => {},
+                          'bhu' => {},
+                          'bhv' => {},
+                          'bhw' => {},
+                          'bhx' => {},
+                          'bhy' => {},
+                          'bhz' => {},
+                          'bi' => {},
+                          'bia' => {},
+                          'bib' => {},
+                          'bic' => {},
+                          'bid' => {},
+                          'bie' => {},
+                          'bif' => {},
+                          'big' => {},
+                          'bij' => {},
+                          'bik' => {},
+                          'bil' => {},
+                          'bim' => {},
+                          'bin' => {},
+                          'bio' => {},
+                          'bip' => {},
+                          'biq' => {},
+                          'bir' => {},
+                          'bit' => {},
+                          'biu' => {},
+                          'biv' => {},
+                          'biw' => {},
+                          'bix' => {},
+                          'biy' => {},
+                          'biz' => {},
+                          'bja' => {},
+                          'bjb' => {},
+                          'bjc' => {},
+                          'bjd' => {},
+                          'bje' => {},
+                          'bjf' => {},
+                          'bjg' => {},
+                          'bjh' => {},
+                          'bji' => {},
+                          'bjj' => {},
+                          'bjk' => {},
+                          'bjl' => {},
+                          'bjm' => {},
+                          'bjn' => {},
+                          'bjo' => {},
+                          'bjq' => {
+                                     '_deprecated' => 1
                                    },
-                          'bin' => {
-                                     '_canon' => '_lowercase'
+                          'bjr' => {},
+                          'bjs' => {},
+                          'bjt' => {},
+                          'bju' => {},
+                          'bjv' => {},
+                          'bjw' => {},
+                          'bjx' => {},
+                          'bjy' => {},
+                          'bjz' => {},
+                          'bka' => {},
+                          'bkb' => {
+                                     '_deprecated' => 1
                                    },
-                          'bla' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'bm' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'bkc' => {},
+                          'bkd' => {},
+                          'bkf' => {},
+                          'bkg' => {},
+                          'bkh' => {},
+                          'bki' => {},
+                          'bkj' => {},
+                          'bkk' => {},
+                          'bkl' => {},
+                          'bkm' => {},
+                          'bkn' => {},
+                          'bko' => {},
+                          'bkp' => {},
+                          'bkq' => {},
+                          'bkr' => {},
+                          'bks' => {},
+                          'bkt' => {},
+                          'bku' => {},
+                          'bkv' => {},
+                          'bkw' => {},
+                          'bkx' => {},
+                          'bky' => {},
+                          'bkz' => {},
+                          'bla' => {},
+                          'blb' => {},
+                          'blc' => {},
+                          'bld' => {},
+                          'ble' => {},
+                          'blf' => {},
+                          'blg' => {},
+                          'blh' => {},
+                          'bli' => {},
+                          'blj' => {},
+                          'blk' => {},
+                          'bll' => {},
+                          'blm' => {},
+                          'bln' => {},
+                          'blo' => {},
+                          'blp' => {},
+                          'blq' => {},
+                          'blr' => {},
+                          'bls' => {},
+                          'blt' => {},
+                          'blv' => {},
+                          'blw' => {},
+                          'blx' => {},
+                          'bly' => {},
+                          'blz' => {},
+                          'bm' => {},
+                          'bma' => {},
+                          'bmb' => {},
+                          'bmc' => {},
+                          'bmd' => {},
+                          'bme' => {},
+                          'bmf' => {},
+                          'bmg' => {},
+                          'bmh' => {},
+                          'bmi' => {},
+                          'bmj' => {},
+                          'bmk' => {},
+                          'bml' => {},
+                          'bmm' => {},
+                          'bmn' => {},
+                          'bmo' => {},
+                          'bmp' => {},
+                          'bmq' => {},
+                          'bmr' => {},
+                          'bms' => {},
+                          'bmt' => {},
+                          'bmu' => {},
+                          'bmv' => {},
+                          'bmw' => {},
+                          'bmx' => {},
+                          'bmy' => {},
+                          'bmz' => {},
                           'bn' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'beng'
                                   },
-                          'bnt' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'bo' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'br' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'bra' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'bna' => {},
+                          'bnb' => {},
+                          'bnc' => {},
+                          'bnd' => {},
+                          'bne' => {},
+                          'bnf' => {},
+                          'bng' => {},
+                          'bni' => {},
+                          'bnj' => {},
+                          'bnk' => {},
+                          'bnl' => {},
+                          'bnm' => {},
+                          'bnn' => {},
+                          'bno' => {},
+                          'bnp' => {},
+                          'bnq' => {},
+                          'bnr' => {},
+                          'bns' => {},
+                          'bnt' => {},
+                          'bnu' => {},
+                          'bnv' => {},
+                          'bnw' => {},
+                          'bnx' => {},
+                          'bny' => {},
+                          'bnz' => {},
+                          'bo' => {},
+                          'boa' => {},
+                          'bob' => {},
+                          'boe' => {},
+                          'bof' => {},
+                          'bog' => {},
+                          'boh' => {},
+                          'boi' => {},
+                          'boj' => {},
+                          'bok' => {},
+                          'bol' => {},
+                          'bom' => {},
+                          'bon' => {},
+                          'boo' => {},
+                          'bop' => {},
+                          'boq' => {},
+                          'bor' => {},
+                          'bot' => {},
+                          'bou' => {},
+                          'bov' => {},
+                          'bow' => {},
+                          'box' => {},
+                          'boy' => {},
+                          'boz' => {},
+                          'bpa' => {},
+                          'bpb' => {},
+                          'bpd' => {},
+                          'bpg' => {},
+                          'bph' => {},
+                          'bpi' => {},
+                          'bpj' => {},
+                          'bpk' => {},
+                          'bpl' => {},
+                          'bpm' => {},
+                          'bpn' => {},
+                          'bpo' => {},
+                          'bpp' => {},
+                          'bpq' => {},
+                          'bpr' => {},
+                          'bps' => {},
+                          'bpt' => {},
+                          'bpu' => {},
+                          'bpv' => {},
+                          'bpw' => {},
+                          'bpx' => {},
+                          'bpy' => {},
+                          'bpz' => {},
+                          'bqa' => {},
+                          'bqb' => {},
+                          'bqc' => {},
+                          'bqd' => {},
+                          'bqf' => {},
+                          'bqg' => {},
+                          'bqh' => {},
+                          'bqi' => {},
+                          'bqj' => {},
+                          'bqk' => {},
+                          'bql' => {},
+                          'bqm' => {},
+                          'bqn' => {},
+                          'bqo' => {},
+                          'bqp' => {},
+                          'bqq' => {},
+                          'bqr' => {},
+                          'bqs' => {},
+                          'bqt' => {},
+                          'bqu' => {},
+                          'bqv' => {},
+                          'bqw' => {},
+                          'bqx' => {},
+                          'bqy' => {},
+                          'bqz' => {},
+                          'br' => {},
+                          'bra' => {},
+                          'brb' => {},
+                          'brc' => {},
+                          'brd' => {},
+                          'brf' => {},
+                          'brg' => {},
+                          'brh' => {},
+                          'bri' => {},
+                          'brj' => {},
+                          'brk' => {},
+                          'brl' => {},
+                          'brm' => {},
+                          'brn' => {},
+                          'bro' => {},
+                          'brp' => {},
+                          'brq' => {},
+                          'brr' => {},
+                          'brs' => {},
+                          'brt' => {},
+                          'bru' => {},
+                          'brv' => {},
+                          'brw' => {},
+                          'brx' => {},
+                          'bry' => {},
+                          'brz' => {},
                           'bs' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'btk' => {
-                                     '_canon' => '_lowercase'
+                          'bsa' => {},
+                          'bsb' => {},
+                          'bsc' => {},
+                          'bse' => {},
+                          'bsf' => {},
+                          'bsg' => {},
+                          'bsh' => {},
+                          'bsi' => {},
+                          'bsj' => {},
+                          'bsk' => {},
+                          'bsl' => {},
+                          'bsm' => {},
+                          'bsn' => {},
+                          'bso' => {},
+                          'bsp' => {},
+                          'bsq' => {},
+                          'bsr' => {},
+                          'bss' => {},
+                          'bst' => {},
+                          'bsu' => {},
+                          'bsv' => {},
+                          'bsw' => {},
+                          'bsx' => {},
+                          'bsy' => {},
+                          'bta' => {},
+                          'btb' => {
+                                     '_deprecated' => 1
                                    },
-                          'bua' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'bug' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'byn' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'btc' => {},
+                          'btd' => {},
+                          'bte' => {},
+                          'btf' => {},
+                          'btg' => {},
+                          'bth' => {},
+                          'bti' => {},
+                          'btj' => {},
+                          'btk' => {},
+                          'btl' => {},
+                          'btm' => {},
+                          'btn' => {},
+                          'bto' => {},
+                          'btp' => {},
+                          'btq' => {},
+                          'btr' => {},
+                          'bts' => {},
+                          'btt' => {},
+                          'btu' => {},
+                          'btv' => {},
+                          'btw' => {},
+                          'btx' => {},
+                          'bty' => {},
+                          'btz' => {},
+                          'bua' => {},
+                          'bub' => {},
+                          'buc' => {},
+                          'bud' => {},
+                          'bue' => {},
+                          'buf' => {},
+                          'bug' => {},
+                          'buh' => {},
+                          'bui' => {},
+                          'buj' => {},
+                          'buk' => {},
+                          'bum' => {},
+                          'bun' => {},
+                          'buo' => {},
+                          'bup' => {},
+                          'buq' => {},
+                          'bus' => {},
+                          'but' => {},
+                          'buu' => {},
+                          'buv' => {},
+                          'buw' => {},
+                          'bux' => {},
+                          'buy' => {},
+                          'buz' => {},
+                          'bva' => {},
+                          'bvb' => {},
+                          'bvc' => {},
+                          'bvd' => {},
+                          'bve' => {},
+                          'bvf' => {},
+                          'bvg' => {},
+                          'bvh' => {},
+                          'bvi' => {},
+                          'bvj' => {},
+                          'bvk' => {},
+                          'bvl' => {},
+                          'bvm' => {},
+                          'bvn' => {},
+                          'bvo' => {},
+                          'bvq' => {},
+                          'bvr' => {},
+                          'bvt' => {},
+                          'bvu' => {},
+                          'bvv' => {},
+                          'bvw' => {},
+                          'bvx' => {},
+                          'bvy' => {},
+                          'bvz' => {},
+                          'bwa' => {},
+                          'bwb' => {},
+                          'bwc' => {},
+                          'bwd' => {},
+                          'bwe' => {},
+                          'bwf' => {},
+                          'bwg' => {},
+                          'bwh' => {},
+                          'bwi' => {},
+                          'bwj' => {},
+                          'bwk' => {},
+                          'bwl' => {},
+                          'bwm' => {},
+                          'bwn' => {},
+                          'bwo' => {},
+                          'bwp' => {},
+                          'bwq' => {},
+                          'bwr' => {},
+                          'bws' => {},
+                          'bwt' => {},
+                          'bwu' => {},
+                          'bww' => {},
+                          'bwx' => {},
+                          'bwy' => {},
+                          'bwz' => {},
+                          'bxa' => {},
+                          'bxb' => {},
+                          'bxc' => {},
+                          'bxd' => {},
+                          'bxe' => {},
+                          'bxf' => {},
+                          'bxg' => {},
+                          'bxh' => {},
+                          'bxi' => {},
+                          'bxj' => {},
+                          'bxk' => {},
+                          'bxl' => {},
+                          'bxm' => {},
+                          'bxn' => {},
+                          'bxo' => {},
+                          'bxp' => {},
+                          'bxq' => {},
+                          'bxr' => {},
+                          'bxs' => {},
+                          'bxu' => {},
+                          'bxv' => {},
+                          'bxw' => {},
+                          'bxx' => {},
+                          'bxz' => {},
+                          'bya' => {},
+                          'byb' => {},
+                          'byc' => {},
+                          'byd' => {},
+                          'bye' => {},
+                          'byf' => {},
+                          'byg' => {},
+                          'byh' => {},
+                          'byi' => {},
+                          'byj' => {},
+                          'byk' => {},
+                          'byl' => {},
+                          'bym' => {},
+                          'byn' => {},
+                          'byo' => {},
+                          'byp' => {},
+                          'byq' => {},
+                          'byr' => {},
+                          'bys' => {},
+                          'byt' => {},
+                          'byv' => {},
+                          'byw' => {},
+                          'byx' => {},
+                          'byy' => {},
+                          'byz' => {},
+                          'bza' => {},
+                          'bzb' => {},
+                          'bzc' => {},
+                          'bzd' => {},
+                          'bze' => {},
+                          'bzf' => {},
+                          'bzg' => {},
+                          'bzh' => {},
+                          'bzi' => {},
+                          'bzj' => {},
+                          'bzk' => {},
+                          'bzl' => {},
+                          'bzm' => {},
+                          'bzn' => {},
+                          'bzo' => {},
+                          'bzp' => {},
+                          'bzq' => {},
+                          'bzr' => {},
+                          'bzs' => {},
+                          'bzt' => {},
+                          'bzu' => {},
+                          'bzv' => {},
+                          'bzw' => {},
+                          'bzx' => {},
+                          'bzy' => {},
+                          'bzz' => {},
                           'ca' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'cad' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cai' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'car' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cau' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ce' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ceb' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cel' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'caa' => {},
+                          'cab' => {},
+                          'cac' => {},
+                          'cad' => {},
+                          'cae' => {},
+                          'caf' => {},
+                          'cag' => {},
+                          'cah' => {},
+                          'cai' => {},
+                          'caj' => {},
+                          'cak' => {},
+                          'cal' => {},
+                          'cam' => {},
+                          'can' => {},
+                          'cao' => {},
+                          'cap' => {},
+                          'caq' => {},
+                          'car' => {},
+                          'cas' => {},
+                          'cau' => {},
+                          'cav' => {},
+                          'caw' => {},
+                          'cax' => {},
+                          'cay' => {},
+                          'caz' => {},
+                          'cba' => {},
+                          'cbb' => {},
+                          'cbc' => {},
+                          'cbd' => {},
+                          'cbe' => {},
+                          'cbg' => {},
+                          'cbh' => {},
+                          'cbi' => {},
+                          'cbj' => {},
+                          'cbk' => {},
+                          'cbl' => {},
+                          'cbn' => {},
+                          'cbo' => {},
+                          'cbr' => {},
+                          'cbs' => {},
+                          'cbt' => {},
+                          'cbu' => {},
+                          'cbv' => {},
+                          'cbw' => {},
+                          'cby' => {},
+                          'cca' => {},
+                          'ccc' => {},
+                          'ccd' => {},
+                          'cce' => {},
+                          'ccg' => {},
+                          'cch' => {},
+                          'ccj' => {},
+                          'ccl' => {},
+                          'ccm' => {},
+                          'ccn' => {},
+                          'cco' => {},
+                          'ccp' => {},
+                          'ccq' => {},
+                          'ccr' => {},
+                          'ccs' => {},
+                          'cda' => {},
+                          'cdc' => {},
+                          'cdd' => {},
+                          'cde' => {},
+                          'cdf' => {},
+                          'cdg' => {},
+                          'cdh' => {},
+                          'cdi' => {},
+                          'cdj' => {},
+                          'cdm' => {},
+                          'cdn' => {},
+                          'cdo' => {},
+                          'cdr' => {},
+                          'cds' => {},
+                          'cdy' => {},
+                          'cdz' => {},
+                          'ce' => {},
+                          'cea' => {},
+                          'ceb' => {},
+                          'ceg' => {},
+                          'cel' => {},
+                          'cen' => {},
+                          'cet' => {},
+                          'cfa' => {},
+                          'cfd' => {},
+                          'cfg' => {},
+                          'cfm' => {},
+                          'cga' => {},
+                          'cgc' => {},
+                          'cgg' => {},
+                          'cgk' => {},
                           'ch' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'chb' => {
-                                     '_canon' => '_lowercase'
+                          'chb' => {},
+                          'chc' => {},
+                          'chd' => {},
+                          'chf' => {},
+                          'chg' => {},
+                          'chh' => {},
+                          'chj' => {},
+                          'chk' => {},
+                          'chl' => {},
+                          'chm' => {},
+                          'chn' => {},
+                          'cho' => {},
+                          'chp' => {},
+                          'chq' => {},
+                          'chr' => {},
+                          'cht' => {},
+                          'chw' => {},
+                          'chx' => {},
+                          'chy' => {},
+                          'chz' => {},
+                          'cia' => {},
+                          'cib' => {},
+                          'cic' => {},
+                          'cid' => {},
+                          'cie' => {},
+                          'cih' => {},
+                          'cik' => {},
+                          'cim' => {},
+                          'cin' => {},
+                          'cip' => {},
+                          'cir' => {},
+                          'ciw' => {},
+                          'ciy' => {},
+                          'cja' => {},
+                          'cje' => {},
+                          'cjh' => {},
+                          'cji' => {},
+                          'cjk' => {},
+                          'cjm' => {},
+                          'cjn' => {},
+                          'cjo' => {},
+                          'cjp' => {},
+                          'cjr' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'mom'
                                    },
-                          'chg' => {
-                                     '_canon' => '_lowercase'
+                          'cjs' => {},
+                          'cjv' => {},
+                          'cjy' => {},
+                          'cka' => {},
+                          'ckb' => {},
+                          'ckh' => {},
+                          'ckl' => {},
+                          'cko' => {},
+                          'ckq' => {},
+                          'ckr' => {},
+                          'cks' => {},
+                          'ckt' => {},
+                          'cku' => {},
+                          'ckv' => {},
+                          'ckx' => {},
+                          'cky' => {},
+                          'ckz' => {},
+                          'cla' => {},
+                          'clc' => {},
+                          'cld' => {},
+                          'cle' => {},
+                          'clh' => {},
+                          'cli' => {},
+                          'clk' => {},
+                          'cll' => {},
+                          'clm' => {},
+                          'clo' => {},
+                          'clu' => {},
+                          'clw' => {},
+                          'cly' => {},
+                          'cma' => {},
+                          'cmc' => {},
+                          'cme' => {},
+                          'cmg' => {},
+                          'cmi' => {},
+                          'cmk' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'xch'
                                    },
-                          'chk' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'chm' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'chn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cho' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'chp' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'chr' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'chy' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cmc' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'co' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'cop' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cpe' => {
-                                     '_canon' => '_lowercase',
-                                     '_suppress' => 'latn'
-                                   },
-                          'cpf' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cpp' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cr' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'crh' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'crp' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'cml' => {},
+                          'cmm' => {},
+                          'cmn' => {},
+                          'cmo' => {},
+                          'cmr' => {},
+                          'cms' => {},
+                          'cmt' => {},
+                          'cna' => {},
+                          'cnb' => {},
+                          'cnc' => {},
+                          'cng' => {},
+                          'cnh' => {},
+                          'cni' => {},
+                          'cnk' => {},
+                          'cnl' => {},
+                          'cno' => {},
+                          'cns' => {},
+                          'cnt' => {},
+                          'cnu' => {},
+                          'cnw' => {},
+                          'cnx' => {},
+                          'co' => {},
+                          'coa' => {},
+                          'cob' => {},
+                          'coc' => {},
+                          'cod' => {},
+                          'coe' => {},
+                          'cof' => {},
+                          'cog' => {},
+                          'coh' => {},
+                          'coj' => {},
+                          'cok' => {},
+                          'col' => {},
+                          'com' => {},
+                          'con' => {},
+                          'coo' => {},
+                          'cop' => {},
+                          'coq' => {},
+                          'cot' => {},
+                          'cou' => {},
+                          'cov' => {},
+                          'cow' => {},
+                          'cox' => {},
+                          'coy' => {},
+                          'coz' => {},
+                          'cpa' => {},
+                          'cpb' => {},
+                          'cpc' => {},
+                          'cpe' => {},
+                          'cpf' => {},
+                          'cpg' => {},
+                          'cpi' => {},
+                          'cpn' => {},
+                          'cpp' => {},
+                          'cps' => {},
+                          'cpu' => {},
+                          'cpx' => {},
+                          'cpy' => {},
+                          'cqd' => {},
+                          'cqu' => {},
+                          'cr' => {},
+                          'cra' => {},
+                          'crb' => {},
+                          'crc' => {},
+                          'crd' => {},
+                          'crf' => {},
+                          'crg' => {},
+                          'crh' => {},
+                          'cri' => {},
+                          'crj' => {},
+                          'crk' => {},
+                          'crl' => {},
+                          'crm' => {},
+                          'crn' => {},
+                          'cro' => {},
+                          'crp' => {},
+                          'crq' => {},
+                          'crr' => {},
+                          'crs' => {},
+                          'crt' => {},
+                          'crv' => {},
+                          'crw' => {},
+                          'crx' => {},
+                          'cry' => {},
+                          'crz' => {},
                           'cs' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'csb' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cu' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'cus' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'cv' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'csa' => {},
+                          'csb' => {},
+                          'csc' => {},
+                          'csd' => {},
+                          'cse' => {},
+                          'csf' => {},
+                          'csg' => {},
+                          'csh' => {},
+                          'csi' => {},
+                          'csk' => {},
+                          'csl' => {},
+                          'csm' => {},
+                          'csn' => {},
+                          'cso' => {},
+                          'csq' => {},
+                          'csr' => {},
+                          'css' => {},
+                          'cst' => {},
+                          'csu' => {},
+                          'csw' => {},
+                          'csy' => {},
+                          'csz' => {},
+                          'cta' => {},
+                          'ctc' => {},
+                          'ctd' => {},
+                          'cte' => {},
+                          'ctg' => {},
+                          'ctl' => {},
+                          'ctm' => {},
+                          'ctn' => {},
+                          'cto' => {},
+                          'ctp' => {},
+                          'cts' => {},
+                          'ctt' => {},
+                          'ctu' => {},
+                          'ctz' => {},
+                          'cu' => {},
+                          'cua' => {},
+                          'cub' => {},
+                          'cuc' => {},
+                          'cug' => {},
+                          'cuh' => {},
+                          'cui' => {},
+                          'cuj' => {},
+                          'cuk' => {},
+                          'cul' => {},
+                          'cum' => {},
+                          'cuo' => {},
+                          'cup' => {},
+                          'cuq' => {},
+                          'cur' => {},
+                          'cus' => {},
+                          'cut' => {},
+                          'cuu' => {},
+                          'cuv' => {},
+                          'cuw' => {},
+                          'cux' => {},
+                          'cv' => {},
+                          'cvg' => {},
+                          'cvn' => {},
+                          'cwa' => {},
+                          'cwb' => {},
+                          'cwd' => {},
+                          'cwe' => {},
+                          'cwg' => {},
+                          'cwt' => {},
                           'cy' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'cya' => {},
+                          'cyb' => {},
+                          'cyo' => {},
+                          'czh' => {},
+                          'czk' => {},
+                          'czn' => {},
+                          'czo' => {},
+                          'czt' => {},
                           'da' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'dak' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'dar' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'day' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'daa' => {},
+                          'dac' => {},
+                          'dad' => {},
+                          'dae' => {},
+                          'daf' => {},
+                          'dag' => {},
+                          'dah' => {},
+                          'dai' => {},
+                          'daj' => {},
+                          'dak' => {},
+                          'dal' => {},
+                          'dam' => {},
+                          'dao' => {},
+                          'dap' => {},
+                          'daq' => {},
+                          'dar' => {},
+                          'das' => {},
+                          'dau' => {},
+                          'dav' => {},
+                          'daw' => {},
+                          'dax' => {},
+                          'day' => {},
+                          'daz' => {},
+                          'dba' => {},
+                          'dbb' => {},
+                          'dbd' => {},
+                          'dbe' => {},
+                          'dbf' => {},
+                          'dbg' => {},
+                          'dbi' => {},
+                          'dbj' => {},
+                          'dbl' => {},
+                          'dbm' => {},
+                          'dbn' => {},
+                          'dbo' => {},
+                          'dbp' => {},
+                          'dbq' => {},
+                          'dbr' => {},
+                          'dbu' => {},
+                          'dbv' => {},
+                          'dby' => {},
+                          'dcc' => {},
+                          'dcr' => {},
+                          'ddd' => {},
+                          'dde' => {},
+                          'ddg' => {},
+                          'ddi' => {},
+                          'ddj' => {},
+                          'ddn' => {},
+                          'ddo' => {},
+                          'dds' => {},
+                          'ddw' => {},
                           'de' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'del' => {
-                                     '_canon' => '_lowercase'
+                          'dec' => {},
+                          'ded' => {},
+                          'dee' => {},
+                          'def' => {},
+                          'deg' => {},
+                          'deh' => {},
+                          'dei' => {},
+                          'dek' => {},
+                          'del' => {},
+                          'dem' => {},
+                          'den' => {},
+                          'dep' => {},
+                          'deq' => {},
+                          'der' => {},
+                          'des' => {},
+                          'dev' => {},
+                          'dez' => {},
+                          'dga' => {},
+                          'dgb' => {},
+                          'dgc' => {},
+                          'dgd' => {},
+                          'dge' => {},
+                          'dgg' => {},
+                          'dgh' => {},
+                          'dgi' => {},
+                          'dgk' => {},
+                          'dgn' => {},
+                          'dgo' => {},
+                          'dgr' => {},
+                          'dgs' => {},
+                          'dgu' => {},
+                          'dgx' => {},
+                          'dgz' => {},
+                          'dha' => {
+                                     '_deprecated' => 1
                                    },
-                          'den' => {
-                                     '_canon' => '_lowercase'
+                          'dhd' => {},
+                          'dhg' => {},
+                          'dhi' => {},
+                          'dhl' => {},
+                          'dhm' => {},
+                          'dhn' => {},
+                          'dho' => {},
+                          'dhr' => {},
+                          'dhs' => {},
+                          'dhu' => {},
+                          'dhv' => {},
+                          'dhw' => {},
+                          'dia' => {},
+                          'dib' => {},
+                          'dic' => {},
+                          'did' => {},
+                          'dif' => {},
+                          'dig' => {},
+                          'dih' => {},
+                          'dii' => {},
+                          'dij' => {},
+                          'dik' => {},
+                          'dil' => {},
+                          'dim' => {},
+                          'din' => {},
+                          'dio' => {},
+                          'dip' => {},
+                          'diq' => {},
+                          'dir' => {},
+                          'dis' => {},
+                          'dit' => {},
+                          'diu' => {},
+                          'diw' => {},
+                          'dix' => {},
+                          'diy' => {},
+                          'diz' => {},
+                          'djb' => {},
+                          'djc' => {},
+                          'djd' => {},
+                          'dje' => {},
+                          'djf' => {},
+                          'dji' => {},
+                          'djj' => {},
+                          'djk' => {},
+                          'djl' => {},
+                          'djm' => {},
+                          'djn' => {},
+                          'djo' => {},
+                          'djr' => {},
+                          'dju' => {},
+                          'djw' => {},
+                          'dka' => {},
+                          'dkk' => {},
+                          'dkl' => {
+                                     '_deprecated' => 1
                                    },
-                          'dgr' => {
-                                     '_canon' => '_lowercase'
+                          'dkr' => {},
+                          'dks' => {},
+                          'dkx' => {},
+                          'dlg' => {},
+                          'dlm' => {},
+                          'dln' => {},
+                          'dma' => {},
+                          'dmb' => {},
+                          'dmc' => {},
+                          'dme' => {},
+                          'dmg' => {},
+                          'dmk' => {},
+                          'dml' => {},
+                          'dmm' => {},
+                          'dmn' => {},
+                          'dmo' => {},
+                          'dmr' => {},
+                          'dms' => {},
+                          'dmu' => {},
+                          'dmv' => {},
+                          'dmx' => {},
+                          'dmy' => {},
+                          'dna' => {},
+                          'dnd' => {},
+                          'dne' => {},
+                          'dng' => {},
+                          'dni' => {},
+                          'dnk' => {},
+                          'dnn' => {},
+                          'dnr' => {},
+                          'dnt' => {},
+                          'dnu' => {},
+                          'dnw' => {},
+                          'dny' => {},
+                          'doa' => {},
+                          'dob' => {},
+                          'doc' => {},
+                          'doe' => {},
+                          'dof' => {},
+                          'doh' => {},
+                          'doi' => {},
+                          'dok' => {},
+                          'dol' => {},
+                          'don' => {},
+                          'doo' => {},
+                          'dop' => {},
+                          'doq' => {},
+                          'dor' => {},
+                          'dos' => {},
+                          'dot' => {},
+                          'dov' => {},
+                          'dow' => {},
+                          'dox' => {},
+                          'doy' => {},
+                          'doz' => {},
+                          'dpp' => {},
+                          'dra' => {},
+                          'drb' => {},
+                          'drc' => {},
+                          'drd' => {},
+                          'dre' => {},
+                          'drg' => {},
+                          'drh' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'khk'
                                    },
-                          'din' => {
-                                     '_canon' => '_lowercase'
+                          'dri' => {},
+                          'drl' => {},
+                          'drn' => {},
+                          'dro' => {},
+                          'drq' => {},
+                          'drr' => {},
+                          'drs' => {},
+                          'drt' => {},
+                          'dru' => {},
+                          'drw' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'prs'
                                    },
-                          'doi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'dra' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'dry' => {},
                           'dsb' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
-                          'dua' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'dum' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'dse' => {},
+                          'dsh' => {},
+                          'dsi' => {},
+                          'dsl' => {},
+                          'dsn' => {},
+                          'dso' => {},
+                          'dsq' => {},
+                          'dta' => {},
+                          'dtb' => {},
+                          'dtd' => {},
+                          'dti' => {},
+                          'dtk' => {},
+                          'dtm' => {},
+                          'dtp' => {},
+                          'dtr' => {},
+                          'dts' => {},
+                          'dtt' => {},
+                          'dtu' => {},
+                          'dua' => {},
+                          'dub' => {},
+                          'duc' => {},
+                          'dud' => {},
+                          'due' => {},
+                          'duf' => {},
+                          'dug' => {},
+                          'duh' => {},
+                          'dui' => {},
+                          'duj' => {},
+                          'duk' => {},
+                          'dul' => {},
+                          'dum' => {},
+                          'dun' => {},
+                          'duo' => {},
+                          'dup' => {},
+                          'duq' => {},
+                          'dur' => {},
+                          'dus' => {},
+                          'duu' => {},
+                          'duv' => {},
+                          'duw' => {},
+                          'dux' => {},
+                          'duy' => {},
+                          'duz' => {},
                           'dv' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'thaa'
                                   },
-                          'dyu' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'dva' => {},
+                          'dwa' => {},
+                          'dwl' => {},
+                          'dwr' => {},
+                          'dws' => {},
+                          'dww' => {},
+                          'dya' => {},
+                          'dyb' => {},
+                          'dyd' => {},
+                          'dyg' => {},
+                          'dyi' => {},
+                          'dym' => {},
+                          'dyn' => {},
+                          'dyo' => {},
+                          'dyu' => {},
+                          'dyy' => {},
                           'dz' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'tibt'
                                   },
-                          'ee' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'efi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'egy' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'eka' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'dza' => {},
+                          'dzd' => {},
+                          'dzg' => {},
+                          'dzl' => {},
+                          'dzn' => {},
+                          'ebg' => {},
+                          'ebk' => {},
+                          'ebo' => {},
+                          'ebr' => {},
+                          'ebu' => {},
+                          'ecr' => {},
+                          'ecs' => {},
+                          'ecy' => {},
+                          'ee' => {},
+                          'eee' => {},
+                          'efa' => {},
+                          'efe' => {},
+                          'efi' => {},
+                          'ega' => {},
+                          'egl' => {},
+                          'ego' => {},
+                          'egx' => {},
+                          'egy' => {},
+                          'ehu' => {},
+                          'eip' => {},
+                          'eit' => {},
+                          'eiv' => {},
+                          'eja' => {},
+                          'eka' => {},
+                          'eke' => {},
+                          'ekg' => {},
+                          'eki' => {},
+                          'ekk' => {},
+                          'ekl' => {},
+                          'ekm' => {},
+                          'eko' => {},
+                          'ekp' => {},
+                          'ekr' => {},
+                          'eky' => {},
                           'el' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'grek'
                                   },
-                          'elx' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ele' => {},
+                          'elh' => {},
+                          'eli' => {},
+                          'elk' => {},
+                          'elm' => {},
+                          'elo' => {},
+                          'elp' => {},
+                          'elu' => {},
+                          'elx' => {},
+                          'ema' => {},
+                          'emb' => {},
+                          'eme' => {},
+                          'emg' => {},
+                          'emi' => {},
+                          'emk' => {},
+                          'emm' => {},
+                          'emn' => {},
+                          'emo' => {},
+                          'emp' => {},
+                          'ems' => {},
+                          'emu' => {},
+                          'emw' => {},
+                          'emx' => {},
+                          'emy' => {},
                           'en' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'enm' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ena' => {},
+                          'enb' => {},
+                          'enc' => {},
+                          'end' => {},
+                          'enf' => {},
+                          'enh' => {},
+                          'enm' => {},
+                          'enn' => {},
+                          'eno' => {},
+                          'enq' => {},
+                          'enr' => {},
+                          'enu' => {},
+                          'env' => {},
+                          'enw' => {},
                           'eo' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'eot' => {},
+                          'epi' => {},
+                          'era' => {},
+                          'erg' => {},
+                          'erh' => {},
+                          'eri' => {},
+                          'erk' => {},
+                          'ero' => {},
+                          'err' => {},
+                          'ers' => {},
+                          'ert' => {},
+                          'erw' => {},
                           'es' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'ese' => {},
+                          'esh' => {},
+                          'esi' => {},
+                          'esk' => {},
+                          'esl' => {},
+                          'esm' => {},
+                          'esn' => {},
+                          'eso' => {},
+                          'esq' => {},
+                          'ess' => {},
+                          'esu' => {},
+                          'esx' => {},
                           'et' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'etb' => {},
+                          'etc' => {},
+                          'eth' => {},
+                          'etn' => {},
+                          'eto' => {},
+                          'etr' => {},
+                          'ets' => {},
+                          'ett' => {},
+                          'etu' => {},
+                          'etx' => {},
+                          'etz' => {},
                           'eu' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'ewo' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'euq' => {},
+                          'eve' => {},
+                          'evh' => {},
+                          'evn' => {},
+                          'ewo' => {},
+                          'ext' => {},
+                          'eya' => {},
+                          'eyo' => {},
+                          'eze' => {},
                           'fa' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'arab'
                                   },
-                          'fan' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'fat' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ff' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'faa' => {},
+                          'fab' => {},
+                          'fad' => {},
+                          'faf' => {},
+                          'fag' => {},
+                          'fah' => {},
+                          'fai' => {},
+                          'faj' => {},
+                          'fak' => {},
+                          'fal' => {},
+                          'fam' => {},
+                          'fan' => {},
+                          'fap' => {},
+                          'far' => {},
+                          'fat' => {},
+                          'fau' => {},
+                          'fax' => {},
+                          'fay' => {},
+                          'faz' => {},
+                          'fbl' => {},
+                          'fcs' => {},
+                          'fer' => {},
+                          'ff' => {},
+                          'ffi' => {},
+                          'ffm' => {},
+                          'fgr' => {},
                           'fi' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'fil' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'fiu' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'fia' => {},
+                          'fie' => {},
+                          'fil' => {},
+                          'fip' => {},
+                          'fir' => {},
+                          'fit' => {},
+                          'fiu' => {},
+                          'fiw' => {},
                           'fj' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'fkv' => {},
+                          'fla' => {},
+                          'flh' => {},
+                          'fli' => {},
+                          'fll' => {},
+                          'fln' => {},
+                          'flr' => {},
+                          'fly' => {},
+                          'fmp' => {},
+                          'fmu' => {},
+                          'fng' => {},
+                          'fni' => {},
                           'fo' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'fon' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'fod' => {},
+                          'foi' => {},
+                          'fom' => {},
+                          'fon' => {},
+                          'for' => {},
+                          'fos' => {},
+                          'fox' => {},
+                          'fpe' => {},
+                          'fqs' => {},
                           'fr' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'frm' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'fro' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'frc' => {},
+                          'frd' => {},
+                          'frk' => {},
+                          'frm' => {},
+                          'fro' => {},
+                          'frp' => {},
+                          'frq' => {},
                           'frr' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
                           'frs' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
-                          'fur' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'frt' => {},
+                          'fse' => {},
+                          'fsl' => {},
+                          'fss' => {},
+                          'fub' => {},
+                          'fuc' => {},
+                          'fud' => {},
+                          'fue' => {},
+                          'fuf' => {},
+                          'fuh' => {},
+                          'fui' => {},
+                          'fuj' => {},
+                          'fum' => {},
+                          'fun' => {},
+                          'fuq' => {},
+                          'fur' => {},
+                          'fut' => {},
+                          'fuu' => {},
+                          'fuv' => {},
+                          'fuy' => {},
+                          'fvr' => {},
+                          'fwa' => {},
+                          'fwe' => {},
                           'fy' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
                           'ga' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'gaa' => {
-                                     '_canon' => '_lowercase'
+                          'gaa' => {},
+                          'gab' => {},
+                          'gac' => {},
+                          'gad' => {},
+                          'gae' => {},
+                          'gaf' => {},
+                          'gag' => {},
+                          'gah' => {},
+                          'gai' => {},
+                          'gaj' => {},
+                          'gak' => {},
+                          'gal' => {},
+                          'gam' => {},
+                          'gan' => {},
+                          'gao' => {},
+                          'gap' => {},
+                          'gaq' => {},
+                          'gar' => {},
+                          'gas' => {},
+                          'gat' => {},
+                          'gau' => {},
+                          'gav' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'dev'
                                    },
-                          'gay' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'gba' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'gd' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'gem' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'gez' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'gil' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'gaw' => {},
+                          'gax' => {},
+                          'gay' => {},
+                          'gaz' => {},
+                          'gba' => {},
+                          'gbb' => {},
+                          'gbc' => {},
+                          'gbd' => {},
+                          'gbe' => {},
+                          'gbf' => {},
+                          'gbg' => {},
+                          'gbh' => {},
+                          'gbi' => {},
+                          'gbj' => {},
+                          'gbk' => {},
+                          'gbl' => {},
+                          'gbm' => {},
+                          'gbn' => {},
+                          'gbo' => {},
+                          'gbp' => {},
+                          'gbq' => {},
+                          'gbr' => {},
+                          'gbs' => {},
+                          'gbu' => {},
+                          'gbv' => {},
+                          'gbx' => {},
+                          'gby' => {},
+                          'gbz' => {},
+                          'gcc' => {},
+                          'gcd' => {},
+                          'gce' => {},
+                          'gcf' => {},
+                          'gcl' => {},
+                          'gcn' => {},
+                          'gcr' => {},
+                          'gct' => {},
+                          'gd' => {},
+                          'gda' => {},
+                          'gdb' => {},
+                          'gdc' => {},
+                          'gdd' => {},
+                          'gde' => {},
+                          'gdf' => {},
+                          'gdg' => {},
+                          'gdh' => {},
+                          'gdi' => {},
+                          'gdj' => {},
+                          'gdk' => {},
+                          'gdl' => {},
+                          'gdm' => {},
+                          'gdn' => {},
+                          'gdo' => {},
+                          'gdq' => {},
+                          'gdr' => {},
+                          'gdu' => {},
+                          'gdx' => {},
+                          'gea' => {},
+                          'geb' => {},
+                          'gec' => {},
+                          'ged' => {},
+                          'geg' => {},
+                          'geh' => {},
+                          'gei' => {},
+                          'gej' => {},
+                          'gek' => {},
+                          'gel' => {},
+                          'gem' => {},
+                          'geq' => {},
+                          'ges' => {},
+                          'gew' => {},
+                          'gex' => {},
+                          'gey' => {},
+                          'gez' => {},
+                          'gfk' => {},
+                          'gft' => {},
+                          'gga' => {},
+                          'ggb' => {},
+                          'ggd' => {},
+                          'gge' => {},
+                          'ggg' => {},
+                          'ggk' => {},
+                          'ggl' => {},
+                          'ggn' => {},
+                          'ggo' => {},
+                          'ggr' => {},
+                          'ggt' => {},
+                          'ggu' => {},
+                          'ggw' => {},
+                          'gha' => {},
+                          'ghc' => {},
+                          'ghe' => {},
+                          'ghh' => {},
+                          'ghk' => {},
+                          'ghl' => {},
+                          'ghn' => {},
+                          'gho' => {},
+                          'ghr' => {},
+                          'ghs' => {},
+                          'ght' => {},
+                          'gia' => {},
+                          'gib' => {},
+                          'gic' => {},
+                          'gid' => {},
+                          'gig' => {},
+                          'gil' => {},
+                          'gim' => {},
+                          'gin' => {},
+                          'gio' => {},
+                          'gip' => {},
+                          'giq' => {},
+                          'gir' => {},
+                          'gis' => {},
+                          'git' => {},
+                          'giw' => {},
+                          'gix' => {},
+                          'giy' => {},
+                          'giz' => {},
+                          'gji' => {},
+                          'gjk' => {},
+                          'gjn' => {},
+                          'gju' => {},
+                          'gka' => {},
+                          'gke' => {},
+                          'gkn' => {},
+                          'gkp' => {},
                           'gl' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'gmh' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'glc' => {},
+                          'gld' => {},
+                          'glh' => {},
+                          'gli' => {},
+                          'glj' => {},
+                          'glk' => {},
+                          'glo' => {},
+                          'glr' => {},
+                          'glu' => {},
+                          'glw' => {},
+                          'gly' => {},
+                          'gma' => {},
+                          'gmb' => {},
+                          'gmd' => {},
+                          'gme' => {},
+                          'gmh' => {},
+                          'gml' => {},
+                          'gmm' => {},
+                          'gmn' => {},
+                          'gmq' => {},
+                          'gmu' => {},
+                          'gmv' => {},
+                          'gmw' => {},
+                          'gmx' => {},
+                          'gmy' => {},
                           'gn' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'goh' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'gon' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'gor' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'got' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'grb' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'grc' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'gna' => {},
+                          'gnb' => {},
+                          'gnc' => {},
+                          'gnd' => {},
+                          'gne' => {},
+                          'gng' => {},
+                          'gnh' => {},
+                          'gni' => {},
+                          'gnk' => {},
+                          'gnl' => {},
+                          'gnm' => {},
+                          'gnn' => {},
+                          'gno' => {},
+                          'gnq' => {},
+                          'gnr' => {},
+                          'gnt' => {},
+                          'gnu' => {},
+                          'gnw' => {},
+                          'gnz' => {},
+                          'goa' => {},
+                          'gob' => {},
+                          'goc' => {},
+                          'god' => {},
+                          'goe' => {},
+                          'gof' => {},
+                          'gog' => {},
+                          'goh' => {},
+                          'goi' => {},
+                          'goj' => {},
+                          'gok' => {},
+                          'gol' => {},
+                          'gom' => {},
+                          'gon' => {},
+                          'goo' => {},
+                          'gop' => {},
+                          'goq' => {},
+                          'gor' => {},
+                          'gos' => {},
+                          'got' => {},
+                          'gou' => {},
+                          'gow' => {},
+                          'gox' => {},
+                          'goy' => {},
+                          'goz' => {},
+                          'gpa' => {},
+                          'gpn' => {},
+                          'gqa' => {},
+                          'gqi' => {},
+                          'gqn' => {},
+                          'gqr' => {},
+                          'gra' => {},
+                          'grb' => {},
+                          'grc' => {},
+                          'grd' => {},
+                          'grg' => {},
+                          'grh' => {},
+                          'gri' => {},
+                          'grj' => {},
+                          'grk' => {},
+                          'grm' => {},
+                          'gro' => {},
+                          'grq' => {},
+                          'grr' => {},
+                          'grs' => {},
+                          'grt' => {},
+                          'gru' => {},
+                          'grv' => {},
+                          'grw' => {},
+                          'grx' => {},
+                          'gry' => {},
+                          'grz' => {},
+                          'gse' => {},
+                          'gsg' => {},
+                          'gsl' => {},
+                          'gsm' => {},
+                          'gsn' => {},
+                          'gso' => {},
+                          'gsp' => {},
+                          'gss' => {},
                           'gsw' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'gta' => {},
+                          'gti' => {},
                           'gu' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'gujr'
                                   },
+                          'gua' => {},
+                          'gub' => {},
+                          'guc' => {},
+                          'gud' => {},
+                          'gue' => {},
+                          'guf' => {},
+                          'gug' => {},
+                          'guh' => {},
+                          'gui' => {},
+                          'guk' => {},
+                          'gul' => {},
+                          'gum' => {},
+                          'gun' => {},
+                          'guo' => {},
+                          'gup' => {},
+                          'guq' => {},
+                          'gur' => {},
+                          'gus' => {},
+                          'gut' => {},
+                          'guu' => {},
+                          'guv' => {},
+                          'guw' => {},
+                          'gux' => {},
+                          'guz' => {},
                           'gv' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'gwi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ha' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'hai' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'haw' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'gva' => {},
+                          'gvc' => {},
+                          'gve' => {},
+                          'gvf' => {},
+                          'gvj' => {},
+                          'gvl' => {},
+                          'gvm' => {},
+                          'gvn' => {},
+                          'gvo' => {},
+                          'gvp' => {},
+                          'gvr' => {},
+                          'gvs' => {},
+                          'gvy' => {},
+                          'gwa' => {},
+                          'gwb' => {},
+                          'gwc' => {},
+                          'gwd' => {},
+                          'gwe' => {},
+                          'gwf' => {},
+                          'gwg' => {},
+                          'gwi' => {},
+                          'gwj' => {},
+                          'gwn' => {},
+                          'gwr' => {},
+                          'gwt' => {},
+                          'gwu' => {},
+                          'gww' => {},
+                          'gwx' => {},
+                          'gxx' => {},
+                          'gya' => {},
+                          'gyb' => {},
+                          'gyd' => {},
+                          'gye' => {},
+                          'gyf' => {},
+                          'gyg' => {},
+                          'gyi' => {},
+                          'gyl' => {},
+                          'gym' => {},
+                          'gyn' => {},
+                          'gyr' => {},
+                          'gyy' => {},
+                          'gza' => {},
+                          'gzi' => {},
+                          'gzn' => {},
+                          'ha' => {},
+                          'haa' => {},
+                          'hab' => {},
+                          'hac' => {},
+                          'had' => {},
+                          'hae' => {},
+                          'haf' => {},
+                          'hag' => {},
+                          'hah' => {},
+                          'hai' => {},
+                          'haj' => {},
+                          'hak' => {},
+                          'hal' => {},
+                          'ham' => {},
+                          'han' => {},
+                          'hao' => {},
+                          'hap' => {},
+                          'haq' => {},
+                          'har' => {},
+                          'has' => {},
+                          'hav' => {},
+                          'haw' => {},
+                          'hax' => {},
+                          'hay' => {},
+                          'haz' => {},
+                          'hba' => {},
+                          'hbb' => {},
+                          'hbn' => {},
+                          'hbo' => {},
+                          'hbu' => {},
+                          'hca' => {},
+                          'hch' => {},
+                          'hdn' => {},
+                          'hds' => {},
+                          'hdy' => {},
                           'he' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'hebr'
                                   },
+                          'hea' => {},
+                          'hed' => {},
+                          'heg' => {},
+                          'heh' => {},
+                          'hei' => {},
+                          'hem' => {},
+                          'hgm' => {},
+                          'hgw' => {},
+                          'hhi' => {},
+                          'hhr' => {},
+                          'hhy' => {},
                           'hi' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'deva'
                                   },
-                          'hil' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'him' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'hit' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'hmn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ho' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'hia' => {},
+                          'hib' => {},
+                          'hid' => {},
+                          'hif' => {},
+                          'hig' => {},
+                          'hih' => {},
+                          'hii' => {},
+                          'hij' => {},
+                          'hik' => {},
+                          'hil' => {},
+                          'him' => {},
+                          'hio' => {},
+                          'hir' => {},
+                          'hit' => {},
+                          'hiw' => {},
+                          'hix' => {},
+                          'hji' => {},
+                          'hka' => {},
+                          'hke' => {},
+                          'hkk' => {},
+                          'hks' => {},
+                          'hla' => {},
+                          'hlb' => {},
+                          'hld' => {},
+                          'hle' => {},
+                          'hlt' => {},
+                          'hlu' => {},
+                          'hma' => {},
+                          'hmb' => {},
+                          'hmc' => {},
+                          'hmd' => {},
+                          'hme' => {},
+                          'hmf' => {},
+                          'hmg' => {},
+                          'hmh' => {},
+                          'hmi' => {},
+                          'hmj' => {},
+                          'hmk' => {},
+                          'hml' => {},
+                          'hmm' => {},
+                          'hmn' => {},
+                          'hmp' => {},
+                          'hmq' => {},
+                          'hmr' => {},
+                          'hms' => {},
+                          'hmt' => {},
+                          'hmu' => {},
+                          'hmv' => {},
+                          'hmw' => {},
+                          'hmx' => {},
+                          'hmy' => {},
+                          'hmz' => {},
+                          'hna' => {},
+                          'hnd' => {},
+                          'hne' => {},
+                          'hnh' => {},
+                          'hni' => {},
+                          'hnj' => {},
+                          'hnn' => {},
+                          'hno' => {},
+                          'hns' => {},
+                          'hnu' => {},
+                          'ho' => {},
+                          'hoa' => {},
+                          'hob' => {},
+                          'hoc' => {},
+                          'hod' => {},
+                          'hoe' => {},
+                          'hoh' => {},
+                          'hoi' => {},
+                          'hoj' => {},
+                          'hok' => {},
+                          'hol' => {},
+                          'hom' => {},
+                          'hoo' => {},
+                          'hop' => {},
+                          'hor' => {},
+                          'hos' => {},
+                          'hot' => {},
+                          'hov' => {},
+                          'how' => {},
+                          'hoy' => {},
+                          'hoz' => {},
+                          'hpo' => {},
+                          'hps' => {},
                           'hr' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'hra' => {},
+                          'hre' => {},
+                          'hrk' => {},
+                          'hrm' => {},
+                          'hro' => {},
+                          'hrr' => {},
+                          'hrt' => {},
+                          'hru' => {},
+                          'hrx' => {},
+                          'hrz' => {},
                           'hsb' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'hsh' => {},
+                          'hsl' => {},
+                          'hsn' => {},
+                          'hss' => {},
                           'ht' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'hti' => {},
+                          'hto' => {},
+                          'hts' => {},
+                          'htu' => {},
+                          'htx' => {},
                           'hu' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'hup' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'hub' => {},
+                          'huc' => {},
+                          'hud' => {},
+                          'hue' => {},
+                          'huf' => {},
+                          'hug' => {},
+                          'huh' => {},
+                          'hui' => {},
+                          'huj' => {},
+                          'huk' => {},
+                          'hul' => {},
+                          'hum' => {},
+                          'huo' => {},
+                          'hup' => {},
+                          'huq' => {},
+                          'hur' => {},
+                          'hus' => {},
+                          'hut' => {},
+                          'huu' => {},
+                          'huv' => {},
+                          'huw' => {},
+                          'hux' => {},
+                          'huy' => {},
+                          'huz' => {},
+                          'hvc' => {},
+                          'hve' => {},
+                          'hvk' => {},
+                          'hvn' => {},
+                          'hvv' => {},
+                          'hwa' => {},
+                          'hwc' => {},
+                          'hwo' => {},
                           'hy' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'armn'
                                   },
-                          'hz' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ia' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'iba' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'hya' => {},
+                          'hyx' => {},
+                          'hz' => {},
+                          'ia' => {},
+                          'iai' => {},
+                          'ian' => {},
+                          'iap' => {},
+                          'iar' => {},
+                          'iba' => {},
+                          'ibb' => {},
+                          'ibd' => {},
+                          'ibe' => {},
+                          'ibg' => {},
+                          'ibi' => {},
+                          'ibl' => {},
+                          'ibm' => {},
+                          'ibn' => {},
+                          'ibr' => {},
+                          'ibu' => {},
+                          'iby' => {},
+                          'ica' => {},
+                          'ich' => {},
+                          'icl' => {},
+                          'icr' => {},
                           'id' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'ie' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ig' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ii' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ijo' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ik' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ilo' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ida' => {},
+                          'idb' => {},
+                          'idc' => {},
+                          'idd' => {},
+                          'ide' => {},
+                          'idi' => {},
+                          'idr' => {},
+                          'ids' => {},
+                          'idt' => {},
+                          'idu' => {},
+                          'ie' => {},
+                          'ifa' => {},
+                          'ifb' => {},
+                          'ife' => {},
+                          'iff' => {},
+                          'ifk' => {},
+                          'ifm' => {},
+                          'ifu' => {},
+                          'ify' => {},
+                          'ig' => {},
+                          'igb' => {},
+                          'ige' => {},
+                          'igg' => {},
+                          'igl' => {},
+                          'igm' => {},
+                          'ign' => {},
+                          'igo' => {},
+                          'igs' => {},
+                          'igw' => {},
+                          'ihb' => {},
+                          'ihi' => {},
+                          'ihp' => {},
+                          'ii' => {},
+                          'iir' => {},
+                          'ijc' => {},
+                          'ije' => {},
+                          'ijj' => {},
+                          'ijn' => {},
+                          'ijo' => {},
+                          'ijs' => {},
+                          'ik' => {},
+                          'ike' => {},
+                          'iki' => {},
+                          'ikk' => {},
+                          'ikl' => {},
+                          'iko' => {},
+                          'ikp' => {},
+                          'ikt' => {},
+                          'ikv' => {},
+                          'ikw' => {},
+                          'ikx' => {},
+                          'ikz' => {},
+                          'ila' => {},
+                          'ilb' => {},
+                          'ilg' => {},
+                          'ili' => {},
+                          'ilk' => {},
+                          'ill' => {},
+                          'ilo' => {},
+                          'ils' => {},
+                          'ilu' => {},
+                          'ilv' => {},
+                          'ilw' => {},
+                          'ima' => {},
+                          'ime' => {},
+                          'imi' => {},
+                          'iml' => {},
+                          'imn' => {},
+                          'imo' => {},
+                          'imr' => {},
+                          'ims' => {},
+                          'imy' => {},
                           'in' => {
-                                    '_canon' => '_lowercase',
                                     '_deprecated' => 1,
                                     '_preferred' => 'id',
                                     '_suppress' => 'latn'
                                   },
-                          'inc' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ine' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'inh' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'io' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ira' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'iro' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'inb' => {},
+                          'inc' => {},
+                          'ine' => {},
+                          'ing' => {},
+                          'inh' => {},
+                          'inj' => {},
+                          'inl' => {},
+                          'inm' => {},
+                          'inn' => {},
+                          'ino' => {},
+                          'inp' => {},
+                          'ins' => {},
+                          'int' => {},
+                          'inz' => {},
+                          'io' => {},
+                          'ior' => {},
+                          'iou' => {},
+                          'iow' => {},
+                          'ipi' => {},
+                          'ipo' => {},
+                          'iqu' => {},
+                          'ira' => {},
+                          'ire' => {},
+                          'irh' => {},
+                          'iri' => {},
+                          'irk' => {},
+                          'irn' => {},
+                          'iro' => {},
+                          'irr' => {},
+                          'iru' => {},
+                          'irx' => {},
+                          'iry' => {},
                           'is' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'isa' => {},
+                          'isc' => {},
+                          'isd' => {},
+                          'ise' => {},
+                          'isg' => {},
+                          'ish' => {},
+                          'isi' => {},
+                          'isk' => {},
+                          'ism' => {},
+                          'isn' => {},
+                          'iso' => {},
+                          'isr' => {},
+                          'ist' => {},
+                          'isu' => {},
                           'it' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'iu' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'itb' => {},
+                          'itc' => {},
+                          'ite' => {},
+                          'iti' => {},
+                          'itk' => {},
+                          'itl' => {},
+                          'itm' => {},
+                          'ito' => {},
+                          'itr' => {},
+                          'its' => {},
+                          'itt' => {},
+                          'itv' => {},
+                          'itw' => {},
+                          'itx' => {},
+                          'ity' => {},
+                          'itz' => {},
+                          'iu' => {},
+                          'ium' => {},
+                          'ivb' => {},
+                          'ivv' => {},
                           'iw' => {
-                                    '_canon' => '_lowercase',
                                     '_deprecated' => 1,
                                     '_preferred' => 'he',
                                     '_suppress' => 'hebr'
                                   },
+                          'iwk' => {},
+                          'iwm' => {},
+                          'iwo' => {},
+                          'iws' => {},
+                          'ixc' => {},
+                          'ixl' => {},
+                          'iya' => {},
+                          'iyo' => {},
+                          'iyx' => {},
+                          'izh' => {},
+                          'izi' => {},
+                          'izr' => {},
                           'ja' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'jpan'
                                   },
-                          'jbo' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'jaa' => {},
+                          'jab' => {},
+                          'jac' => {},
+                          'jad' => {},
+                          'jae' => {},
+                          'jaf' => {},
+                          'jah' => {},
+                          'jaj' => {},
+                          'jak' => {},
+                          'jal' => {},
+                          'jam' => {},
+                          'jao' => {},
+                          'jaq' => {},
+                          'jar' => {},
+                          'jas' => {},
+                          'jat' => {},
+                          'jau' => {},
+                          'jax' => {},
+                          'jay' => {},
+                          'jaz' => {},
+                          'jbe' => {},
+                          'jbj' => {},
+                          'jbn' => {},
+                          'jbo' => {},
+                          'jbr' => {},
+                          'jbt' => {},
+                          'jbu' => {},
+                          'jcs' => {},
+                          'jct' => {},
+                          'jda' => {},
+                          'jdg' => {},
+                          'jdt' => {},
+                          'jeb' => {},
+                          'jee' => {},
+                          'jeg' => {},
+                          'jeh' => {},
+                          'jei' => {},
+                          'jek' => {},
+                          'jel' => {},
+                          'jen' => {},
+                          'jer' => {},
+                          'jet' => {},
+                          'jeu' => {},
+                          'jgb' => {},
+                          'jge' => {},
+                          'jgo' => {},
+                          'jhi' => {},
+                          'jhs' => {},
                           'ji' => {
-                                    '_canon' => '_lowercase',
                                     '_deprecated' => 1,
                                     '_preferred' => 'yi'
                                   },
-                          'jpr' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'jrb' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'jv' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'jia' => {},
+                          'jib' => {},
+                          'jic' => {},
+                          'jid' => {},
+                          'jie' => {},
+                          'jig' => {},
+                          'jih' => {},
+                          'jii' => {},
+                          'jil' => {},
+                          'jim' => {},
+                          'jio' => {},
+                          'jiq' => {},
+                          'jit' => {},
+                          'jiu' => {},
+                          'jiv' => {},
+                          'jiy' => {},
+                          'jko' => {},
+                          'jku' => {},
+                          'jle' => {},
+                          'jls' => {},
+                          'jma' => {},
+                          'jmb' => {},
+                          'jmc' => {},
+                          'jmd' => {},
+                          'jmi' => {},
+                          'jml' => {},
+                          'jmn' => {},
+                          'jmr' => {},
+                          'jms' => {},
+                          'jmx' => {},
+                          'jna' => {},
+                          'jnd' => {},
+                          'jng' => {},
+                          'jni' => {},
+                          'jnj' => {},
+                          'jnl' => {},
+                          'jns' => {},
+                          'job' => {},
+                          'jod' => {},
+                          'jor' => {},
+                          'jos' => {},
+                          'jow' => {},
+                          'jpa' => {},
+                          'jpr' => {},
+                          'jpx' => {},
+                          'jqr' => {},
+                          'jra' => {},
+                          'jrb' => {},
+                          'jrr' => {},
+                          'jrt' => {},
+                          'jru' => {},
+                          'jsl' => {},
+                          'jua' => {},
+                          'jub' => {},
+                          'juc' => {},
+                          'jud' => {},
+                          'juh' => {},
+                          'juk' => {},
+                          'jul' => {},
+                          'jum' => {},
+                          'jun' => {},
+                          'juo' => {},
+                          'jup' => {},
+                          'jur' => {},
+                          'jus' => {},
+                          'jut' => {},
+                          'juu' => {},
+                          'juw' => {},
+                          'juy' => {},
+                          'jv' => {},
+                          'jvd' => {},
+                          'jvn' => {},
                           'jw' => {
-                                    '_canon' => '_lowercase',
                                     '_deprecated' => 1,
                                     '_preferred' => 'jv'
                                   },
+                          'jwi' => {},
+                          'jya' => {},
+                          'jye' => {},
+                          'jyy' => {},
                           'ka' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'geor'
                                   },
-                          'kaa' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kab' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kac' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kam' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kar' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kaw' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kbd' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kg' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'kha' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'khi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kho' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ki' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'kj' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'kaa' => {},
+                          'kab' => {},
+                          'kac' => {},
+                          'kad' => {},
+                          'kae' => {},
+                          'kaf' => {},
+                          'kag' => {},
+                          'kah' => {},
+                          'kai' => {},
+                          'kaj' => {},
+                          'kak' => {},
+                          'kam' => {},
+                          'kao' => {},
+                          'kap' => {},
+                          'kaq' => {},
+                          'kar' => {},
+                          'kav' => {},
+                          'kaw' => {},
+                          'kax' => {},
+                          'kay' => {},
+                          'kba' => {},
+                          'kbb' => {},
+                          'kbc' => {},
+                          'kbd' => {},
+                          'kbe' => {},
+                          'kbf' => {},
+                          'kbg' => {},
+                          'kbh' => {},
+                          'kbi' => {},
+                          'kbj' => {},
+                          'kbk' => {},
+                          'kbl' => {},
+                          'kbm' => {},
+                          'kbn' => {},
+                          'kbo' => {},
+                          'kbp' => {},
+                          'kbq' => {},
+                          'kbr' => {},
+                          'kbs' => {},
+                          'kbt' => {},
+                          'kbu' => {},
+                          'kbv' => {},
+                          'kbw' => {},
+                          'kbx' => {},
+                          'kby' => {},
+                          'kbz' => {},
+                          'kca' => {},
+                          'kcb' => {},
+                          'kcc' => {},
+                          'kcd' => {},
+                          'kce' => {},
+                          'kcf' => {},
+                          'kcg' => {},
+                          'kch' => {},
+                          'kci' => {},
+                          'kcj' => {},
+                          'kck' => {},
+                          'kcl' => {},
+                          'kcm' => {},
+                          'kcn' => {},
+                          'kco' => {},
+                          'kcp' => {},
+                          'kcq' => {},
+                          'kcr' => {},
+                          'kcs' => {},
+                          'kct' => {},
+                          'kcu' => {},
+                          'kcv' => {},
+                          'kcw' => {},
+                          'kcx' => {},
+                          'kcy' => {},
+                          'kcz' => {},
+                          'kda' => {},
+                          'kdc' => {},
+                          'kdd' => {},
+                          'kde' => {},
+                          'kdf' => {},
+                          'kdg' => {},
+                          'kdh' => {},
+                          'kdi' => {},
+                          'kdj' => {},
+                          'kdk' => {},
+                          'kdl' => {},
+                          'kdm' => {},
+                          'kdn' => {},
+                          'kdo' => {},
+                          'kdp' => {},
+                          'kdq' => {},
+                          'kdr' => {},
+                          'kdt' => {},
+                          'kdu' => {},
+                          'kdv' => {},
+                          'kdw' => {},
+                          'kdx' => {},
+                          'kdy' => {},
+                          'kdz' => {},
+                          'kea' => {},
+                          'keb' => {},
+                          'kec' => {},
+                          'ked' => {},
+                          'kee' => {},
+                          'kef' => {},
+                          'keg' => {},
+                          'keh' => {},
+                          'kei' => {},
+                          'kej' => {},
+                          'kek' => {},
+                          'kel' => {},
+                          'kem' => {},
+                          'ken' => {},
+                          'keo' => {},
+                          'kep' => {},
+                          'keq' => {},
+                          'ker' => {},
+                          'kes' => {},
+                          'ket' => {},
+                          'keu' => {},
+                          'kev' => {},
+                          'kew' => {},
+                          'kex' => {},
+                          'key' => {},
+                          'kez' => {},
+                          'kfa' => {},
+                          'kfb' => {},
+                          'kfc' => {},
+                          'kfd' => {},
+                          'kfe' => {},
+                          'kff' => {},
+                          'kfg' => {},
+                          'kfh' => {},
+                          'kfi' => {},
+                          'kfj' => {},
+                          'kfk' => {},
+                          'kfl' => {},
+                          'kfm' => {},
+                          'kfn' => {},
+                          'kfo' => {},
+                          'kfp' => {},
+                          'kfq' => {},
+                          'kfr' => {},
+                          'kfs' => {},
+                          'kft' => {},
+                          'kfu' => {},
+                          'kfv' => {},
+                          'kfw' => {},
+                          'kfx' => {},
+                          'kfy' => {},
+                          'kfz' => {},
+                          'kg' => {},
+                          'kga' => {},
+                          'kgb' => {},
+                          'kgc' => {},
+                          'kgd' => {},
+                          'kge' => {},
+                          'kgf' => {},
+                          'kgg' => {},
+                          'kgh' => {},
+                          'kgi' => {},
+                          'kgj' => {},
+                          'kgk' => {},
+                          'kgl' => {},
+                          'kgm' => {},
+                          'kgn' => {},
+                          'kgo' => {},
+                          'kgp' => {},
+                          'kgq' => {},
+                          'kgr' => {},
+                          'kgs' => {},
+                          'kgt' => {},
+                          'kgu' => {},
+                          'kgv' => {},
+                          'kgw' => {},
+                          'kgx' => {},
+                          'kgy' => {},
+                          'kha' => {},
+                          'khb' => {},
+                          'khc' => {},
+                          'khd' => {},
+                          'khe' => {},
+                          'khf' => {},
+                          'khg' => {},
+                          'khh' => {},
+                          'khi' => {},
+                          'khj' => {},
+                          'khk' => {},
+                          'khl' => {},
+                          'khn' => {},
+                          'kho' => {},
+                          'khp' => {},
+                          'khq' => {},
+                          'khr' => {},
+                          'khs' => {},
+                          'kht' => {},
+                          'khu' => {},
+                          'khv' => {},
+                          'khw' => {},
+                          'khx' => {},
+                          'khy' => {},
+                          'khz' => {},
+                          'ki' => {},
+                          'kia' => {},
+                          'kib' => {},
+                          'kic' => {},
+                          'kid' => {},
+                          'kie' => {},
+                          'kif' => {},
+                          'kig' => {},
+                          'kih' => {},
+                          'kii' => {},
+                          'kij' => {},
+                          'kil' => {},
+                          'kim' => {},
+                          'kio' => {},
+                          'kip' => {},
+                          'kiq' => {},
+                          'kis' => {},
+                          'kit' => {},
+                          'kiu' => {},
+                          'kiv' => {},
+                          'kiw' => {},
+                          'kix' => {},
+                          'kiy' => {},
+                          'kiz' => {},
+                          'kj' => {},
+                          'kja' => {},
+                          'kjb' => {},
+                          'kjc' => {},
+                          'kjd' => {},
+                          'kje' => {},
+                          'kjf' => {},
+                          'kjg' => {},
+                          'kjh' => {},
+                          'kji' => {},
+                          'kjj' => {},
+                          'kjk' => {},
+                          'kjl' => {},
+                          'kjm' => {},
+                          'kjn' => {},
+                          'kjo' => {},
+                          'kjp' => {},
+                          'kjq' => {},
+                          'kjr' => {},
+                          'kjs' => {},
+                          'kjt' => {},
+                          'kju' => {},
+                          'kjx' => {},
+                          'kjy' => {},
+                          'kjz' => {},
                           'kk' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'cyrl'
                                   },
+                          'kka' => {},
+                          'kkb' => {},
+                          'kkc' => {},
+                          'kkd' => {},
+                          'kke' => {},
+                          'kkf' => {},
+                          'kkg' => {},
+                          'kkh' => {},
+                          'kki' => {},
+                          'kkj' => {},
+                          'kkk' => {},
+                          'kkl' => {},
+                          'kkm' => {},
+                          'kkn' => {},
+                          'kko' => {},
+                          'kkp' => {},
+                          'kkq' => {},
+                          'kkr' => {},
+                          'kks' => {},
+                          'kkt' => {},
+                          'kku' => {},
+                          'kkv' => {},
+                          'kkw' => {},
+                          'kkx' => {},
+                          'kky' => {},
+                          'kkz' => {},
                           'kl' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'kla' => {},
+                          'klb' => {},
+                          'klc' => {},
+                          'kld' => {},
+                          'kle' => {},
+                          'klf' => {},
+                          'klg' => {},
+                          'klh' => {},
+                          'kli' => {},
+                          'klj' => {},
+                          'klk' => {},
+                          'kll' => {},
+                          'klm' => {},
+                          'kln' => {},
+                          'klo' => {},
+                          'klp' => {},
+                          'klq' => {},
+                          'klr' => {},
+                          'kls' => {},
+                          'klt' => {},
+                          'klu' => {},
+                          'klv' => {},
+                          'klw' => {},
+                          'klx' => {},
+                          'kly' => {},
+                          'klz' => {},
                           'km' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'khmr'
                                   },
-                          'kmb' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'kma' => {},
+                          'kmb' => {},
+                          'kmc' => {},
+                          'kmd' => {},
+                          'kme' => {},
+                          'kmf' => {},
+                          'kmg' => {},
+                          'kmh' => {},
+                          'kmi' => {},
+                          'kmj' => {},
+                          'kmk' => {},
+                          'kml' => {},
+                          'kmm' => {},
+                          'kmn' => {},
+                          'kmo' => {},
+                          'kmp' => {},
+                          'kmq' => {},
+                          'kmr' => {},
+                          'kms' => {},
+                          'kmt' => {},
+                          'kmu' => {},
+                          'kmv' => {},
+                          'kmw' => {},
+                          'kmx' => {},
+                          'kmy' => {},
+                          'kmz' => {},
                           'kn' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'knda'
                                   },
+                          'kna' => {},
+                          'knb' => {},
+                          'knc' => {},
+                          'knd' => {},
+                          'kne' => {},
+                          'knf' => {},
+                          'kng' => {},
+                          'kni' => {},
+                          'knj' => {},
+                          'knk' => {},
+                          'knl' => {},
+                          'knm' => {},
+                          'knn' => {},
+                          'kno' => {},
+                          'knp' => {},
+                          'knq' => {},
+                          'knr' => {},
+                          'kns' => {},
+                          'knt' => {},
+                          'knu' => {},
+                          'knv' => {},
+                          'knw' => {},
+                          'knx' => {},
+                          'kny' => {},
+                          'knz' => {},
                           'ko' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'kore'
                                   },
+                          'koa' => {},
+                          'koc' => {},
+                          'kod' => {},
+                          'koe' => {},
+                          'kof' => {},
+                          'kog' => {},
+                          'koh' => {},
+                          'koi' => {},
+                          'koj' => {},
                           'kok' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'deva'
                                    },
-                          'kos' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kpe' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kr' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'krc' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'krl' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kro' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kru' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ks' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ku' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'kum' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kut' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'kv' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'kw' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ky' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'kol' => {},
+                          'koo' => {},
+                          'kop' => {},
+                          'koq' => {},
+                          'kos' => {},
+                          'kot' => {},
+                          'kou' => {},
+                          'kov' => {},
+                          'kow' => {},
+                          'kox' => {},
+                          'koy' => {},
+                          'koz' => {},
+                          'kpa' => {},
+                          'kpb' => {},
+                          'kpc' => {},
+                          'kpd' => {},
+                          'kpe' => {},
+                          'kpf' => {},
+                          'kpg' => {},
+                          'kph' => {},
+                          'kpi' => {},
+                          'kpj' => {},
+                          'kpk' => {},
+                          'kpl' => {},
+                          'kpm' => {},
+                          'kpn' => {},
+                          'kpo' => {},
+                          'kpp' => {},
+                          'kpq' => {},
+                          'kpr' => {},
+                          'kps' => {},
+                          'kpt' => {},
+                          'kpu' => {},
+                          'kpv' => {},
+                          'kpw' => {},
+                          'kpx' => {},
+                          'kpy' => {},
+                          'kpz' => {},
+                          'kqa' => {},
+                          'kqb' => {},
+                          'kqc' => {},
+                          'kqd' => {},
+                          'kqe' => {},
+                          'kqf' => {},
+                          'kqg' => {},
+                          'kqh' => {},
+                          'kqi' => {},
+                          'kqj' => {},
+                          'kqk' => {},
+                          'kql' => {},
+                          'kqm' => {},
+                          'kqn' => {},
+                          'kqo' => {},
+                          'kqp' => {},
+                          'kqq' => {},
+                          'kqr' => {},
+                          'kqs' => {},
+                          'kqt' => {},
+                          'kqu' => {},
+                          'kqv' => {},
+                          'kqw' => {},
+                          'kqx' => {},
+                          'kqy' => {},
+                          'kqz' => {},
+                          'kr' => {},
+                          'kra' => {},
+                          'krb' => {},
+                          'krc' => {},
+                          'krd' => {},
+                          'kre' => {},
+                          'krf' => {},
+                          'krh' => {},
+                          'kri' => {},
+                          'krj' => {},
+                          'krk' => {},
+                          'krl' => {},
+                          'krm' => {},
+                          'krn' => {},
+                          'kro' => {},
+                          'krp' => {},
+                          'krr' => {},
+                          'krs' => {},
+                          'krt' => {},
+                          'kru' => {},
+                          'krv' => {},
+                          'krw' => {},
+                          'krx' => {},
+                          'kry' => {},
+                          'krz' => {},
+                          'ks' => {},
+                          'ksa' => {},
+                          'ksb' => {},
+                          'ksc' => {},
+                          'ksd' => {},
+                          'kse' => {},
+                          'ksf' => {},
+                          'ksg' => {},
+                          'ksh' => {},
+                          'ksi' => {},
+                          'ksj' => {},
+                          'ksk' => {},
+                          'ksl' => {},
+                          'ksm' => {},
+                          'ksn' => {},
+                          'kso' => {},
+                          'ksp' => {},
+                          'ksq' => {},
+                          'ksr' => {},
+                          'kss' => {},
+                          'kst' => {},
+                          'ksu' => {},
+                          'ksv' => {},
+                          'ksw' => {},
+                          'ksx' => {},
+                          'ksy' => {},
+                          'ksz' => {},
+                          'kta' => {},
+                          'ktb' => {},
+                          'ktc' => {},
+                          'ktd' => {},
+                          'kte' => {},
+                          'ktf' => {},
+                          'ktg' => {},
+                          'kth' => {},
+                          'kti' => {},
+                          'ktj' => {},
+                          'ktk' => {},
+                          'ktl' => {},
+                          'ktm' => {},
+                          'ktn' => {},
+                          'kto' => {},
+                          'ktp' => {},
+                          'ktq' => {},
+                          'ktr' => {},
+                          'kts' => {},
+                          'ktt' => {},
+                          'ktu' => {},
+                          'ktv' => {},
+                          'ktw' => {},
+                          'ktx' => {},
+                          'kty' => {},
+                          'ktz' => {},
+                          'ku' => {},
+                          'kub' => {},
+                          'kuc' => {},
+                          'kud' => {},
+                          'kue' => {},
+                          'kuf' => {},
+                          'kug' => {},
+                          'kuh' => {},
+                          'kui' => {},
+                          'kuj' => {},
+                          'kuk' => {},
+                          'kul' => {},
+                          'kum' => {},
+                          'kun' => {},
+                          'kuo' => {},
+                          'kup' => {},
+                          'kuq' => {},
+                          'kus' => {},
+                          'kut' => {},
+                          'kuu' => {},
+                          'kuv' => {},
+                          'kuw' => {},
+                          'kux' => {},
+                          'kuy' => {},
+                          'kuz' => {},
+                          'kv' => {},
+                          'kva' => {},
+                          'kvb' => {},
+                          'kvc' => {},
+                          'kvd' => {},
+                          'kve' => {},
+                          'kvf' => {},
+                          'kvg' => {},
+                          'kvh' => {},
+                          'kvi' => {},
+                          'kvj' => {},
+                          'kvk' => {},
+                          'kvl' => {},
+                          'kvm' => {},
+                          'kvn' => {},
+                          'kvo' => {},
+                          'kvp' => {},
+                          'kvq' => {},
+                          'kvr' => {},
+                          'kvs' => {},
+                          'kvt' => {},
+                          'kvu' => {},
+                          'kvv' => {},
+                          'kvw' => {},
+                          'kvx' => {},
+                          'kvy' => {},
+                          'kvz' => {},
+                          'kw' => {},
+                          'kwa' => {},
+                          'kwb' => {},
+                          'kwc' => {},
+                          'kwd' => {},
+                          'kwe' => {},
+                          'kwf' => {},
+                          'kwg' => {},
+                          'kwh' => {},
+                          'kwi' => {},
+                          'kwj' => {},
+                          'kwk' => {},
+                          'kwl' => {},
+                          'kwm' => {},
+                          'kwn' => {},
+                          'kwo' => {},
+                          'kwp' => {},
+                          'kwq' => {},
+                          'kwr' => {},
+                          'kws' => {},
+                          'kwt' => {},
+                          'kwu' => {},
+                          'kwv' => {},
+                          'kww' => {},
+                          'kwx' => {},
+                          'kwy' => {},
+                          'kwz' => {},
+                          'kxa' => {},
+                          'kxb' => {},
+                          'kxc' => {},
+                          'kxd' => {},
+                          'kxe' => {},
+                          'kxf' => {},
+                          'kxh' => {},
+                          'kxi' => {},
+                          'kxj' => {},
+                          'kxk' => {},
+                          'kxl' => {},
+                          'kxm' => {},
+                          'kxn' => {},
+                          'kxo' => {},
+                          'kxp' => {},
+                          'kxq' => {},
+                          'kxr' => {},
+                          'kxs' => {},
+                          'kxt' => {},
+                          'kxu' => {},
+                          'kxv' => {},
+                          'kxw' => {},
+                          'kxx' => {},
+                          'kxy' => {},
+                          'kxz' => {},
+                          'ky' => {},
+                          'kya' => {},
+                          'kyb' => {},
+                          'kyc' => {},
+                          'kyd' => {},
+                          'kye' => {},
+                          'kyf' => {},
+                          'kyg' => {},
+                          'kyh' => {},
+                          'kyi' => {},
+                          'kyj' => {},
+                          'kyk' => {},
+                          'kyl' => {},
+                          'kym' => {},
+                          'kyn' => {},
+                          'kyo' => {},
+                          'kyp' => {},
+                          'kyq' => {},
+                          'kyr' => {},
+                          'kys' => {},
+                          'kyt' => {},
+                          'kyu' => {},
+                          'kyv' => {},
+                          'kyw' => {},
+                          'kyx' => {},
+                          'kyy' => {},
+                          'kyz' => {},
+                          'kza' => {},
+                          'kzb' => {},
+                          'kzc' => {},
+                          'kzd' => {},
+                          'kze' => {},
+                          'kzf' => {},
+                          'kzg' => {},
+                          'kzh' => {},
+                          'kzi' => {},
+                          'kzj' => {},
+                          'kzk' => {},
+                          'kzl' => {},
+                          'kzm' => {},
+                          'kzn' => {},
+                          'kzo' => {},
+                          'kzp' => {},
+                          'kzq' => {},
+                          'kzr' => {},
+                          'kzs' => {},
+                          'kzt' => {},
+                          'kzu' => {},
+                          'kzv' => {},
+                          'kzw' => {},
+                          'kzx' => {},
+                          'kzy' => {},
+                          'kzz' => {},
                           'la' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'lad' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'lah' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'lam' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'laa' => {},
+                          'lab' => {},
+                          'lac' => {},
+                          'lad' => {},
+                          'lae' => {},
+                          'laf' => {},
+                          'lag' => {},
+                          'lah' => {},
+                          'lai' => {},
+                          'laj' => {},
+                          'lak' => {},
+                          'lal' => {},
+                          'lam' => {},
+                          'lan' => {},
+                          'lap' => {},
+                          'laq' => {},
+                          'lar' => {},
+                          'las' => {},
+                          'lau' => {},
+                          'law' => {},
+                          'lax' => {},
+                          'lay' => {},
+                          'laz' => {},
                           'lb' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'lez' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'lg' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'li' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'lba' => {},
+                          'lbb' => {},
+                          'lbc' => {},
+                          'lbe' => {},
+                          'lbf' => {},
+                          'lbg' => {},
+                          'lbi' => {},
+                          'lbj' => {},
+                          'lbk' => {},
+                          'lbl' => {},
+                          'lbm' => {},
+                          'lbn' => {},
+                          'lbo' => {},
+                          'lbq' => {},
+                          'lbr' => {},
+                          'lbs' => {},
+                          'lbt' => {},
+                          'lbu' => {},
+                          'lbv' => {},
+                          'lbw' => {},
+                          'lbx' => {},
+                          'lby' => {},
+                          'lbz' => {},
+                          'lcc' => {},
+                          'lcd' => {},
+                          'lce' => {},
+                          'lcf' => {},
+                          'lch' => {},
+                          'lcl' => {},
+                          'lcm' => {},
+                          'lcp' => {},
+                          'lcq' => {},
+                          'lcs' => {},
+                          'ldb' => {},
+                          'ldd' => {},
+                          'ldg' => {},
+                          'ldh' => {},
+                          'ldi' => {},
+                          'ldj' => {},
+                          'ldk' => {},
+                          'ldl' => {},
+                          'ldm' => {},
+                          'ldn' => {},
+                          'ldo' => {},
+                          'ldp' => {},
+                          'ldq' => {},
+                          'lea' => {},
+                          'leb' => {},
+                          'lec' => {},
+                          'led' => {},
+                          'lee' => {},
+                          'lef' => {},
+                          'leg' => {},
+                          'leh' => {},
+                          'lei' => {},
+                          'lej' => {},
+                          'lek' => {},
+                          'lel' => {},
+                          'lem' => {},
+                          'len' => {},
+                          'leo' => {},
+                          'lep' => {},
+                          'leq' => {},
+                          'ler' => {},
+                          'les' => {},
+                          'let' => {},
+                          'leu' => {},
+                          'lev' => {},
+                          'lew' => {},
+                          'lex' => {},
+                          'ley' => {},
+                          'lez' => {},
+                          'lfa' => {},
+                          'lfn' => {},
+                          'lg' => {},
+                          'lga' => {},
+                          'lgb' => {},
+                          'lgg' => {},
+                          'lgh' => {},
+                          'lgi' => {},
+                          'lgk' => {},
+                          'lgl' => {},
+                          'lgm' => {},
+                          'lgn' => {},
+                          'lgq' => {},
+                          'lgr' => {},
+                          'lgt' => {},
+                          'lgu' => {},
+                          'lgz' => {},
+                          'lha' => {},
+                          'lhh' => {},
+                          'lhi' => {},
+                          'lhl' => {},
+                          'lhm' => {},
+                          'lhn' => {},
+                          'lhp' => {},
+                          'lhs' => {},
+                          'lht' => {},
+                          'lhu' => {},
+                          'li' => {},
+                          'lia' => {},
+                          'lib' => {},
+                          'lic' => {},
+                          'lid' => {},
+                          'lie' => {},
+                          'lif' => {},
+                          'lig' => {},
+                          'lih' => {},
+                          'lii' => {},
+                          'lij' => {},
+                          'lik' => {},
+                          'lil' => {},
+                          'lio' => {},
+                          'lip' => {},
+                          'liq' => {},
+                          'lir' => {},
+                          'lis' => {},
+                          'liu' => {},
+                          'liv' => {},
+                          'liw' => {},
+                          'lix' => {},
+                          'liy' => {},
+                          'liz' => {},
+                          'lje' => {},
+                          'lji' => {},
+                          'ljl' => {},
+                          'ljp' => {},
+                          'lka' => {},
+                          'lkb' => {},
+                          'lkc' => {},
+                          'lkd' => {},
+                          'lke' => {},
+                          'lkh' => {},
+                          'lki' => {},
+                          'lkj' => {},
+                          'lkl' => {},
+                          'lkn' => {},
+                          'lko' => {},
+                          'lkr' => {},
+                          'lks' => {},
+                          'lkt' => {},
+                          'lky' => {},
+                          'lla' => {},
+                          'llb' => {},
+                          'llc' => {},
+                          'lld' => {},
+                          'lle' => {},
+                          'llf' => {},
+                          'llg' => {},
+                          'llh' => {},
+                          'lli' => {},
+                          'llk' => {},
+                          'lll' => {},
+                          'llm' => {},
+                          'lln' => {},
+                          'llo' => {},
+                          'llp' => {},
+                          'llq' => {},
+                          'lls' => {},
+                          'llu' => {},
+                          'llx' => {},
+                          'lma' => {},
+                          'lmb' => {},
+                          'lmc' => {},
+                          'lmd' => {},
+                          'lme' => {},
+                          'lmf' => {},
+                          'lmg' => {},
+                          'lmh' => {},
+                          'lmi' => {},
+                          'lmj' => {},
+                          'lmk' => {},
+                          'lml' => {},
+                          'lmm' => {},
+                          'lmn' => {},
+                          'lmo' => {},
+                          'lmp' => {},
+                          'lmq' => {},
+                          'lmr' => {},
+                          'lmu' => {},
+                          'lmv' => {},
+                          'lmw' => {},
+                          'lmx' => {},
+                          'lmy' => {},
+                          'lmz' => {},
                           'ln' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'lna' => {},
+                          'lnb' => {},
+                          'lnd' => {},
+                          'lng' => {},
+                          'lnh' => {},
+                          'lni' => {},
+                          'lnj' => {},
+                          'lnl' => {},
+                          'lnm' => {},
+                          'lnn' => {},
+                          'lno' => {},
+                          'lns' => {},
+                          'lnu' => {},
+                          'lnz' => {},
                           'lo' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'laoo'
                                   },
-                          'lol' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'loz' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'loa' => {},
+                          'lob' => {},
+                          'loc' => {},
+                          'loe' => {},
+                          'lof' => {},
+                          'log' => {},
+                          'loh' => {},
+                          'loi' => {},
+                          'loj' => {},
+                          'lok' => {},
+                          'lol' => {},
+                          'lom' => {},
+                          'lon' => {},
+                          'loo' => {},
+                          'lop' => {},
+                          'loq' => {},
+                          'lor' => {},
+                          'los' => {},
+                          'lot' => {},
+                          'lou' => {},
+                          'lov' => {},
+                          'low' => {},
+                          'lox' => {},
+                          'loy' => {},
+                          'loz' => {},
+                          'lpa' => {},
+                          'lpe' => {},
+                          'lpn' => {},
+                          'lpo' => {},
+                          'lpx' => {},
+                          'lra' => {},
+                          'lrc' => {},
+                          'lre' => {},
+                          'lrg' => {},
+                          'lri' => {},
+                          'lrk' => {},
+                          'lrl' => {},
+                          'lrm' => {},
+                          'lrn' => {},
+                          'lro' => {},
+                          'lrr' => {},
+                          'lrt' => {},
+                          'lrv' => {},
+                          'lrz' => {},
+                          'lsa' => {},
+                          'lsd' => {},
+                          'lse' => {},
+                          'lsg' => {},
+                          'lsh' => {},
+                          'lsi' => {},
+                          'lsl' => {},
+                          'lsm' => {},
+                          'lso' => {},
+                          'lsp' => {},
+                          'lsr' => {},
+                          'lss' => {},
+                          'lst' => {},
+                          'lsy' => {},
                           'lt' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'lu' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'lua' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'lui' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'lun' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'luo' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'lus' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ltc' => {},
+                          'ltg' => {},
+                          'lti' => {},
+                          'ltn' => {},
+                          'lto' => {},
+                          'lts' => {},
+                          'ltu' => {},
+                          'lu' => {},
+                          'lua' => {},
+                          'luc' => {},
+                          'lud' => {},
+                          'lue' => {},
+                          'luf' => {},
+                          'lui' => {},
+                          'luj' => {},
+                          'luk' => {},
+                          'lul' => {},
+                          'lum' => {},
+                          'lun' => {},
+                          'luo' => {},
+                          'lup' => {},
+                          'luq' => {},
+                          'lur' => {},
+                          'lus' => {},
+                          'lut' => {},
+                          'luu' => {},
+                          'luv' => {},
+                          'luw' => {},
+                          'luy' => {},
+                          'luz' => {},
                           'lv' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'mad' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mag' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'lva' => {},
+                          'lvk' => {},
+                          'lvs' => {},
+                          'lvu' => {},
+                          'lwa' => {},
+                          'lwe' => {},
+                          'lwg' => {},
+                          'lwh' => {},
+                          'lwl' => {},
+                          'lwm' => {},
+                          'lwo' => {},
+                          'lwt' => {},
+                          'lww' => {},
+                          'lya' => {},
+                          'lyg' => {},
+                          'lyn' => {},
+                          'lzh' => {},
+                          'lzl' => {},
+                          'lzn' => {},
+                          'lzz' => {},
+                          'maa' => {},
+                          'mab' => {},
+                          'mad' => {},
+                          'mae' => {},
+                          'maf' => {},
+                          'mag' => {},
                           'mai' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'deva'
                                    },
-                          'mak' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'man' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'map' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mas' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mdf' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mdr' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'maj' => {},
+                          'mak' => {},
+                          'mam' => {},
+                          'man' => {},
+                          'map' => {},
+                          'maq' => {},
+                          'mas' => {},
+                          'mat' => {},
+                          'mau' => {},
+                          'mav' => {},
+                          'maw' => {},
+                          'max' => {},
+                          'maz' => {},
+                          'mba' => {},
+                          'mbb' => {},
+                          'mbc' => {},
+                          'mbd' => {},
+                          'mbe' => {},
+                          'mbf' => {},
+                          'mbh' => {},
+                          'mbi' => {},
+                          'mbj' => {},
+                          'mbk' => {},
+                          'mbl' => {},
+                          'mbm' => {},
+                          'mbn' => {},
+                          'mbo' => {},
+                          'mbp' => {},
+                          'mbq' => {},
+                          'mbr' => {},
+                          'mbs' => {},
+                          'mbt' => {},
+                          'mbu' => {},
+                          'mbv' => {},
+                          'mbw' => {},
+                          'mbx' => {},
+                          'mby' => {},
+                          'mbz' => {},
+                          'mca' => {},
+                          'mcb' => {},
+                          'mcc' => {},
+                          'mcd' => {},
+                          'mce' => {},
+                          'mcf' => {},
+                          'mcg' => {},
+                          'mch' => {},
+                          'mci' => {},
+                          'mcj' => {},
+                          'mck' => {},
+                          'mcl' => {},
+                          'mcm' => {},
+                          'mcn' => {},
+                          'mco' => {},
+                          'mcp' => {},
+                          'mcq' => {},
+                          'mcr' => {},
+                          'mcs' => {},
+                          'mct' => {},
+                          'mcu' => {},
+                          'mcv' => {},
+                          'mcw' => {},
+                          'mcx' => {},
+                          'mcy' => {},
+                          'mcz' => {},
+                          'mda' => {},
+                          'mdb' => {},
+                          'mdc' => {},
+                          'mdd' => {},
+                          'mde' => {},
+                          'mdf' => {},
+                          'mdg' => {},
+                          'mdh' => {},
+                          'mdi' => {},
+                          'mdj' => {},
+                          'mdk' => {},
+                          'mdl' => {},
+                          'mdm' => {},
+                          'mdn' => {},
+                          'mdp' => {},
+                          'mdq' => {},
+                          'mdr' => {},
+                          'mds' => {},
+                          'mdt' => {},
+                          'mdu' => {},
+                          'mdv' => {},
+                          'mdw' => {},
+                          'mdx' => {},
+                          'mdy' => {},
+                          'mdz' => {},
+                          'mea' => {},
+                          'meb' => {},
+                          'mec' => {},
+                          'med' => {},
+                          'mee' => {},
+                          'mef' => {},
+                          'meg' => {},
+                          'meh' => {},
+                          'mei' => {},
+                          'mej' => {},
+                          'mek' => {},
+                          'mel' => {},
+                          'mem' => {},
                           'men' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'meo' => {},
+                          'mep' => {},
+                          'meq' => {},
+                          'mer' => {},
+                          'mes' => {},
+                          'met' => {},
+                          'meu' => {},
+                          'mev' => {},
+                          'mew' => {},
+                          'mey' => {},
+                          'mez' => {},
+                          'mfa' => {},
+                          'mfb' => {},
+                          'mfc' => {},
+                          'mfd' => {},
+                          'mfe' => {},
+                          'mff' => {},
+                          'mfg' => {},
+                          'mfh' => {},
+                          'mfi' => {},
+                          'mfj' => {},
+                          'mfk' => {},
+                          'mfl' => {},
+                          'mfm' => {},
+                          'mfn' => {},
+                          'mfo' => {},
+                          'mfp' => {},
+                          'mfq' => {},
+                          'mfr' => {},
+                          'mfs' => {},
+                          'mft' => {},
+                          'mfu' => {},
+                          'mfv' => {},
+                          'mfw' => {},
+                          'mfx' => {},
+                          'mfy' => {},
+                          'mfz' => {},
                           'mg' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'mga' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'mga' => {},
+                          'mgb' => {},
+                          'mgc' => {},
+                          'mgd' => {},
+                          'mge' => {},
+                          'mgf' => {},
+                          'mgg' => {},
+                          'mgh' => {},
+                          'mgi' => {},
+                          'mgj' => {},
+                          'mgk' => {},
+                          'mgl' => {},
+                          'mgm' => {},
+                          'mgn' => {},
+                          'mgo' => {},
+                          'mgp' => {},
+                          'mgq' => {},
+                          'mgr' => {},
+                          'mgs' => {},
+                          'mgt' => {},
+                          'mgu' => {},
+                          'mgv' => {},
+                          'mgw' => {},
+                          'mgx' => {},
+                          'mgy' => {},
+                          'mgz' => {},
                           'mh' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'mi' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'mic' => {
-                                     '_canon' => '_lowercase'
+                          'mha' => {},
+                          'mhb' => {},
+                          'mhc' => {},
+                          'mhd' => {},
+                          'mhe' => {},
+                          'mhf' => {},
+                          'mhg' => {},
+                          'mhh' => {},
+                          'mhi' => {},
+                          'mhj' => {},
+                          'mhk' => {},
+                          'mhl' => {},
+                          'mhm' => {},
+                          'mhn' => {},
+                          'mho' => {},
+                          'mhp' => {},
+                          'mhq' => {},
+                          'mhr' => {},
+                          'mhs' => {},
+                          'mht' => {},
+                          'mhu' => {},
+                          'mhw' => {},
+                          'mhx' => {},
+                          'mhy' => {},
+                          'mhz' => {},
+                          'mi' => {},
+                          'mia' => {},
+                          'mib' => {},
+                          'mic' => {},
+                          'mid' => {},
+                          'mie' => {},
+                          'mif' => {},
+                          'mig' => {},
+                          'mih' => {},
+                          'mii' => {},
+                          'mij' => {},
+                          'mik' => {},
+                          'mil' => {},
+                          'mim' => {},
+                          'min' => {},
+                          'mio' => {},
+                          'mip' => {},
+                          'miq' => {},
+                          'mir' => {},
+                          'mis' => {},
+                          'mit' => {},
+                          'miu' => {},
+                          'miw' => {},
+                          'mix' => {},
+                          'miy' => {},
+                          'miz' => {},
+                          'mja' => {
+                                     '_deprecated' => 1
                                    },
-                          'min' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mis' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'mjc' => {},
+                          'mjd' => {},
+                          'mje' => {},
+                          'mjg' => {},
+                          'mjh' => {},
+                          'mji' => {},
+                          'mjj' => {},
+                          'mjk' => {},
+                          'mjl' => {},
+                          'mjm' => {},
+                          'mjn' => {},
+                          'mjo' => {},
+                          'mjp' => {},
+                          'mjq' => {},
+                          'mjr' => {},
+                          'mjs' => {},
+                          'mjt' => {},
+                          'mju' => {},
+                          'mjv' => {},
+                          'mjw' => {},
+                          'mjx' => {},
+                          'mjy' => {},
+                          'mjz' => {},
                           'mk' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'cyrl'
                                   },
-                          'mkh' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'mka' => {},
+                          'mkb' => {},
+                          'mkc' => {},
+                          'mke' => {},
+                          'mkf' => {},
+                          'mkg' => {},
+                          'mkh' => {},
+                          'mki' => {},
+                          'mkj' => {},
+                          'mkk' => {},
+                          'mkl' => {},
+                          'mkm' => {},
+                          'mkn' => {},
+                          'mko' => {},
+                          'mkp' => {},
+                          'mkq' => {},
+                          'mkr' => {},
+                          'mks' => {},
+                          'mkt' => {},
+                          'mku' => {},
+                          'mkv' => {},
+                          'mkw' => {},
+                          'mkx' => {},
+                          'mky' => {},
+                          'mkz' => {},
                           'ml' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'mlym'
                                   },
-                          'mn' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'mnc' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mni' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mno' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'mla' => {},
+                          'mlb' => {},
+                          'mlc' => {},
+                          'mld' => {},
+                          'mle' => {},
+                          'mlf' => {},
+                          'mlh' => {},
+                          'mli' => {},
+                          'mlj' => {},
+                          'mlk' => {},
+                          'mll' => {},
+                          'mlm' => {},
+                          'mln' => {},
+                          'mlo' => {},
+                          'mlp' => {},
+                          'mlq' => {},
+                          'mlr' => {},
+                          'mls' => {},
+                          'mlu' => {},
+                          'mlv' => {},
+                          'mlw' => {},
+                          'mlx' => {},
+                          'mlz' => {},
+                          'mma' => {},
+                          'mmb' => {},
+                          'mmc' => {},
+                          'mmd' => {},
+                          'mme' => {},
+                          'mmf' => {},
+                          'mmg' => {},
+                          'mmh' => {},
+                          'mmi' => {},
+                          'mmj' => {},
+                          'mmk' => {},
+                          'mml' => {},
+                          'mmm' => {},
+                          'mmn' => {},
+                          'mmo' => {},
+                          'mmp' => {},
+                          'mmq' => {},
+                          'mmr' => {},
+                          'mmt' => {},
+                          'mmu' => {},
+                          'mmv' => {},
+                          'mmw' => {},
+                          'mmx' => {},
+                          'mmy' => {},
+                          'mmz' => {},
+                          'mn' => {},
+                          'mna' => {},
+                          'mnb' => {},
+                          'mnc' => {},
+                          'mnd' => {},
+                          'mne' => {},
+                          'mnf' => {},
+                          'mng' => {},
+                          'mnh' => {},
+                          'mni' => {},
+                          'mnj' => {},
+                          'mnk' => {},
+                          'mnl' => {},
+                          'mnm' => {},
+                          'mnn' => {},
+                          'mno' => {},
+                          'mnp' => {},
+                          'mnq' => {},
+                          'mnr' => {},
+                          'mns' => {},
+                          'mnt' => {},
+                          'mnu' => {},
+                          'mnv' => {},
+                          'mnw' => {},
+                          'mnx' => {},
+                          'mny' => {},
+                          'mnz' => {},
                           'mo' => {
-                                    '_canon' => '_lowercase',
+                                    '_deprecated' => 1,
+                                    '_preferred' => 'ro',
                                     '_suppress' => 'latn'
                                   },
-                          'moh' => {
-                                     '_canon' => '_lowercase'
+                          'moa' => {},
+                          'moc' => {},
+                          'mod' => {},
+                          'moe' => {},
+                          'mof' => {
+                                     '_deprecated' => 1
                                    },
-                          'mos' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'mog' => {},
+                          'moh' => {},
+                          'moi' => {},
+                          'moj' => {},
+                          'mok' => {},
+                          'mom' => {},
+                          'moo' => {},
+                          'mop' => {},
+                          'moq' => {},
+                          'mor' => {},
+                          'mos' => {},
+                          'mot' => {},
+                          'mou' => {},
+                          'mov' => {},
+                          'mow' => {},
+                          'mox' => {},
+                          'moy' => {},
+                          'moz' => {},
+                          'mpa' => {},
+                          'mpb' => {},
+                          'mpc' => {},
+                          'mpd' => {},
+                          'mpe' => {},
+                          'mpg' => {},
+                          'mph' => {},
+                          'mpi' => {},
+                          'mpj' => {},
+                          'mpk' => {},
+                          'mpl' => {},
+                          'mpm' => {},
+                          'mpn' => {},
+                          'mpo' => {},
+                          'mpp' => {},
+                          'mpq' => {},
+                          'mpr' => {},
+                          'mps' => {},
+                          'mpt' => {},
+                          'mpu' => {},
+                          'mpv' => {},
+                          'mpw' => {},
+                          'mpx' => {},
+                          'mpy' => {},
+                          'mpz' => {},
+                          'mqa' => {},
+                          'mqb' => {},
+                          'mqc' => {},
+                          'mqe' => {},
+                          'mqf' => {},
+                          'mqg' => {},
+                          'mqh' => {},
+                          'mqi' => {},
+                          'mqj' => {},
+                          'mqk' => {},
+                          'mql' => {},
+                          'mqm' => {},
+                          'mqn' => {},
+                          'mqo' => {},
+                          'mqp' => {},
+                          'mqq' => {},
+                          'mqr' => {},
+                          'mqs' => {},
+                          'mqt' => {},
+                          'mqu' => {},
+                          'mqv' => {},
+                          'mqw' => {},
+                          'mqx' => {},
+                          'mqy' => {},
+                          'mqz' => {},
                           'mr' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'deva'
                                   },
+                          'mra' => {},
+                          'mrb' => {},
+                          'mrc' => {},
+                          'mrd' => {},
+                          'mre' => {},
+                          'mrf' => {},
+                          'mrg' => {},
+                          'mrh' => {},
+                          'mrj' => {},
+                          'mrk' => {},
+                          'mrl' => {},
+                          'mrm' => {},
+                          'mrn' => {},
+                          'mro' => {},
+                          'mrp' => {},
+                          'mrq' => {},
+                          'mrr' => {},
+                          'mrs' => {},
+                          'mrt' => {},
+                          'mru' => {},
+                          'mrv' => {},
+                          'mrw' => {},
+                          'mrx' => {},
+                          'mry' => {},
+                          'mrz' => {},
                           'ms' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'msb' => {},
+                          'msc' => {},
+                          'msd' => {},
+                          'mse' => {},
+                          'msf' => {},
+                          'msg' => {},
+                          'msh' => {},
+                          'msi' => {},
+                          'msj' => {},
+                          'msk' => {},
+                          'msl' => {},
+                          'msm' => {},
+                          'msn' => {},
+                          'mso' => {},
+                          'msp' => {},
+                          'msq' => {},
+                          'msr' => {},
+                          'mss' => {},
+                          'mst' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'mry'
+                                   },
+                          'msu' => {},
+                          'msv' => {},
+                          'msw' => {},
+                          'msx' => {},
+                          'msy' => {},
+                          'msz' => {},
                           'mt' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'mul' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mun' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mus' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mwl' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'mwr' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'mta' => {},
+                          'mtb' => {},
+                          'mtc' => {},
+                          'mtd' => {},
+                          'mte' => {},
+                          'mtf' => {},
+                          'mtg' => {},
+                          'mth' => {},
+                          'mti' => {},
+                          'mtj' => {},
+                          'mtk' => {},
+                          'mtl' => {},
+                          'mtm' => {},
+                          'mtn' => {},
+                          'mto' => {},
+                          'mtp' => {},
+                          'mtq' => {},
+                          'mtr' => {},
+                          'mts' => {},
+                          'mtt' => {},
+                          'mtu' => {},
+                          'mtv' => {},
+                          'mtw' => {},
+                          'mtx' => {},
+                          'mty' => {},
+                          'mua' => {},
+                          'mub' => {},
+                          'muc' => {},
+                          'mud' => {},
+                          'mue' => {},
+                          'mug' => {},
+                          'muh' => {},
+                          'mui' => {},
+                          'muj' => {},
+                          'muk' => {},
+                          'mul' => {},
+                          'mum' => {},
+                          'mun' => {},
+                          'muo' => {},
+                          'mup' => {},
+                          'muq' => {},
+                          'mur' => {},
+                          'mus' => {},
+                          'mut' => {},
+                          'muu' => {},
+                          'muv' => {},
+                          'mux' => {},
+                          'muy' => {},
+                          'muz' => {},
+                          'mva' => {},
+                          'mvb' => {},
+                          'mvd' => {},
+                          'mve' => {},
+                          'mvf' => {},
+                          'mvg' => {},
+                          'mvh' => {},
+                          'mvi' => {},
+                          'mvk' => {},
+                          'mvl' => {},
+                          'mvm' => {},
+                          'mvn' => {},
+                          'mvo' => {},
+                          'mvp' => {},
+                          'mvq' => {},
+                          'mvr' => {},
+                          'mvs' => {},
+                          'mvt' => {},
+                          'mvu' => {},
+                          'mvv' => {},
+                          'mvw' => {},
+                          'mvx' => {},
+                          'mvy' => {},
+                          'mvz' => {},
+                          'mwa' => {},
+                          'mwb' => {},
+                          'mwc' => {},
+                          'mwd' => {},
+                          'mwe' => {},
+                          'mwf' => {},
+                          'mwg' => {},
+                          'mwh' => {},
+                          'mwi' => {},
+                          'mwj' => {},
+                          'mwk' => {},
+                          'mwl' => {},
+                          'mwm' => {},
+                          'mwn' => {},
+                          'mwo' => {},
+                          'mwp' => {},
+                          'mwq' => {},
+                          'mwr' => {},
+                          'mws' => {},
+                          'mwt' => {},
+                          'mwu' => {},
+                          'mwv' => {},
+                          'mww' => {},
+                          'mwx' => {},
+                          'mwy' => {},
+                          'mwz' => {},
+                          'mxa' => {},
+                          'mxb' => {},
+                          'mxc' => {},
+                          'mxd' => {},
+                          'mxe' => {},
+                          'mxf' => {},
+                          'mxg' => {},
+                          'mxh' => {},
+                          'mxi' => {},
+                          'mxj' => {},
+                          'mxk' => {},
+                          'mxl' => {},
+                          'mxm' => {},
+                          'mxn' => {},
+                          'mxo' => {},
+                          'mxp' => {},
+                          'mxq' => {},
+                          'mxr' => {},
+                          'mxs' => {},
+                          'mxt' => {},
+                          'mxu' => {},
+                          'mxv' => {},
+                          'mxw' => {},
+                          'mxx' => {},
+                          'mxy' => {},
+                          'mxz' => {},
                           'my' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'mymr'
                                   },
-                          'myn' => {
-                                     '_canon' => '_lowercase'
+                          'myb' => {},
+                          'myc' => {},
+                          'myd' => {},
+                          'mye' => {},
+                          'myf' => {},
+                          'myg' => {},
+                          'myh' => {},
+                          'myi' => {},
+                          'myj' => {},
+                          'myk' => {},
+                          'myl' => {},
+                          'mym' => {},
+                          'myn' => {},
+                          'myo' => {},
+                          'myp' => {},
+                          'myq' => {},
+                          'myr' => {},
+                          'mys' => {},
+                          'myt' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'mry'
                                    },
-                          'myv' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'myu' => {},
+                          'myv' => {},
+                          'myw' => {},
+                          'myx' => {},
+                          'myy' => {},
+                          'myz' => {},
+                          'mza' => {},
+                          'mzb' => {},
+                          'mzc' => {},
+                          'mzd' => {},
+                          'mze' => {},
+                          'mzg' => {},
+                          'mzh' => {},
+                          'mzi' => {},
+                          'mzj' => {},
+                          'mzk' => {},
+                          'mzl' => {},
+                          'mzm' => {},
+                          'mzn' => {},
+                          'mzo' => {},
+                          'mzp' => {},
+                          'mzq' => {},
+                          'mzr' => {},
+                          'mzs' => {},
+                          'mzt' => {},
+                          'mzu' => {},
+                          'mzv' => {},
+                          'mzw' => {},
+                          'mzx' => {},
+                          'mzy' => {},
+                          'mzz' => {},
                           'na' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'nah' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'nai' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'nap' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'naa' => {},
+                          'nab' => {},
+                          'nac' => {},
+                          'nad' => {},
+                          'nae' => {},
+                          'naf' => {},
+                          'nag' => {},
+                          'nah' => {},
+                          'nai' => {},
+                          'naj' => {},
+                          'nak' => {},
+                          'nal' => {},
+                          'nam' => {},
+                          'nan' => {},
+                          'nao' => {},
+                          'nap' => {},
+                          'naq' => {},
+                          'nar' => {},
+                          'nas' => {},
+                          'nat' => {},
+                          'naw' => {},
+                          'nax' => {},
+                          'nay' => {},
+                          'naz' => {},
                           'nb' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'nba' => {},
+                          'nbb' => {},
+                          'nbc' => {},
+                          'nbd' => {},
+                          'nbe' => {},
+                          'nbf' => {
+                                     '_deprecated' => 1
+                                   },
+                          'nbg' => {},
+                          'nbh' => {},
+                          'nbi' => {},
+                          'nbj' => {},
+                          'nbk' => {},
+                          'nbm' => {},
+                          'nbn' => {},
+                          'nbo' => {},
+                          'nbp' => {},
+                          'nbq' => {},
+                          'nbr' => {},
+                          'nbs' => {},
+                          'nbt' => {},
+                          'nbu' => {},
+                          'nbv' => {},
+                          'nbw' => {},
+                          'nbx' => {},
+                          'nby' => {},
+                          'nca' => {},
+                          'ncb' => {},
+                          'ncc' => {},
+                          'ncd' => {},
+                          'nce' => {},
+                          'ncf' => {},
+                          'ncg' => {},
+                          'nch' => {},
+                          'nci' => {},
+                          'ncj' => {},
+                          'nck' => {},
+                          'ncl' => {},
+                          'ncm' => {},
+                          'ncn' => {},
+                          'nco' => {},
+                          'ncp' => {},
+                          'ncr' => {},
+                          'ncs' => {},
+                          'nct' => {},
+                          'ncu' => {},
+                          'ncx' => {},
+                          'ncz' => {},
                           'nd' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'nda' => {},
+                          'ndb' => {},
+                          'ndc' => {},
+                          'ndd' => {},
+                          'ndf' => {},
+                          'ndg' => {},
+                          'ndh' => {},
+                          'ndi' => {},
+                          'ndj' => {},
+                          'ndk' => {},
+                          'ndl' => {},
+                          'ndm' => {},
+                          'ndn' => {},
+                          'ndp' => {},
+                          'ndq' => {},
+                          'ndr' => {},
                           'nds' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'ndt' => {},
+                          'ndu' => {},
+                          'ndv' => {},
+                          'ndw' => {},
+                          'ndx' => {},
+                          'ndy' => {},
+                          'ndz' => {},
                           'ne' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'deva'
                                   },
-                          'new' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ng' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'nia' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'nic' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'nea' => {},
+                          'neb' => {},
+                          'nec' => {},
+                          'ned' => {},
+                          'nee' => {},
+                          'nef' => {},
+                          'neg' => {},
+                          'neh' => {},
+                          'nei' => {},
+                          'nej' => {},
+                          'nek' => {},
+                          'nem' => {},
+                          'nen' => {},
+                          'neo' => {},
+                          'neq' => {},
+                          'ner' => {},
+                          'nes' => {},
+                          'net' => {},
+                          'nev' => {},
+                          'new' => {},
+                          'nex' => {},
+                          'ney' => {},
+                          'nez' => {},
+                          'nfa' => {},
+                          'nfd' => {},
+                          'nfl' => {},
+                          'nfr' => {},
+                          'nfu' => {},
+                          'ng' => {},
+                          'nga' => {},
+                          'ngb' => {},
+                          'ngc' => {},
+                          'ngd' => {},
+                          'nge' => {},
+                          'ngf' => {},
+                          'ngg' => {},
+                          'ngh' => {},
+                          'ngi' => {},
+                          'ngj' => {},
+                          'ngk' => {},
+                          'ngl' => {},
+                          'ngm' => {},
+                          'ngn' => {},
+                          'ngo' => {},
+                          'ngp' => {},
+                          'ngq' => {},
+                          'ngr' => {},
+                          'ngs' => {},
+                          'ngt' => {},
+                          'ngu' => {},
+                          'ngv' => {},
+                          'ngw' => {},
+                          'ngx' => {},
+                          'ngy' => {},
+                          'ngz' => {},
+                          'nha' => {},
+                          'nhb' => {},
+                          'nhc' => {},
+                          'nhd' => {},
+                          'nhe' => {},
+                          'nhf' => {},
+                          'nhg' => {},
+                          'nhh' => {},
+                          'nhi' => {},
+                          'nhk' => {},
+                          'nhm' => {},
+                          'nhn' => {},
+                          'nho' => {},
+                          'nhp' => {},
+                          'nhq' => {},
+                          'nhr' => {},
+                          'nht' => {},
+                          'nhu' => {},
+                          'nhv' => {},
+                          'nhw' => {},
+                          'nhx' => {},
+                          'nhy' => {},
+                          'nhz' => {},
+                          'nia' => {},
+                          'nib' => {},
+                          'nic' => {},
+                          'nid' => {},
+                          'nie' => {},
+                          'nif' => {},
+                          'nig' => {},
+                          'nih' => {},
+                          'nii' => {},
+                          'nij' => {},
+                          'nik' => {},
+                          'nil' => {},
+                          'nim' => {},
+                          'nin' => {},
+                          'nio' => {},
+                          'niq' => {},
+                          'nir' => {},
+                          'nis' => {},
+                          'nit' => {},
                           'niu' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'niv' => {},
+                          'niw' => {},
+                          'nix' => {},
+                          'niy' => {},
+                          'niz' => {},
+                          'nja' => {},
+                          'njb' => {},
+                          'njd' => {},
+                          'njh' => {},
+                          'nji' => {},
+                          'njj' => {},
+                          'njl' => {},
+                          'njm' => {},
+                          'njn' => {},
+                          'njo' => {},
+                          'njr' => {},
+                          'njs' => {},
+                          'njt' => {},
+                          'nju' => {},
+                          'njx' => {},
+                          'njy' => {},
+                          'nka' => {},
+                          'nkb' => {},
+                          'nkc' => {},
+                          'nkd' => {},
+                          'nke' => {},
+                          'nkf' => {},
+                          'nkg' => {},
+                          'nkh' => {},
+                          'nki' => {},
+                          'nkj' => {},
+                          'nkk' => {},
+                          'nkm' => {},
+                          'nkn' => {},
+                          'nko' => {},
+                          'nkp' => {},
+                          'nkq' => {},
+                          'nkr' => {},
+                          'nks' => {},
+                          'nkt' => {},
+                          'nku' => {},
+                          'nkv' => {},
+                          'nkw' => {},
+                          'nkx' => {},
+                          'nkz' => {},
                           'nl' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'nla' => {},
+                          'nlc' => {},
+                          'nle' => {},
+                          'nlg' => {},
+                          'nli' => {},
+                          'nlj' => {},
+                          'nlk' => {},
+                          'nll' => {},
+                          'nln' => {},
+                          'nlo' => {},
+                          'nlr' => {},
+                          'nlu' => {},
+                          'nlv' => {},
+                          'nlx' => {},
+                          'nly' => {},
+                          'nlz' => {},
+                          'nma' => {},
+                          'nmb' => {},
+                          'nmc' => {},
+                          'nmd' => {},
+                          'nme' => {},
+                          'nmf' => {},
+                          'nmg' => {},
+                          'nmh' => {},
+                          'nmi' => {},
+                          'nmj' => {},
+                          'nmk' => {},
+                          'nml' => {},
+                          'nmm' => {},
+                          'nmn' => {},
+                          'nmo' => {},
+                          'nmp' => {},
+                          'nmq' => {},
+                          'nmr' => {},
+                          'nms' => {},
+                          'nmt' => {},
+                          'nmu' => {},
+                          'nmv' => {},
+                          'nmw' => {},
+                          'nmx' => {},
+                          'nmy' => {},
+                          'nmz' => {},
                           'nn' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'nna' => {},
+                          'nnb' => {},
+                          'nnc' => {},
+                          'nnd' => {},
+                          'nne' => {},
+                          'nnf' => {},
+                          'nng' => {},
+                          'nnh' => {},
+                          'nni' => {},
+                          'nnj' => {},
+                          'nnk' => {},
+                          'nnl' => {},
+                          'nnm' => {},
+                          'nnn' => {},
+                          'nnp' => {},
+                          'nnq' => {},
+                          'nnr' => {},
+                          'nns' => {},
+                          'nnt' => {},
+                          'nnu' => {},
+                          'nnv' => {},
+                          'nnw' => {},
+                          'nnx' => {},
+                          'nny' => {},
+                          'nnz' => {},
                           'no' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'nog' => {
-                                     '_canon' => '_lowercase'
+                          'noa' => {},
+                          'noc' => {},
+                          'nod' => {},
+                          'noe' => {},
+                          'nof' => {},
+                          'nog' => {},
+                          'noh' => {},
+                          'noi' => {},
+                          'noj' => {},
+                          'nok' => {},
+                          'nom' => {},
+                          'non' => {},
+                          'noo' => {
+                                     '_deprecated' => 1
                                    },
-                          'non' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'nop' => {},
+                          'noq' => {},
+                          'nos' => {},
+                          'not' => {},
+                          'nou' => {},
+                          'nov' => {},
+                          'now' => {},
+                          'noy' => {},
+                          'noz' => {},
+                          'npa' => {},
+                          'npb' => {},
+                          'nph' => {},
+                          'npl' => {},
+                          'npn' => {},
+                          'npo' => {},
+                          'nps' => {},
+                          'npu' => {},
+                          'npy' => {},
+                          'nqg' => {},
+                          'nqk' => {},
+                          'nqm' => {},
+                          'nqn' => {},
                           'nqo' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'nkoo'
                                    },
                           'nr' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'nra' => {},
+                          'nrb' => {},
+                          'nrc' => {},
+                          'nre' => {},
+                          'nrg' => {},
+                          'nri' => {},
+                          'nrl' => {},
+                          'nrm' => {},
+                          'nrn' => {},
+                          'nrp' => {},
+                          'nrr' => {},
+                          'nrt' => {},
+                          'nru' => {},
+                          'nrx' => {},
+                          'nrz' => {},
+                          'nsa' => {},
+                          'nsc' => {},
+                          'nsd' => {},
+                          'nse' => {},
+                          'nsg' => {},
+                          'nsh' => {},
+                          'nsi' => {},
+                          'nsk' => {},
+                          'nsl' => {},
+                          'nsm' => {},
+                          'nsn' => {},
                           'nso' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
-                          'nub' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'nv' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'nwc' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'nsp' => {},
+                          'nsq' => {},
+                          'nsr' => {},
+                          'nss' => {},
+                          'nst' => {},
+                          'nsu' => {},
+                          'nsv' => {},
+                          'nsw' => {},
+                          'nsx' => {},
+                          'nsy' => {},
+                          'nsz' => {},
+                          'nte' => {},
+                          'nti' => {},
+                          'ntj' => {},
+                          'ntk' => {},
+                          'ntm' => {},
+                          'nto' => {},
+                          'ntp' => {},
+                          'ntr' => {},
+                          'nts' => {},
+                          'ntu' => {},
+                          'ntw' => {},
+                          'nty' => {},
+                          'ntz' => {},
+                          'nua' => {},
+                          'nub' => {},
+                          'nuc' => {},
+                          'nud' => {},
+                          'nue' => {},
+                          'nuf' => {},
+                          'nug' => {},
+                          'nuh' => {},
+                          'nui' => {},
+                          'nuj' => {},
+                          'nuk' => {},
+                          'nul' => {},
+                          'num' => {},
+                          'nun' => {},
+                          'nuo' => {},
+                          'nup' => {},
+                          'nuq' => {},
+                          'nur' => {},
+                          'nus' => {},
+                          'nut' => {},
+                          'nuu' => {},
+                          'nuv' => {},
+                          'nuw' => {},
+                          'nux' => {},
+                          'nuy' => {},
+                          'nuz' => {},
+                          'nv' => {},
+                          'nvh' => {},
+                          'nvm' => {},
+                          'nwa' => {},
+                          'nwb' => {},
+                          'nwc' => {},
+                          'nwe' => {},
+                          'nwi' => {},
+                          'nwm' => {},
+                          'nwr' => {},
+                          'nwx' => {},
+                          'nwy' => {},
+                          'nxa' => {},
+                          'nxd' => {},
+                          'nxe' => {},
+                          'nxg' => {},
+                          'nxi' => {},
+                          'nxl' => {},
+                          'nxm' => {},
+                          'nxn' => {},
+                          'nxq' => {},
+                          'nxr' => {},
+                          'nxu' => {},
+                          'nxx' => {},
                           'ny' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'nym' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'nyn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'nyo' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'nzi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'oc' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'oj' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'nyb' => {},
+                          'nyc' => {},
+                          'nyd' => {},
+                          'nye' => {},
+                          'nyf' => {},
+                          'nyg' => {},
+                          'nyh' => {},
+                          'nyi' => {},
+                          'nyj' => {},
+                          'nyk' => {},
+                          'nyl' => {},
+                          'nym' => {},
+                          'nyn' => {},
+                          'nyo' => {},
+                          'nyp' => {},
+                          'nyq' => {},
+                          'nyr' => {},
+                          'nys' => {},
+                          'nyt' => {},
+                          'nyu' => {},
+                          'nyv' => {},
+                          'nyw' => {},
+                          'nyx' => {},
+                          'nyy' => {},
+                          'nza' => {},
+                          'nzb' => {},
+                          'nzi' => {},
+                          'nzk' => {},
+                          'nzm' => {},
+                          'nzs' => {},
+                          'nzu' => {},
+                          'nzy' => {},
+                          'nzz' => {},
+                          'oaa' => {},
+                          'oac' => {},
+                          'oar' => {},
+                          'oav' => {},
+                          'obi' => {},
+                          'obk' => {},
+                          'obl' => {},
+                          'obm' => {},
+                          'obo' => {},
+                          'obr' => {},
+                          'obt' => {},
+                          'obu' => {},
+                          'oc' => {},
+                          'oca' => {},
+                          'och' => {},
+                          'oco' => {},
+                          'ocu' => {},
+                          'oda' => {},
+                          'odk' => {},
+                          'odt' => {},
+                          'odu' => {},
+                          'ofo' => {},
+                          'ofs' => {},
+                          'ofu' => {},
+                          'ogb' => {},
+                          'ogc' => {},
+                          'oge' => {},
+                          'ogg' => {},
+                          'ogo' => {},
+                          'ogu' => {},
+                          'oht' => {},
+                          'ohu' => {},
+                          'oia' => {},
+                          'oin' => {},
+                          'oj' => {},
+                          'ojb' => {},
+                          'ojc' => {},
+                          'ojg' => {},
+                          'ojp' => {},
+                          'ojs' => {},
+                          'ojv' => {},
+                          'ojw' => {},
+                          'oka' => {},
+                          'okb' => {},
+                          'okd' => {},
+                          'oke' => {},
+                          'okh' => {},
+                          'oki' => {},
+                          'okj' => {},
+                          'okk' => {},
+                          'okl' => {},
+                          'okm' => {},
+                          'okn' => {},
+                          'oko' => {},
+                          'okr' => {},
+                          'oks' => {},
+                          'oku' => {},
+                          'okv' => {},
+                          'okx' => {},
+                          'ola' => {},
+                          'old' => {},
+                          'ole' => {},
+                          'olm' => {},
+                          'olo' => {},
+                          'olr' => {},
                           'om' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'oma' => {},
+                          'omb' => {},
+                          'omc' => {},
+                          'ome' => {},
+                          'omg' => {},
+                          'omi' => {},
+                          'omk' => {},
+                          'oml' => {},
+                          'omn' => {},
+                          'omo' => {},
+                          'omp' => {},
+                          'omq' => {},
+                          'omr' => {},
+                          'omt' => {},
+                          'omu' => {},
+                          'omv' => {},
+                          'omw' => {},
+                          'omx' => {},
+                          'ona' => {},
+                          'onb' => {},
+                          'one' => {},
+                          'ong' => {},
+                          'oni' => {},
+                          'onj' => {},
+                          'onk' => {},
+                          'onn' => {},
+                          'ono' => {},
+                          'onp' => {},
+                          'onr' => {},
+                          'ons' => {},
+                          'ont' => {},
+                          'onu' => {},
+                          'onw' => {},
+                          'onx' => {},
+                          'ood' => {},
+                          'oog' => {},
+                          'oon' => {},
+                          'oor' => {},
+                          'oos' => {},
+                          'opa' => {},
+                          'opk' => {},
+                          'opm' => {},
+                          'opo' => {},
+                          'opt' => {},
+                          'opy' => {},
                           'or' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'orya'
                                   },
-                          'os' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'osa' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ota' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'oto' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ora' => {},
+                          'orc' => {},
+                          'ore' => {},
+                          'org' => {},
+                          'orh' => {},
+                          'orn' => {},
+                          'oro' => {},
+                          'orr' => {},
+                          'ors' => {},
+                          'ort' => {},
+                          'oru' => {},
+                          'orv' => {},
+                          'orw' => {},
+                          'orx' => {},
+                          'orz' => {},
+                          'os' => {},
+                          'osa' => {},
+                          'osc' => {},
+                          'osi' => {},
+                          'oso' => {},
+                          'osp' => {},
+                          'ost' => {},
+                          'osu' => {},
+                          'osx' => {},
+                          'ota' => {},
+                          'otb' => {},
+                          'otd' => {},
+                          'ote' => {},
+                          'oti' => {},
+                          'otk' => {},
+                          'otl' => {},
+                          'otm' => {},
+                          'otn' => {},
+                          'oto' => {},
+                          'otq' => {},
+                          'otr' => {},
+                          'ots' => {},
+                          'ott' => {},
+                          'otu' => {},
+                          'otw' => {},
+                          'otx' => {},
+                          'oty' => {},
+                          'otz' => {},
+                          'oua' => {},
+                          'oub' => {},
+                          'oue' => {},
+                          'oui' => {},
+                          'oum' => {},
+                          'oun' => {},
+                          'owi' => {},
+                          'owl' => {},
+                          'oyb' => {},
+                          'oyd' => {},
+                          'oym' => {},
+                          'oyy' => {},
+                          'ozm' => {},
                           'pa' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'guru'
                                   },
-                          'paa' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pag' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pal' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pam' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pap' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pau' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'peo' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'phi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'phn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pi' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'paa' => {},
+                          'pab' => {},
+                          'pac' => {},
+                          'pad' => {},
+                          'pae' => {},
+                          'paf' => {},
+                          'pag' => {},
+                          'pah' => {},
+                          'pai' => {},
+                          'pak' => {},
+                          'pal' => {},
+                          'pam' => {},
+                          'pao' => {},
+                          'pap' => {},
+                          'paq' => {},
+                          'par' => {},
+                          'pas' => {},
+                          'pat' => {},
+                          'pau' => {},
+                          'pav' => {},
+                          'paw' => {},
+                          'pax' => {},
+                          'pay' => {},
+                          'paz' => {},
+                          'pbb' => {},
+                          'pbc' => {},
+                          'pbe' => {},
+                          'pbf' => {},
+                          'pbg' => {},
+                          'pbh' => {},
+                          'pbi' => {},
+                          'pbl' => {},
+                          'pbn' => {},
+                          'pbo' => {},
+                          'pbp' => {},
+                          'pbr' => {},
+                          'pbs' => {},
+                          'pbt' => {},
+                          'pbu' => {},
+                          'pbv' => {},
+                          'pby' => {},
+                          'pbz' => {},
+                          'pca' => {},
+                          'pcb' => {},
+                          'pcc' => {},
+                          'pcd' => {},
+                          'pce' => {},
+                          'pcf' => {},
+                          'pcg' => {},
+                          'pch' => {},
+                          'pci' => {},
+                          'pcj' => {},
+                          'pck' => {},
+                          'pcl' => {},
+                          'pcm' => {},
+                          'pcn' => {},
+                          'pcp' => {},
+                          'pcr' => {},
+                          'pcw' => {},
+                          'pda' => {},
+                          'pdc' => {},
+                          'pdi' => {},
+                          'pdn' => {},
+                          'pdo' => {},
+                          'pdt' => {},
+                          'pdu' => {},
+                          'pea' => {},
+                          'peb' => {},
+                          'ped' => {},
+                          'pee' => {},
+                          'pef' => {},
+                          'peg' => {},
+                          'peh' => {},
+                          'pei' => {},
+                          'pej' => {},
+                          'pek' => {},
+                          'pel' => {},
+                          'pem' => {},
+                          'peo' => {},
+                          'pep' => {},
+                          'peq' => {},
+                          'pes' => {},
+                          'pev' => {},
+                          'pex' => {},
+                          'pey' => {},
+                          'pez' => {},
+                          'pfa' => {},
+                          'pfe' => {},
+                          'pfl' => {},
+                          'pga' => {},
+                          'pgg' => {},
+                          'pgi' => {},
+                          'pgk' => {},
+                          'pgl' => {},
+                          'pgn' => {},
+                          'pgs' => {},
+                          'pgu' => {},
+                          'pgy' => {},
+                          'pha' => {},
+                          'phd' => {},
+                          'phg' => {},
+                          'phh' => {},
+                          'phi' => {},
+                          'phk' => {},
+                          'phl' => {},
+                          'phm' => {},
+                          'phn' => {},
+                          'pho' => {},
+                          'phq' => {},
+                          'phr' => {},
+                          'pht' => {},
+                          'phu' => {},
+                          'phv' => {},
+                          'phw' => {},
+                          'pi' => {},
+                          'pia' => {},
+                          'pib' => {},
+                          'pic' => {},
+                          'pid' => {},
+                          'pie' => {},
+                          'pif' => {},
+                          'pig' => {},
+                          'pih' => {},
+                          'pii' => {},
+                          'pij' => {},
+                          'pil' => {},
+                          'pim' => {},
+                          'pin' => {},
+                          'pio' => {},
+                          'pip' => {},
+                          'pir' => {},
+                          'pis' => {},
+                          'pit' => {},
+                          'piu' => {},
+                          'piv' => {},
+                          'piw' => {},
+                          'pix' => {},
+                          'piy' => {},
+                          'piz' => {},
+                          'pjt' => {},
+                          'pka' => {},
+                          'pkb' => {},
+                          'pkc' => {},
+                          'pkg' => {},
+                          'pkh' => {},
+                          'pkn' => {},
+                          'pko' => {},
+                          'pkp' => {},
+                          'pkr' => {},
+                          'pks' => {},
+                          'pkt' => {},
+                          'pku' => {},
                           'pl' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'pon' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pra' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'pro' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'pla' => {},
+                          'plb' => {},
+                          'plc' => {},
+                          'pld' => {},
+                          'ple' => {},
+                          'plf' => {},
+                          'plg' => {},
+                          'plh' => {},
+                          'plj' => {},
+                          'plk' => {},
+                          'pll' => {},
+                          'pln' => {},
+                          'plo' => {},
+                          'plp' => {},
+                          'plq' => {},
+                          'plr' => {},
+                          'pls' => {},
+                          'plt' => {},
+                          'plu' => {},
+                          'plv' => {},
+                          'plw' => {},
+                          'ply' => {},
+                          'plz' => {},
+                          'pma' => {},
+                          'pmb' => {},
+                          'pmc' => {},
+                          'pme' => {},
+                          'pmf' => {},
+                          'pmh' => {},
+                          'pmi' => {},
+                          'pmj' => {},
+                          'pmk' => {},
+                          'pml' => {},
+                          'pmm' => {},
+                          'pmn' => {},
+                          'pmo' => {},
+                          'pmq' => {},
+                          'pmr' => {},
+                          'pms' => {},
+                          'pmt' => {},
+                          'pmu' => {},
+                          'pmw' => {},
+                          'pmx' => {},
+                          'pmy' => {},
+                          'pmz' => {},
+                          'pna' => {},
+                          'pnb' => {},
+                          'pnc' => {},
+                          'pne' => {},
+                          'png' => {},
+                          'pnh' => {},
+                          'pni' => {},
+                          'pnm' => {},
+                          'pnn' => {},
+                          'pno' => {},
+                          'pnp' => {},
+                          'pnq' => {},
+                          'pnr' => {},
+                          'pns' => {},
+                          'pnt' => {},
+                          'pnu' => {},
+                          'pnv' => {},
+                          'pnw' => {},
+                          'pnx' => {},
+                          'pny' => {},
+                          'pnz' => {},
+                          'poc' => {},
+                          'pod' => {},
+                          'poe' => {},
+                          'pof' => {},
+                          'pog' => {},
+                          'poh' => {},
+                          'poi' => {},
+                          'pok' => {},
+                          'pom' => {},
+                          'pon' => {},
+                          'poo' => {},
+                          'pop' => {},
+                          'poq' => {},
+                          'pos' => {},
+                          'pot' => {},
+                          'pov' => {},
+                          'pow' => {},
+                          'pox' => {},
+                          'poy' => {},
+                          'poz' => {},
+                          'ppa' => {},
+                          'ppe' => {},
+                          'ppi' => {},
+                          'ppk' => {},
+                          'ppl' => {},
+                          'ppm' => {},
+                          'ppn' => {},
+                          'ppo' => {},
+                          'ppp' => {},
+                          'ppq' => {},
+                          'ppr' => {},
+                          'pps' => {},
+                          'ppt' => {},
+                          'ppu' => {},
+                          'pqa' => {},
+                          'pqe' => {},
+                          'pqm' => {},
+                          'pqw' => {},
+                          'pra' => {},
+                          'prb' => {},
+                          'prc' => {},
+                          'prd' => {},
+                          'pre' => {},
+                          'prf' => {},
+                          'prg' => {},
+                          'prh' => {},
+                          'pri' => {},
+                          'prk' => {},
+                          'prl' => {},
+                          'prm' => {},
+                          'prn' => {},
+                          'pro' => {},
+                          'prp' => {},
+                          'prq' => {},
+                          'prr' => {},
+                          'prs' => {},
+                          'prt' => {},
+                          'pru' => {},
+                          'prw' => {},
+                          'prx' => {},
+                          'pry' => {},
+                          'prz' => {},
                           'ps' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'arab'
                                   },
+                          'psa' => {},
+                          'psc' => {},
+                          'psd' => {},
+                          'pse' => {},
+                          'psg' => {},
+                          'psh' => {},
+                          'psi' => {},
+                          'psl' => {},
+                          'psm' => {},
+                          'psn' => {},
+                          'pso' => {},
+                          'psp' => {},
+                          'psq' => {},
+                          'psr' => {},
+                          'pss' => {},
+                          'pst' => {},
+                          'psu' => {},
+                          'psw' => {},
+                          'psy' => {},
                           'pt' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'qaa' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'pta' => {},
+                          'pth' => {},
+                          'pti' => {},
+                          'ptn' => {},
+                          'pto' => {},
+                          'ptp' => {},
+                          'ptr' => {},
+                          'ptt' => {},
+                          'ptu' => {},
+                          'ptv' => {},
+                          'ptw' => {},
+                          'pty' => {},
+                          'pua' => {},
+                          'pub' => {},
+                          'puc' => {},
+                          'pud' => {},
+                          'pue' => {},
+                          'puf' => {},
+                          'pug' => {},
+                          'pui' => {},
+                          'puj' => {},
+                          'puk' => {},
+                          'pum' => {},
+                          'puo' => {},
+                          'pup' => {},
+                          'puq' => {},
+                          'pur' => {},
+                          'put' => {},
+                          'puu' => {},
+                          'puw' => {},
+                          'pux' => {},
+                          'puy' => {},
+                          'puz' => {},
+                          'pwa' => {},
+                          'pwb' => {},
+                          'pwg' => {},
+                          'pwm' => {},
+                          'pwn' => {},
+                          'pwo' => {},
+                          'pwr' => {},
+                          'pww' => {},
+                          'pxm' => {},
+                          'pye' => {},
+                          'pym' => {},
+                          'pyn' => {},
+                          'pys' => {},
+                          'pyu' => {},
+                          'pyx' => {},
+                          'pyy' => {},
+                          'pzn' => {},
+                          'qaa' => {},
                           'qab' => {},
                           'qac' => {},
                           'qad' => {},
@@ -1810,448 +7732,2468 @@ $Whatpm::LangTag::Registry = {
                           'qty' => {},
                           'qtz' => {},
                           'qu' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'raj' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'rap' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'rar' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'qua' => {},
+                          'qub' => {},
+                          'quc' => {},
+                          'qud' => {},
+                          'quf' => {},
+                          'qug' => {},
+                          'quh' => {},
+                          'qui' => {},
+                          'quk' => {},
+                          'qul' => {},
+                          'qum' => {},
+                          'qun' => {},
+                          'qup' => {},
+                          'quq' => {},
+                          'qur' => {},
+                          'qus' => {},
+                          'quv' => {},
+                          'quw' => {},
+                          'qux' => {},
+                          'quy' => {},
+                          'quz' => {},
+                          'qva' => {},
+                          'qvc' => {},
+                          'qve' => {},
+                          'qvh' => {},
+                          'qvi' => {},
+                          'qvj' => {},
+                          'qvl' => {},
+                          'qvm' => {},
+                          'qvn' => {},
+                          'qvo' => {},
+                          'qvp' => {},
+                          'qvs' => {},
+                          'qvw' => {},
+                          'qvy' => {},
+                          'qvz' => {},
+                          'qwa' => {},
+                          'qwc' => {},
+                          'qwe' => {},
+                          'qwh' => {},
+                          'qwm' => {},
+                          'qws' => {},
+                          'qwt' => {},
+                          'qxa' => {},
+                          'qxc' => {},
+                          'qxh' => {},
+                          'qxl' => {},
+                          'qxn' => {},
+                          'qxo' => {},
+                          'qxp' => {},
+                          'qxq' => {},
+                          'qxr' => {},
+                          'qxs' => {},
+                          'qxt' => {},
+                          'qxu' => {},
+                          'qxw' => {},
+                          'qya' => {},
+                          'qyp' => {},
+                          'raa' => {},
+                          'rab' => {},
+                          'rac' => {},
+                          'rad' => {},
+                          'raf' => {},
+                          'rag' => {},
+                          'rah' => {},
+                          'rai' => {},
+                          'raj' => {},
+                          'rak' => {},
+                          'ral' => {},
+                          'ram' => {},
+                          'ran' => {},
+                          'rao' => {},
+                          'rap' => {},
+                          'raq' => {},
+                          'rar' => {},
+                          'ras' => {},
+                          'rat' => {},
+                          'rau' => {},
+                          'rav' => {},
+                          'raw' => {},
+                          'rax' => {},
+                          'ray' => {},
+                          'raz' => {},
+                          'rbb' => {},
+                          'rbk' => {},
+                          'rbl' => {},
+                          'rcf' => {},
+                          'rdb' => {},
+                          'rea' => {},
+                          'reb' => {},
+                          'ree' => {},
+                          'reg' => {},
+                          'rei' => {},
+                          'rej' => {},
+                          'rel' => {},
+                          'rem' => {},
+                          'ren' => {},
+                          'rer' => {},
+                          'res' => {},
+                          'ret' => {},
+                          'rey' => {},
+                          'rga' => {},
+                          'rge' => {},
+                          'rgk' => {},
+                          'rgn' => {},
+                          'rgr' => {},
+                          'rgs' => {},
+                          'rgu' => {},
+                          'rhg' => {},
+                          'rhp' => {},
+                          'ria' => {},
+                          'rie' => {},
+                          'rif' => {},
+                          'ril' => {},
+                          'rim' => {},
+                          'rin' => {},
+                          'rir' => {},
+                          'rit' => {},
+                          'riu' => {},
+                          'rjg' => {},
+                          'rji' => {},
+                          'rjs' => {},
+                          'rka' => {},
+                          'rkb' => {},
+                          'rkh' => {},
+                          'rki' => {},
+                          'rkm' => {},
+                          'rkt' => {},
                           'rm' => {
-                                    '_canon' => '_lowercase'
+                                    '_suppress' => 'latn'
                                   },
+                          'rma' => {},
+                          'rmb' => {},
+                          'rmc' => {},
+                          'rmd' => {},
+                          'rme' => {},
+                          'rmf' => {},
+                          'rmg' => {},
+                          'rmh' => {},
+                          'rmi' => {},
+                          'rmk' => {},
+                          'rml' => {},
+                          'rmm' => {},
+                          'rmn' => {},
+                          'rmo' => {},
+                          'rmp' => {},
+                          'rmq' => {},
+                          'rmr' => {
+                                     '_deprecated' => 1
+                                   },
+                          'rms' => {},
+                          'rmt' => {},
+                          'rmu' => {},
+                          'rmv' => {},
+                          'rmw' => {},
+                          'rmx' => {},
+                          'rmy' => {},
+                          'rmz' => {},
                           'rn' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'rna' => {},
+                          'rnd' => {},
+                          'rng' => {},
+                          'rnl' => {},
+                          'rnn' => {},
+                          'rnp' => {},
+                          'rnw' => {},
                           'ro' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'roa' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'rom' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'roa' => {},
+                          'rob' => {},
+                          'roc' => {},
+                          'rod' => {},
+                          'roe' => {},
+                          'rof' => {},
+                          'rog' => {},
+                          'rol' => {},
+                          'rom' => {},
+                          'roo' => {},
+                          'rop' => {},
+                          'ror' => {},
+                          'rou' => {},
+                          'row' => {},
+                          'rpn' => {},
+                          'rpt' => {},
+                          'rri' => {},
+                          'rro' => {},
+                          'rsb' => {},
+                          'rsi' => {},
+                          'rsl' => {},
+                          'rth' => {},
+                          'rtm' => {},
+                          'rtw' => {},
                           'ru' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'cyrl'
                                   },
-                          'rup' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'rub' => {},
+                          'ruc' => {},
+                          'rue' => {},
+                          'ruf' => {},
+                          'rug' => {},
+                          'ruh' => {},
+                          'rui' => {},
+                          'ruk' => {},
+                          'ruo' => {},
+                          'rup' => {},
+                          'ruq' => {},
+                          'rut' => {},
+                          'ruu' => {},
+                          'ruy' => {},
+                          'ruz' => {},
                           'rw' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'sa' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'sad' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sah' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sai' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sal' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sam' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sas' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sat' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sc' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'scn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sco' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sd' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'se' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'sel' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sem' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'rwa' => {},
+                          'rwk' => {},
+                          'rwm' => {},
+                          'rwo' => {},
+                          'rwr' => {},
+                          'ryn' => {},
+                          'rys' => {},
+                          'ryu' => {},
+                          'sa' => {},
+                          'saa' => {},
+                          'sab' => {},
+                          'sac' => {},
+                          'sad' => {},
+                          'sae' => {},
+                          'saf' => {},
+                          'sah' => {},
+                          'sai' => {},
+                          'saj' => {},
+                          'sak' => {},
+                          'sal' => {},
+                          'sam' => {},
+                          'sao' => {},
+                          'sap' => {},
+                          'saq' => {},
+                          'sar' => {},
+                          'sas' => {},
+                          'sat' => {},
+                          'sau' => {},
+                          'sav' => {},
+                          'saw' => {},
+                          'sax' => {},
+                          'say' => {},
+                          'saz' => {},
+                          'sba' => {},
+                          'sbb' => {},
+                          'sbc' => {},
+                          'sbd' => {},
+                          'sbe' => {},
+                          'sbf' => {},
+                          'sbg' => {},
+                          'sbh' => {},
+                          'sbi' => {},
+                          'sbj' => {},
+                          'sbk' => {},
+                          'sbl' => {},
+                          'sbm' => {},
+                          'sbn' => {},
+                          'sbo' => {},
+                          'sbp' => {},
+                          'sbq' => {},
+                          'sbr' => {},
+                          'sbs' => {},
+                          'sbt' => {},
+                          'sbu' => {},
+                          'sbv' => {},
+                          'sbw' => {},
+                          'sbx' => {},
+                          'sby' => {},
+                          'sbz' => {},
+                          'sc' => {},
+                          'sca' => {},
+                          'scb' => {},
+                          'sce' => {},
+                          'scf' => {},
+                          'scg' => {},
+                          'sch' => {},
+                          'sci' => {},
+                          'sck' => {},
+                          'scl' => {},
+                          'scn' => {},
+                          'sco' => {},
+                          'scp' => {},
+                          'scq' => {},
+                          'scs' => {},
+                          'scu' => {},
+                          'scv' => {},
+                          'scw' => {},
+                          'scx' => {},
+                          'sd' => {},
+                          'sda' => {},
+                          'sdb' => {},
+                          'sdc' => {},
+                          'sde' => {},
+                          'sdf' => {},
+                          'sdg' => {},
+                          'sdh' => {},
+                          'sdj' => {},
+                          'sdk' => {},
+                          'sdl' => {},
+                          'sdm' => {},
+                          'sdn' => {},
+                          'sdo' => {},
+                          'sdp' => {},
+                          'sdr' => {},
+                          'sds' => {},
+                          'sdt' => {},
+                          'sdu' => {},
+                          'sdv' => {},
+                          'sdx' => {},
+                          'sdz' => {},
+                          'se' => {},
+                          'sea' => {},
+                          'seb' => {},
+                          'sec' => {},
+                          'sed' => {},
+                          'see' => {},
+                          'sef' => {},
+                          'seg' => {},
+                          'seh' => {},
+                          'sei' => {},
+                          'sej' => {},
+                          'sek' => {},
+                          'sel' => {},
+                          'sem' => {},
+                          'sen' => {},
+                          'seo' => {},
+                          'sep' => {},
+                          'seq' => {},
+                          'ser' => {},
+                          'ses' => {},
+                          'set' => {},
+                          'seu' => {},
+                          'sev' => {},
+                          'sew' => {},
+                          'sey' => {},
+                          'sez' => {},
+                          'sfb' => {},
+                          'sfm' => {},
+                          'sfs' => {},
+                          'sfw' => {},
                           'sg' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'sga' => {
-                                     '_canon' => '_lowercase'
+                          'sga' => {},
+                          'sgb' => {},
+                          'sgc' => {},
+                          'sgd' => {},
+                          'sge' => {},
+                          'sgg' => {},
+                          'sgh' => {},
+                          'sgi' => {},
+                          'sgk' => {},
+                          'sgl' => {
+                                     '_deprecated' => 1
                                    },
-                          'sgn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sh' => {
-                                    '_canon' => '_lowercase',
-                                    '_deprecated' => 1
-                                  },
-                          'shn' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'sgm' => {},
+                          'sgn' => {},
+                          'sgo' => {},
+                          'sgp' => {},
+                          'sgr' => {},
+                          'sgs' => {},
+                          'sgt' => {},
+                          'sgu' => {},
+                          'sgw' => {},
+                          'sgx' => {},
+                          'sgy' => {},
+                          'sgz' => {},
+                          'sh' => {},
+                          'sha' => {},
+                          'shb' => {},
+                          'shc' => {},
+                          'shd' => {},
+                          'she' => {},
+                          'shg' => {},
+                          'shh' => {},
+                          'shi' => {},
+                          'shj' => {},
+                          'shk' => {},
+                          'shl' => {},
+                          'shm' => {},
+                          'shn' => {},
+                          'sho' => {},
+                          'shp' => {},
+                          'shq' => {},
+                          'shr' => {},
+                          'shs' => {},
+                          'sht' => {},
+                          'shu' => {},
+                          'shv' => {},
+                          'shw' => {},
+                          'shx' => {},
+                          'shy' => {},
+                          'shz' => {},
                           'si' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'sinh'
                                   },
-                          'sid' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sio' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sit' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'sia' => {},
+                          'sib' => {},
+                          'sid' => {},
+                          'sie' => {},
+                          'sif' => {},
+                          'sig' => {},
+                          'sih' => {},
+                          'sii' => {},
+                          'sij' => {},
+                          'sik' => {},
+                          'sil' => {},
+                          'sim' => {},
+                          'sio' => {},
+                          'sip' => {},
+                          'siq' => {},
+                          'sir' => {},
+                          'sis' => {},
+                          'sit' => {},
+                          'siu' => {},
+                          'siv' => {},
+                          'siw' => {},
+                          'six' => {},
+                          'siy' => {},
+                          'siz' => {},
+                          'sja' => {},
+                          'sjb' => {},
+                          'sjd' => {},
+                          'sje' => {},
+                          'sjg' => {},
+                          'sjk' => {},
+                          'sjl' => {},
+                          'sjm' => {},
+                          'sjn' => {},
+                          'sjo' => {},
+                          'sjp' => {},
+                          'sjr' => {},
+                          'sjs' => {},
+                          'sjt' => {},
+                          'sju' => {},
+                          'sjw' => {},
                           'sk' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'ska' => {},
+                          'skb' => {},
+                          'skc' => {},
+                          'skd' => {},
+                          'ske' => {},
+                          'skf' => {},
+                          'skg' => {},
+                          'skh' => {},
+                          'ski' => {},
+                          'skj' => {},
+                          'skk' => {},
+                          'skm' => {},
+                          'skn' => {},
+                          'sko' => {},
+                          'skp' => {},
+                          'skq' => {},
+                          'skr' => {},
+                          'sks' => {},
+                          'skt' => {},
+                          'sku' => {},
+                          'skv' => {},
+                          'skw' => {},
+                          'skx' => {},
+                          'sky' => {},
+                          'skz' => {},
                           'sl' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'sla' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'sla' => {},
+                          'slc' => {},
+                          'sld' => {},
+                          'sle' => {},
+                          'slf' => {},
+                          'slg' => {},
+                          'slh' => {},
+                          'sli' => {},
+                          'slj' => {},
+                          'sll' => {},
+                          'slm' => {},
+                          'sln' => {},
+                          'slp' => {},
+                          'slq' => {},
+                          'slr' => {},
+                          'sls' => {},
+                          'slt' => {},
+                          'slu' => {},
+                          'slw' => {},
+                          'slx' => {},
+                          'sly' => {},
+                          'slz' => {},
                           'sm' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'sma' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'smi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'smj' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'smn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sms' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'sn' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'snk' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'sma' => {},
+                          'smb' => {},
+                          'smc' => {},
+                          'smd' => {},
+                          'smf' => {},
+                          'smg' => {},
+                          'smh' => {},
+                          'smi' => {},
+                          'smj' => {},
+                          'smk' => {},
+                          'sml' => {},
+                          'smm' => {},
+                          'smn' => {},
+                          'smp' => {},
+                          'smq' => {},
+                          'smr' => {},
+                          'sms' => {},
+                          'smt' => {},
+                          'smu' => {},
+                          'smv' => {},
+                          'smw' => {},
+                          'smx' => {},
+                          'smy' => {},
+                          'smz' => {},
+                          'sn' => {},
+                          'snb' => {},
+                          'snc' => {},
+                          'sne' => {},
+                          'snf' => {},
+                          'sng' => {},
+                          'snh' => {},
+                          'sni' => {},
+                          'snj' => {},
+                          'snk' => {},
+                          'snl' => {},
+                          'snm' => {},
+                          'snn' => {},
+                          'sno' => {},
+                          'snp' => {},
+                          'snq' => {},
+                          'snr' => {},
+                          'sns' => {},
+                          'snu' => {},
+                          'snv' => {},
+                          'snw' => {},
+                          'snx' => {},
+                          'sny' => {},
+                          'snz' => {},
                           'so' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'sog' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'son' => {
-                                     '_canon' => '_lowercase',
-                                     '_suppress' => 'latn'
-                                   },
+                          'soa' => {},
+                          'sob' => {},
+                          'soc' => {},
+                          'sod' => {},
+                          'soe' => {},
+                          'sog' => {},
+                          'soh' => {},
+                          'soi' => {},
+                          'soj' => {},
+                          'sok' => {},
+                          'sol' => {},
+                          'son' => {},
+                          'soo' => {},
+                          'sop' => {},
+                          'soq' => {},
+                          'sor' => {},
+                          'sos' => {},
+                          'sou' => {},
+                          'sov' => {},
+                          'sow' => {},
+                          'sox' => {},
+                          'soy' => {},
+                          'soz' => {},
+                          'spb' => {},
+                          'spc' => {},
+                          'spd' => {},
+                          'spe' => {},
+                          'spg' => {},
+                          'spi' => {},
+                          'spk' => {},
+                          'spl' => {},
+                          'spm' => {},
+                          'spo' => {},
+                          'spp' => {},
+                          'spq' => {},
+                          'spr' => {},
+                          'sps' => {},
+                          'spt' => {},
+                          'spu' => {},
+                          'spx' => {},
+                          'spy' => {},
                           'sq' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'sr' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'srn' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'srr' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'sqa' => {},
+                          'sqh' => {},
+                          'sqj' => {},
+                          'sqm' => {},
+                          'sqn' => {},
+                          'sqo' => {},
+                          'sqq' => {},
+                          'sqr' => {},
+                          'sqs' => {},
+                          'sqt' => {},
+                          'squ' => {},
+                          'sr' => {},
+                          'sra' => {},
+                          'srb' => {},
+                          'src' => {},
+                          'sre' => {},
+                          'srf' => {},
+                          'srg' => {},
+                          'srh' => {},
+                          'sri' => {},
+                          'srk' => {},
+                          'srl' => {},
+                          'srm' => {},
+                          'srn' => {},
+                          'sro' => {},
+                          'srq' => {},
+                          'srr' => {},
+                          'srs' => {},
+                          'srt' => {},
+                          'sru' => {},
+                          'srv' => {},
+                          'srw' => {},
+                          'srx' => {},
+                          'sry' => {},
+                          'srz' => {},
                           'ss' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'ssa' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ssa' => {},
+                          'ssb' => {},
+                          'ssc' => {},
+                          'ssd' => {},
+                          'sse' => {},
+                          'ssf' => {},
+                          'ssg' => {},
+                          'ssh' => {},
+                          'ssi' => {},
+                          'ssj' => {},
+                          'ssk' => {},
+                          'ssl' => {},
+                          'ssm' => {},
+                          'ssn' => {},
+                          'sso' => {},
+                          'ssp' => {},
+                          'ssq' => {},
+                          'ssr' => {},
+                          'sss' => {},
+                          'sst' => {},
+                          'ssu' => {},
+                          'ssv' => {},
+                          'ssx' => {},
+                          'ssy' => {},
+                          'ssz' => {},
                           'st' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'su' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'suk' => {
-                                     '_canon' => '_lowercase'
+                          'sta' => {},
+                          'stb' => {},
+                          'std' => {},
+                          'ste' => {},
+                          'stf' => {},
+                          'stg' => {},
+                          'sth' => {},
+                          'sti' => {},
+                          'stj' => {},
+                          'stk' => {},
+                          'stl' => {},
+                          'stm' => {},
+                          'stn' => {},
+                          'sto' => {},
+                          'stp' => {},
+                          'stq' => {},
+                          'str' => {},
+                          'sts' => {},
+                          'stt' => {},
+                          'stu' => {},
+                          'stv' => {},
+                          'stw' => {},
+                          'su' => {},
+                          'sua' => {},
+                          'sub' => {},
+                          'suc' => {},
+                          'sue' => {},
+                          'sug' => {},
+                          'sui' => {},
+                          'suj' => {},
+                          'suk' => {},
+                          'sul' => {
+                                     '_deprecated' => 1
                                    },
-                          'sus' => {
-                                     '_canon' => '_lowercase'
+                          'sum' => {
+                                     '_deprecated' => 1
                                    },
-                          'sux' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'suq' => {},
+                          'sur' => {},
+                          'sus' => {},
+                          'sut' => {},
+                          'suv' => {},
+                          'suw' => {},
+                          'sux' => {},
+                          'suy' => {},
+                          'suz' => {},
                           'sv' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'sva' => {},
+                          'svb' => {},
+                          'svc' => {},
+                          'sve' => {},
+                          'svk' => {},
+                          'svr' => {},
+                          'svs' => {},
+                          'svx' => {},
                           'sw' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'syc' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'syr' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'swb' => {},
+                          'swc' => {},
+                          'swf' => {},
+                          'swg' => {},
+                          'swh' => {},
+                          'swi' => {},
+                          'swj' => {},
+                          'swk' => {},
+                          'swl' => {},
+                          'swm' => {},
+                          'swn' => {},
+                          'swo' => {},
+                          'swp' => {},
+                          'swq' => {},
+                          'swr' => {},
+                          'sws' => {},
+                          'swt' => {},
+                          'swu' => {},
+                          'swv' => {},
+                          'sww' => {},
+                          'swx' => {},
+                          'swy' => {},
+                          'sxb' => {},
+                          'sxc' => {},
+                          'sxe' => {},
+                          'sxg' => {},
+                          'sxk' => {},
+                          'sxl' => {},
+                          'sxm' => {},
+                          'sxn' => {},
+                          'sxo' => {},
+                          'sxr' => {},
+                          'sxs' => {},
+                          'sxu' => {},
+                          'sxw' => {},
+                          'sya' => {},
+                          'syb' => {},
+                          'syc' => {},
+                          'syd' => {},
+                          'syi' => {},
+                          'syk' => {},
+                          'syl' => {},
+                          'sym' => {},
+                          'syn' => {},
+                          'syo' => {},
+                          'syr' => {},
+                          'sys' => {},
+                          'syw' => {},
+                          'syy' => {},
+                          'sza' => {},
+                          'szb' => {},
+                          'szc' => {},
+                          'szd' => {},
+                          'sze' => {},
+                          'szg' => {},
+                          'szl' => {},
+                          'szn' => {},
+                          'szp' => {},
+                          'szv' => {},
+                          'szw' => {},
                           'ta' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'taml'
                                   },
-                          'tai' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'taa' => {},
+                          'tab' => {},
+                          'tac' => {},
+                          'tad' => {},
+                          'tae' => {},
+                          'taf' => {},
+                          'tag' => {},
+                          'tai' => {},
+                          'taj' => {},
+                          'tak' => {},
+                          'tal' => {},
+                          'tan' => {},
+                          'tao' => {},
+                          'tap' => {},
+                          'taq' => {},
+                          'tar' => {},
+                          'tas' => {},
+                          'tau' => {},
+                          'tav' => {},
+                          'taw' => {},
+                          'tax' => {},
+                          'tay' => {},
+                          'taz' => {},
+                          'tba' => {},
+                          'tbb' => {},
+                          'tbc' => {},
+                          'tbd' => {},
+                          'tbe' => {},
+                          'tbf' => {},
+                          'tbg' => {},
+                          'tbh' => {},
+                          'tbi' => {},
+                          'tbj' => {},
+                          'tbk' => {},
+                          'tbl' => {},
+                          'tbm' => {},
+                          'tbn' => {},
+                          'tbo' => {},
+                          'tbp' => {},
+                          'tbq' => {},
+                          'tbr' => {},
+                          'tbs' => {},
+                          'tbt' => {},
+                          'tbu' => {},
+                          'tbv' => {},
+                          'tbw' => {},
+                          'tbx' => {},
+                          'tby' => {},
+                          'tbz' => {},
+                          'tca' => {},
+                          'tcb' => {},
+                          'tcc' => {},
+                          'tcd' => {},
+                          'tce' => {},
+                          'tcf' => {},
+                          'tcg' => {},
+                          'tch' => {},
+                          'tci' => {},
+                          'tck' => {},
+                          'tcl' => {},
+                          'tcm' => {},
+                          'tcn' => {},
+                          'tco' => {},
+                          'tcp' => {},
+                          'tcq' => {},
+                          'tcs' => {},
+                          'tct' => {},
+                          'tcu' => {},
+                          'tcw' => {},
+                          'tcx' => {},
+                          'tcy' => {},
+                          'tcz' => {},
+                          'tda' => {},
+                          'tdb' => {},
+                          'tdc' => {},
+                          'tdd' => {},
+                          'tde' => {},
+                          'tdf' => {},
+                          'tdg' => {},
+                          'tdh' => {},
+                          'tdi' => {},
+                          'tdj' => {},
+                          'tdk' => {},
+                          'tdl' => {},
+                          'tdn' => {},
+                          'tdo' => {},
+                          'tdq' => {},
+                          'tdr' => {},
+                          'tds' => {},
+                          'tdt' => {},
+                          'tdu' => {},
+                          'tdv' => {},
+                          'tdx' => {},
+                          'tdy' => {},
                           'te' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'telu'
                                   },
+                          'tea' => {},
+                          'teb' => {},
+                          'tec' => {},
+                          'ted' => {},
+                          'tee' => {},
+                          'tef' => {},
+                          'teg' => {},
+                          'teh' => {},
+                          'tei' => {},
+                          'tek' => {},
                           'tem' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
-                          'ter' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'tet' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'tg' => {
-                                    '_canon' => '_lowercase'
-                                  },
+                          'ten' => {},
+                          'teo' => {},
+                          'tep' => {},
+                          'teq' => {},
+                          'ter' => {},
+                          'tes' => {},
+                          'tet' => {},
+                          'teu' => {},
+                          'tev' => {},
+                          'tew' => {},
+                          'tex' => {},
+                          'tey' => {},
+                          'tfi' => {},
+                          'tfn' => {},
+                          'tfo' => {},
+                          'tfr' => {},
+                          'tft' => {},
+                          'tg' => {},
+                          'tga' => {},
+                          'tgb' => {},
+                          'tgc' => {},
+                          'tgd' => {},
+                          'tge' => {},
+                          'tgf' => {},
+                          'tgg' => {},
+                          'tgh' => {},
+                          'tgi' => {},
+                          'tgn' => {},
+                          'tgo' => {},
+                          'tgp' => {},
+                          'tgq' => {},
+                          'tgr' => {},
+                          'tgs' => {},
+                          'tgt' => {},
+                          'tgu' => {},
+                          'tgv' => {},
+                          'tgw' => {},
+                          'tgx' => {},
+                          'tgy' => {},
                           'th' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'thai'
                                   },
+                          'thc' => {},
+                          'thd' => {},
+                          'the' => {},
+                          'thf' => {},
+                          'thh' => {},
+                          'thi' => {},
+                          'thk' => {},
+                          'thl' => {},
+                          'thm' => {},
+                          'thn' => {},
+                          'thp' => {},
+                          'thq' => {},
+                          'thr' => {},
+                          'ths' => {},
+                          'tht' => {},
+                          'thu' => {},
+                          'thv' => {},
+                          'thw' => {},
+                          'thx' => {},
+                          'thy' => {},
+                          'thz' => {},
                           'ti' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'ethi'
                                   },
-                          'tig' => {
-                                     '_canon' => '_lowercase'
+                          'tia' => {},
+                          'tic' => {},
+                          'tid' => {},
+                          'tie' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'ras'
                                    },
-                          'tiv' => {
-                                     '_canon' => '_lowercase'
+                          'tif' => {},
+                          'tig' => {},
+                          'tih' => {},
+                          'tii' => {},
+                          'tij' => {},
+                          'tik' => {},
+                          'til' => {},
+                          'tim' => {},
+                          'tin' => {},
+                          'tio' => {},
+                          'tip' => {},
+                          'tiq' => {},
+                          'tis' => {},
+                          'tit' => {},
+                          'tiu' => {},
+                          'tiv' => {},
+                          'tiw' => {},
+                          'tix' => {},
+                          'tiy' => {},
+                          'tiz' => {},
+                          'tja' => {},
+                          'tjg' => {},
+                          'tji' => {},
+                          'tjm' => {},
+                          'tjn' => {},
+                          'tjo' => {},
+                          'tjs' => {},
+                          'tju' => {},
+                          'tk' => {},
+                          'tka' => {},
+                          'tkb' => {},
+                          'tkd' => {},
+                          'tke' => {},
+                          'tkf' => {},
+                          'tkg' => {},
+                          'tkk' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'twm'
                                    },
-                          'tk' => {
-                                    '_canon' => '_lowercase'
-                                  },
                           'tkl' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'tkm' => {},
+                          'tkn' => {},
+                          'tkp' => {},
+                          'tkq' => {},
+                          'tkr' => {},
+                          'tks' => {},
+                          'tkt' => {},
+                          'tku' => {},
+                          'tkw' => {},
+                          'tkx' => {},
+                          'tkz' => {},
                           'tl' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'tlh' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'tli' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'tla' => {},
+                          'tlb' => {},
+                          'tlc' => {},
+                          'tld' => {},
+                          'tlf' => {},
+                          'tlg' => {},
+                          'tlh' => {},
+                          'tli' => {},
+                          'tlj' => {},
+                          'tlk' => {},
+                          'tll' => {},
+                          'tlm' => {},
+                          'tln' => {},
+                          'tlo' => {},
+                          'tlp' => {},
+                          'tlq' => {},
+                          'tlr' => {},
+                          'tls' => {},
+                          'tlt' => {},
+                          'tlu' => {},
+                          'tlv' => {},
+                          'tlw' => {},
+                          'tlx' => {},
+                          'tly' => {},
+                          'tma' => {},
+                          'tmb' => {},
+                          'tmc' => {},
+                          'tmd' => {},
+                          'tme' => {},
+                          'tmf' => {},
+                          'tmg' => {},
                           'tmh' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'tmi' => {},
+                          'tmj' => {},
+                          'tmk' => {},
+                          'tml' => {},
+                          'tmm' => {},
+                          'tmn' => {},
+                          'tmo' => {},
+                          'tmp' => {},
+                          'tmq' => {},
+                          'tmr' => {},
+                          'tms' => {},
+                          'tmt' => {},
+                          'tmu' => {},
+                          'tmv' => {},
+                          'tmw' => {},
+                          'tmy' => {},
+                          'tmz' => {},
                           'tn' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'tna' => {},
+                          'tnb' => {},
+                          'tnc' => {},
+                          'tnd' => {},
+                          'tne' => {},
+                          'tnf' => {
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'prs'
+                                   },
+                          'tng' => {},
+                          'tnh' => {},
+                          'tni' => {},
+                          'tnk' => {},
+                          'tnl' => {},
+                          'tnm' => {},
+                          'tnn' => {},
+                          'tno' => {},
+                          'tnp' => {},
+                          'tnq' => {},
+                          'tnr' => {},
+                          'tns' => {},
+                          'tnt' => {},
+                          'tnu' => {},
+                          'tnv' => {},
+                          'tnw' => {},
+                          'tnx' => {},
+                          'tny' => {},
+                          'tnz' => {},
                           'to' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'tog' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'tob' => {},
+                          'toc' => {},
+                          'tod' => {},
+                          'toe' => {},
+                          'tof' => {},
+                          'tog' => {},
+                          'toh' => {},
+                          'toi' => {},
+                          'toj' => {},
+                          'tol' => {},
+                          'tom' => {},
+                          'too' => {},
+                          'top' => {},
+                          'toq' => {},
+                          'tor' => {},
+                          'tos' => {},
+                          'tou' => {},
+                          'tov' => {},
+                          'tow' => {},
+                          'tox' => {},
+                          'toy' => {},
+                          'toz' => {},
+                          'tpa' => {},
+                          'tpc' => {},
+                          'tpe' => {},
+                          'tpf' => {},
+                          'tpg' => {},
                           'tpi' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
+                          'tpj' => {},
+                          'tpk' => {},
+                          'tpl' => {},
+                          'tpm' => {},
+                          'tpn' => {},
+                          'tpo' => {},
+                          'tpp' => {},
+                          'tpq' => {},
+                          'tpr' => {},
+                          'tpt' => {},
+                          'tpu' => {},
+                          'tpv' => {},
+                          'tpw' => {},
+                          'tpx' => {},
+                          'tpy' => {},
+                          'tpz' => {},
+                          'tqb' => {},
+                          'tql' => {},
+                          'tqm' => {},
+                          'tqn' => {},
+                          'tqo' => {},
+                          'tqp' => {},
+                          'tqq' => {},
+                          'tqr' => {},
+                          'tqt' => {},
+                          'tqu' => {},
+                          'tqw' => {},
                           'tr' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'tra' => {},
+                          'trb' => {},
+                          'trc' => {},
+                          'trd' => {},
+                          'tre' => {},
+                          'trf' => {},
+                          'trg' => {},
+                          'trh' => {},
+                          'tri' => {},
+                          'trj' => {},
+                          'trk' => {},
+                          'trl' => {},
+                          'trm' => {},
+                          'trn' => {},
+                          'tro' => {},
+                          'trp' => {},
+                          'trq' => {},
+                          'trr' => {},
+                          'trs' => {},
+                          'trt' => {},
+                          'tru' => {},
+                          'trv' => {},
+                          'trw' => {},
+                          'trx' => {},
+                          'try' => {},
+                          'trz' => {},
                           'ts' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'tsi' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'tt' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'tum' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'tup' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'tut' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'tsa' => {},
+                          'tsb' => {},
+                          'tsc' => {},
+                          'tsd' => {},
+                          'tse' => {},
+                          'tsf' => {},
+                          'tsg' => {},
+                          'tsh' => {},
+                          'tsi' => {},
+                          'tsj' => {},
+                          'tsk' => {},
+                          'tsl' => {},
+                          'tsm' => {},
+                          'tsp' => {},
+                          'tsq' => {},
+                          'tsr' => {},
+                          'tss' => {},
+                          'tst' => {},
+                          'tsu' => {},
+                          'tsv' => {},
+                          'tsw' => {},
+                          'tsx' => {},
+                          'tsy' => {},
+                          'tsz' => {},
+                          'tt' => {},
+                          'tta' => {},
+                          'ttb' => {},
+                          'ttc' => {},
+                          'ttd' => {},
+                          'tte' => {},
+                          'ttf' => {},
+                          'ttg' => {},
+                          'tth' => {},
+                          'tti' => {},
+                          'ttj' => {},
+                          'ttk' => {},
+                          'ttl' => {},
+                          'ttm' => {},
+                          'ttn' => {},
+                          'tto' => {},
+                          'ttp' => {},
+                          'ttq' => {},
+                          'ttr' => {},
+                          'tts' => {},
+                          'ttt' => {},
+                          'ttu' => {},
+                          'ttv' => {},
+                          'ttw' => {},
+                          'tty' => {},
+                          'ttz' => {},
+                          'tua' => {},
+                          'tub' => {},
+                          'tuc' => {},
+                          'tud' => {},
+                          'tue' => {},
+                          'tuf' => {},
+                          'tug' => {},
+                          'tuh' => {},
+                          'tui' => {},
+                          'tuj' => {},
+                          'tul' => {},
+                          'tum' => {},
+                          'tun' => {},
+                          'tuo' => {},
+                          'tup' => {},
+                          'tuq' => {},
+                          'tus' => {},
+                          'tut' => {},
+                          'tuu' => {},
+                          'tuv' => {},
+                          'tuw' => {},
+                          'tux' => {},
+                          'tuy' => {},
+                          'tuz' => {},
+                          'tva' => {},
+                          'tvd' => {},
+                          'tve' => {},
+                          'tvk' => {},
                           'tvl' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'latn'
                                    },
-                          'tw' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ty' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'tyv' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'udm' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'ug' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'uga' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'tvm' => {},
+                          'tvn' => {},
+                          'tvo' => {},
+                          'tvs' => {},
+                          'tvt' => {},
+                          'tvw' => {},
+                          'tvy' => {},
+                          'tw' => {},
+                          'twa' => {},
+                          'twb' => {},
+                          'twc' => {},
+                          'twd' => {},
+                          'twe' => {},
+                          'twf' => {},
+                          'twg' => {},
+                          'twh' => {},
+                          'twl' => {},
+                          'twm' => {},
+                          'twn' => {},
+                          'two' => {},
+                          'twp' => {},
+                          'twq' => {},
+                          'twr' => {},
+                          'twt' => {},
+                          'twu' => {},
+                          'tww' => {},
+                          'twx' => {},
+                          'twy' => {},
+                          'txa' => {},
+                          'txb' => {},
+                          'txc' => {},
+                          'txe' => {},
+                          'txg' => {},
+                          'txh' => {},
+                          'txi' => {},
+                          'txm' => {},
+                          'txn' => {},
+                          'txo' => {},
+                          'txq' => {},
+                          'txr' => {},
+                          'txs' => {},
+                          'txt' => {},
+                          'txu' => {},
+                          'txx' => {},
+                          'txy' => {},
+                          'ty' => {},
+                          'tya' => {},
+                          'tye' => {},
+                          'tyh' => {},
+                          'tyi' => {},
+                          'tyj' => {},
+                          'tyl' => {},
+                          'tyn' => {},
+                          'typ' => {},
+                          'tyr' => {},
+                          'tys' => {},
+                          'tyt' => {},
+                          'tyu' => {},
+                          'tyv' => {},
+                          'tyx' => {},
+                          'tyz' => {},
+                          'tza' => {},
+                          'tzh' => {},
+                          'tzj' => {},
+                          'tzm' => {},
+                          'tzn' => {},
+                          'tzo' => {},
+                          'tzx' => {},
+                          'uam' => {},
+                          'uan' => {},
+                          'uar' => {},
+                          'uba' => {},
+                          'ubi' => {},
+                          'ubl' => {},
+                          'ubr' => {},
+                          'ubu' => {},
+                          'uby' => {},
+                          'uda' => {},
+                          'ude' => {},
+                          'udg' => {},
+                          'udi' => {},
+                          'udj' => {},
+                          'udl' => {},
+                          'udm' => {},
+                          'udu' => {},
+                          'ues' => {},
+                          'ufi' => {},
+                          'ug' => {},
+                          'uga' => {},
+                          'ugb' => {},
+                          'uge' => {},
+                          'ugn' => {},
+                          'ugo' => {},
+                          'ugy' => {},
+                          'uha' => {},
+                          'uhn' => {},
+                          'uis' => {},
+                          'uiv' => {},
+                          'uji' => {},
                           'uk' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'cyrl'
                                   },
-                          'umb' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'und' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'uka' => {},
+                          'ukg' => {},
+                          'ukh' => {},
+                          'ukl' => {},
+                          'ukp' => {},
+                          'ukq' => {},
+                          'uks' => {},
+                          'uku' => {},
+                          'ukw' => {},
+                          'ula' => {},
+                          'ulb' => {},
+                          'ulc' => {},
+                          'ulf' => {},
+                          'uli' => {},
+                          'ulk' => {},
+                          'ull' => {},
+                          'ulm' => {},
+                          'uln' => {},
+                          'ulu' => {},
+                          'ulw' => {},
+                          'uma' => {},
+                          'umb' => {},
+                          'umc' => {},
+                          'umd' => {},
+                          'umg' => {},
+                          'umi' => {},
+                          'umm' => {},
+                          'umn' => {},
+                          'umo' => {},
+                          'ump' => {},
+                          'umr' => {},
+                          'ums' => {},
+                          'umu' => {},
+                          'una' => {},
+                          'und' => {},
+                          'une' => {},
+                          'ung' => {},
+                          'unk' => {},
+                          'unm' => {},
+                          'unp' => {},
+                          'unr' => {},
+                          'unx' => {},
+                          'unz' => {},
+                          'uok' => {},
+                          'upi' => {},
+                          'upv' => {},
                           'ur' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'arab'
                                   },
-                          'uz' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'vai' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'ura' => {},
+                          'urb' => {},
+                          'urc' => {},
+                          'ure' => {},
+                          'urf' => {},
+                          'urg' => {},
+                          'urh' => {},
+                          'uri' => {},
+                          'urj' => {},
+                          'urk' => {},
+                          'url' => {},
+                          'urm' => {},
+                          'urn' => {},
+                          'uro' => {},
+                          'urp' => {},
+                          'urr' => {},
+                          'urt' => {},
+                          'uru' => {},
+                          'urv' => {},
+                          'urw' => {},
+                          'urx' => {},
+                          'ury' => {},
+                          'urz' => {},
+                          'usa' => {},
+                          'ush' => {},
+                          'usi' => {},
+                          'usk' => {},
+                          'usp' => {},
+                          'usu' => {},
+                          'uta' => {},
+                          'ute' => {},
+                          'utp' => {},
+                          'utr' => {},
+                          'utu' => {},
+                          'uum' => {},
+                          'uun' => {},
+                          'uur' => {},
+                          'uuu' => {},
+                          'uve' => {},
+                          'uvh' => {},
+                          'uvl' => {},
+                          'uwa' => {},
+                          'uya' => {},
+                          'uz' => {},
+                          'uzn' => {},
+                          'uzs' => {},
+                          'vaa' => {},
+                          'vae' => {},
+                          'vaf' => {},
+                          'vag' => {},
+                          'vah' => {},
+                          'vai' => {},
+                          'vaj' => {},
+                          'val' => {},
+                          'vam' => {},
+                          'van' => {},
+                          'vao' => {},
+                          'vap' => {},
+                          'var' => {},
+                          'vas' => {},
+                          'vau' => {},
+                          'vav' => {},
+                          'vay' => {},
+                          'vbb' => {},
+                          'vbk' => {},
                           've' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
+                          'vec' => {},
+                          'ved' => {},
+                          'vel' => {},
+                          'vem' => {},
+                          'veo' => {},
+                          'vep' => {},
+                          'ver' => {},
+                          'vgr' => {},
+                          'vgt' => {},
                           'vi' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'vo' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'vot' => {
-                                     '_canon' => '_lowercase'
+                          'vic' => {},
+                          'vid' => {},
+                          'vif' => {},
+                          'vig' => {},
+                          'vil' => {},
+                          'vin' => {},
+                          'vis' => {},
+                          'vit' => {},
+                          'viv' => {},
+                          'vka' => {},
+                          'vki' => {},
+                          'vkj' => {},
+                          'vkk' => {},
+                          'vkl' => {},
+                          'vkm' => {},
+                          'vko' => {},
+                          'vkp' => {},
+                          'vkt' => {},
+                          'vku' => {},
+                          'vlp' => {},
+                          'vls' => {},
+                          'vma' => {},
+                          'vmb' => {},
+                          'vmc' => {},
+                          'vmd' => {},
+                          'vme' => {},
+                          'vmf' => {},
+                          'vmg' => {},
+                          'vmh' => {},
+                          'vmi' => {},
+                          'vmj' => {},
+                          'vmk' => {},
+                          'vml' => {},
+                          'vmm' => {},
+                          'vmp' => {},
+                          'vmq' => {},
+                          'vmr' => {},
+                          'vms' => {},
+                          'vmu' => {},
+                          'vmv' => {},
+                          'vmw' => {},
+                          'vmx' => {},
+                          'vmy' => {},
+                          'vmz' => {},
+                          'vnk' => {},
+                          'vnm' => {},
+                          'vnp' => {},
+                          'vo' => {},
+                          'vor' => {},
+                          'vot' => {},
+                          'vra' => {},
+                          'vro' => {},
+                          'vrs' => {},
+                          'vrt' => {},
+                          'vsi' => {},
+                          'vsl' => {},
+                          'vsv' => {},
+                          'vto' => {},
+                          'vum' => {},
+                          'vun' => {},
+                          'vut' => {},
+                          'vwa' => {},
+                          'wa' => {},
+                          'waa' => {},
+                          'wab' => {},
+                          'wac' => {},
+                          'wad' => {},
+                          'wae' => {},
+                          'waf' => {},
+                          'wag' => {},
+                          'wah' => {},
+                          'wai' => {},
+                          'waj' => {},
+                          'wak' => {},
+                          'wal' => {},
+                          'wam' => {},
+                          'wan' => {},
+                          'wao' => {},
+                          'wap' => {},
+                          'waq' => {},
+                          'war' => {},
+                          'was' => {},
+                          'wat' => {},
+                          'wau' => {},
+                          'wav' => {},
+                          'waw' => {},
+                          'wax' => {},
+                          'way' => {},
+                          'waz' => {},
+                          'wba' => {},
+                          'wbb' => {},
+                          'wbe' => {},
+                          'wbf' => {},
+                          'wbh' => {},
+                          'wbi' => {},
+                          'wbj' => {},
+                          'wbk' => {},
+                          'wbl' => {},
+                          'wbm' => {},
+                          'wbp' => {},
+                          'wbq' => {},
+                          'wbr' => {},
+                          'wbt' => {},
+                          'wbv' => {},
+                          'wbw' => {},
+                          'wca' => {},
+                          'wci' => {},
+                          'wdd' => {},
+                          'wdg' => {},
+                          'wdj' => {},
+                          'wdu' => {},
+                          'wea' => {},
+                          'wec' => {},
+                          'wed' => {},
+                          'weh' => {},
+                          'wei' => {},
+                          'wem' => {},
+                          'wen' => {},
+                          'weo' => {},
+                          'wep' => {},
+                          'wer' => {},
+                          'wes' => {},
+                          'wet' => {},
+                          'weu' => {},
+                          'wew' => {},
+                          'wfg' => {},
+                          'wga' => {},
+                          'wgb' => {},
+                          'wgg' => {},
+                          'wgi' => {},
+                          'wgo' => {},
+                          'wgw' => {
+                                     '_deprecated' => 1
                                    },
-                          'wa' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'wak' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'wal' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'war' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'was' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'wen' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'wo' => {
-                                    '_canon' => '_lowercase',
-                                    '_suppress' => 'latn'
-                                  },
-                          'xal' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'wgy' => {},
+                          'wha' => {},
+                          'whg' => {},
+                          'whk' => {},
+                          'whu' => {},
+                          'wib' => {},
+                          'wic' => {},
+                          'wie' => {},
+                          'wif' => {},
+                          'wig' => {},
+                          'wih' => {},
+                          'wii' => {},
+                          'wij' => {},
+                          'wik' => {},
+                          'wil' => {},
+                          'wim' => {},
+                          'win' => {},
+                          'wir' => {},
+                          'wit' => {},
+                          'wiu' => {},
+                          'wiv' => {},
+                          'wiw' => {},
+                          'wiy' => {},
+                          'wja' => {},
+                          'wji' => {},
+                          'wka' => {},
+                          'wkb' => {},
+                          'wkd' => {},
+                          'wkl' => {},
+                          'wku' => {},
+                          'wkw' => {},
+                          'wla' => {},
+                          'wlc' => {},
+                          'wle' => {},
+                          'wlg' => {},
+                          'wli' => {},
+                          'wlk' => {},
+                          'wll' => {},
+                          'wlm' => {},
+                          'wlo' => {},
+                          'wlr' => {},
+                          'wls' => {},
+                          'wlu' => {},
+                          'wlv' => {},
+                          'wlw' => {},
+                          'wlx' => {},
+                          'wly' => {},
+                          'wma' => {},
+                          'wmb' => {},
+                          'wmc' => {},
+                          'wmd' => {},
+                          'wme' => {},
+                          'wmh' => {},
+                          'wmi' => {},
+                          'wmm' => {},
+                          'wmn' => {},
+                          'wmo' => {},
+                          'wms' => {},
+                          'wmt' => {},
+                          'wmw' => {},
+                          'wmx' => {},
+                          'wnb' => {},
+                          'wnc' => {},
+                          'wnd' => {},
+                          'wne' => {},
+                          'wng' => {},
+                          'wni' => {},
+                          'wnk' => {},
+                          'wnm' => {},
+                          'wno' => {},
+                          'wnp' => {},
+                          'wnu' => {},
+                          'wo' => {},
+                          'woa' => {},
+                          'wob' => {},
+                          'woc' => {},
+                          'wod' => {},
+                          'woe' => {},
+                          'wof' => {},
+                          'wog' => {},
+                          'woi' => {},
+                          'wok' => {},
+                          'wom' => {},
+                          'won' => {},
+                          'woo' => {},
+                          'wor' => {},
+                          'wos' => {},
+                          'wow' => {},
+                          'woy' => {},
+                          'wpc' => {},
+                          'wra' => {},
+                          'wrb' => {},
+                          'wrd' => {},
+                          'wrg' => {},
+                          'wrh' => {},
+                          'wri' => {},
+                          'wrl' => {},
+                          'wrm' => {},
+                          'wrn' => {},
+                          'wrp' => {},
+                          'wrr' => {},
+                          'wrs' => {},
+                          'wru' => {},
+                          'wrv' => {},
+                          'wrw' => {},
+                          'wrx' => {},
+                          'wry' => {},
+                          'wrz' => {},
+                          'wsa' => {},
+                          'wsi' => {},
+                          'wsk' => {},
+                          'wsr' => {},
+                          'wss' => {},
+                          'wsu' => {},
+                          'wsv' => {},
+                          'wtf' => {},
+                          'wti' => {},
+                          'wtk' => {},
+                          'wtm' => {},
+                          'wtw' => {},
+                          'wua' => {},
+                          'wub' => {},
+                          'wud' => {},
+                          'wuh' => {},
+                          'wul' => {},
+                          'wum' => {},
+                          'wun' => {},
+                          'wur' => {},
+                          'wut' => {},
+                          'wuu' => {},
+                          'wuv' => {},
+                          'wux' => {},
+                          'wuy' => {},
+                          'wwa' => {},
+                          'wwo' => {},
+                          'wwr' => {},
+                          'www' => {},
+                          'wxa' => {},
+                          'wya' => {},
+                          'wyb' => {},
+                          'wym' => {},
+                          'wyr' => {},
+                          'wyy' => {},
+                          'xaa' => {},
+                          'xab' => {},
+                          'xac' => {},
+                          'xad' => {},
+                          'xae' => {},
+                          'xag' => {},
+                          'xai' => {},
+                          'xal' => {},
+                          'xam' => {},
+                          'xan' => {},
+                          'xao' => {},
+                          'xap' => {},
+                          'xaq' => {},
+                          'xar' => {},
+                          'xas' => {},
+                          'xat' => {},
+                          'xau' => {},
+                          'xav' => {},
+                          'xaw' => {},
+                          'xay' => {},
+                          'xba' => {},
+                          'xbb' => {},
+                          'xbc' => {},
+                          'xbi' => {},
+                          'xbm' => {},
+                          'xbn' => {},
+                          'xbo' => {},
+                          'xbr' => {},
+                          'xbw' => {},
+                          'xbx' => {},
+                          'xcb' => {},
+                          'xcc' => {},
+                          'xce' => {},
+                          'xcg' => {},
+                          'xch' => {},
+                          'xcl' => {},
+                          'xcm' => {},
+                          'xcn' => {},
+                          'xco' => {},
+                          'xcr' => {},
+                          'xct' => {},
+                          'xcu' => {},
+                          'xcv' => {},
+                          'xcw' => {},
+                          'xcy' => {},
+                          'xdc' => {},
+                          'xdm' => {},
+                          'xdy' => {},
+                          'xeb' => {},
+                          'xed' => {},
+                          'xeg' => {},
+                          'xel' => {},
+                          'xem' => {},
+                          'xep' => {},
+                          'xer' => {},
+                          'xes' => {},
+                          'xet' => {},
+                          'xeu' => {},
+                          'xfa' => {},
+                          'xga' => {},
+                          'xgf' => {},
+                          'xgl' => {},
+                          'xgn' => {},
+                          'xgr' => {},
                           'xh' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'yao' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'yap' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'xha' => {},
+                          'xhc' => {},
+                          'xhd' => {},
+                          'xhe' => {},
+                          'xhr' => {},
+                          'xht' => {},
+                          'xhu' => {},
+                          'xhv' => {},
+                          'xia' => {},
+                          'xib' => {},
+                          'xii' => {},
+                          'xil' => {},
+                          'xin' => {},
+                          'xip' => {},
+                          'xir' => {},
+                          'xiv' => {},
+                          'xiy' => {},
+                          'xka' => {},
+                          'xkb' => {},
+                          'xkc' => {},
+                          'xkd' => {},
+                          'xke' => {},
+                          'xkf' => {},
+                          'xkg' => {},
+                          'xkh' => {},
+                          'xki' => {},
+                          'xkj' => {},
+                          'xkk' => {},
+                          'xkl' => {},
+                          'xkn' => {},
+                          'xko' => {},
+                          'xkp' => {},
+                          'xkq' => {},
+                          'xkr' => {},
+                          'xks' => {},
+                          'xkt' => {},
+                          'xku' => {},
+                          'xkv' => {},
+                          'xkw' => {},
+                          'xkx' => {},
+                          'xky' => {},
+                          'xkz' => {},
+                          'xla' => {},
+                          'xlb' => {},
+                          'xlc' => {},
+                          'xld' => {},
+                          'xle' => {},
+                          'xlg' => {},
+                          'xli' => {},
+                          'xln' => {},
+                          'xlo' => {},
+                          'xlp' => {},
+                          'xls' => {},
+                          'xlu' => {},
+                          'xly' => {},
+                          'xma' => {},
+                          'xmb' => {},
+                          'xmc' => {},
+                          'xmd' => {},
+                          'xme' => {},
+                          'xmf' => {},
+                          'xmg' => {},
+                          'xmh' => {},
+                          'xmj' => {},
+                          'xmk' => {},
+                          'xml' => {},
+                          'xmm' => {},
+                          'xmn' => {},
+                          'xmo' => {},
+                          'xmp' => {},
+                          'xmq' => {},
+                          'xmr' => {},
+                          'xms' => {},
+                          'xmt' => {},
+                          'xmu' => {},
+                          'xmv' => {},
+                          'xmw' => {},
+                          'xmx' => {},
+                          'xmy' => {},
+                          'xmz' => {},
+                          'xna' => {},
+                          'xnb' => {},
+                          'xnd' => {},
+                          'xng' => {},
+                          'xnh' => {},
+                          'xnn' => {},
+                          'xno' => {},
+                          'xnr' => {},
+                          'xns' => {},
+                          'xnt' => {},
+                          'xoc' => {},
+                          'xod' => {},
+                          'xog' => {},
+                          'xoi' => {},
+                          'xok' => {},
+                          'xom' => {},
+                          'xon' => {},
+                          'xoo' => {},
+                          'xop' => {},
+                          'xor' => {},
+                          'xow' => {},
+                          'xpc' => {},
+                          'xpe' => {},
+                          'xpg' => {},
+                          'xpi' => {},
+                          'xpk' => {},
+                          'xpm' => {},
+                          'xpn' => {},
+                          'xpo' => {},
+                          'xpp' => {},
+                          'xpq' => {},
+                          'xpr' => {},
+                          'xps' => {},
+                          'xpu' => {},
+                          'xpy' => {},
+                          'xqa' => {},
+                          'xqt' => {},
+                          'xra' => {},
+                          'xrb' => {},
+                          'xre' => {},
+                          'xri' => {},
+                          'xrm' => {},
+                          'xrn' => {},
+                          'xrr' => {},
+                          'xrt' => {},
+                          'xru' => {},
+                          'xrw' => {},
+                          'xsa' => {},
+                          'xsb' => {},
+                          'xsc' => {},
+                          'xsd' => {},
+                          'xse' => {},
+                          'xsh' => {},
+                          'xsi' => {},
+                          'xsj' => {},
+                          'xsl' => {},
+                          'xsm' => {},
+                          'xsn' => {},
+                          'xso' => {},
+                          'xsp' => {},
+                          'xsq' => {},
+                          'xsr' => {},
+                          'xss' => {},
+                          'xsu' => {},
+                          'xsv' => {},
+                          'xsy' => {},
+                          'xta' => {},
+                          'xtb' => {},
+                          'xtc' => {},
+                          'xtd' => {},
+                          'xte' => {},
+                          'xtg' => {},
+                          'xti' => {},
+                          'xtj' => {},
+                          'xtl' => {},
+                          'xtm' => {},
+                          'xtn' => {},
+                          'xto' => {},
+                          'xtp' => {},
+                          'xtq' => {},
+                          'xtr' => {},
+                          'xts' => {},
+                          'xtt' => {},
+                          'xtu' => {},
+                          'xtw' => {},
+                          'xty' => {},
+                          'xtz' => {},
+                          'xua' => {},
+                          'xub' => {},
+                          'xug' => {},
+                          'xuj' => {},
+                          'xum' => {},
+                          'xuo' => {},
+                          'xup' => {},
+                          'xur' => {},
+                          'xut' => {},
+                          'xuu' => {},
+                          'xve' => {},
+                          'xvi' => {},
+                          'xvn' => {},
+                          'xvo' => {},
+                          'xvs' => {},
+                          'xwa' => {},
+                          'xwc' => {},
+                          'xwe' => {},
+                          'xwg' => {},
+                          'xwl' => {},
+                          'xwo' => {},
+                          'xwr' => {},
+                          'xxb' => {},
+                          'xxk' => {},
+                          'xxr' => {},
+                          'xxt' => {},
+                          'xyl' => {},
+                          'xzh' => {},
+                          'xzm' => {},
+                          'xzp' => {},
+                          'yaa' => {},
+                          'yab' => {},
+                          'yac' => {},
+                          'yad' => {},
+                          'yae' => {},
+                          'yaf' => {},
+                          'yag' => {},
+                          'yah' => {},
+                          'yai' => {},
+                          'yaj' => {},
+                          'yak' => {},
+                          'yal' => {},
+                          'yam' => {},
+                          'yan' => {},
+                          'yao' => {},
+                          'yap' => {},
+                          'yaq' => {},
+                          'yar' => {},
+                          'yas' => {},
+                          'yat' => {},
+                          'yau' => {},
+                          'yav' => {},
+                          'yaw' => {},
+                          'yax' => {},
+                          'yay' => {},
+                          'yaz' => {},
+                          'yba' => {},
+                          'ybb' => {},
+                          'ybd' => {},
+                          'ybe' => {},
+                          'ybh' => {},
+                          'ybi' => {},
+                          'ybj' => {},
+                          'ybk' => {},
+                          'ybl' => {},
+                          'ybm' => {},
+                          'ybn' => {},
+                          'ybo' => {},
+                          'ybx' => {},
+                          'yby' => {},
+                          'ych' => {},
+                          'ycl' => {},
+                          'ycn' => {},
+                          'ycp' => {},
+                          'ydd' => {},
+                          'yde' => {},
+                          'ydg' => {},
+                          'ydk' => {},
+                          'yds' => {},
+                          'yea' => {},
+                          'yec' => {},
+                          'yee' => {},
+                          'yei' => {},
+                          'yej' => {},
+                          'yel' => {},
+                          'yen' => {},
+                          'yer' => {},
+                          'yes' => {},
+                          'yet' => {},
+                          'yeu' => {},
+                          'yev' => {},
+                          'yey' => {},
+                          'ygl' => {},
+                          'ygm' => {},
+                          'ygp' => {},
+                          'ygr' => {},
+                          'ygw' => {},
+                          'yha' => {},
+                          'yhd' => {},
+                          'yhl' => {},
                           'yi' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'hebr'
                                   },
-                          'yo' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'ypk' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'za' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'zap' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'yia' => {},
+                          'yif' => {},
+                          'yig' => {},
+                          'yih' => {},
+                          'yii' => {},
+                          'yij' => {},
+                          'yik' => {},
+                          'yil' => {},
+                          'yim' => {},
+                          'yin' => {},
+                          'yip' => {},
+                          'yiq' => {},
+                          'yir' => {},
+                          'yis' => {},
+                          'yit' => {},
+                          'yiu' => {},
+                          'yiv' => {},
+                          'yix' => {},
+                          'yiy' => {},
+                          'yiz' => {},
+                          'yka' => {},
+                          'ykg' => {},
+                          'yki' => {},
+                          'ykk' => {},
+                          'ykl' => {},
+                          'ykm' => {},
+                          'yko' => {},
+                          'ykr' => {},
+                          'ykt' => {},
+                          'yky' => {},
+                          'yla' => {},
+                          'ylb' => {},
+                          'yle' => {},
+                          'ylg' => {},
+                          'yli' => {},
+                          'yll' => {},
+                          'ylm' => {},
+                          'yln' => {},
+                          'ylo' => {},
+                          'ylr' => {},
+                          'ylu' => {},
+                          'yly' => {},
+                          'yma' => {},
+                          'ymb' => {},
+                          'ymc' => {},
+                          'ymd' => {},
+                          'yme' => {},
+                          'ymg' => {},
+                          'ymh' => {},
+                          'ymi' => {},
+                          'ymk' => {},
+                          'yml' => {},
+                          'ymm' => {},
+                          'ymn' => {},
+                          'ymo' => {},
+                          'ymp' => {},
+                          'ymq' => {},
+                          'ymr' => {},
+                          'yms' => {},
+                          'ymt' => {},
+                          'ymx' => {},
+                          'ymz' => {},
+                          'yna' => {},
+                          'ynd' => {},
+                          'yne' => {},
+                          'yng' => {},
+                          'ynh' => {},
+                          'ynk' => {},
+                          'ynl' => {},
+                          'ynn' => {},
+                          'yno' => {},
+                          'yns' => {},
+                          'ynu' => {},
+                          'yo' => {},
+                          'yob' => {},
+                          'yog' => {},
+                          'yoi' => {},
+                          'yok' => {},
+                          'yol' => {},
+                          'yom' => {},
+                          'yon' => {},
+                          'yos' => {},
+                          'yox' => {},
+                          'yoy' => {},
+                          'ypa' => {},
+                          'ypb' => {},
+                          'ypg' => {},
+                          'yph' => {},
+                          'ypk' => {},
+                          'ypm' => {},
+                          'ypn' => {},
+                          'ypo' => {},
+                          'ypp' => {},
+                          'ypz' => {},
+                          'yra' => {},
+                          'yrb' => {},
+                          'yre' => {},
+                          'yri' => {},
+                          'yrk' => {},
+                          'yrl' => {},
+                          'yrn' => {},
+                          'yrs' => {},
+                          'yrw' => {},
+                          'ysc' => {},
+                          'ysd' => {},
+                          'ysl' => {},
+                          'ysn' => {},
+                          'yso' => {},
+                          'ysp' => {},
+                          'ysr' => {},
+                          'yss' => {},
+                          'ysy' => {},
+                          'yta' => {},
+                          'ytl' => {},
+                          'ytp' => {},
+                          'ytw' => {},
+                          'yua' => {},
+                          'yub' => {},
+                          'yuc' => {},
+                          'yud' => {},
+                          'yue' => {},
+                          'yuf' => {},
+                          'yug' => {},
+                          'yui' => {},
+                          'yuj' => {},
+                          'yuk' => {},
+                          'yul' => {},
+                          'yum' => {},
+                          'yun' => {},
+                          'yup' => {},
+                          'yuq' => {},
+                          'yur' => {},
+                          'yut' => {},
+                          'yuu' => {},
+                          'yuw' => {},
+                          'yux' => {},
+                          'yuy' => {},
+                          'yuz' => {},
+                          'yva' => {},
+                          'yvt' => {},
+                          'ywa' => {},
+                          'ywl' => {},
+                          'ywn' => {},
+                          'ywq' => {},
+                          'ywr' => {},
+                          'ywt' => {},
+                          'ywu' => {},
+                          'yww' => {},
+                          'yyu' => {},
+                          'yyz' => {},
+                          'yzg' => {},
+                          'yzk' => {},
+                          'za' => {},
+                          'zaa' => {},
+                          'zab' => {},
+                          'zac' => {},
+                          'zad' => {},
+                          'zae' => {},
+                          'zaf' => {},
+                          'zag' => {},
+                          'zah' => {},
+                          'zai' => {},
+                          'zaj' => {},
+                          'zak' => {},
+                          'zal' => {},
+                          'zam' => {},
+                          'zao' => {},
+                          'zap' => {},
+                          'zaq' => {},
+                          'zar' => {},
+                          'zas' => {},
+                          'zat' => {},
+                          'zau' => {},
+                          'zav' => {},
+                          'zaw' => {},
+                          'zax' => {},
+                          'zay' => {},
+                          'zaz' => {},
+                          'zbc' => {},
+                          'zbe' => {},
                           'zbl' => {
-                                     '_canon' => '_lowercase',
                                      '_suppress' => 'blis'
                                    },
-                          'zen' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'zh' => {
-                                    '_canon' => '_lowercase'
-                                  },
-                          'znd' => {
-                                     '_canon' => '_lowercase'
-                                   },
+                          'zbt' => {},
+                          'zbw' => {},
+                          'zca' => {},
+                          'zch' => {},
+                          'zdj' => {},
+                          'zea' => {},
+                          'zeg' => {},
+                          'zeh' => {},
+                          'zen' => {},
+                          'zga' => {},
+                          'zgb' => {},
+                          'zgm' => {},
+                          'zgn' => {},
+                          'zgr' => {},
+                          'zh' => {},
+                          'zhb' => {},
+                          'zhd' => {},
+                          'zhi' => {},
+                          'zhn' => {},
+                          'zhw' => {},
+                          'zhx' => {},
+                          'zia' => {},
+                          'zib' => {},
+                          'zik' => {},
+                          'zil' => {},
+                          'zim' => {},
+                          'zin' => {},
+                          'zir' => {},
+                          'ziw' => {},
+                          'ziz' => {},
+                          'zka' => {},
+                          'zkb' => {},
+                          'zkg' => {},
+                          'zkh' => {},
+                          'zkk' => {},
+                          'zko' => {},
+                          'zkp' => {},
+                          'zkr' => {},
+                          'zkt' => {},
+                          'zku' => {},
+                          'zkv' => {},
+                          'zkz' => {},
+                          'zle' => {},
+                          'zlj' => {},
+                          'zlm' => {},
+                          'zln' => {},
+                          'zlq' => {},
+                          'zls' => {},
+                          'zlw' => {},
+                          'zma' => {},
+                          'zmb' => {},
+                          'zmc' => {},
+                          'zmd' => {},
+                          'zme' => {},
+                          'zmf' => {},
+                          'zmg' => {},
+                          'zmh' => {},
+                          'zmi' => {},
+                          'zmj' => {},
+                          'zmk' => {},
+                          'zml' => {},
+                          'zmm' => {},
+                          'zmn' => {},
+                          'zmo' => {},
+                          'zmp' => {},
+                          'zmq' => {},
+                          'zmr' => {},
+                          'zms' => {},
+                          'zmt' => {},
+                          'zmu' => {},
+                          'zmv' => {},
+                          'zmw' => {},
+                          'zmx' => {},
+                          'zmy' => {},
+                          'zmz' => {},
+                          'zna' => {},
+                          'znd' => {},
+                          'zne' => {},
+                          'zng' => {},
+                          'znk' => {},
+                          'zns' => {},
+                          'zoc' => {},
+                          'zoh' => {},
+                          'zom' => {},
+                          'zoo' => {},
+                          'zoq' => {},
+                          'zor' => {},
+                          'zos' => {},
+                          'zpa' => {},
+                          'zpb' => {},
+                          'zpc' => {},
+                          'zpd' => {},
+                          'zpe' => {},
+                          'zpf' => {},
+                          'zpg' => {},
+                          'zph' => {},
+                          'zpi' => {},
+                          'zpj' => {},
+                          'zpk' => {},
+                          'zpl' => {},
+                          'zpm' => {},
+                          'zpn' => {},
+                          'zpo' => {},
+                          'zpp' => {},
+                          'zpq' => {},
+                          'zpr' => {},
+                          'zps' => {},
+                          'zpt' => {},
+                          'zpu' => {},
+                          'zpv' => {},
+                          'zpw' => {},
+                          'zpx' => {},
+                          'zpy' => {},
+                          'zpz' => {},
+                          'zqe' => {},
+                          'zra' => {},
+                          'zrg' => {},
+                          'zrn' => {},
+                          'zro' => {},
+                          'zrp' => {},
+                          'zrs' => {},
+                          'zsa' => {},
+                          'zsk' => {},
+                          'zsl' => {},
+                          'zsm' => {},
+                          'zsr' => {},
+                          'zsu' => {},
+                          'zte' => {},
+                          'ztg' => {},
+                          'ztl' => {},
+                          'ztm' => {},
+                          'ztn' => {},
+                          'ztp' => {},
+                          'ztq' => {},
+                          'zts' => {},
+                          'ztt' => {},
+                          'ztu' => {},
+                          'ztx' => {},
+                          'zty' => {},
                           'zu' => {
-                                    '_canon' => '_lowercase',
                                     '_suppress' => 'latn'
                                   },
-                          'zun' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'zxx' => {
-                                     '_canon' => '_lowercase'
-                                   },
-                          'zza' => {
-                                     '_canon' => '_lowercase'
-                                   }
+                          'zua' => {},
+                          'zuh' => {},
+                          'zum' => {},
+                          'zun' => {},
+                          'zuy' => {},
+                          'zwa' => {},
+                          'zxx' => {},
+                          'zyb' => {},
+                          'zyg' => {},
+                          'zyj' => {},
+                          'zyn' => {},
+                          'zyp' => {},
+                          'zza' => {},
+                          'zzj' => {}
                         },
           'redundant' => {
                            'az-arab' => {
@@ -2318,61 +10260,99 @@ $Whatpm::LangTag::Registry = {
                                           '_canon' => 'mn-Mong'
                                         },
                            'sgn-br' => {
-                                         '_canon' => 'sgn-BR'
+                                         '_canon' => 'sgn-BR',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'bzs'
                                        },
                            'sgn-co' => {
-                                         '_canon' => 'sgn-CO'
+                                         '_canon' => 'sgn-CO',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'csn'
                                        },
                            'sgn-de' => {
-                                         '_canon' => 'sgn-DE'
+                                         '_canon' => 'sgn-DE',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'gsg'
                                        },
                            'sgn-dk' => {
-                                         '_canon' => 'sgn-DK'
+                                         '_canon' => 'sgn-DK',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'dsl'
                                        },
                            'sgn-es' => {
-                                         '_canon' => 'sgn-ES'
+                                         '_canon' => 'sgn-ES',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'ssp'
                                        },
                            'sgn-fr' => {
-                                         '_canon' => 'sgn-FR'
+                                         '_canon' => 'sgn-FR',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'fsl'
                                        },
                            'sgn-gb' => {
-                                         '_canon' => 'sgn-GB'
+                                         '_canon' => 'sgn-GB',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'bfi'
                                        },
                            'sgn-gr' => {
-                                         '_canon' => 'sgn-GR'
+                                         '_canon' => 'sgn-GR',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'gss'
                                        },
                            'sgn-ie' => {
-                                         '_canon' => 'sgn-IE'
+                                         '_canon' => 'sgn-IE',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'isg'
                                        },
                            'sgn-it' => {
-                                         '_canon' => 'sgn-IT'
+                                         '_canon' => 'sgn-IT',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'ise'
                                        },
                            'sgn-jp' => {
-                                         '_canon' => 'sgn-JP'
+                                         '_canon' => 'sgn-JP',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'jsl'
                                        },
                            'sgn-mx' => {
-                                         '_canon' => 'sgn-MX'
+                                         '_canon' => 'sgn-MX',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'mfs'
                                        },
                            'sgn-ni' => {
-                                         '_canon' => 'sgn-NI'
+                                         '_canon' => 'sgn-NI',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'ncs'
                                        },
                            'sgn-nl' => {
-                                         '_canon' => 'sgn-NL'
+                                         '_canon' => 'sgn-NL',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'dse'
                                        },
                            'sgn-no' => {
-                                         '_canon' => 'sgn-NO'
+                                         '_canon' => 'sgn-NO',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'nsl'
                                        },
                            'sgn-pt' => {
-                                         '_canon' => 'sgn-PT'
+                                         '_canon' => 'sgn-PT',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'psr'
                                        },
                            'sgn-se' => {
-                                         '_canon' => 'sgn-SE'
+                                         '_canon' => 'sgn-SE',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'swl'
                                        },
                            'sgn-us' => {
-                                         '_canon' => 'sgn-US'
+                                         '_canon' => 'sgn-US',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'ase'
                                        },
                            'sgn-za' => {
-                                         '_canon' => 'sgn-ZA'
+                                         '_canon' => 'sgn-ZA',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'sfs'
                                        },
                            'sl-nedis' => {
                                            '_canon' => 'sl-nedis'
@@ -2399,8 +10379,28 @@ $Whatpm::LangTag::Registry = {
                                           '_canon' => 'uz-Latn'
                                         },
                            'yi-latn' => {
-                                          '_canon' => 'yi-latn'
+                                          '_canon' => 'yi-Latn'
                                         },
+                           'zh-cmn' => {
+                                         '_canon' => 'zh-cmn',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'cmn'
+                                       },
+                           'zh-cmn-hans' => {
+                                              '_canon' => 'zh-cmn-Hans',
+                                              '_deprecated' => 1,
+                                              '_preferred' => 'cmn-Hans'
+                                            },
+                           'zh-cmn-hant' => {
+                                              '_canon' => 'zh-cmn-Hant',
+                                              '_deprecated' => 1,
+                                              '_preferred' => 'cmn-Hant'
+                                            },
+                           'zh-gan' => {
+                                         '_canon' => 'zh-gan',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'gan'
+                                       },
                            'zh-hans' => {
                                           '_canon' => 'zh-Hans'
                                         },
@@ -2436,7 +10436,17 @@ $Whatpm::LangTag::Registry = {
                                            },
                            'zh-hant-tw' => {
                                              '_canon' => 'zh-Hant-TW'
-                                           }
+                                           },
+                           'zh-wuu' => {
+                                         '_canon' => 'zh-wuu',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'wuu'
+                                       },
+                           'zh-yue' => {
+                                         '_canon' => 'zh-yue',
+                                         '_deprecated' => 1,
+                                         '_preferred' => 'yue'
+                                       }
                          },
           'region' => {
                         '001' => {
@@ -2444,6 +10454,9 @@ $Whatpm::LangTag::Registry = {
                                  },
                         '002' => {
                                    '_canon' => '002'
+                                 },
+                        '003' => {
+                                   '_canon' => '003'
                                  },
                         '005' => {
                                    '_canon' => '005'
@@ -2529,6 +10542,9 @@ $Whatpm::LangTag::Registry = {
                         'aa' => {
                                   '_canon' => '_uppercase'
                                 },
+                        'ac' => {
+                                  '_canon' => '_uppercase'
+                                },
                         'ad' => {
                                   '_canon' => '_uppercase'
                                 },
@@ -2551,7 +10567,8 @@ $Whatpm::LangTag::Registry = {
                                   '_canon' => '_uppercase'
                                 },
                         'an' => {
-                                  '_canon' => '_uppercase'
+                                  '_canon' => '_uppercase',
+                                  '_deprecated' => 1
                                 },
                         'ao' => {
                                   '_canon' => '_uppercase'
@@ -2619,6 +10636,9 @@ $Whatpm::LangTag::Registry = {
                         'bo' => {
                                   '_canon' => '_uppercase'
                                 },
+                        'bq' => {
+                                  '_canon' => '_uppercase'
+                                },
                         'br' => {
                                   '_canon' => '_uppercase'
                                 },
@@ -2681,6 +10701,9 @@ $Whatpm::LangTag::Registry = {
                         'co' => {
                                   '_canon' => '_uppercase'
                                 },
+                        'cp' => {
+                                  '_canon' => '_uppercase'
+                                },
                         'cr' => {
                                   '_canon' => '_uppercase'
                                 },
@@ -2692,6 +10715,9 @@ $Whatpm::LangTag::Registry = {
                                   '_canon' => '_uppercase'
                                 },
                         'cv' => {
+                                  '_canon' => '_uppercase'
+                                },
+                        'cw' => {
                                   '_canon' => '_uppercase'
                                 },
                         'cx' => {
@@ -2711,6 +10737,9 @@ $Whatpm::LangTag::Registry = {
                         'de' => {
                                   '_canon' => '_uppercase'
                                 },
+                        'dg' => {
+                                  '_canon' => '_uppercase'
+                                },
                         'dj' => {
                                   '_canon' => '_uppercase'
                                 },
@@ -2724,6 +10753,9 @@ $Whatpm::LangTag::Registry = {
                                   '_canon' => '_uppercase'
                                 },
                         'dz' => {
+                                  '_canon' => '_uppercase'
+                                },
+                        'ea' => {
                                   '_canon' => '_uppercase'
                                 },
                         'ec' => {
@@ -2745,6 +10777,9 @@ $Whatpm::LangTag::Registry = {
                                   '_canon' => '_uppercase'
                                 },
                         'et' => {
+                                  '_canon' => '_uppercase'
+                                },
+                        'eu' => {
                                   '_canon' => '_uppercase'
                                 },
                         'fi' => {
@@ -2843,6 +10878,9 @@ $Whatpm::LangTag::Registry = {
                                   '_canon' => '_uppercase'
                                 },
                         'hu' => {
+                                  '_canon' => '_uppercase'
+                                },
+                        'ic' => {
                                   '_canon' => '_uppercase'
                                 },
                         'id' => {
@@ -3186,6 +11224,9 @@ $Whatpm::LangTag::Registry = {
                         'sr' => {
                                   '_canon' => '_uppercase'
                                 },
+                        'ss' => {
+                                  '_canon' => '_uppercase'
+                                },
                         'st' => {
                                   '_canon' => '_uppercase'
                                 },
@@ -3196,10 +11237,16 @@ $Whatpm::LangTag::Registry = {
                         'sv' => {
                                   '_canon' => '_uppercase'
                                 },
+                        'sx' => {
+                                  '_canon' => '_uppercase'
+                                },
                         'sy' => {
                                   '_canon' => '_uppercase'
                                 },
                         'sz' => {
+                                  '_canon' => '_uppercase'
+                                },
+                        'ta' => {
                                   '_canon' => '_uppercase'
                                 },
                         'tc' => {
@@ -3341,8 +11388,7 @@ $Whatpm::LangTag::Registry = {
                                 },
                         'yu' => {
                                   '_canon' => '_uppercase',
-                                  '_deprecated' => 1,
-                                  '_preferred' => 'CS'
+                                  '_deprecated' => 1
                                 },
                         'za' => {
                                   '_canon' => '_uppercase'
@@ -3363,6 +11409,9 @@ $Whatpm::LangTag::Registry = {
                                 }
                       },
           'script' => {
+                        'afak' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'arab' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3376,6 +11425,12 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'bali' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'bamu' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'bass' => {
                                     '_canon' => '_titlecase'
                                   },
                         'batk' => {
@@ -3438,6 +11493,9 @@ $Whatpm::LangTag::Registry = {
                         'dsrt' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'dupl' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'egyd' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3445,6 +11503,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'egyp' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'elba' => {
                                     '_canon' => '_titlecase'
                                   },
                         'ethi' => {
@@ -3460,6 +11521,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'goth' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'gran' => {
                                     '_canon' => '_titlecase'
                                   },
                         'grek' => {
@@ -3513,6 +11577,9 @@ $Whatpm::LangTag::Registry = {
                         'jpan' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'jurc' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'kali' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3525,10 +11592,16 @@ $Whatpm::LangTag::Registry = {
                         'khmr' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'khoj' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'knda' => {
                                     '_canon' => '_titlecase'
                                   },
                         'kore' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'kpel' => {
                                     '_canon' => '_titlecase'
                                   },
                         'kthi' => {
@@ -3561,6 +11634,12 @@ $Whatpm::LangTag::Registry = {
                         'linb' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'lisu' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'loma' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'lyci' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3576,6 +11655,12 @@ $Whatpm::LangTag::Registry = {
                         'maya' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'mend' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'merc' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'mero' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3588,13 +11673,28 @@ $Whatpm::LangTag::Registry = {
                         'moon' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'mroo' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'mtei' => {
                                     '_canon' => '_titlecase'
                                   },
                         'mymr' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'narb' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'nbat' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'nkgb' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'nkoo' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'nshu' => {
                                     '_canon' => '_titlecase'
                                   },
                         'ogam' => {
@@ -3610,6 +11710,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'osma' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'palm' => {
                                     '_canon' => '_titlecase'
                                   },
                         'perm' => {
@@ -3703,6 +11806,9 @@ $Whatpm::LangTag::Registry = {
                         'sara' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'sarb' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'saur' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3712,7 +11818,16 @@ $Whatpm::LangTag::Registry = {
                         'shaw' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'shrd' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'sind' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'sinh' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'sora' => {
                                     '_canon' => '_titlecase'
                                   },
                         'sund' => {
@@ -3736,6 +11851,9 @@ $Whatpm::LangTag::Registry = {
                         'tagb' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'takr' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'tale' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3743,6 +11861,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'taml' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'tang' => {
                                     '_canon' => '_titlecase'
                                   },
                         'tavt' => {
@@ -3769,6 +11890,9 @@ $Whatpm::LangTag::Registry = {
                         'tibt' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'tirh' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'ugar' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3778,6 +11902,12 @@ $Whatpm::LangTag::Registry = {
                         'visp' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'wara' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'wole' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'xpeo' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -3785,6 +11915,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'yiii' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'zinh' => {
                                     '_canon' => '_titlecase'
                                   },
                         'zmth' => {
@@ -3822,6 +11955,12 @@ $Whatpm::LangTag::Registry = {
                                                  ],
                                      '_canon' => '1901'
                                    },
+                         '1959acad' => {
+                                         'Prefix' => [
+                                                       'be'
+                                                     ],
+                                         '_canon' => '1959acad'
+                                       },
                          '1994' => {
                                      'Prefix' => [
                                                    'sl-rozaj-biske',
@@ -3838,17 +11977,23 @@ $Whatpm::LangTag::Registry = {
                                                  ],
                                      '_canon' => '1996'
                                    },
+                         'alalc97' => {
+                                        '_canon' => 'alalc97'
+                                      },
+                         'aluku' => {
+                                      'Prefix' => [
+                                                    'djk'
+                                                  ]
+                                    },
                          'arevela' => {
                                         'Prefix' => [
                                                       'hy'
-                                                    ],
-                                        '_canon' => '_lowercase'
+                                                    ]
                                       },
                          'arevmda' => {
                                         'Prefix' => [
                                                       'hy'
-                                                    ],
-                                        '_canon' => '_lowercase'
+                                                    ]
                                       },
                          'baku1926' => {
                                          'Prefix' => [
@@ -3865,95 +12010,213 @@ $Whatpm::LangTag::Registry = {
                                                      ],
                                          '_canon' => 'baku1926'
                                        },
+                         'bauddha' => {
+                                        'Prefix' => [
+                                                      'sa'
+                                                    ]
+                                      },
+                         'biscayan' => {
+                                         'Prefix' => [
+                                                       'eu'
+                                                     ]
+                                       },
                          'biske' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
                                     },
                          'boont' => {
                                       'Prefix' => [
                                                     'en'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
                                     },
-                         'fonipa' => {
-                                       '_canon' => '_lowercase'
+                         'fonipa' => {},
+                         'fonupa' => {},
+                         'fonxsamp' => {},
+                         'hepburn' => {
+                                        'Prefix' => [
+                                                      'ja-latn'
+                                                    ]
+                                      },
+                         'heploc' => {
+                                       'Prefix' => [
+                                                     'ja-latn-hepburn'
+                                                   ],
+                                       '_deprecated' => 1,
+                                       '_preferred' => 'alalc97'
                                      },
-                         'fonupa' => {
-                                       '_canon' => '_lowercase'
-                                     },
+                         'hognorsk' => {
+                                         'Prefix' => [
+                                                       'nn'
+                                                     ]
+                                       },
+                         'itihasa' => {
+                                        'Prefix' => [
+                                                      'sa'
+                                                    ]
+                                      },
+                         'jauer' => {
+                                      'Prefix' => [
+                                                    'rm'
+                                                  ]
+                                    },
+                         'jyutping' => {
+                                         'Prefix' => [
+                                                       'yue'
+                                                     ]
+                                       },
+                         'kkcor' => {
+                                      'Prefix' => [
+                                                    'kw'
+                                                  ]
+                                    },
+                         'laukika' => {
+                                        'Prefix' => [
+                                                      'sa'
+                                                    ]
+                                      },
                          'lipaw' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
                                     },
+                         'luna1918' => {
+                                         'Prefix' => [
+                                                       'ru'
+                                                     ],
+                                         '_canon' => 'luna1918'
+                                       },
                          'monoton' => {
                                         'Prefix' => [
                                                       'el'
-                                                    ],
-                                        '_canon' => '_lowercase'
+                                                    ]
                                       },
+                         'ndyuka' => {
+                                       'Prefix' => [
+                                                     'djk'
+                                                   ]
+                                     },
                          'nedis' => {
                                       'Prefix' => [
                                                     'sl'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
                                     },
                          'njiva' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
                                     },
                          'osojs' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
                                     },
+                         'pamaka' => {
+                                       'Prefix' => [
+                                                     'djk'
+                                                   ]
+                                     },
+                         'petr1708' => {
+                                         'Prefix' => [
+                                                       'ru'
+                                                     ],
+                                         '_canon' => 'petr1708'
+                                       },
+                         'pinyin' => {
+                                       'Prefix' => [
+                                                     'bo-latn',
+                                                     'zh-latn'
+                                                   ]
+                                     },
                          'polyton' => {
                                         'Prefix' => [
                                                       'el'
-                                                    ],
-                                        '_canon' => '_lowercase'
+                                                    ]
                                       },
+                         'puter' => {
+                                      'Prefix' => [
+                                                    'rm'
+                                                  ]
+                                    },
                          'rozaj' => {
                                       'Prefix' => [
                                                     'sl'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
+                                    },
+                         'rumgr' => {
+                                      'Prefix' => [
+                                                    'rm'
+                                                  ]
                                     },
                          'scotland' => {
                                          'Prefix' => [
                                                        'en'
-                                                     ],
-                                         '_canon' => '_lowercase'
+                                                     ]
                                        },
                          'scouse' => {
                                        'Prefix' => [
                                                      'en'
-                                                   ],
-                                       '_canon' => '_lowercase'
+                                                   ]
                                      },
                          'solba' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
-                                                  ],
-                                      '_canon' => '_lowercase'
+                                                  ]
                                     },
+                         'surmiran' => {
+                                         'Prefix' => [
+                                                       'rm'
+                                                     ]
+                                       },
+                         'sursilv' => {
+                                        'Prefix' => [
+                                                      'rm'
+                                                    ]
+                                      },
+                         'sutsilv' => {
+                                        'Prefix' => [
+                                                      'rm'
+                                                    ]
+                                      },
                          'tarask' => {
                                        'Prefix' => [
                                                      'be'
-                                                   ],
-                                       '_canon' => '_lowercase'
+                                                   ]
                                      },
+                         'uccor' => {
+                                      'Prefix' => [
+                                                    'kw'
+                                                  ]
+                                    },
+                         'ucrcor' => {
+                                       'Prefix' => [
+                                                     'kw'
+                                                   ]
+                                     },
+                         'ulster' => {
+                                       'Prefix' => [
+                                                     'sco'
+                                                   ]
+                                     },
+                         'vaidika' => {
+                                        'Prefix' => [
+                                                      'sa'
+                                                    ]
+                                      },
                          'valencia' => {
                                          'Prefix' => [
                                                        'ca'
-                                                     ],
-                                         '_canon' => '_lowercase'
+                                                     ]
+                                       },
+                         'vallader' => {
+                                         'Prefix' => [
+                                                       'rm'
+                                                     ]
+                                       },
+                         'wadegile' => {
+                                         'Prefix' => [
+                                                       'zh-latn'
+                                                     ]
                                        }
                        }
         };

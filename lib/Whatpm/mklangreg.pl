@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use strict;
+use warnings;
 
 my $subtags;
 
@@ -35,8 +36,8 @@ my $langreg_source_file_name = shift;
         $subtag->{_canon} = '_titlecase';
       } elsif ($tag_name_start =~ /^[A-Z]++(?>\.\.[A-Z]++)?+$/) {
         $subtag->{_canon} = '_uppercase';
-      } elsif ($tag_name_start =~ /^[a-z]++(?>\.\.[a-z]++)?+$/) {
-        $subtag->{_canon} = '_lowercase';
+      } elsif ($tag_name_start =~ /^[a-z]++(?>\.\.[a-z-]++)?+$/) {
+        #$subtag->{_canon} = '_lowercase';
       } else {
         $subtag->{_canon} = $tag_name_start;
       }
@@ -48,7 +49,11 @@ my $langreg_source_file_name = shift;
       } else {
         $tag_name_end = $tag_name_start;
       }
-      for my $tag_name ($tag_name_start .. $tag_name_end) {
+      for my $tag_name (
+        $tag_name_start eq $tag_name_end
+          ? ($tag_name_start) # for 'nan'
+          : ($tag_name_start .. $tag_name_end)
+      ) {
         if ($subtags->{$subtag->{Type}->[0]}->{$tag_name}) {
           warn "Duplicate tag: $tag_name\n";
         } else {
@@ -75,12 +80,16 @@ for my $type (grep {!/^_/} keys %{$subtags}) {
     delete $subtag->{Tag};
     delete $subtag->{Subtag};
     delete $subtag->{Type};
+    delete $subtag->{Macrolanguage};
+    delete $subtag->{Scope};
     
     $subtag->{_deprecated} = 1 if $subtag->{Deprecated};
     delete $subtag->{Deprecated};
 
-    $subtag->{_preferred} = $subtag->{'Preferred-Value'}->[0]
-        if defined $subtag->{'Preferred-Value'}->[0];
+    if (defined $subtag->{'Preferred-Value'}->[0]) {
+      $subtag->{_preferred} = $subtag->{'Preferred-Value'}->[0];
+      #$subtag->{_preferred} =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+    }
     delete $subtag->{'Preferred-Value'};
 
     if (defined $subtag->{'Suppress-Script'}->[0]) {
@@ -99,19 +108,19 @@ for my $type (grep {!/^_/} keys %{$subtags}) {
 }
 
 ## Resolve transitive relationship of Preferred-Value field
-## NOTE: Although noted in RFC 4646, urrently no tag has such relationship.
 
 for my $type (grep {!/^_/} keys %{$subtags}) {
   for my $tag (keys %{$subtags->{$type}}) {
     my $subtag = $subtags->{$type}->{$tag};
-    my $new_subtag = $subtag;
+    my $preferred_subtag = $subtag;
+    my $preferred = $tag;
     while (1) {
-      my $preferred = $new_subtag->{_preferred};
-      last unless defined $preferred;
-      $preferred =~ tr/A-Z/a-z/;
-      $new_subtag = $subtags->{$type}->{$preferred};
-      last unless $new_subtag;
+      $preferred = $preferred_subtag->{_preferred} || $tag;
+      $preferred =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+      last if $preferred eq $tag;
+      $preferred_subtag = $subtags->{$type}->{$preferred};
     }
+    $subtag->{_preferred} = $preferred if $preferred ne $tag;
   }
 }
 

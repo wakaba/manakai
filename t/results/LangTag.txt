@@ -1,0 +1,205 @@
+ok 1 -  normalize
+ok 2 -  normalize
+ok 3 -  normalize
+ok 4 -  normalize
+ok 5 -  normalize
+ok 6 -  normalize
+ok 7 -  normalize
+ok 8 -  normalize
+ok 9 -  normalize
+ok 10 -  normalize
+# t/langtag-1.dat
+ok 11 - en
+ok 12 - en-US
+ok 13 - en-GB
+ok 14 - ja
+ok 15 - mn-Cyrl-MN
+ok 16 - MN-cYRL-mn
+ok 17 - mN-cYrL-Mn
+ok 18 - frm-1606nicT
+ok 19 - sl-rozaj
+ok 20 - sl-rozaJ-bIske
+ok 21 - sl-X-mytype
+ok 22 - X-mYtype
+ok 23 - sl-x-my-lang
+ok 24 - en-scousE
+ok 25 - iu-LatN
+not ok 26 - ZH-gan
+#   Failed test 'ZH-gan'
+#   at t/LangTag.t line 49.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------------------+---+--------------------------------------+
+# | Ln|Got                                        | Ln|Expected                              |
+# +---+-------------------------------------------+---+--------------------------------------+
+# *  1|langtag:redundant:case;;ZH-gan;s\n         *  1|langtag:grandfathered:case;;ZH-gan;s  *
+# *  2|langtag:redundant:deprecated;gan;ZH-gan;s  *   |                                      |
+# +---+-------------------------------------------+---+--------------------------------------+
+not ok 27 - I-Tsu
+#   Failed test 'I-Tsu'
+#   at t/LangTag.t line 49.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+----------------------------------------------+---+-------------------------------------+
+# | Ln|Got                                           | Ln|Expected                             |
+# +---+----------------------------------------------+---+-------------------------------------+
+# *  1|langtag:grandfathered:case;;I-Tsu;s\n         *  1|langtag:grandfathered:case;;I-Tsu;s  *
+# *  2|langtag:grandfathered:deprecated;tsu;I-Tsu;s  *   |                                     |
+# +---+----------------------------------------------+---+-------------------------------------+
+ok 28 - fr-Latn-CA
+ok 29 - qaa
+ok 30 - qrx
+ok 31 - qtz
+ok 32 - x-fr-CH
+ok 33 - i-klingon
+not ok 34 - i-bnn
+#   Failed test 'i-bnn'
+#   at t/LangTag.t line 49.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+----------------------------------------------+---+----------+
+# | Ln|Got                                           | Ln|Expected  |
+# +---+----------------------------------------------+---+----------+
+# *  1|langtag:grandfathered:deprecated;bnn;i-bnn;s  *   |          |
+# +---+----------------------------------------------+---+----------+
+ok 35 - haw
+ok 36 - i-enochian
+ok 37 - enochian-AQ
+ok 38 - enochian-Latn
+not ok 39 - zh-gan
+#   Failed test 'zh-gan'
+#   at t/LangTag.t line 49.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------------------+---+----------+
+# | Ln|Got                                        | Ln|Expected  |
+# +---+-------------------------------------------+---+----------+
+# *  1|langtag:redundant:deprecated;gan;zh-gan;s  *   |          |
+# +---+-------------------------------------------+---+----------+
+ok 40 - sr-Latn
+ok 41 - ja-Jpan
+ok 42 - ja-Latn
+ok 43 - de
+ok 44 - de-CH
+ok 45 - de-CH-1996
+ok 46 - de-CH-x-phonebk
+ok 47 - de-DE
+ok 48 - de-DE-1901
+ok 49 - es-419
+ok 50 - sl-IT-nedis
+ok 51 - sr-Latn
+ok 52 - sr-Latn-CS
+ok 53 - sr-Cyrl
+ok 54 - en-US-boont
+ok 55 - en-AA
+ok 56 - en-Qm
+ok 57 - en-QS
+ok 58 - en-QZ
+ok 59 - en-xa
+ok 60 - en-XG
+ok 61 - en-XZ
+ok 62 - en-ZZ
+ok 63 - sl-nedis
+ok 64 - sl-IT-nedis
+ok 65 - zh-nedis
+ok 66 - it-IT-nedis
+ok 67 - is-nedis
+ok 68 - de-1996-1901
+ok 69 - de-1901-1996
+ok 70 - de-1996
+ok 71 - de-Latg-1996
+ok 72 - de-a-value
+ok 73 - en-a-bbb-a-ccc
+ok 74 - en-a-bbb-x-a-ccc
+ok 75 - fr-a-Latn
+ok 76 - en-Latn-GB-boont-r-extended-sequence-x-private
+ok 77 - en-x-US
+ok 78 - az-Arab-x-AZE-derbend
+ok 79 - es-CO
+ok 80 - es-Latn-CO-x-private
+ok 81 - no-nyn
+ok 82 - fr-1996
+ok 83 - is-Latn
+ok 84 - art-lojban
+ok 85 - en-Latn
+ok 86 - en-Latn-US
+ok 87 - fr
+ok 88 - en-TL
+ok 89 - en-TP
+ok 90 - en-276
+ok 91 - en-830
+ok 92 - en-831
+ok 93 - en-832
+ok 94 - en-833
+ok 95 - en-UK
+ok 96 - sl
+ok 97 - sl-Latn-rozaj
+ok 98 - sl-Latn-IT-nedis
+ok 99 - sl-IT-rozaj
+ok 100 - de-nedis
+ok 101 - en-Brai
+ok 102 - iw
+ok 103 - und
+ok 104 - mul
+ok 105 - de-DE-1901-1901
+ok 106 - zh-Hant-TW
+ok 107 - zh-Hant
+ok 108 - zh-Hans
+ok 109 - zh-Hans-CN
+ok 110 - az
+ok 111 - az-Latn
+ok 112 - az-Cyrl
+ok 113 - zh-Latn-CN-variant1-a-extend1-x-wadegile-private1
+ok 114 - zh-Latn-CN-variant1-a-extend1-x-wadegile
+ok 115 - zh-Latn-CN-variant1-a-extend1
+ok 116 - zh-Latn-CN-variant1
+ok 117 - zh-Latn-CN
+ok 118 - zh-Latn
+ok 119 - zh
+not ok 120 - zh-guoyu
+#   Failed test 'zh-guoyu'
+#   at t/LangTag.t line 49.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------------------------+----------------------------------------------------+
+# | Ln|Got                                              |Expected                                            |
+# +---+-------------------------------------------------+----------------------------------------------------+
+# *  1|langtag:grandfathered:deprecated;cmn;zh-guoyu;s  |langtag:grandfathered:deprecated;zh-cmn;zh-guoyu;s  *
+# +---+-------------------------------------------------+----------------------------------------------------+
+ok 121 - en-A-aaa-B-ccc-bbb-x-xyz
+ok 122 - en-B-ccc-bbb-A-aaa-X-xyz
+ok 123 - en-BU
+ok 124 - en-MM
+ok 125 - en-a-aaa-bbb-ccc
+ok 126 - en-a-ccc-bbb-aaa
+ok 127 - en-b-ccc-bbb-aaa
+ok 128 - en-b-aaa-bbb-ccc
+ok 129 - zh-Hans-XQ
+ok 130 - x-someLang
+not ok 131 - zh-min
+#   Failed test 'zh-min'
+#   at t/LangTag.t line 49.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+--------------------------------------------+---+----------+
+# | Ln|Got                                         | Ln|Expected  |
+# +---+--------------------------------------------+---+----------+
+# *  1|langtag:grandfathered:deprecated;;zh-min;s  *   |          |
+# +---+--------------------------------------------+---+----------+
+not ok 132 - zh-min-nan-Hant-CN
+#   Failed test 'zh-min-nan-Hant-CN'
+#   at t/LangTag.t line 49.
+#   (in test::Whatpm::LangTag->_parse)
+# +---+-------------------------------+---+----------------------------------+
+# | Ln|Got                            | Ln|Expected                          |
+# +---+-------------------------------+---+----------------------------------+
+# *  1|langtag:extlang:prefix;;min;m  *  1|langtag:extlang:invalid;;min;m\n  *
+# |   |                               *  2|langtag:extlang:invalid;;nan;m    *
+# +---+-------------------------------+---+----------------------------------+
+ok 133 - x-whatever
+ok 134 - qaa-Qaaa-QM-x-southern
+ok 135 - de-Qaaa
+ok 136 - sr-Latn-QM
+ok 137 - sr-Qaaa-CS
+ok 138 - en-US-u-islamCal
+ok 139 - zh-CN-a-myExt-x-private
+ok 140 - en-a-myExt-b-another
+ok 141 - de-419-DE
+ok 142 - a-DE
+ok 143 - ar-a-aaa-b-bbb-a-ccc
+1..143
+# Looks like you failed 7 tests of 143.

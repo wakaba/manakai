@@ -1,5 +1,7 @@
 package Whatpm::LangTag;
 use strict;
+use warnings;
+our $VERSION = '1.0';
 
 my $default_error_levels = {
   langtag_fact => 'm',
@@ -10,6 +12,21 @@ my $default_error_levels = {
   warn => 'w',
   info => 'i',
 };
+
+## NOTE: RFC 5646 2.1.
+sub normalize_rfc5646_langtag ($$) {
+  my @tag = map { tr/A-Z/a-z/; $_ } split /-/, $_[1], -1;
+  for my $i (1..$#tag) {
+    if (1 == length $tag[$i - 1]) {
+      #
+    } elsif ($tag[$i] =~ /\A(..)\z/s) {
+      $tag[$i] =~ tr/a-z/A-Z/;
+    } elsif ($tag[$i] =~ /\A([a-z])(.{3})\z/s) {
+      $tag[$i] = (uc $1) . $2;
+    }
+  }
+  return join '-', @tag;
+} # normalize_rfc5646_langtag
 
 ## NOTE: This method, with appropriate $onerror handler, is a
 ## "well-formed" processor [RFC 4646].
@@ -229,6 +246,7 @@ sub check_rfc4646_langtag ($$$;$) {
   my $check_case = sub ($$$) {
     my ($type, $actual, $expected) = @_;
     
+    $expected ||= '_lowercase';
     if ($expected eq '_lowercase' and $actual !~ /[A-Z]/) {
       #
     } elsif ($expected eq '_uppercase' and $actual !~ /[a-z]/) {
@@ -756,4 +774,14 @@ sub check_rfc3066_language_tag ($$;$$) {
   ## TODO: Non-registered tags should be warned.
   ## $fact_level for i-*, $good_level for others.
 } # check_rfc3066_language_tag
+
+=head1 LICENSE
+
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;
