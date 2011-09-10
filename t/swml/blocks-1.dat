@@ -1082,6 +1082,27 @@
 |       "abc"
 
 #data
+| [EG[
+|  a
+| >
+| -b
+| ]EG]
+| abc
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <sw example>
+|       <pre>
+|         " a
+| >
+| -b"
+|     <p>
+|       "abc"
+
+#data
 | [PRE[
 | [INS[
 | ]INS]
@@ -1211,6 +1232,26 @@
 |       <dt>
 |       <dd>
 |         <sw refs>
+|           <p>
+|             "a"
+|         "b"
+
+#data
+| ::
+| [EG[
+| a
+| ]EG]
+| b
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <dl>
+|       <dt>
+|       <dd>
+|         <sw example>
 |           <p>
 |             "a"
 |         "b"
@@ -1435,6 +1476,29 @@
 |   <head>
 |   <body>
 |     <sw refs>
+|       <ul>
+|         <li>
+|           "abc"
+|         <li>
+|           "xyz"
+|     <ul>
+|       <li>
+|         <ul>
+|           <li>
+
+#data
+| [EG[
+| - abc
+| - xyz
+| ]EG]
+| --
+#errors
+#document
+| <html>
+|   xmlns xmlns="http://www.w3.org/1999/xhtml"
+|   <head>
+|   <body>
+|     <sw example>
 |       <ul>
 |         <li>
 |           "abc"

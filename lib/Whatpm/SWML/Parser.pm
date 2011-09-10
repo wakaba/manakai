@@ -44,12 +44,14 @@ sub TABLE_COLSPAN_CELL_TOKEN () { 27 }
 my %block_elements = (
   insert => SW09_NS, delete => SW09_NS, refs => SW09_NS,
   figure => HTML_NS, figcaption => HTML_NS,
+  example => SW09_NS,
 );
 
 my $tag_name_to_block_element_name = {
   INS => 'insert',
   DEL => 'delete',
   REFS => 'refs',
+  EG => 'example',
   FIG => 'figure',
   FIGCAPTION => 'figcaption',
 };
@@ -268,7 +270,7 @@ sub parse_char_string ($$$;$) {
           unshift @s, $s;
           $line--;
           last;
-        } elsif ($s =~ /\A\](INS|DEL|REFS|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
+        } elsif ($s =~ /\A\](INS|DEL|REFS|EG|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
           push @nt, {type => PREFORMATTED_END_TOKEN,
                      line => $line, column => $column};
           push @nt, {type => BLOCK_END_TAG_TOKEN, tag_name => $1,
@@ -352,7 +354,7 @@ sub parse_char_string ($$$;$) {
         $tokenize_text->(\$s);
       }
       return shift @nt;
-    } elsif ($s =~ /\A\[(INS|DEL|REFS|FIG(?:CAPTION)?)(?>\(([^()\\]*)\))?\[[\x09\x20]*\z/) {
+    } elsif ($s =~ /\A\[(INS|DEL|REFS|EG|FIG(?:CAPTION)?)(?>\(([^()\\]*)\))?\[[\x09\x20]*\z/) {
       undef $continuous_line;
       return {type => BLOCK_START_TAG_TOKEN, tag_name => $1,
               classes => $2,
@@ -393,7 +395,7 @@ sub parse_char_string ($$$;$) {
       $tokenize_text->(\$s);
       $continuous_line = 1;
       return shift @nt;
-    } elsif ($s =~ /\A\](INS|DEL|REFS|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
+    } elsif ($s =~ /\A\](INS|DEL|REFS|EG|FIG(?:CAPTION)?)\][\x09\x20]*\z/) {
       $continuous_line = 1;
       return {type => BLOCK_END_TAG_TOKEN, tag_name => $1,
               line => $line, column => $column};
