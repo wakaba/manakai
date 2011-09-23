@@ -540,121 +540,72 @@ sub check_rfc4646_langtag ($$$;$) {
 
         ## XXX RFC 5646 variant ordering
 
-      my @read_variant; # ([$original, $lowercased], ...)
+      my @prev_variant;
+      my %prev_variant;
       for my $variant_orig (@{$tag_o->{variant}}) {
         my $variant = $variant_orig;
         $variant =~ tr/A-Z/a-z/;
         if ($Registry->{variant}->{$variant}) {
           ## NOTE: This is a registered variant language subtag.
 
-          my $other_variants = {};
           my $prefixes = $Registry->{variant}->{$variant}->{Prefix} || [];
-          HAS_PREFIX: {
-            ## NOTE: @$prefixes is sorted by reverse order of lengths.
-
-            my $lang = $tag_o->{language}; # is not undef unless $tag_o broken
-            $lang =~ tr/A-Z/a-z/;
-            P: for my $prefix_s (@$prefixes) {
-              my $prefix_o = Whatpm::LangTag->parse_rfc4646_langtag
-                  ($prefix_s);
-              ## NOTE: We assumes that $prefix_s is a well-formed,
-              ## non-grandfathered tag.
-              next P unless $prefix_o->{language} eq $lang;
-              XL: for my $p_extlang (@{$prefix_o->{extlang}}) {
-                for (@{$tag_o->{extlang}}) {
-                  my $extlang = $_;
-                  $extlang =~ tr/A-Z/a-z/;
-                  if ($p_extlang eq $extlang) {
-                    next XL;
-                  }
+          if (@$prefixes) {
+            HAS_PREFIX: {
+              ## NOTE: @$prefixes is sorted by reverse order of
+              ## lengths.
+              
+              my $tag = join '-', grep { defined $_ }
+                  $tag_o->{language},
+                  @{$tag_o->{extlang} or []},
+                  $tag_o->{script},
+                  $tag_o->{region},
+                  @prev_variant;
+              for my $prefix_s (@$prefixes) {
+                if (Whatpm::LangTag->extended_filtering_range_rfc4647
+                        ($prefix_s, $tag)) {
+                  last HAS_PREFIX;
                 }
-                next P;
               }
-              my $p_script = $prefix_o->{script};
-              if ($p_script) {
-                my $script = $tag_o->{script};
-                next P unless defined $script;
-                $script =~ tr/A-Z/a-z/;
-                next P unless $p_script eq $script;
-              }
-              my $p_region = $prefix_o->{region};
-              if ($p_region) {
-                my $region = $tag_o->{region};
-                next P unless defined $region;
-                $region =~ tr/A-Z/a-z/;
-                next P unless $p_region eq $region;
-              }
-              ## NOTE: Whethter |...-variant1-variant2| should match
-              ## with |...-variant2-variant1| or not is unclear, but
-              ## it seems (from the use of the word "prefix" and the
-              ## context) that the former should not match with the
-              ## latter.
-              $other_variants = {};
-              my @t_variant = @read_variant;
-              my @p_variant = @{$prefix_o->{variant}};
-              XL: while (@t_variant) {
-                unless (@p_variant) {
-                  $other_variants->{$_->[1]} = $_->[0] for @t_variant;
-                  last XL;
-                }
-
-                my $t_v = shift @t_variant;
-                if ($t_v->[1] eq $p_variant[0]) {
-                  shift @p_variant;
-                } else {
-                  $other_variants->{$t_v->[1]} = $t_v->[0];
-                }
-              } # XL
-              next P if @p_variant;
-
-              ## NOTE: Matched.
-              last HAS_PREFIX;
-            } # P
-
-            ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
-            ## and RFC 4646 4.1. (SHOULD)
-            $onerror->(type => 'langtag:variant:prefix',
-                       value => $variant,
-                       level => $levels->{should});
-          } # HAS_PREFIX
+              
+              ## NOTE: RFC 4646 2.9. ("validating" processor MUST
+              ## check) and RFC 4646 4.1. (SHOULD)
+              $onerror->(type => 'langtag:variant:prefix',
+                         text => (join '|', @$prefixes),
+                         value => $variant,
+                         level => $levels->{should});
+            } # HAS_PREFIX
+          }
 
           $check_case->('variant', $variant_orig,
                         $Registry->{variant}->{$variant}->{_canon});
           $check_deprecated->('variant', $variant_orig,
                               $Registry->{variant}->{$variant});
 
-          for (keys %{$other_variants}) {
-            ## NOTE: RFC 4646 2.2.5. shows '1996' and '1901' as a bad
+          if ($prev_variant{$variant}) {
+            ## A variant subtag SHOULD only be used at most once in a
+            ## tag (RFC 4646 4.1. 6.)
+            $onerror->(type => 'langtag:variant:duplication',
+                       value => $variant_orig,
+                       level => $levels->{should});
+          } elsif (($variant eq '1996' and $prev_variant{1901}) or
+                   ($variant eq '1901' and $prev_variant{1996})) {
+            ## RFC 4646 2.2.5. shows '1996' and '1901' as a bad
             ## example and says that they SHOULD NOT be used together.
-            ## Additionally, it says that a variant registration
-            ## SHOULD include a 'Prefix' for appropriate combinations.
-            ## However, it never says that bad combinations other than
-            ## the example were non-conforming.
-            if ($variant eq $_) {
-              ## NOTE: In particular, use of same variant subtags is a
-              ## SHOULD NOT error (RFC 4646 4.1. 6.)
-              $onerror->(type => 'langtag:variant:duplication',
-                         value => $variant_orig,
-                         level => $levels->{should});
-            } else {
-              my $level = $levels->{warn};
-              $level = $levels->{should}
-                  if $variant eq '1901' and $_ eq '1996' or
-                      $_ eq '1901' and $variant eq '1996';
-              $onerror->(type => 'langtag:variant:combination',
-                         text => $variant_orig,
-                         value => $other_variants->{$_},
-                         level => $level);
-            }
+            $onerror->(type => 'langtag:variant:combination',
+                       text => $variant_orig,
+                       value => $variant eq '1901' ? '1996' : '1901',
+                       level => $levels->{should});
           }
-
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:variant:invalid',
                      value => $variant_orig,
-                     level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
+                     level => $RFC5646
+                                  ? $levels->{must}
+                                  : $levels->{langtag_fact});
         }
-        push @read_variant, [$variant_orig, $variant];
+        push @prev_variant, $variant_orig;
+        $prev_variant{$variant} = 1;
       }
 
       my $max_ext = 0x00;
