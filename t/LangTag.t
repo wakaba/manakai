@@ -51,12 +51,17 @@ sub _parse : Tests {
 
       my $parsed = Whatpm::LangTag->parse_rfc4646_langtag
           ($test->{data}->[0], $onerror);
-      Whatpm::LangTag->check_rfc4646_langtag ($parsed, $onerror);
+      my $result = Whatpm::LangTag->check_rfc4646_langtag ($parsed, $onerror);
       
-      if ($test->{4646}) {
+      my $expected = $test->{4646};
+      if ($expected) {
         eq_or_diff join ("\n", sort {$a cmp $b} @errors),
-            join ("\n", sort {$a cmp $b} @{$test->{4646}->[0]}),
+            join ("\n", sort {$a cmp $b} @{$expected->[0]}),
             '_parse ' . $test->{data}->[0];
+        is !$result->{well_formed},
+            !! grep { $_ eq 'ill-formed' } @{$expected->[1] or []};
+        is !$result->{valid},
+            !! grep { $_ eq 'ill-formed' or $_ eq 'invalid' } @{$expected->[1] or []};
       } else {
         warn qq[No test item: "$test->{data}->[0]];
       }
@@ -67,12 +72,17 @@ sub _parse : Tests {
       
       my $parsed = Whatpm::LangTag->parse_rfc5646_langtag
           ($test->{data}->[0], $onerror);
-      Whatpm::LangTag->check_rfc5646_langtag ($parsed, $onerror);
+      my $result = Whatpm::LangTag->check_rfc5646_langtag ($parsed, $onerror);
 
-      if ($test->{5646} || $test->{4646}) {
+      my $expected = $test->{5646} || $test->{4646};
+      if ($expected) {
         eq_or_diff join ("\n", sort {$a cmp $b} @errors),
-            join ("\n", sort {$a cmp $b} @{$test->{5646}->[0] || $test->{4646}->[0]}),
+            join ("\n", sort {$a cmp $b} @{$expected->[0]}),
             '_parse ' . $test->{data}->[0];
+        is !$result->{well_formed},
+            !! grep { $_ eq 'ill-formed' } @{$expected->[1]};
+        is !$result->{valid},
+            !! grep { $_ eq 'ill-formed' or $_ eq 'invalid' } @{$expected->[1]};
       }
     }
   }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[

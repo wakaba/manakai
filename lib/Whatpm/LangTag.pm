@@ -56,7 +56,7 @@ sub parse_rfc4646_langtag ($$;$$) {
   my @tag = split /-/, $tag, -1;
 
   my %r = (
-    language => shift @tag,
+    language => (@tag ? shift @tag : ''),
     extlang => [],
     variant => [],
     extension => [],
@@ -229,7 +229,7 @@ sub parse_rfc4646_langtag ($$;$$) {
   return \%r;
 } # parse_rfc4646_langtag
 
-sub check_rfc5646_langtag ($$$;$) {
+sub check_rfc5646_langtag ($$$;$%) {
   local $RFC5646 = 1;
   return shift->check_rfc4646_langtag (@_);
 } # check_rfc5646_langtag
@@ -241,6 +241,15 @@ sub check_rfc5646_langtag ($$$;$) {
 sub check_rfc4646_langtag ($$$;$) {
   my (undef, $tag_o, $onerror, $levels) = @_;
   $levels ||= $default_error_levels;
+
+  my $result = {well_formed => !@{$tag_o->{illegal}}, valid => 1};
+  if (defined $tag_o->{language}) {
+    delete $result->{well_formed}
+        unless $tag_o->{language} =~ /\A[A-Za-z]{2,8}\z/;
+  }
+  delete $result->{well_formed}
+      if grep { not /\A[A-Za-z0-9]{1,8}\z/ } @{$tag_o->{privateuse}};
+  delete $result->{valid} unless $result->{well_formed};
 
   require Whatpm::_LangTagReg;
   our $Registry;
@@ -345,6 +354,7 @@ sub check_rfc4646_langtag ($$$;$) {
     $onerror->(type => 'langtag:grandfathered:invalid',
                value => $tag_o->{grandfathered},
                level => $levels->{langtag_fact});
+    delete $result->{valid};
   } else {
     ## NOTE: We ignore illegal subtags for the purpose of validation
     ## in this case.
@@ -407,6 +417,7 @@ sub check_rfc4646_langtag ($$$;$) {
           $onerror->(type => 'langtag:language:invalid',
                      value => $tag_o->{language},
                      level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
+          delete $result->{valid};
         }
       } else {
         ## NOTE: If $tag_o is an output of the method
@@ -424,6 +435,7 @@ sub check_rfc4646_langtag ($$$;$) {
           $onerror->(type => 'langtag:extlang:invalid',
                      value => $extlang_orig,
                      level => $levels->{must});
+          delete $result->{valid};
           next;
         }
 
@@ -444,6 +456,7 @@ sub check_rfc4646_langtag ($$$;$) {
               $onerror->(type => 'langtag:extlang:prefix',
                          value => $extlang,
                          level => $levels->{must});
+              delete $result->{valid} unless $RFC5646;
             }
           }
 
@@ -459,8 +472,9 @@ sub check_rfc4646_langtag ($$$;$) {
           ## subtags.
           $onerror->(type => 'langtag:extlang:invalid',
                      value => $extlang_orig,
-                     level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
-          
+                     level => $RFC5646
+                         ? $levels->{must} : $levels->{langtag_fact});
+          delete $result->{valid};
         }
         $i_extlang++;
       } # extlang
@@ -502,6 +516,7 @@ sub check_rfc4646_langtag ($$$;$) {
           $onerror->(type => 'langtag:script:invalid',
                      value => $tag_o->{script},
                      level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
+          delete $result->{valid};
         }
       }
       
@@ -535,6 +550,7 @@ sub check_rfc4646_langtag ($$$;$) {
           $onerror->(type => 'langtag:region:invalid',
                      value => $tag_o->{region},
                      level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
+          delete $result->{valid};
         }
       }
 
@@ -582,6 +598,7 @@ sub check_rfc4646_langtag ($$$;$) {
                          text => (join '|', @$prefixes),
                          value => $variant,
                          level => $levels->{should});
+              delete $result->{valid} unless $RFC5646;
             } # HAS_PREFIX
             if ($RFC5646 and @longer_prefix and @longer_prefix != @$prefixes) {
               my $tag = join '-', grep { defined $_ }
@@ -625,6 +642,7 @@ sub check_rfc4646_langtag ($$$;$) {
             $onerror->(type => 'langtag:variant:duplication',
                        value => $variant_orig,
                        level => $levels->{should});
+            delete $result->{valid};
           } elsif (($variant eq '1996' and $prev_variant{1901}) or
                    ($variant eq '1901' and $prev_variant{1996})) {
             ## RFC 4646 2.2.5. shows '1996' and '1901' as a bad
@@ -641,12 +659,14 @@ sub check_rfc4646_langtag ($$$;$) {
                      level => $RFC5646
                                   ? $levels->{must}
                                   : $levels->{langtag_fact});
+          delete $result->{valid};
         }
         push @prev_variant, $variant_orig;
         $prev_variant{$variant} = 1;
       }
 
       my $max_ext = 0x00;
+      my %has_ext;
       for my $ext (@{$tag_o->{extension}}) {
         ## NOTE: Extension subtag.  At the time of writing of this
         ## code, there is no defined extension subtag.
@@ -666,6 +686,8 @@ sub check_rfc4646_langtag ($$$;$) {
         ## (RFC 4646 3.7.) - We don't check this, since there is no
         ## extension defined.
 
+        #delete $result->{valid} if $RFC4646 and extension is invalid.
+
         my $ext_type = $ext->[0];
         $ext_type =~ tr/A-Z/a-z/;
         if ($max_ext > ord $ext_type) {
@@ -681,7 +703,12 @@ sub check_rfc4646_langtag ($$$;$) {
                      value => $ext->[0],
                      level => $levels->{should});
         } else {
+          if ($has_ext{$ext_type}) {
+            delete $result->{well_formed} unless $RFC5646;
+            delete $result->{valid};
+          }
           $max_ext = ord $ext_type;
+          $has_ext{$ext_type} = 1;
         }
       }
 
@@ -717,10 +744,9 @@ sub check_rfc4646_langtag ($$$;$) {
       ## on the case of invalid subtags).
     }
   }
-} # check_rfc4646_langtag
 
-## TODO: Should we return values that indicate whether a tag is
-## well-formed, valid, or canonical?
+  return $result;
+} # check_rfc4646_langtag
 
 ## XXX RFC 5646 full canonicalization
 

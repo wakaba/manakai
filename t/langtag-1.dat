@@ -12,17 +12,17 @@ en-GB
 
 #data
 english
-#4646
+#4646 invalid
 langtag:language:invalid;;english;m
 
 #data
 en-cockney
-#4646
+#4646 invalid
 langtag:variant:invalid;;cockney;m
 
 #data
 en-GB-Hixie
-#4646
+#4646 invalid
 langtag:variant:invalid;;Hixie;m
 
 #data
@@ -34,7 +34,7 @@ langtag:privateuse;;X-Hixie;s
 
 #data
 en-securid
-#4646
+#4646 invalid
 langtag:variant:invalid;;securid;m
 
 #data
@@ -48,19 +48,19 @@ langtag:privateuse;;x-SI;s
 
 #data
 en-US-h3h
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;en-US-h3h;m
-#5646
+#5646 ill-formed
 langtag:illegal;;h3h;m
 
 #data
 en-US-Hixie
-#4646
+#4646 invalid
 langtag:variant:invalid;;Hixie;m
 
 #data
 en-US-slang
-#4646
+#4646 invalid
 langtag:variant:invalid;;slang;m
 
 #data
@@ -92,7 +92,9 @@ langtag:variant:case;;1606nicT;s
 
 #data
 fr-1606nict
-#4646
+#4646 invalid
+langtag:variant:prefix;frm;1606nict;s
+#5646
 langtag:variant:prefix;frm;1606nict;s
 
 #data
@@ -107,7 +109,9 @@ fr-1694acad
 
 #data
 frm-1694acad
-#4646
+#4646 invalid
+langtag:variant:prefix;fr;1694acad;s
+#5646
 langtag:variant:prefix;fr;1694acad;s
 
 #data
@@ -147,7 +151,9 @@ sl-rozaj-biske-1994
 
 #data
 sl-1994-rozaj-biske
-#4646
+#4646 invalid
+langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
+#5646
 langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
 
 #data
@@ -204,7 +210,7 @@ en-scotland-fonipa-fonupa-fonxsamp
 
 #data
 en-scotland-fonipa-fonupa-fonxsamp-hepburn
-#4646
+#4646 invalid
 langtag:variant:prefix;ja-latn;hepburn;s
 #5646
 langtag:variant:prefix;ja-latn;hepburn;s
@@ -216,12 +222,17 @@ ja-Latn-hepburn
 
 #data
 ja-hepburn
-#4646
+#4646 invalid
+langtag:variant:prefix;ja-latn;hepburn;s
+#5646
 langtag:variant:prefix;ja-latn;hepburn;s
 
 #data
 ja-jp-hepburn
-#4646
+#4646 invalid
+langtag:variant:prefix;ja-latn;hepburn;s
+langtag:region:case;;jp;s
+#5646
 langtag:variant:prefix;ja-latn;hepburn;s
 langtag:region:case;;jp;s
 
@@ -231,13 +242,20 @@ ja-Latn-JP-hepburn
 
 #data
 ja-heploc
-#4646
+#4646 invalid
+langtag:variant:deprecated;alalc97;heploc;s
+langtag:variant:prefix;ja-latn-hepburn;heploc;s
+#5646
 langtag:variant:deprecated;alalc97;heploc;s
 langtag:variant:prefix;ja-latn-hepburn;heploc;s
 
 #data
 ja-Latn-jp-heploc
-#4646
+#4646 invalid
+langtag:variant:deprecated;alalc97;heploc;s
+langtag:region:case;;jp;s
+langtag:variant:prefix;ja-latn-hepburn;heploc;s
+#5646
 langtag:variant:deprecated;alalc97;heploc;s
 langtag:region:case;;jp;s
 langtag:variant:prefix;ja-latn-hepburn;heploc;s
@@ -250,7 +268,10 @@ langtag:region:case;;jp;s
 
 #data
 ja-Latn-JP-heploc-hepburn
-#4646
+#4646 invalid
+langtag:variant:deprecated;alalc97;heploc;s
+langtag:variant:prefix;ja-latn-hepburn;heploc;s
+#5646
 langtag:variant:deprecated;alalc97;heploc;s
 langtag:variant:prefix;ja-latn-hepburn;heploc;s
 
@@ -287,6 +308,25 @@ zh-Latn-pinyin
 #4646
 
 #data
+abcd-yue
+#4646 ill-formed
+langtag:illegal;;yue;m
+langtag:language:invalid;;abcd;m
+
+#data
+abcde-yue
+#4646 ill-formed
+langtag:illegal;;yue;m
+langtag:language:invalid;;abcde;m
+
+#data
+1234-yue
+#4646 ill-formed
+langtag:illegal;;yue;m
+langtag:language:invalid;;1234;m
+langtag:language:syntax;;1234;m
+
+#data
 zh-yue-Latn-pinyin
 #4646
 #5646
@@ -294,7 +334,10 @@ langtag:extlang:preferred;yue;yue;s
 
 #data
 yue-Latn-Pinyin
-#4646
+#4646 invalid
+langtag:variant:case;;Pinyin;s
+langtag:variant:prefix;bo-latn|zh-latn;pinyin;s
+#5646
 langtag:variant:case;;Pinyin;s
 langtag:variant:prefix;bo-latn|zh-latn;pinyin;s
 
@@ -308,58 +351,58 @@ zh-Latn-TW-pinyin
 
 #data
 zh-amoy
-#4646
+#4646 invalid
 langtag:script:invalid;;amoy;m
 
 #data
 zh-canton
-#4646
+#4646 invalid
 langtag:variant:invalid;;canton;m
 
 #data
 zh-chaozhou
-#4646
+#4646 invalid
 langtag:variant:invalid;;chaozhou;m
 
 #data
 zh-fukien
-#4646
+#4646 invalid
 langtag:variant:invalid;;fukien;m
 
 #data
 zh-fuzhou
-#4646
+#4646 invalid
 langtag:variant:invalid;;fuzhou;m
 
 #data
 zh-hainan
-#4646
+#4646 invalid
 langtag:variant:invalid;;hainan;m
 
 #data
 zh-mandarin
-#4646
+#4646 invalid
 langtag:variant:invalid;;mandarin;m
 
 #data
 zh-mandarin-smpl
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;zh-mandarin-smpl;m
-#5646
+#5646 ill-formed
 langtag:variant:invalid;;mandarin;m
 langtag:illegal;;smpl;m
 
 #data
 zh-mandarin-trad
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;zh-mandarin-trad;m
-#5646
+#5646 ill-formed
 langtag:variant:invalid;;mandarin;m
 langtag:illegal;;trad;m
 
 #data
 zh-yunnan
-#4646
+#4646 invalid
 langtag:variant:invalid;;yunnan;m
 
 #data
@@ -427,7 +470,7 @@ langtag:privateuse;;x-klingon;s
 
 #data
 i-klingon-romanized
-#4646
+#4646 ill-formed
 langtag:illegal;;romanized;m
 langtag:language:invalid;;i;m
 langtag:language:syntax;;i;m
@@ -452,7 +495,9 @@ langtag:script:case;;latn;s
 
 #data
 en-baku1926
-#4646
+#4646 invalid
+langtag:variant:prefix;crh|krc|sah|az|ba|kk|ky|tk|tt|uz;baku1926;s
+#5646
 langtag:variant:prefix;crh|krc|sah|az|ba|kk|ky|tk|tt|uz;baku1926;s
 
 #data
@@ -478,13 +523,13 @@ haw
 
 #data
 lit-classic
-#4646
+#4646 invalid
 langtag:language:invalid;;lit;m
 langtag:variant:invalid;;classic;m
 
 #data
 lt-classic
-#4646
+#4646 invalid
 langtag:variant:invalid;;classic;m
 
 #data
@@ -493,17 +538,23 @@ x-minbari-warrior-caste
 langtag:privateuse;;x-minbari-warrior-caste;s
 
 #data
+x-123456789
+#4646 ill-formed
+langtag:privateuse:syntax;;123456789;m
+langtag:privateuse;;x-123456789;s
+
+#data
 i-enochian
 #4646
 
 #data
 enochian-AQ
-#4646
+#4646 invalid
 langtag:language:invalid;;enochian;m
 
 #data
 enochian-Latn
-#4646
+#4646 invalid
 langtag:language:invalid;;enochian;m
 
 #data
@@ -562,45 +613,45 @@ langtag:extlang:preferred;yue;yue;s
 
 #data
 zh-yue-hoe
-#4646
+#4646 invalid
 langtag:extlang:invalid;;hoe;m
-#5646
+#5646 invalid
 langtag:extlang:preferred;yue;yue;s
 langtag:extlang:invalid;;hoe;m
 
 #data
 zh-zaf-yue
-#4646
+#4646 invalid
 langtag:extlang:invalid;;zaf;m
-#5646
+#5646 invalid
 langtag:extlang:invalid;;zaf;m
 langtag:extlang:invalid;;yue;m
 
 #data
 zh-yue-zaf
-#4646
+#4646 invalid
 langtag:extlang:invalid;;zaf;m
-#5646
+#5646 invalid
 langtag:extlang:invalid;;zaf;m
 langtag:extlang:preferred;yue;yue;s
 
 #data
 zh-yue-hoe-zaf
-#4646
+#4646 invalid
 langtag:extlang:invalid;;hoe;m
 langtag:extlang:invalid;;zaf;m
-#5646
+#5646 invalid
 langtag:extlang:invalid;;hoe;m
 langtag:extlang:invalid;;zaf;m
 langtag:extlang:preferred;yue;yue;s
 
 #data
 zh-yue-hoe-fuga-Hant
-#4646
+#4646 ill-formed
 langtag:extlang:invalid;;hoe;m
 langtag:illegal;;Hant;m
 langtag:script:invalid;;fuga;m
-#5646
+#5646 ill-formed
 langtag:extlang:invalid;;hoe;m
 langtag:illegal;;Hant;m
 langtag:script:invalid;;fuga;m
@@ -608,9 +659,9 @@ langtag:extlang:preferred;yue;yue;s
 
 #data
 zh-Hant-yue
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;zh-Hant-yue;m
-#5646
+#5646 ill-formed
 langtag:illegal;;yue;m
 
 #data
@@ -619,7 +670,7 @@ yue-jyutping
 
 #data
 zh-yue-jyutping
-#4646
+#4646 invalid
 langtag:variant:prefix;yue;jyutping;s
 #5646
 langtag:extlang:preferred;yue;yue;s
@@ -652,12 +703,12 @@ cmn
 
 #data
 zh-classical
-#4646
+#4646 ill-formed
 langtag:illegal;;classical;m
 
 #data
 mul-kambun
-#4646
+#4646 invalid
 langtag:language:mul;;;s
 langtag:variant:invalid;;kambun;m
 
@@ -705,39 +756,39 @@ ja-Latn
 
 #data
 ja-2ch
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;ja-2ch;m
-#5646
+#5646 ill-formed
 langtag:illegal;;2ch;m
 
 #data
 ja-2ch-2001-08
-#4646
+#4646 ill-formed
 langtag:illegal;;08;m
 langtag:illegal;;2001;m
 langtag:illegal;;2ch;m
 
 #data
 ja-JP-kansai-oosaka
-#4646
+#4646 invalid
 langtag:variant:invalid;;kansai;m
 langtag:variant:invalid;;oosaka;m
 
 #data
 ja-JP-oosaka
-#4646
+#4646 invalid
 langtag:variant:invalid;;oosaka;m
 
 #data
 ja-JP-TKY-shibuya-slang
-#4646
+#4646 ill-formed
 langtag:illegal;;TKY;m
 langtag:illegal;;shibuya;m
 langtag:illegal;;slang;m
 
 #data
 ja-JP-TKY-shibuya-slang-2002
-#4646
+#4646 ill-formed
 langtag:illegal;;2002;m
 langtag:illegal;;TKY;m
 langtag:illegal;;shibuya;m
@@ -745,40 +796,40 @@ langtag:illegal;;slang;m
 
 #data
 ja-trad
-#4646
+#4646 invalid
 langtag:script:invalid;;trad;m
 
 #data
 ja-classic
-#4646
+#4646 invalid
 langtag:variant:invalid;;classic;m
 
 #data
 ja-classic-heian
-#4646
+#4646 invalid
 langtag:variant:invalid;;classic;m
 langtag:variant:invalid;;heian;m
 
 #data
 ja-JPM
-#4646
+#4646 invalid
 langtag:extlang:invalid;;JPM;m
 
 #data
 ja-JP-mac
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;ja-JP-mac;m
-#5646
+#5646 ill-formed
 langtag:illegal;;mac;m
 
 #data
 ja-ryuukyuu
-#4646
+#4646 invalid
 langtag:variant:invalid;;ryuukyuu;m
 
 #data
 jp
-#4646
+#4646 invalid
 langtag:language:invalid;;jp;m
 
 #data
@@ -795,17 +846,17 @@ de-CH-1996
 
 #data
 de-example
-#4646
+#4646 invalid
 langtag:variant:invalid;;example;m
 
 #data
 de-1996-example
-#4646
+#4646 invalid
 langtag:variant:invalid;;example;m
 
 #data
 de-example-1996
-#4646
+#4646 invalid
 langtag:variant:invalid;;example;m
 
 #data
@@ -859,18 +910,18 @@ es-021
 
 #data
 es-trad
-#4646
+#4646 invalid
 langtag:script:invalid;;trad;m
 
 #data
 spa-modern
-#4646
+#4646 invalid
 langtag:language:invalid;;spa;m
 langtag:variant:invalid;;modern;m
 
 #data
 spa-trad
-#4646
+#4646 invalid
 langtag:language:invalid;;spa;m
 langtag:script:invalid;;trad;m
 
@@ -888,12 +939,12 @@ hr
 
 #data
 ma
-#4646
+#4646 invalid
 langtag:language:invalid;;ma;m
 
 #data
 teamemh
-#4646
+#4646 invalid
 langtag:language:invalid;;teamemh;m
 
 #data
@@ -906,7 +957,7 @@ sr-Latn
 
 #data
 sr-latin
-#4646
+#4646 invalid
 langtag:variant:invalid;;latin;m
 
 #data
@@ -940,7 +991,9 @@ en-JP-boont
 
 #data
 ja-boont
-#4646
+#4646 invalid
+langtag:variant:prefix;en;boont;s
+#5646
 langtag:variant:prefix;en;boont;s
 
 #data
@@ -959,7 +1012,7 @@ langtag:region:private;;AA;w
 
 #data
 en-QL
-#4646
+#4646 invalid
 langtag:region:invalid;;QL;m
 
 #data
@@ -1009,17 +1062,23 @@ sl-IT-nedis
 
 #data
 zh-nedis
-#4646
+#4646 invalid
+langtag:variant:prefix;sl;nedis;s
+#5646
 langtag:variant:prefix;sl;nedis;s
 
 #data
 it-IT-nedis
-#4646
+#4646 invalid
+langtag:variant:prefix;sl;nedis;s
+#5646
 langtag:variant:prefix;sl;nedis;s
 
 #data
 is-nedis
-#4646
+#4646 invalid
+langtag:variant:prefix;sl;nedis;s
+#5646
 langtag:variant:prefix;sl;nedis;s
 
 #data
@@ -1042,9 +1101,9 @@ de-Latg-1996
 
 #data
 a-value
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;a-value;m
-#5646
+#5646 ill-formed
 langtag:language:invalid;;a;m
 langtag:language:syntax;;a;m
 langtag:variant:invalid;;value;m
@@ -1056,7 +1115,11 @@ langtag:extension:unknown;;a-value;m
 
 #data
 en-a-bbb-a-ccc
-#4646
+#4646 ill-formed
+langtag:extension:duplication;;a;m
+langtag:extension:unknown;;a-bbb;m
+langtag:extension:unknown;;a-ccc;m
+#5646 invalid
 langtag:extension:duplication;;a;m
 langtag:extension:unknown;;a-bbb;m
 langtag:extension:unknown;;a-ccc;m
@@ -1074,7 +1137,7 @@ langtag:extension:unknown;;a-Latn;m
 
 #data
 tlh-a-b-foo
-#4646
+#4646 ill-formed
 langtag:illegal;;a;m
 langtag:illegal;;b;m
 langtag:illegal;;foo;m
@@ -1107,12 +1170,12 @@ langtag:privateuse;;x-attic;s
 
 #data
 az-arabic
-#4646
+#4646 invalid
 langtag:variant:invalid;;arabic;m
 
 #data
 az-cyrillic
-#4646
+#4646 invalid
 langtag:variant:invalid;;cyrillic;m
 
 #data
@@ -1142,7 +1205,7 @@ langtag:grandfathered:deprecated;nn;no-nyn;s
 
 #data
 no-nynorsk
-#4646
+#4646 invalid
 langtag:variant:invalid;;nynorsk;m
 
 #data
@@ -1170,12 +1233,14 @@ langtag:privateuse;;x-personal;s
 
 #data
 fr-1996
-#4646
+#4646 invalid
+langtag:variant:prefix;de;1996;s
+#5646
 langtag:variant:prefix;de;1996;s
 
 #data
 fr-JP-antipop
-#4646
+#4646 invalid
 langtag:variant:invalid;;antipop;m
 
 #data
@@ -1221,12 +1286,12 @@ langtag:region:deprecated;TL;TP;s
 
 #data
 en-276
-#4646
+#4646 invalid
 langtag:region:invalid;;276;m
 
 #data
 en-830
-#4646
+#4646 invalid
 langtag:region:invalid;;830;m
 
 #data
@@ -1235,22 +1300,22 @@ en-150
 
 #data
 en-831
-#4646
+#4646 invalid
 langtag:region:invalid;;831;m
 
 #data
 en-832
-#4646
+#4646 invalid
 langtag:region:invalid;;832;m
 
 #data
 en-833
-#4646
+#4646 invalid
 langtag:region:invalid;;833;m
 
 #data
 en-UK
-#4646
+#4646 invalid
 langtag:region:invalid;;UK;m
 
 #data
@@ -1259,7 +1324,7 @@ en-EU
 
 #data
 ro-RO/Romanian/Romania
-#4646
+#4646 ill-formed
 langtag:illegal;;RO/Romanian/Romania;m
 
 #data
@@ -1298,23 +1363,33 @@ sl-IT-rozaj-biske-1994
 
 #data
 sl-IT-biske-rozaj-1994
-#4646
+#4646 invalid
+langtag:variant:prefix;sl-rozaj;biske;s
+#5646
 langtag:variant:prefix;sl-rozaj;biske;s
 
 #data
 sl-IT-1994-rozaj-biske
-#4646
+#4646 invalid
+langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
+#5646
 langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
 
 #data
 sl-IT-1994-biske-rozaj
-#4646
+#4646 invalid
+langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
+langtag:variant:prefix;sl-rozaj;biske;s
+#5646
 langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
 langtag:variant:prefix;sl-rozaj;biske;s
 
 #data
 sl-IT-biske-1994-rozaj
-#4646
+#4646 invalid
+langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
+langtag:variant:prefix;sl-rozaj;biske;s
+#5646
 langtag:variant:prefix;sl-rozaj-biske|sl-rozaj-njiva|sl-rozaj-osojs|sl-rozaj-solba|sl-rozaj;1994;s
 langtag:variant:prefix;sl-rozaj;biske;s
 
@@ -1324,12 +1399,16 @@ sl-rozaj-lipaw
 
 #data
 sl-lipaw-rozaj
-#4646
+#4646 invalid
+langtag:variant:prefix;sl-rozaj;lipaw;s
+#5646
 langtag:variant:prefix;sl-rozaj;lipaw;s
 
 #data
 sl-lipaw-rozaj-biske
-#4646
+#4646 invalid
+langtag:variant:prefix;sl-rozaj;lipaw;s
+#5646
 langtag:variant:prefix;sl-rozaj;lipaw;s
 
 #data
@@ -1338,7 +1417,9 @@ sl-rozaj-biske-lipaw
 
 #data
 de-nedis
-#4646
+#4646 invalid
+langtag:variant:prefix;sl;nedis;s
+#5646
 langtag:variant:prefix;sl;nedis;s
 
 #data
@@ -1389,7 +1470,7 @@ langtag:language:case;;miS;s
 
 #data
 de-DE-1901-1901
-#4646
+#4646 invalid
 langtag:variant:duplication;;1901;s
 
 #data
@@ -1427,17 +1508,17 @@ zh-Hans-CN
 
 #data
 chi-CN-wu
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;chi-CN-wu;m
-#5646
+#5646 ill-formed
 langtag:illegal;;wu;m
 langtag:language:invalid;;chi;m
 
 #data
 chi-mandarin-smpl
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;chi-mandarin-smpl;m
-#5646
+#5646 ill-formed
 langtag:illegal;;smpl;m
 langtag:language:invalid;;chi;m
 langtag:variant:invalid;;mandarin;m
@@ -1452,7 +1533,7 @@ az-Latn
 
 #data
 az-latin
-#4646
+#4646 invalid
 langtag:variant:invalid;;latin;m
 
 #data
@@ -1461,27 +1542,27 @@ az-Cyrl
 
 #data
 zh-Latn-CN-variant1-a-extend1-x-wadegile-private1
-#4646
+#4646 invalid
 langtag:variant:invalid;;variant1;m
 langtag:extension:unknown;;a-extend1;m
 langtag:privateuse;;x-wadegile-private1;s
 
 #data
 zh-Latn-CN-variant1-a-extend1-x-wadegile
-#4646
+#4646 invalid
 langtag:variant:invalid;;variant1;m
 langtag:extension:unknown;;a-extend1;m
 langtag:privateuse;;x-wadegile;s
 
 #data
 zh-Latn-CN-variant1-a-extend1
-#4646
+#4646 invalid
 langtag:variant:invalid;;variant1;m
 langtag:extension:unknown;;a-extend1;m
 
 #data
 zh-Latn-CN-variant1
-#4646
+#4646 invalid
 langtag:variant:invalid;;variant1;m
 
 #data
@@ -1575,18 +1656,18 @@ langtag:grandfathered:deprecated;nan;zh-min-nan;s
 
 #data
 zh-min-nan-Hant-CN
-#4646
+#4646 invalid
 langtag:extlang:prefix;;min;m
-#5646
+#5646 invalid
 langtag:extlang:invalid;;nan;m
 langtag:extlang:preferred;min;min;s
 langtag:extlang:prefix;;min;m
 
 #data
 ms-min-nan-Hant-CN
-#4646
+#4646 invalid
 langtag:extlang:prefix;;nan;m
-#5646
+#5646 invalid
 langtag:extlang:invalid;;nan;m
 langtag:extlang:preferred;min;min;s
 
@@ -1663,16 +1744,16 @@ langtag:extension:unknown;;b-another;m
 
 #data
 de-419-DE
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;de-419-DE;m
-#5646
+#5646 ill-formed
 langtag:illegal;;DE;m
 
 #data
 a-DE
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;a-DE;m
-#5646
+#5646 ill-formed
 langtag:language:invalid;;a;m
 langtag:language:syntax;;a;m
 
@@ -1682,12 +1763,12 @@ vi
 
 #data
 vi-hanoi
-#4646
+#4646 invalid
 langtag:variant:invalid;;hanoi;m
 
 #data
 vi-saigon
-#4646
+#4646 invalid
 langtag:variant:invalid;;saigon;m
 
 #data
@@ -1724,7 +1805,7 @@ ar-Cyrl-CO
 
 #data
 ara-DZ
-#4646
+#4646 invalid
 langtag:language:invalid;;ara;m
 
 #data
@@ -1745,9 +1826,9 @@ uz-Zxxx
 
 #data
 i-sami-no
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;i-sami-no;m
-#5646
+#5646 ill-formed
 langtag:language:invalid;;i;m
 langtag:language:syntax;;i;m
 langtag:region:case;;no;s
@@ -1780,50 +1861,50 @@ langtag:privateuse;;x-none;s
 
 #data
 none
-#4646
+#4646 invalid
 langtag:language:invalid;;none;m
 
 #data
 1234
-#4646
+#4646 ill-formed
 langtag:language:invalid;;1234;m
 langtag:language:syntax;;1234;m
 
 #data
 abcde
-#4646
+#4646 invalid
 langtag:language:invalid;;abcde;m
 
 #data
 inherit
-#4646
+#4646 invalid
 langtag:language:invalid;;inherit;m
 
 #data
 unknown
-#4646
+#4646 invalid
 langtag:language:invalid;;unknown;m
 
 #data
 abcdefgh
-#4646
+#4646 invalid
 langtag:language:invalid;;abcdefgh;m
 
 #data
 abcdefghi
-#4646
+#4646 ill-formed
 langtag:language:invalid;;abcdefghi;m
 langtag:language:syntax;;abcdefghi;m
 
 #data
 abcdefghij
-#4646
+#4646 ill-formed
 langtag:language:invalid;;abcdefghij;m
 langtag:language:syntax;;abcdefghij;m
 
 #data
 abcdefghijk
-#4646
+#4646 ill-formed
 langtag:language:invalid;;abcdefghijk;m
 langtag:language:syntax;;abcdefghijk;m
 
@@ -1880,9 +1961,9 @@ sgn-RU
 
 #data
 sgn-US-MA
-#4646
+#4646 invalid
 langtag:grandfathered:invalid;;sgn-US-MA;m
-#5646
+#5646 ill-formed
 langtag:illegal;;MA;m
 
 #data
@@ -1925,41 +2006,42 @@ af
 
 #data
 afr
-#4646
+#4646 invalid
 langtag:language:invalid;;afr;m
 
 #data
 alb
-#4646
+#4646 invalid
 langtag:language:invalid;;alb;m
 
 #data escaped
 \u65E5\u672C\u8A9E
-#4646 escaped
+#4646 ill-formed escaped
 langtag:language:invalid;;\u65e5\u672c\u8a9e;m
 langtag:language:syntax;;\u65e5\u672c\u8a9e;m
 
 #data escaped
 \u82F1\u8A9E-(U.S)
-#4646 escaped
+#4646 ill-formed escaped
 langtag:illegal;;(U.S);m
 langtag:language:invalid;;\u82f1\u8a9e;m
 langtag:language:syntax;;\u82f1\u8a9e;m
 
 #data
-#4646
+#4646 ill-formed
 langtag:language:syntax;;;m
+langtag:language:invalid;;;m
 
 #data
 -
-#4646
+#4646 ill-formed
 langtag:illegal;;;m
 langtag:language:invalid;;;m
 langtag:language:syntax;;;m
 
 #data
 --
-#4646
+#4646 ill-formed
 langtag:illegal;;;m
 langtag:illegal;;;m
 langtag:language:invalid;;;m
@@ -1967,14 +2049,14 @@ langtag:language:syntax;;;m
 
 #data
 -jp
-#4646
+#4646 ill-formed
 langtag:language:invalid;;;m
 langtag:language:syntax;;;m
 langtag:region:case;;jp;s
 
 #data
 --jp
-#4646
+#4646 ill-formed
 langtag:illegal;;;m
 langtag:illegal;;jp;m
 langtag:language:invalid;;;m
@@ -1982,48 +2064,48 @@ langtag:language:syntax;;;m
 
 #data
 a
-#4646
+#4646 ill-formed
 langtag:language:invalid;;a;m
 langtag:language:syntax;;a;m
 
 #data
 b
-#4646
+#4646 ill-formed
 langtag:language:invalid;;b;m
 langtag:language:syntax;;b;m
 
 #data
 u
-#4646
+#4646 ill-formed
 langtag:language:invalid;;u;m
 langtag:language:syntax;;u;m
 
 #data
 i
-#4646
+#4646 ill-formed
 langtag:language:invalid;;i;m
 langtag:language:syntax;;i;m
 
 #data
 x
-#4646
+#4646 ill-formed
 langtag:illegal;;x;m
 
 #data
 x-
-#4646
+#4646 ill-formed
 langtag:privateuse:case;;;s
 langtag:privateuse:syntax;;;m
 langtag:privateuse;;x-;s
 
 #data
 z
-#4646
+#4646 ill-formed
 langtag:language:invalid;;z;m
 langtag:language:syntax;;z;m
 
 #data
 1
-#4646
+#4646 ill-formed
 langtag:language:invalid;;1;m
 langtag:language:syntax;;1;m
