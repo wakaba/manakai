@@ -1,7 +1,7 @@
 package Whatpm::LangTag;
 use strict;
 use warnings;
-our $VERSION = '1.0';
+our $VERSION = '2.0';
 
 my $default_error_levels = {
   langtag_fact => 'm',
@@ -13,12 +13,15 @@ my $default_error_levels = {
   info => 'i',
 };
 
-## NOTE: RFC 5646 2.1.
+## NOTE: RFC 5646 2.1., 2.2.6.
 sub normalize_rfc5646_langtag ($$) {
   my @tag = map { tr/A-Z/a-z/; $_ } split /-/, $_[1], -1;
+  my $in_extension;
   for my $i (1..$#tag) {
     if (1 == length $tag[$i - 1]) {
-      #
+      if ($tag[$i - 1] ne 'x' and $tag[$i - 1] ne 'i') {
+        last;
+      }
     } elsif ($tag[$i] =~ /\A(..)\z/s) {
       $tag[$i] =~ tr/a-z/A-Z/;
     } elsif ($tag[$i] =~ /\A([a-z])(.{3})\z/s) {

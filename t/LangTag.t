@@ -9,7 +9,7 @@ require Whatpm::LangTag;
 use Test::More;
 use Test::Differences;
 
-sub _normalize : Tests {
+sub _normalize : Test(13) {
   for (
     ['', ''],
     ['ja', 'ja'],
@@ -21,6 +21,9 @@ sub _normalize : Tests {
     ['in-in', 'in-IN'],
     ["\x{0130}n-\x{0130}n", "\x{0130}n-\x{0130}N"],
     ["\x{0131}n-\x{0131}n", "\x{0131}n-\x{0131}N"],
+    ['ja-latn-jp-u-ja-JP-Latn' => 'ja-Latn-JP-u-ja-jp-latn'],
+    ['ja-latn-jp-i-ja-JP-Latn' => 'ja-Latn-JP-i-ja-JP-Latn'],
+    ['ja-latn-jp-x-ja-JP-Latn' => 'ja-Latn-JP-x-ja-JP-Latn'],
   ) {
     is +Whatpm::LangTag->normalize_rfc5646_langtag ($_->[0]), $_->[1];
   }

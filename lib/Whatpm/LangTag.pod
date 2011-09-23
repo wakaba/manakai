@@ -23,9 +23,14 @@ language tags according to relevant standard.
 
 =item $tag = Whatpm::LangTag->normalize_rfc5646_langtag ($tag_orig)
 
-Normalize a language tag by folding cases, following RFC 5646 2.1.
-Note that this method does not replace any subtag into its preferred
-alternative.
+Normalize a language tag by folding cases, following RFC 5646 2.1. and
+2.2.6.  Note that this method does not replace any subtag into its
+preferred alternative; this method does not rearrange ordering of
+subtags.
+
+Although this method does not completely convert language tags into
+their canonical form, its result will be good enough for comparison in
+most usual situations.
 
 =item $parsed = Whatpm::LangTag->parse_rfc4646_langtag ($tag, $onerror)
 
