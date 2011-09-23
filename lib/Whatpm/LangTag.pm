@@ -538,10 +538,9 @@ sub check_rfc4646_langtag ($$$;$) {
         }
       }
 
-        ## XXX RFC 5646 variant ordering
-
       my @prev_variant;
       my %prev_variant;
+      my $last_unprefixed_variant;
       for my $variant_orig (@{$tag_o->{variant}}) {
         my $variant = $variant_orig;
         $variant =~ tr/A-Z/a-z/;
@@ -549,7 +548,15 @@ sub check_rfc4646_langtag ($$$;$) {
           ## NOTE: This is a registered variant language subtag.
 
           my $prefixes = $Registry->{variant}->{$variant}->{Prefix} || [];
+          my @longer_prefix;
           if (@$prefixes) {
+            if ($RFC5646 and defined $last_unprefixed_variant) {
+              $onerror->(type => 'langtag:variant:order',
+                         text => $variant,
+                         value => $last_unprefixed_variant,
+                         level => $levels->{should});
+            }
+
             HAS_PREFIX: {
               ## NOTE: @$prefixes is sorted by reverse order of
               ## lengths.
@@ -564,6 +571,8 @@ sub check_rfc4646_langtag ($$$;$) {
                 if (Whatpm::LangTag->extended_filtering_range_rfc4647
                         ($prefix_s, $tag)) {
                   last HAS_PREFIX;
+                } else {
+                  push @longer_prefix, $prefix_s;
                 }
               }
               
@@ -574,7 +583,36 @@ sub check_rfc4646_langtag ($$$;$) {
                          value => $variant,
                          level => $levels->{should});
             } # HAS_PREFIX
-          }
+            if ($RFC5646 and @longer_prefix and @longer_prefix != @$prefixes) {
+              my $tag = join '-', grep { defined $_ }
+                    $tag_o->{language},
+                    @{$tag_o->{extlang} or []},
+                    $tag_o->{script},
+                    $tag_o->{region},
+                    @{$tag_o->{variant} or []};
+              for my $prefix_s (@longer_prefix) {
+                ## RFC 5646 4.1. Variant subtag ordering requirement
+                if (Whatpm::LangTag->extended_filtering_range_rfc4647
+                        ($prefix_s, $tag)) {
+                  $onerror->(type => 'langtag:variant:order',
+                             text => $prefix_s,
+                             value => $variant,
+                             level => $levels->{should});
+                }
+              }
+            }
+          } else { # @$prefixes
+            ## RFC 5646 4.1. Variant subtag ordering requirement
+            if ($RFC5646 and defined $last_unprefixed_variant) {
+              if (($variant cmp $last_unprefixed_variant) < 0) {
+                $onerror->(type => 'langtag:variant:order',
+                           text => $variant,
+                           value => $last_unprefixed_variant,
+                           level => $levels->{should});
+              }
+            }
+            $last_unprefixed_variant = $variant;
+          } # @$prefixes
 
           $check_case->('variant', $variant_orig,
                         $Registry->{variant}->{$variant}->{_canon});
