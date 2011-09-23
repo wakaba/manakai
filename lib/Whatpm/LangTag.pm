@@ -832,6 +832,21 @@ sub check_rfc3066_language_tag ($$;$$) {
 ## XXX document RFC5646 methods
 ## XXX RFC 1766 support
 
+*match_range_rfc3066 = \&basic_filtering_range_rfc4647;
+
+sub basic_filtering_range_rfc4647 ($$$) {
+  my (undef, $range, $tag) = @_;
+  $range = '' unless defined $range;
+  $tag = '' unless defined $tag;
+
+  return 1 if $range eq '*';
+  
+  $range =~ tr/A-Z/a-z/;
+  $tag =~ tr/A-Z/a-z/;
+  
+  return $range eq $tag || $tag =~ /^\Q$range\E-/;
+} # basic_filtering_range_rfc4647
+
 =head1 LICENSE
 
 Copyright 2007-2011 Wakaba <w@suika.fam.cx>.

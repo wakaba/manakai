@@ -80,6 +80,48 @@ sub _parse : Tests {
   ];
 } # _parse
 
+sub _basic_filtering_range_rfc4647 : Test(68) {
+  for (
+     [undef, undef, 1],
+     ['*', undef, 1],
+     ['', undef, 1],
+     ['', '', 1],
+     ['*', '', 1],
+     ['', undef, 1],
+     ['ja', 'ja', 1],
+     ['JA', 'ja', 1],
+     ['ja', 'JA', 1],
+     ['InValid', 'invalid', 1],
+     ['ja-jp', 'ja', 0],
+     ['ja', 'ja-jp', 1],
+     ['jajp', 'ja', 0],
+     ['ja', 'jajp', 0],
+     ['ja-', 'jajp', 0],
+     ['ja-', 'ja-jp', 0],
+     ['ja-', 'ja--', 1],
+     ['ja-j', 'ja-jp', 0],
+     ['ja-', 'ja-', 1],
+     ['de-ch', 'de-ch-1996', 1],
+     ['de-ch', 'de-CH-1996', 1],
+     ['de-ch', 'de-ch', 1],
+     ['de-ch', 'de-ch-1901-x-hoge', 1],
+     ['de-ch', 'de-zh-1996', 0],
+     ['de-ch', 'de-Latn-ch', 0],
+     ['de-ch', 'de', 0],
+     ['de-ch', 'x-de-ch', 0],
+     ['de', 'de-ch-1996', 1],
+     ['de', 'de-ch', 1],
+     ['x-hoge', 'de-ch', 0],
+     ['x-hoge', 'x-hoge', 1],
+     ['x-hoge', 'x-hoge-fuga', 1],
+     ['x', 'x-hoge-fuga', 1],
+     ['x-', 'x-hoge-fuga', 0],
+  ) {
+    is !!Whatpm::LangTag->basic_filtering_range_rfc4647 ($_->[0], $_->[1]), !!$_->[2];
+    is !!Whatpm::LangTag->match_range_rfc3066 ($_->[0], $_->[1]), !!$_->[2];
+  }
+} # _basic_filtering_range_rfc4647
+
 __PACKAGE__->runtests;
 
 ## License: Public Domain.

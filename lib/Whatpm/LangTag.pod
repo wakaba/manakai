@@ -19,18 +19,9 @@ language tags according to relevant standard.
 
 =head1 METHODS
 
+=head2 PARSING
+
 =over 4
-
-=item $tag = Whatpm::LangTag->normalize_rfc5646_langtag ($tag_orig)
-
-Normalize a language tag by folding cases, following RFC 5646 2.1. and
-2.2.6.  Note that this method does not replace any subtag into its
-preferred alternative; this method does not rearrange ordering of
-subtags.
-
-Although this method does not completely convert language tags into
-their canonical form, its result will be good enough for comparison in
-most usual situations.
 
 =item $parsed = Whatpm::LangTag->parse_rfc4646_langtag ($tag, $onerror)
 
@@ -85,6 +76,12 @@ Illegal (syntactically non-conforming) string fragments.
 
 =back
 
+=back
+
+=head2 CONFORMANCE CHECKING
+
+=over 4
+
 =item Whatpm::LangTag->check_rfc4646_langtag ($parsed, $onerror)
 
 Finds conformance errors from a parsed langauge tag with regard to RFC
@@ -118,11 +115,57 @@ cannot be tested without human interpretation, and therefore the
 methods in this module do not (or cannot) try to detect violation to
 these rules.
 
+=head2 NORMALIZATION
+
+=over 4
+
+=item $tag = Whatpm::LangTag->normalize_rfc5646_langtag ($tag_orig)
+
+Normalize a language tag by folding cases, following RFC 5646 2.1. and
+2.2.6.  Note that this method does not replace any subtag into its
+preferred alternative; this method does not rearrange ordering of
+subtags.
+
+Although this method does not completely convert language tags into
+their canonical form, its result will be good enough for comparison in
+most usual situations.
+
+=back
+
+=head2 COMPARISON
+
+=over 4
+
+=item BOOL = Whatpm::LangTag->basic_filtering_range_rfc4647 ($range, $tag)
+
+Compares a basic language range to a language tag according to RFC
+4647 Section 3.3.1.  This method returns whether the range matches to
+the tag or not.
+
+A basic language range is either a language tag or C<*>.  (For more
+information, see RFC 4647 Section 2.1.).
+
+=item BOOL = Whatpm::LangTag->match_range_rfc3066 ($range, $tag)
+
+Compares a language-range to a language tag according to RFC 3066
+Section 2.5.  This method returns whether the range matches to the tag
+or not.
+
+A language range is either a language tag or C<*>.  (For more
+information, see RFC 3066 2.5).
+
+Note that this method is equivalent to
+C<basic_filtering_range_rfc4647> by definition.
+
+=back
+
 =head1 SEE ALSO
 
 RFC 3066 <http://tools.ietf.org/html/rfc3066>.
 
 RFC 4646 <http://tools.ietf.org/html/rfc4646>.
+
+RFC 4647 <http://tools.ietf.org/html/rfc4647>.
 
 RFC 5646 <http://tools.ietf.org/html/rfc5646>.
 
