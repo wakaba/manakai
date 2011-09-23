@@ -13,7 +13,17 @@ my $default_error_levels = {
   info => 'i',
 };
 
-## NOTE: RFC 5646 2.1., 2.2.6.
+## Versioning flags
+our $RFC5646;
+
+my $Grandfathered5646 = {map { $_ => 1 } qw(
+  en-gb-oed i-ami i-bnn i-default i-enochian i-hak i-klingon i-lux
+  i-mingo i-navajo i-pwn i-tao i-tay i-tsu sgn-be-fr sgn-be-nl sgn-ch-de
+  art-lojban cel-gaulish no-bok no-nyn zh-guoyu zh-hakka zh-min
+  zh-min-nan zh-xiang
+)};
+
+## Note: RFC 5646 2.1., 2.2.6.
 sub normalize_rfc5646_langtag ($$) {
   my @tag = map { tr/A-Z/a-z/; $_ } split /-/, $_[1], -1;
   my $in_extension;
@@ -30,6 +40,11 @@ sub normalize_rfc5646_langtag ($$) {
   }
   return join '-', @tag;
 } # normalize_rfc5646_langtag
+
+sub parse_rfc5646_langtag ($$;$$) {
+  local $RFC5646 = 1;
+  return shift->parse_rfc4646_langtag (@_);
+} # parse_rfc5646_langtag
 
 ## NOTE: This method, with appropriate $onerror handler, is a
 ## "well-formed" processor [RFC 4646].
@@ -49,9 +64,14 @@ sub parse_rfc4646_langtag ($$;$$) {
     illegal => [],
   );
 
-  my $grandfathered = $tag =~ /\A[A-Za-z]{1,3}(?>-[A-Za-z0-9]{2,8}){1,2}\z/;
+  my $tag_l = $tag;
+  $tag_l =~ tr/A-Z/a-z/;
+  my $grandfathered =
+      $RFC5646 
+          ? $Grandfathered5646->{$tag_l}
+          : $tag =~ /\A[A-Za-z]{1,3}(?>-[A-Za-z0-9]{2,8}){1,2}\z/;
   
-  if ($r{language} =~ /\A[A-Za-z]+\z/) {
+  if ($r{language} and $r{language} =~ /\A[A-Za-z]+\z/) {
     if (length $r{language} == 1) {
       if ($r{language} =~ /\A[Xx]\z/) {
         unshift @tag, $r{language};
@@ -209,6 +229,11 @@ sub parse_rfc4646_langtag ($$;$$) {
   return \%r;
 } # parse_rfc4646_langtag
 
+sub check_rfc5646_langtag ($$$;$) {
+  local $RFC5646 = 1;
+  return shift->check_rfc4646_langtag (@_);
+} # check_rfc5646_langtag
+
 ## NOTE: This method, with appropriate $onerror handler, is intended
 ## to be a "validating" processor of language tags, as defined in RFC
 ## 4646, if an output of the |parse_rfc4646_langtag| method is
@@ -216,17 +241,6 @@ sub parse_rfc4646_langtag ($$;$$) {
 sub check_rfc4646_langtag ($$$;$) {
   my (undef, $tag_o, $onerror, $levels) = @_;
   $levels ||= $default_error_levels;
-
-  ## NOTE: "strongly RECOMMENDED that users not define their own rules
-  ## for language tag choice" (RFC 4646 4.1.) - We can't test whether
-  ## a tag is chosen by his own rules.
-
-  ## NOTE: "Subtags SHOULD only be used where they add useful
-  ## distinguishing information" (RFC 4646 4.1.) - We can't test
-  ## whether a subtag is useful or not.
-
-  ## NOTE: "Use as precise a tag as possible, but no more specific
-  ## than is justified." (RFC 4646 4.1. 1.) - We can't test.
 
   require Whatpm::_LangTagReg;
   our $Registry;
@@ -293,6 +307,12 @@ sub check_rfc4646_langtag ($$$;$) {
                  text => $def->{_preferred}, # might be undef
                  value => $actual,
                  level => $levels->{should});
+    } elsif ($RFC5646 and $def->{_preferred}) {
+      ## RFC 5646 2.2.2.
+      $onerror->(type => 'langtag:'.$type.':preferred',
+                 text => $def->{_preferred},
+                 value => $actual,
+                 level => $levels->{should});
     }
   }; # $check_deprecated
                         
@@ -308,6 +328,13 @@ sub check_rfc4646_langtag ($$$;$) {
                   $Registry->{grandfathered}->{$tag_s}->{_canon});
     $check_deprecated->('grandfathered', $tag_s_orig,
                         $Registry->{grandfathered}->{$tag_s});
+
+    if ($RFC5646 and $tag_s eq 'i-default') {
+      ## RFC 5646 4.1.
+      $onerror->(type => 'langtag:grandfathered:i-default',
+                 value => $tag_o->{grandfathered},
+                 level => $levels->{should});
+    }
   } elsif (defined $tag_o->{grandfathered}) {
     ## NOTE: The language tag does conform to the |grandfathered|
     ## syntax, but it is not a registered tag.  Though it might be
@@ -335,7 +362,9 @@ sub check_rfc4646_langtag ($$$;$) {
                     $Registry->{redundant}->{$tag_s}->{_canon});      
       $check_deprecated->('redundant', $tag_s_orig,
                           $Registry->{redundant}->{$tag_s});      
-    } else {
+    }
+
+    {
       ## NOTE: We don't raise non-recommended-case error for invalid
       ## tags (with no strong preference; we might change the behavior
       ## if it seems better).
@@ -363,6 +392,11 @@ sub check_rfc4646_langtag ($$$;$) {
             ## NOTE: SHOULD NOT (RFC 4646 4.1. 5.)
             $onerror->(type => 'langtag:language:mul',
                        level => $levels->{should});
+          } elsif ($lang eq 'mis') {
+            ## NOTE: SHOULD NOT (RFC 5646 4.1.)
+            $onerror->(type => 'langtag:language:mis',
+                       level => $levels->{should})
+                if $RFC5646;
           }
         } else {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
@@ -372,7 +406,7 @@ sub check_rfc4646_langtag ($$$;$) {
           ## subtags.
           $onerror->(type => 'langtag:language:invalid',
                      value => $tag_o->{language},
-                     level => $levels->{langtag_fact});
+                     level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
         }
       } else {
         ## NOTE: If $tag_o is an output of the method
@@ -383,7 +417,16 @@ sub check_rfc4646_langtag ($$$;$) {
         $lang = ''; # for later use.
       }
       
+      my $i_extlang = 0;
       for my $extlang_orig (@{$tag_o->{extlang}}) {
+        if ($RFC5646 and $i_extlang) {
+          ## RFC 5646 2.2.2.
+          $onerror->(type => 'langtag:extlang:invalid',
+                     value => $extlang_orig,
+                     level => $levels->{must});
+          next;
+        }
+
         my $extlang = $extlang_orig;
         $extlang =~ tr/A-Z/a-z/;
         if ($Registry->{extlang}->{$extlang}) {
@@ -416,10 +459,11 @@ sub check_rfc4646_langtag ($$$;$) {
           ## subtags.
           $onerror->(type => 'langtag:extlang:invalid',
                      value => $extlang_orig,
-                     level => $levels->{langtag_fact});
+                     level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
           
         }
-      }
+        $i_extlang++;
+      } # extlang
       
       if (defined $tag_o->{script}) {
         my $script = $tag_o->{script};
@@ -457,7 +501,7 @@ sub check_rfc4646_langtag ($$$;$) {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:script:invalid',
                      value => $tag_o->{script},
-                     level => $levels->{langtag_fact});
+                     level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
         }
       }
       
@@ -490,9 +534,11 @@ sub check_rfc4646_langtag ($$$;$) {
           ## check)
           $onerror->(type => 'langtag:region:invalid',
                      value => $tag_o->{region},
-                     level => $levels->{langtag_fact});
+                     level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
         }
       }
+
+        ## XXX RFC 5646 variant ordering
 
       my @read_variant; # ([$original, $lowercased], ...)
       for my $variant_orig (@{$tag_o->{variant}}) {
@@ -502,7 +548,7 @@ sub check_rfc4646_langtag ($$$;$) {
           ## NOTE: This is a registered variant language subtag.
 
           my $other_variants = {};
-          my $prefixes = $Registry->{variant}->{$variant}->{Prefix} || {};
+          my $prefixes = $Registry->{variant}->{$variant}->{Prefix} || [];
           HAS_PREFIX: {
             ## NOTE: @$prefixes is sorted by reverse order of lengths.
 
@@ -606,7 +652,7 @@ sub check_rfc4646_langtag ($$$;$) {
           ## NOTE: RFC 4646 2.9. ("validating" processor MUST check)
           $onerror->(type => 'langtag:variant:invalid',
                      value => $variant_orig,
-                     level => $levels->{langtag_fact});
+                     level => $RFC5646 ? $levels->{must} : $levels->{langtag_fact});
         }
         push @read_variant, [$variant_orig, $variant];
       }
@@ -686,6 +732,10 @@ sub check_rfc4646_langtag ($$$;$) {
 
 ## TODO: Should we return values that indicate whether a tag is
 ## well-formed, valid, or canonical?
+
+## XXX RFC 5646 full canonicalization
+
+## XXX RFC 5646 extlang form
 
 sub check_rfc3066_language_tag ($$;$$) {
   my $tag = $_[1];
@@ -777,6 +827,10 @@ sub check_rfc3066_language_tag ($$;$$) {
   ## TODO: Non-registered tags should be warned.
   ## $fact_level for i-*, $good_level for others.
 } # check_rfc3066_language_tag
+
+## XXX document error types
+## XXX document RFC5646 methods
+## XXX RFC 1766 support
 
 =head1 LICENSE
 

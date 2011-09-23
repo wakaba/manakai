@@ -108,6 +108,16 @@ to L<Whatpm::HTML>'s I<$onerror> callbacks.
 
 =back
 
+Note that specs sometimes contain semantic or contextual conformance
+rules, such as: "strongly RECOMMENDED that users not define their own
+rules for language tag choice" (RFC 4646 4.1.), "Subtags SHOULD only
+be used where they add useful distinguishing information" (RFC 4646
+4.1.), and "Use as precise a tag as possible, but no more specific
+than is justified" (RFC 4646 4.1. 1.).  These kinds of requirements
+cannot be tested without human interpretation, and therefore the
+methods in this module do not (or cannot) try to detect violation to
+these rules.
+
 =head1 SEE ALSO
 
 RFC 3066 <http://tools.ietf.org/html/rfc3066>.
