@@ -80,7 +80,7 @@ sub _parse : Tests {
   ];
 } # _parse
 
-sub _basic_filtering_range_rfc4647 : Test(68) {
+sub _basic_filtering_range_rfc4647 : Test(70) {
   for (
      [undef, undef, 1],
      ['*', undef, 1],
@@ -114,6 +114,7 @@ sub _basic_filtering_range_rfc4647 : Test(68) {
      ['x-hoge', 'de-ch', 0],
      ['x-hoge', 'x-hoge', 1],
      ['x-hoge', 'x-hoge-fuga', 1],
+     ['x-hoge', 'en-x-hoge-fuga', 0],
      ['x', 'x-hoge-fuga', 1],
      ['x-', 'x-hoge-fuga', 0],
   ) {
@@ -121,6 +122,81 @@ sub _basic_filtering_range_rfc4647 : Test(68) {
     is !!Whatpm::LangTag->match_range_rfc3066 ($_->[0], $_->[1]), !!$_->[2];
   }
 } # _basic_filtering_range_rfc4647
+
+sub _extended_filtering_range_rfc4647 : Test(68) {
+  for (
+     [undef, undef, 1],
+     ['*', undef, 1],
+     ['', undef, 1],
+     ['', '', 1],
+     ['*', '', 1],
+     ['', undef, 1],
+     ['ja', 'ja', 1],
+     ['JA', 'ja', 1],
+     ['ja', 'JA', 1],
+     ['InValid', 'invalid', 1],
+     ['ja-jp', 'ja', 0],
+     ['ja', 'ja-jp', 1],
+     ['jajp', 'ja', 0],
+     ['ja', 'jajp', 0],
+     ['ja-', 'jajp', 0],
+     ['ja-', 'ja-jp', 0],
+     ['ja-', 'ja--', 1],
+     ['ja-j', 'ja-jp', 0],
+     ['ja-', 'ja-', 1],
+     ['de-ch', 'de-ch-1996', 1],
+     ['de-ch', 'de-CH-1996', 1],
+     ['de-ch', 'de-ch', 1],
+     ['de-ch', 'de-ch-1901-x-hoge', 1],
+     ['de-ch', 'de-zh-1996', 0],
+     ['de-ch', 'de-Latn-ch', 1],
+     ['de-ch', 'de', 0],
+     ['de-ch', 'x-de-ch', 0],
+     ['de', 'de-ch-1996', 1],
+     ['de', 'de-ch', 1],
+     ['x-hoge', 'de-ch', 0],
+     ['x-hoge', 'x-hoge', 1],
+     ['x-hoge', 'x-hoge-fuga', 1],
+     ['x-hoge', 'en-x-hoge-fuga', 0],
+     ['x', 'x-hoge-fuga', 1],
+     ['x-', 'x-hoge-fuga', 0],
+     ['de-DE', 'de-de', 1],
+     ['de-DE', 'de-De', 1],
+     ['de-DE', 'de-DE', 1],
+     ['de-DE', 'de-Latn-DE', 1],
+     ['de-DE', 'de-Latf-DE', 1],
+     ['de-DE', 'de-DE-x-goethe', 1],
+     ['de-DE', 'de-Latn-DE-1996', 1],
+     ['de-DE', 'de-Deva-DE', 1],
+     ['de-DE', 'de', 0],
+     ['de-DE', 'de-x-DE', 0],
+     ['de-DE', 'de-Deva', 0],
+     ['ja-*', 'ja', 1],
+     ['ja-*', 'ja-jp', 1],
+     ['ja-*', 'ja-x-hoge', 1],
+     ['ja-*-*', 'ja', 1],
+     ['ja-*-*', 'ja-jp', 1],
+     ['ja-*-*', 'ja-x-hoge', 1],
+     ['ja-*-*-jp', 'ja-jp', 1],
+     ['ja-*-*-jp', 'ja-latn-jp', 1],
+     ['ja-*-*-jp', 'ja-latn-us', 0],
+     ['*-*-jp', 'ja-latn-jp', 1],
+     ['*-*-jp', 'ja-latn-us', 0],
+     ['*-*-jp', 'ja-jp', 1],
+     ['*-*-jp', 'ja-us', 0],
+     ['*-jp', 'ja-latn-jp', 1],
+     ['*-jp', 'ja-latn-us', 0],
+     ['*', 'ja-latn-jp', 1],
+     ['*', 'ja-latn-us', 1],
+     ['*-x', 'ja-x-latn', 1],
+     ['*-y', 'ja-x-latn', 0],
+     ['x', 'ja-x-latn', 0],
+     ['x', 'x-latn', 1],
+     ['latn', 'x-latn', 0],
+  ) {
+    is !!Whatpm::LangTag->extended_filtering_range_rfc4647 ($_->[0], $_->[1]), !!$_->[2];
+  }
+} # _extended_filtering_range_rfc4647
 
 __PACKAGE__->runtests;
 

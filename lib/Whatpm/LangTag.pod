@@ -157,6 +157,15 @@ information, see RFC 3066 2.5).
 Note that this method is equivalent to
 C<basic_filtering_range_rfc4647> by definition.
 
+=item BOOL = Whatpm::LangTag->extended_filtering_range_rfc4647 ($range, $tag)
+
+Compares an extended language range to a language tag according to RFC
+4647 Section 3.3.2.  This method returns whether the range matches to
+the tag or not.
+
+An extended language range is a language tag whose subtags can be
+C<*>s.  (For more information, see RFC 4647 Section 2.2.).
+
 =back
 
 =head1 SEE ALSO

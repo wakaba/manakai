@@ -847,6 +847,56 @@ sub basic_filtering_range_rfc4647 ($$$) {
   return $range eq $tag || $tag =~ /^\Q$range\E-/;
 } # basic_filtering_range_rfc4647
 
+sub extended_filtering_range_rfc4647 ($$$) {
+  my (undef, $range, $tag) = @_;
+  $range = '' unless defined $range;
+  $tag = '' unless defined $tag;
+
+  $range =~ tr/A-Z/a-z/;
+  $tag =~ tr/A-Z/a-z/;
+  
+  ## 1.
+  my @range = split /-/, $range, -1;
+  my @tag = split /-/, $tag, -1;
+
+  push @range, '' unless @range;
+  push @tag, '' unless @tag;
+  
+  ## 2.
+  unless ($range[0] eq '*' or $range[0] eq $tag[0]) {
+    return 0;
+  } else {
+    shift @range;
+    shift @tag;
+  }
+  
+  ## 3.
+  while (@range) {
+    if ($range[0] eq '*') {
+      ## A.
+      shift @range;
+      next;
+    } elsif (not @tag) {
+      ## B.
+      return 0;
+    } elsif ($range[0] eq $tag[0]) {
+      ## C.
+      shift @range;
+      shift @tag;
+      next;
+    } elsif (1 == length $tag[0]) {
+      ## D.
+      return 0;
+    } else {
+      ## E.
+      shift @tag;
+      next;
+    }
+  } # @range
+
+  return !@range;
+} # extended_filtering_range_rfc4647
+
 =head1 LICENSE
 
 Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
