@@ -47,16 +47,16 @@
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
 <pre>
-  use Whatpm::LangTag;</pre>
-<pre>
-  $parsed = Whatpm::LangTag-&gt;parse_rfc4646_tag ($tag, $onerror);
-  Whatpm::LangTag-&gt;check_rfc4646_tag ($parsed, $onerror);
+  use Whatpm::LangTag;
+  
+  $parsed = Whatpm::LangTag-&gt;parse_rfc5646_tag ($tag, $onerror);
+  Whatpm::LangTag-&gt;check_rfc5646_tag ($parsed, $onerror);
   $tag = Whatpm::LangTag-&gt;normalize_rfc5646_tag ($tag);</pre>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>The <a href="../Whatpm/LangTag.html">the Whatpm::LangTag manpage</a> module contains methods to handle language tags
+<p>The <code>Whatpm::LangTag</code> module contains methods to handle language tags
 as defined by BCP 47.  It can be used to parse, validate, or normalize
 language tags according to relevant standard.</p>
 <p>
@@ -67,6 +67,15 @@ language tags according to relevant standard.</p>
 </p>
 <h2><a name="parsing">PARSING</a></h2>
 <dl>
+<dt><strong><a name="parse_rfc5646_tag" class="item">$parsed = Whatpm::LangTag-&gt;parse_rfc5646_tag ($tag, $onerror)</a></strong></dt>
+
+<dd>
+<p>Parses a language tag into subtags.  This method interprets a language
+tag using the definition in <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
+<p>Any parse errors and warnings are reported to the second argument,
+i.e. the <em>$onerror</em> code reference.  Errors are reported in the
+format similar to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
+</dd>
 <dt><strong><a name="parse_rfc4646_tag" class="item">$parsed = Whatpm::LangTag-&gt;parse_rfc4646_tag ($tag, $onerror)</a></strong></dt>
 
 <dd>
@@ -76,71 +85,88 @@ by <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
 <p>Any parse errors and warnings are reported to the second argument,
 i.e. the <em>$onerror</em> code reference.  Errors are reported in the
 format similar to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
-<p>The method returns a hash reference, which contains one or more
-key-value pairs from the following list:</p>
-<dl>
-<dt><strong><a name="language" class="item">language</a></strong></dt>
-
-<dd>
-<p>The language subtag.</p>
-</dd>
-<dt><strong><a name="extlang" class="item">extlang</a></strong></dt>
-
-<dd>
-<p>The extlang subtags.</p>
-</dd>
-<dt><strong><a name="script" class="item">script</a></strong></dt>
-
-<dd>
-<p>The script subtag.</p>
-</dd>
-<dt><strong><a name="region" class="item">region</a></strong></dt>
-
-<dd>
-<p>The region subtag.</p>
-</dd>
-<dt><strong><a name="variant" class="item">variant</a></strong></dt>
-
-<dd>
-<p>The variant subtags.</p>
-</dd>
-<dt><strong><a name="extension" class="item">extension</a></strong></dt>
-
-<dd>
-<p>The extension subtags.</p>
-</dd>
-<dt><strong><a name="privateuse" class="item">privateuse</a></strong></dt>
-
-<dd>
-<p>The privateuse subtags.</p>
-</dd>
-<dt><strong><a name="illegal" class="item">illegal</a></strong></dt>
-
-<dd>
-<p>Illegal (syntactically non-conforming) string fragments.</p>
-</dd>
-<dt><strong><a name="grandfathered" class="item">grandfathered</a></strong></dt>
-
-<dd>
-<p>&quot;Grandfathered&quot; language tag.</p>
 </dd>
 </dl>
+<p>These methods return a hash reference, which contains one or more
+key-value pairs from the following list:</p>
+<dl>
+<dt><strong><a name="language" class="item">language (string)</a></strong></dt>
+
+<dd>
+<p>The language subtag.  There is always a language subtag, even if the
+input is illegal, unless there is <a href="#grandfathered"><code>grandfathered</code></a> tag.  E.g. <code>'ja'</code>
+for input <code>ja-JP</code>.</p>
+</dd>
+<dt><strong><a name="extlang" class="item">extlang (arrayref of strings)</a></strong></dt>
+
+<dd>
+<p>The extlang subtags.  E.g. <code>'yue'</code> for input <code>zh-yue</code>.</p>
+</dd>
+<dt><strong><a name="script" class="item">script (string or undef)</a></strong></dt>
+
+<dd>
+<p>The script subtag.  E.g. <code>'Latn'</code> for input <code>ja-Latn-JP</code>.</p>
+</dd>
+<dt><strong><a name="region" class="item">region (string or undef)</a></strong></dt>
+
+<dd>
+<p>The region subtag.  E.g. <code>'JP'</code> for input <code>en-JP</code>.</p>
+</dd>
+<dt><strong><a name="variant" class="item">variant (arrayref of strings)</a></strong></dt>
+
+<dd>
+<p>The variant subtags.  E.g. <code>['fonipa']</code> for input <code>en-JP-fonipa</code>.</p>
+</dd>
+<dt><strong><a name="extension" class="item">extension (arrayref of arrayrefs of strings)</a></strong></dt>
+
+<dd>
+<p>The extension subtags.  E.g. <code>[['u', 'islamCal']]</code> for input
+<code>en-US-u-islamCal</code>.</p>
+</dd>
+<dt><strong><a name="privateuse" class="item">privateuse (arrayref of strings)</a></strong></dt>
+
+<dd>
+<p>The privateuse subtags.  E.g. <code>['x', 'pig', 'latin']</code> for input
+<code>x-pig-latin</code>.</p>
+</dd>
+<dt><strong><a name="illegal" class="item">illegal (arrayref of strings)</a></strong></dt>
+
+<dd>
+<p>Illegal (syntactically non-conforming) string fragments.
+E.g. <code>['1234', 'xyz', 'abc']</code> for input <code>1234-xyz-abc</code>.</p>
+</dd>
+<dt><strong><a name="grandfathered" class="item">grandfathered (string or undef)</a></strong></dt>
+
+<dd>
+<p>&quot;Grandfathered&quot; language tag.  E.g. <code>'i-default'</code> for input
+<code>i-default</code>.</p>
 </dd>
 </dl>
 <p>
 </p>
 <h2><a name="conformance_checking">CONFORMANCE CHECKING</a></h2>
 <dl>
-<dt><strong><a name="check_rfc4646_langtag" class="item">Whatpm::LangTag-&gt;check_rfc4646_langtag ($parsed, $onerror)</a></strong></dt>
+<dt><strong><a name="check_rfc5646_tag" class="item">Whatpm::LangTag-&gt;check_rfc5646_tag ($parsed, $onerror)</a></strong></dt>
 
 <dd>
-<p>Finds conformance errors from a parsed langauge tag with regard to <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC
+<p>Finds conformance errors from a parsed language tag with regard to <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC
+5646</a>.</p>
+<p>Any errors and warnings are reported to the second argument, i.e. the
+<em>$onerror</em> code reference.  Errors are reported in the format similar
+to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
+<p>This method does not report any parse erros, as this method receives a
+<strong>parsed</strong> language tag.</p>
+</dd>
+<dt><strong><a name="check_rfc4646_tag" class="item">Whatpm::LangTag-&gt;check_rfc4646_tag ($parsed, $onerror)</a></strong></dt>
+
+<dd>
+<p>Finds conformance errors from a parsed language tag with regard to <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC
 4646</a>.  Note that <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a> is obsoleted by <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
 <p>Any errors and warnings are reported to the second argument, i.e. the
 <em>$onerror</em> code reference.  Errors are reported in the format similar
 to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
 <p>This method does not report any parse erros, as this method receives a
-<strong>parsed</strong> langauge tag.</p>
+<strong>parsed</strong> language tag.</p>
 </dd>
 <dt><strong><a name="check_rfc3066_tag" class="item">Whatpm::LangTag-&gt;check_rfc3066_tag ($tag, $onerror)</a></strong></dt>
 
@@ -195,7 +221,7 @@ information, see <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4
 <dd>
 <p>Compares a language-range to a language tag according to <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a>
 Section 2.5.  This method returns whether the range matches to the tag
-or not.</p>
+or not.  Note that <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a> is obsoleted by <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a>.</p>
 <p>A language range is either a language tag or <code>*</code>.  (For more
 information, see <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a> 2.5).</p>
 <p>Note that this method is equivalent to

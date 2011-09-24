@@ -859,7 +859,6 @@ sub normalize_rfc5646_tag ($$) {
 ## XXX RFC 5646 extlang form
 
 ## XXX document error types
-## XXX document RFC5646 methods
 ## XXX RFC 1766 support
 
 # ------ Comparison ------
