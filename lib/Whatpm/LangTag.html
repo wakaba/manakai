@@ -21,6 +21,14 @@
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#parsing">PARSING</a></li>
+		<li><a href="#conformance_checking">CONFORMANCE CHECKING</a></li>
+		<li><a href="#normalization">NORMALIZATION</a></li>
+		<li><a href="#comparison">COMPARISON</a></li>
+	</ul>
+
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
@@ -41,10 +49,9 @@
 <pre>
   use Whatpm::LangTag;</pre>
 <pre>
-  $tag = Whatpm::LangTag-&gt;normalize_rfc5646_langtag ($tag);
-  $parsed = Whatpm::LangTag-&gt;parse_rfc4646_langtag ($tag, $onerror);
-  Whatpm::LangTag-&gt;check_rfc4646_langtag ($parsed, $onerror);
-  Whatpm::LangTag-&gt;check_rfc3066_language_tag ($tag, $onerror);</pre>
+  $parsed = Whatpm::LangTag-&gt;parse_rfc4646_tag ($tag, $onerror);
+  Whatpm::LangTag-&gt;check_rfc4646_tag ($parsed, $onerror);
+  $tag = Whatpm::LangTag-&gt;normalize_rfc5646_tag ($tag);</pre>
 <p>
 </p>
 <hr />
@@ -56,15 +63,11 @@ language tags according to relevant standard.</p>
 </p>
 <hr />
 <h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="parsing">PARSING</a></h2>
 <dl>
-<dt><strong><a name="normalize_rfc5646_langtag" class="item">$tag = Whatpm::LangTag-&gt;normalize_rfc5646_langtag ($tag_orig)</a></strong></dt>
-
-<dd>
-<p>Normalize a language tag by folding cases, following <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a> 2.1.
-Note that this method does not replace any subtag into its preferred
-alternative.</p>
-</dd>
-<dt><strong><a name="parse_rfc4646_langtag" class="item">$parsed = Whatpm::LangTag-&gt;parse_rfc4646_langtag ($tag, $onerror)</a></strong></dt>
+<dt><strong><a name="parse_rfc4646_tag" class="item">$parsed = Whatpm::LangTag-&gt;parse_rfc4646_tag ($tag, $onerror)</a></strong></dt>
 
 <dd>
 <p>Parses a language tag into subtags.  This method interprets a language
@@ -123,6 +126,11 @@ key-value pairs from the following list:</p>
 </dd>
 </dl>
 </dd>
+</dl>
+<p>
+</p>
+<h2><a name="conformance_checking">CONFORMANCE CHECKING</a></h2>
+<dl>
 <dt><strong><a name="check_rfc4646_langtag" class="item">Whatpm::LangTag-&gt;check_rfc4646_langtag ($parsed, $onerror)</a></strong></dt>
 
 <dd>
@@ -134,7 +142,7 @@ to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em
 <p>This method does not report any parse erros, as this method receives a
 <strong>parsed</strong> langauge tag.</p>
 </dd>
-<dt><strong><a name="check_rfc3066_language_tag" class="item">Whatpm::LangTag-&gt;check_rfc3066_language_tag ($tag, $onerror)</a></strong></dt>
+<dt><strong><a name="check_rfc3066_tag" class="item">Whatpm::LangTag-&gt;check_rfc3066_tag ($tag, $onerror)</a></strong></dt>
 
 <dd>
 <p>Parses and finds conformance errors in a language tag (a string) with
@@ -144,12 +152,72 @@ regard to <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a>
 to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
 </dd>
 </dl>
+<p>Note that specs sometimes contain semantic or contextual conformance
+rules, such as: &quot;strongly RECOMMENDED that users not define their own
+rules for language tag choice&quot; (<a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a> 4.1.), &quot;Subtags SHOULD only
+be used where they add useful distinguishing information&quot; (<a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a>
+4.1.), and &quot;Use as precise a tag as possible, but no more specific
+than is justified&quot; (<a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a> 4.1. 1.).  These kinds of requirements
+cannot be tested without human interpretation, and therefore the
+methods in this module do not (or cannot) try to detect violation to
+these rules.</p>
+<p>
+</p>
+<h2><a name="normalization">NORMALIZATION</a></h2>
+<dl>
+<dt><strong><a name="normalize_rfc5646_tag" class="item">$tag = Whatpm::LangTag-&gt;normalize_rfc5646_tag ($tag_orig)</a></strong></dt>
+
+<dd>
+<p>Normalize a language tag by folding cases, following <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a> 2.1. and
+2.2.6.  Note that this method does not replace any subtag into its
+preferred alternative; this method does not rearrange ordering of
+subtags.</p>
+<p>Although this method does not completely convert language tags into
+their canonical form, its result will be good enough for comparison in
+most usual situations.</p>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="comparison">COMPARISON</a></h2>
+<dl>
+<dt><strong><a name="basic_filtering_rfc4647_range" class="item">BOOL = Whatpm::LangTag-&gt;basic_filtering_rfc4647_range ($range, $tag)</a></strong></dt>
+
+<dd>
+<p>Compares a basic language range to a language tag according to <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC
+4647</a> Section 3.3.1.  This method returns whether the range matches to
+the tag or not.</p>
+<p>A basic language range is either a language tag or <code>*</code>.  (For more
+information, see <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a> Section 2.1.).</p>
+</dd>
+<dt><strong><a name="match_rfc3066_range" class="item">BOOL = Whatpm::LangTag-&gt;match_rfc3066_range ($range, $tag)</a></strong></dt>
+
+<dd>
+<p>Compares a language-range to a language tag according to <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a>
+Section 2.5.  This method returns whether the range matches to the tag
+or not.</p>
+<p>A language range is either a language tag or <code>*</code>.  (For more
+information, see <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a> 2.5).</p>
+<p>Note that this method is equivalent to
+<a href="#basic_filtering_rfc4647_range"><code>basic_filtering_rfc4647_range</code></a> by definition.</p>
+</dd>
+<dt><strong><a name="extended_filtering_rfc4647_range" class="item">BOOL = Whatpm::LangTag-&gt;extended_filtering_rfc4647_range ($range, $tag)</a></strong></dt>
+
+<dd>
+<p>Compares an extended language range to a language tag according to <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC
+4647</a> Section 3.3.2.  This method returns whether the range matches to
+the tag or not.</p>
+<p>An extended language range is a language tag whose subtags can be
+<code>*</code>s.  (For more information, see <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a> Section 2.2.).</p>
+</dd>
+</dl>
 <p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p>RFC 3066 &lt;http://tools.ietf.org/html/rfc3066&gt;.</p>
 <p>RFC 4646 &lt;http://tools.ietf.org/html/rfc4646&gt;.</p>
+<p>RFC 4647 &lt;http://tools.ietf.org/html/rfc4647&gt;.</p>
 <p>RFC 5646 &lt;http://tools.ietf.org/html/rfc5646&gt;.</p>
 <p>IANA Language Subtag Registry
 &lt;http://www.iana.org/assignments/language-subtag-registry&gt;.</p>

@@ -9,26 +9,6 @@ require Whatpm::LangTag;
 use Test::More;
 use Test::Differences;
 
-sub _normalize : Test(13) {
-  for (
-    ['', ''],
-    ['ja', 'ja'],
-    ['ja-jp', 'ja-JP'],
-    ['ja-JP', 'ja-JP'],
-    ['en-CA-x-ca', 'en-CA-x-ca'],
-    ['sgn-BE-FR', 'sgn-BE-FR'],
-    ['az-Latn-x-latn', 'az-Latn-x-latn'],
-    ['in-in', 'in-IN'],
-    ["\x{0130}n-\x{0130}n", "\x{0130}n-\x{0130}N"],
-    ["\x{0131}n-\x{0131}n", "\x{0131}n-\x{0131}N"],
-    ['ja-latn-jp-u-ja-JP-Latn' => 'ja-Latn-JP-u-ja-jp-latn'],
-    ['ja-latn-jp-i-ja-JP-Latn' => 'ja-Latn-JP-i-ja-JP-Latn'],
-    ['ja-latn-jp-x-ja-JP-Latn' => 'ja-Latn-JP-x-ja-JP-Latn'],
-  ) {
-    is +Whatpm::LangTag->normalize_rfc5646_langtag ($_->[0]), $_->[1];
-  }
-} # _normalize
-
 sub _parse : Tests {
   execute_test ($_, {
     4646 => {is_list => 1},
@@ -49,9 +29,9 @@ sub _parse : Tests {
     {
       local @errors;
 
-      my $parsed = Whatpm::LangTag->parse_rfc4646_langtag
+      my $parsed = Whatpm::LangTag->parse_rfc4646_tag
           ($test->{data}->[0], $onerror);
-      my $result = Whatpm::LangTag->check_rfc4646_langtag ($parsed, $onerror);
+      my $result = Whatpm::LangTag->check_rfc4646_tag ($parsed, $onerror);
       
       my $expected = $test->{4646};
       if ($expected) {
@@ -70,9 +50,9 @@ sub _parse : Tests {
     {
       local @errors;
       
-      my $parsed = Whatpm::LangTag->parse_rfc5646_langtag
+      my $parsed = Whatpm::LangTag->parse_rfc5646_tag
           ($test->{data}->[0], $onerror);
-      my $result = Whatpm::LangTag->check_rfc5646_langtag ($parsed, $onerror);
+      my $result = Whatpm::LangTag->check_rfc5646_tag ($parsed, $onerror);
 
       my $expected = $test->{5646} || $test->{4646};
       if ($expected) {
@@ -90,7 +70,27 @@ sub _parse : Tests {
   ];
 } # _parse
 
-sub _basic_filtering_range_rfc4647 : Test(70) {
+sub _normalize : Test(13) {
+  for (
+    ['', ''],
+    ['ja', 'ja'],
+    ['ja-jp', 'ja-JP'],
+    ['ja-JP', 'ja-JP'],
+    ['en-CA-x-ca', 'en-CA-x-ca'],
+    ['sgn-BE-FR', 'sgn-BE-FR'],
+    ['az-Latn-x-latn', 'az-Latn-x-latn'],
+    ['in-in', 'in-IN'],
+    ["\x{0130}n-\x{0130}n", "\x{0130}n-\x{0130}N"],
+    ["\x{0131}n-\x{0131}n", "\x{0131}n-\x{0131}N"],
+    ['ja-latn-jp-u-ja-JP-Latn' => 'ja-Latn-JP-u-ja-jp-latn'],
+    ['ja-latn-jp-i-ja-JP-Latn' => 'ja-Latn-JP-i-ja-JP-Latn'],
+    ['ja-latn-jp-x-ja-JP-Latn' => 'ja-Latn-JP-x-ja-JP-Latn'],
+  ) {
+    is +Whatpm::LangTag->normalize_rfc5646_tag ($_->[0]), $_->[1];
+  }
+} # _normalize
+
+sub _basic_filtering_rfc4647_range : Test(70) {
   for (
      [undef, undef, 1],
      ['*', undef, 1],
@@ -128,12 +128,14 @@ sub _basic_filtering_range_rfc4647 : Test(70) {
      ['x', 'x-hoge-fuga', 1],
      ['x-', 'x-hoge-fuga', 0],
   ) {
-    is !!Whatpm::LangTag->basic_filtering_range_rfc4647 ($_->[0], $_->[1]), !!$_->[2];
-    is !!Whatpm::LangTag->match_range_rfc3066 ($_->[0], $_->[1]), !!$_->[2];
+    is !!Whatpm::LangTag->basic_filtering_rfc4647_range ($_->[0], $_->[1]),
+       !!$_->[2];
+    is !!Whatpm::LangTag->match_rfc3066_range ($_->[0], $_->[1]),
+       !!$_->[2];
   }
-} # _basic_filtering_range_rfc4647
+} # _basic_filtering_rfc4647_range
 
-sub _extended_filtering_range_rfc4647 : Test(68) {
+sub _extended_filtering_rfc4647_range : Test(68) {
   for (
      [undef, undef, 1],
      ['*', undef, 1],
@@ -204,9 +206,10 @@ sub _extended_filtering_range_rfc4647 : Test(68) {
      ['x', 'x-latn', 1],
      ['latn', 'x-latn', 0],
   ) {
-    is !!Whatpm::LangTag->extended_filtering_range_rfc4647 ($_->[0], $_->[1]), !!$_->[2];
+    is !!Whatpm::LangTag->extended_filtering_rfc4647_range ($_->[0], $_->[1]),
+       !!$_->[2];
   }
-} # _extended_filtering_range_rfc4647
+} # _extended_filtering_rfc4647_range
 
 __PACKAGE__->runtests;
 

@@ -23,32 +23,19 @@ my $Grandfathered5646 = {map { $_ => 1 } qw(
   zh-min-nan zh-xiang
 )};
 
-## Note: RFC 5646 2.1., 2.2.6.
-sub normalize_rfc5646_langtag ($$) {
-  my @tag = map { tr/A-Z/a-z/; $_ } split /-/, $_[1], -1;
-  my $in_extension;
-  for my $i (1..$#tag) {
-    if (1 == length $tag[$i - 1]) {
-      if ($tag[$i - 1] ne 'x' and $tag[$i - 1] ne 'i') {
-        last;
-      }
-    } elsif ($tag[$i] =~ /\A(..)\z/s) {
-      $tag[$i] =~ tr/a-z/A-Z/;
-    } elsif ($tag[$i] =~ /\A([a-z])(.{3})\z/s) {
-      $tag[$i] = (uc $1) . $2;
-    }
-  }
-  return join '-', @tag;
-} # normalize_rfc5646_langtag
+# ------ Parsing ------
 
-sub parse_rfc5646_langtag ($$;$$) {
+sub parse_rfc5646_tag ($$;$$) {
   local $RFC5646 = 1;
-  return shift->parse_rfc4646_langtag (@_);
-} # parse_rfc5646_langtag
+  return shift->parse_rfc4646_tag (@_);
+} # parse_rfc5646_tag
+
+# Compat
+*parse_rfc4646_langtag = \&parse_rfc4646_tag;
 
 ## NOTE: This method, with appropriate $onerror handler, is a
 ## "well-formed" processor [RFC 4646].
-sub parse_rfc4646_langtag ($$;$$) {
+sub parse_rfc4646_tag ($$;$$) {
   my $tag = $_[1];
   my $onerror = $_[2] || sub { };
   my $levels = $_[3] || $default_error_levels;
@@ -227,18 +214,22 @@ sub parse_rfc4646_langtag ($$;$$) {
   }
 
   return \%r;
-} # parse_rfc4646_langtag
+} # parse_rfc4646_tag
 
-sub check_rfc5646_langtag ($$$;$%) {
+# ------ Conformance checking ------
+
+sub check_rfc5646_tag ($$$;$%) {
   local $RFC5646 = 1;
-  return shift->check_rfc4646_langtag (@_);
-} # check_rfc5646_langtag
+  return shift->check_rfc4646_tag (@_);
+} # check_rfc5646_tag
+
+# Compat
+*check_rfc4646_langtag = \&check_rfc4646_tag;
 
 ## NOTE: This method, with appropriate $onerror handler, is intended
 ## to be a "validating" processor of language tags, as defined in RFC
-## 4646, if an output of the |parse_rfc4646_langtag| method is
-## inputed.
-sub check_rfc4646_langtag ($$$;$) {
+## 4646, if an output of the |parse_rfc4646_tag| method is inputed.
+sub check_rfc4646_tag ($$$;$) {
   my (undef, $tag_o, $onerror, $levels) = @_;
   $levels ||= $default_error_levels;
 
@@ -421,9 +412,10 @@ sub check_rfc4646_langtag ($$$;$) {
         }
       } else {
         ## NOTE: If $tag_o is an output of the method
-        ## |parse_rfc4646_langtag|, then @{$tag_o->{privateuse}} is true
+        ## |parse_rfc4646_tag|, then @{$tag_o->{privateuse}} is true
         ## in this case.  If $tag_o is not an output of that method,
-        ## then it might not be true, but we don't support such a case.
+        ## then it might not be true, but we don't support such a
+        ## case.
         
         $lang = ''; # for later use.
       }
@@ -584,7 +576,7 @@ sub check_rfc4646_langtag ($$$;$) {
                   $tag_o->{region},
                   @prev_variant;
               for my $prefix_s (@$prefixes) {
-                if (Whatpm::LangTag->extended_filtering_range_rfc4647
+                if (Whatpm::LangTag->extended_filtering_rfc4647_range
                         ($prefix_s, $tag)) {
                   last HAS_PREFIX;
                 } else {
@@ -609,7 +601,7 @@ sub check_rfc4646_langtag ($$$;$) {
                     @{$tag_o->{variant} or []};
               for my $prefix_s (@longer_prefix) {
                 ## RFC 5646 4.1. Variant subtag ordering requirement
-                if (Whatpm::LangTag->extended_filtering_range_rfc4647
+                if (Whatpm::LangTag->extended_filtering_rfc4647_range
                         ($prefix_s, $tag)) {
                   $onerror->(type => 'langtag:variant:order',
                              text => $prefix_s,
@@ -746,13 +738,12 @@ sub check_rfc4646_langtag ($$$;$) {
   }
 
   return $result;
-} # check_rfc4646_langtag
+} # check_rfc4646_tag
 
-## XXX RFC 5646 full canonicalization
+# Compat
+*check_rfc3066_language_tag = \&check_rfc3066_tag;
 
-## XXX RFC 5646 extlang form
-
-sub check_rfc3066_language_tag ($$;$$) {
+sub check_rfc3066_tag ($$;$$) {
   my $tag = $_[1];
   my $onerror = $_[2] || sub { };
   my $levels = $_[3] || $default_error_levels;
@@ -843,13 +834,39 @@ sub check_rfc3066_language_tag ($$;$$) {
   ## $fact_level for i-*, $good_level for others.
 } # check_rfc3066_language_tag
 
+# ------ Normalization ------
+
+## Note: RFC 5646 2.1., 2.2.6.
+sub normalize_rfc5646_tag ($$) {
+  my @tag = map { tr/A-Z/a-z/; $_ } split /-/, $_[1], -1;
+  my $in_extension;
+  for my $i (1..$#tag) {
+    if (1 == length $tag[$i - 1]) {
+      if ($tag[$i - 1] ne 'x' and $tag[$i - 1] ne 'i') {
+        last;
+      }
+    } elsif ($tag[$i] =~ /\A(..)\z/s) {
+      $tag[$i] =~ tr/a-z/A-Z/;
+    } elsif ($tag[$i] =~ /\A([a-z])(.{3})\z/s) {
+      $tag[$i] = (uc $1) . $2;
+    }
+  }
+  return join '-', @tag;
+} # normalize_rfc5646_tag
+
+## XXX RFC 5646 full canonicalization
+
+## XXX RFC 5646 extlang form
+
 ## XXX document error types
 ## XXX document RFC5646 methods
 ## XXX RFC 1766 support
 
-*match_range_rfc3066 = \&basic_filtering_range_rfc4647;
+# ------ Comparison ------
 
-sub basic_filtering_range_rfc4647 ($$$) {
+*match_rfc3066_range = \&basic_filtering_rfc4647_range;
+
+sub basic_filtering_rfc4647_range ($$$) {
   my (undef, $range, $tag) = @_;
   $range = '' unless defined $range;
   $tag = '' unless defined $tag;
@@ -860,9 +877,9 @@ sub basic_filtering_range_rfc4647 ($$$) {
   $tag =~ tr/A-Z/a-z/;
   
   return $range eq $tag || $tag =~ /^\Q$range\E-/;
-} # basic_filtering_range_rfc4647
+} # basic_filtering_rfc4647_range
 
-sub extended_filtering_range_rfc4647 ($$$) {
+sub extended_filtering_rfc4647_range ($$$) {
   my (undef, $range, $tag) = @_;
   $range = '' unless defined $range;
   $tag = '' unless defined $tag;
@@ -910,7 +927,7 @@ sub extended_filtering_range_rfc4647 ($$$) {
   } # @range
 
   return !@range;
-} # extended_filtering_range_rfc4647
+} # extended_filtering_rfc4647_range
 
 =head1 LICENSE
 
