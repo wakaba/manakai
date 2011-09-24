@@ -65,6 +65,14 @@ sub _parse : Tests {
             !! grep { $_ eq 'ill-formed' } @{$expected->[1]};
         is !$result->{valid},
             !! grep { $_ eq 'ill-formed' or $_ eq 'invalid' } @{$expected->[1]};
+
+        my $canon = Whatpm::LangTag->canonicalize_rfc5646_tag
+            ($test->{data}->[0]);
+        is $canon, ($test->{canon5646} || $test->{data})->[0];
+
+        my $extlang = Whatpm::LangTag->to_extlang_form_rfc5646_tag
+            ($test->{data}->[0]);
+        is $extlang, ($test->{extlang5646} || $test->{canon5646} || $test->{data})->[0];
       }
     }
   }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[

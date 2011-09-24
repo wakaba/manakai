@@ -24,6 +24,7 @@
 	<ul>
 
 		<li><a href="#parsing">PARSING</a></li>
+		<li><a href="#serialization">SERIALIZATION</a></li>
 		<li><a href="#conformance_checking">CONFORMANCE CHECKING</a></li>
 		<li><a href="#normalization">NORMALIZATION</a></li>
 		<li><a href="#comparison">COMPARISON</a></li>
@@ -50,7 +51,7 @@
   use Whatpm::LangTag;
   
   $parsed = Whatpm::LangTag-&gt;parse_rfc5646_tag ($tag, $onerror);
-  Whatpm::LangTag-&gt;check_rfc5646_tag ($parsed, $onerror);
+  Whatpm::LangTag-&gt;check_rfc5646_parsed_tag ($parsed, $onerror);
   $tag = Whatpm::LangTag-&gt;normalize_rfc5646_tag ($tag);</pre>
 <p>
 </p>
@@ -63,6 +64,11 @@ language tags according to relevant standard.</p>
 </p>
 <hr />
 <h1><a name="methods">METHODS</a></h1>
+<p>For the following strings, if an input or output is a language tag or
+a language range, it is a character string (or possibly utf8 flagged
+string of characters), not a byte string.  Although language tags and
+ranges are specified as a string of ASCII characters, illegal tags and
+ranges can always contain any non-ASCII characters.</p>
 <p>
 </p>
 <h2><a name="parsing">PARSING</a></h2>
@@ -144,9 +150,23 @@ E.g. <code>['1234', 'xyz', 'abc']</code> for input <code>1234-xyz-abc</code>.</p
 </dl>
 <p>
 </p>
+<h2><a name="serialization">SERIALIZATION</a></h2>
+<dl>
+<dt><strong><a name="serialize_parsed_tag" class="item">$tag = Whatpm::LangTag-&gt;serialize_parsed_tag ($parsed_tag)</a></strong></dt>
+
+<dd>
+<p>Convert a parsed language tag into a language tag string.  The
+argument must be a parsed tag as defined in the previous section; a
+broken value would not be processed properly.</p>
+<p>If the given parsed tag does not represent a well-formed language tag,
+the result string would not be a well-formed language tag.</p>
+</dd>
+</dl>
+<p>
+</p>
 <h2><a name="conformance_checking">CONFORMANCE CHECKING</a></h2>
 <dl>
-<dt><strong><a name="check_rfc5646_tag" class="item">Whatpm::LangTag-&gt;check_rfc5646_tag ($parsed, $onerror)</a></strong></dt>
+<dt><strong><a name="check_rfc5646_parsed_tag" class="item">Whatpm::LangTag-&gt;check_rfc5646_parsed_tag ($parsed, $onerror)</a></strong></dt>
 
 <dd>
 <p>Finds conformance errors from a parsed language tag with regard to <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC
@@ -157,7 +177,7 @@ to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em
 <p>This method does not report any parse erros, as this method receives a
 <strong>parsed</strong> language tag.</p>
 </dd>
-<dt><strong><a name="check_rfc4646_tag" class="item">Whatpm::LangTag-&gt;check_rfc4646_tag ($parsed, $onerror)</a></strong></dt>
+<dt><strong><a name="check_rfc4646_parsed_tag" class="item">Whatpm::LangTag-&gt;check_rfc4646_parsed_tag ($parsed, $onerror)</a></strong></dt>
 
 <dd>
 <p>Finds conformance errors from a parsed language tag with regard to <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC
@@ -201,6 +221,32 @@ subtags.</p>
 <p>Although this method does not completely convert language tags into
 their canonical form, its result will be good enough for comparison in
 most usual situations.</p>
+</dd>
+<dt><strong><a name="canonicalize_rfc5646_tag" class="item">$tag = Whatpm::LangTag-&gt;canonicalize_rfc5646_tag ($tag_orig)</a></strong></dt>
+
+<dd>
+<p>Normalize a language tag into its canonicalized form, as per <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>
+4.5.  That is, replace any subtag into its Preferred-Value form if
+possible and sort any extension subtags.  Note that this method does
+NOT do any case folding.  In addition, the &quot;canonicalized form&quot; of a
+langauge tag is not necessary a fully canonicalized form at all - for
+example, variant subtags might not be in the recommended order.</p>
+<p>Note that if the input is not a well-formed language tag according to
+<a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>, the result string might not be a well-formed language tag as
+well.  Sometimes the canonicalization would turn a valid langauge tag
+into an invalid language tag.</p>
+</dd>
+<dt><strong><a name="to_extlang_form_rfc5646_tag" class="item">$tag = Whatpm::LangTag-&gt;to_extlang_form_rfc5646_tag ($tag_orig)</a></strong></dt>
+
+<dd>
+<p>Normalize a language tag into its extlang form, as per <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a> 4.5.
+The extlang form is same as the canonicalized form, except that use of
+extlang subtags is preferred to language-only (or extlang-free)
+representation.</p>
+<p>Note that if the input is not a well-formed language tag according to
+<a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>, the result string might not be a well-formed language tag as
+well.  Sometimes the canonicalization would turn a valid langauge tag
+into an invalid language tag.</p>
 </dd>
 </dl>
 <p>

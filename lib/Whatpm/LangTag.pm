@@ -125,7 +125,9 @@ sub parse_rfc4646_tag ($$;$$) {
     my %has_extension;
     while (@tag >= 2 and $tag[0] =~ /\A[A-WYZa-wyz0-9]\z/ and
            $tag[1] =~ /\A[A-Za-z0-9]{2,8}\z/) {
-      if ($has_extension{$tag[0]}++) {
+      my $exttag = $tag[0];
+      $exttag =~ tr/A-Z/a-z/;
+      if ($has_extension{$exttag}++) {
         ## NOTE: Well-formed processor MUST check (RFC 4646 2.2.9.)
         ## and MUST and MUST NOT (RFC 4646 2.2.6. 4.), , SHOULD be
         ## canonical and to be canonical, it has to be well-formed
@@ -216,6 +218,23 @@ sub parse_rfc4646_tag ($$;$$) {
   return \%r;
 } # parse_rfc4646_tag
 
+sub serialize_parsed_tag ($$) {
+  my $tag_o = $_[1];
+  if (defined $tag_o->{grandfathered}) {
+    return $tag_o->{grandfathered};
+  } else {
+    return join '-',
+        (defined $tag_o->{language} ? ($tag_o->{language}) : ()),
+        @{$tag_o->{extlang}},
+        (defined $tag_o->{script} ? ($tag_o->{script}) : ()),
+        (defined $tag_o->{region} ? ($tag_o->{region}) : ()),
+        @{$tag_o->{variant}},
+        (map { @$_ } @{$tag_o->{extension}}),
+        @{$tag_o->{privateuse}},
+        @{$tag_o->{illegal}};
+  }
+} # serialize_parsed_tag
+
 # ------ Conformance checking ------
 
 sub check_rfc5646_parsed_tag ($$$;$%) {
@@ -247,15 +266,7 @@ sub check_rfc4646_parsed_tag ($$$;$) {
 
   my $tag_s = $tag_o->{grandfathered};
   unless (defined $tag_s) {
-    $tag_s = join '-',
-        (defined $tag_o->{language} ? ($tag_o->{language}) : ()),
-        @{$tag_o->{extlang}},
-        (defined $tag_o->{script} ? ($tag_o->{script}) : ()),
-        (defined $tag_o->{region} ? ($tag_o->{region}) : ()),
-        @{$tag_o->{variant}},
-        @{$tag_o->{extension}},
-        @{$tag_o->{privateuse}},
-        @{$tag_o->{illegal}};
+    $tag_s = Whatpm::LangTag->serialize_parsed_tag ($tag_o);
   }
   my $tag_s_orig = $tag_s;
   $tag_s =~ tr/A-Z/a-z/;
@@ -854,9 +865,83 @@ sub normalize_rfc5646_tag ($$) {
   return join '-', @tag;
 } # normalize_rfc5646_tag
 
-## XXX RFC 5646 full canonicalization
+sub canonicalize_rfc5646_tag ($$) {
+  my $class = shift;
+  my $tag = shift;
+  $tag = '' unless defined $tag;
 
-## XXX RFC 5646 extlang form
+  my $tag_l = $tag;
+  $tag_l =~ tr/A-Z/a-z/;
+
+  require Whatpm::_LangTagReg;
+  our $Registry;
+
+  my $def = $Registry->{grandfathered}->{$tag_l}
+      || $Registry->{redundant}->{$tag_l};
+  if ($def) {
+    if (defined $def->{_preferred}) {
+      return $def->{_preferred};
+    } else {
+      return $tag;
+    }
+  }
+
+  my $parsed_tag = $class->parse_rfc5646_tag ($tag);
+  return $tag unless defined $parsed_tag->{language};
+
+  ## If there are more than one extlang subtags (non-conforming), the
+  ## spec does not define how to canonicalize the tag.
+  if (@{$parsed_tag->{extlang}} == 1) {
+    my $subtag = $parsed_tag->{extlang}->[0];
+    $subtag =~ tr/A-Z/a-z/;
+    my $def = $Registry->{extlang}->{$subtag};
+    if ($def and defined $def->{_preferred}) {
+      $parsed_tag->{language} = $def->{_preferred};
+      @{$parsed_tag->{extlang}} = ();
+    }
+  }
+
+  for (qw(language script region)) {
+    my $subtag = $parsed_tag->{$_};
+    if (defined $subtag) {
+      $subtag =~ tr/A-Z/a-z/;
+      my $def = $Registry->{$_}->{$subtag};
+      if ($def and defined $def->{_preferred}) {
+        $parsed_tag->{$_} = $def->{_preferred};
+      }
+    }
+  }
+
+  for (0..$#{$parsed_tag->{variant}}) {
+    my $subtag = $parsed_tag->{variant}->[$_];
+    $subtag =~ tr/A-Z/a-z/;
+    my $def = $Registry->{variant}->{$subtag};
+    if ($def and defined $def->{_preferred}) {
+      $parsed_tag->{variant}->[$_] = $def->{_preferred};
+    }
+  }
+
+  $parsed_tag->{extension} = [sort { (ord lc $a->[0]) <=> (ord lc $b->[0]) } @{$parsed_tag->{extension}}];
+
+  return Whatpm::LangTag->serialize_parsed_tag ($parsed_tag);
+} # canonicalize_rfc5646_tag
+
+sub to_extlang_form_rfc5646_tag ($$) {
+  my $tag = $_[0]->canonicalize_rfc5646_tag ($_[1]);
+  if ($tag =~ /^([A-Za-z]{3})(?=-|$)(?!-[A-Za-z]{3}(?=-|$))/) {
+    my $subtag = $1;
+    $subtag =~ tr/A-Z/a-z/;
+    
+    require Whatpm::_LangTagReg;
+    our $Registry;
+    
+    my $def = $Registry->{extlang}->{$subtag};
+    if ($def and @{$def->{Prefix} or []}) {
+      return $def->{Prefix}->[0] . '-' . $tag;
+    }
+  }
+  return $tag;
+} # to_extlang_form_rfc5646_tag
 
 ## XXX document error types
 ## XXX RFC 1766 support

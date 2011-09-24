@@ -18,6 +18,12 @@ language tags according to relevant standard.
 
 =head1 METHODS
 
+For the following strings, if an input or output is a language tag or
+a language range, it is a character string (or possibly utf8 flagged
+string of characters), not a byte string.  Although language tags and
+ranges are specified as a string of ASCII characters, illegal tags and
+ranges can always contain any non-ASCII characters.
+
 =head2 PARSING
 
 =over 4
@@ -92,6 +98,21 @@ C<i-default>.
 
 =back
 
+=head2 SERIALIZATION
+
+=over 4
+
+=item $tag = Whatpm::LangTag->serialize_parsed_tag ($parsed_tag)
+
+Convert a parsed language tag into a language tag string.  The
+argument must be a parsed tag as defined in the previous section; a
+broken value would not be processed properly.
+
+If the given parsed tag does not represent a well-formed language tag,
+the result string would not be a well-formed language tag.
+
+=back
+
 =head2 CONFORMANCE CHECKING
 
 =over 4
@@ -155,6 +176,32 @@ subtags.
 Although this method does not completely convert language tags into
 their canonical form, its result will be good enough for comparison in
 most usual situations.
+
+=item $tag = Whatpm::LangTag->canonicalize_rfc5646_tag ($tag_orig)
+
+Normalize a language tag into its canonicalized form, as per RFC 5646
+4.5.  That is, replace any subtag into its Preferred-Value form if
+possible and sort any extension subtags.  Note that this method does
+NOT do any case folding.  In addition, the "canonicalized form" of a
+langauge tag is not necessary a fully canonicalized form at all - for
+example, variant subtags might not be in the recommended order.
+
+Note that if the input is not a well-formed language tag according to
+RFC 5646, the result string might not be a well-formed language tag as
+well.  Sometimes the canonicalization would turn a valid langauge tag
+into an invalid language tag.
+
+=item $tag = Whatpm::LangTag->to_extlang_form_rfc5646_tag ($tag_orig)
+
+Normalize a language tag into its extlang form, as per RFC 5646 4.5.
+The extlang form is same as the canonicalized form, except that use of
+extlang subtags is preferred to language-only (or extlang-free)
+representation.
+
+Note that if the input is not a well-formed language tag according to
+RFC 5646, the result string might not be a well-formed language tag as
+well.  Sometimes the canonicalization would turn a valid langauge tag
+into an invalid language tag.
 
 =back
 
