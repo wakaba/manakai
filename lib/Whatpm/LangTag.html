@@ -30,6 +30,7 @@
 		<li><a href="#comparison">COMPARISON</a></li>
 	</ul>
 
+	<li><a href="#errors">ERRORS</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
@@ -78,9 +79,8 @@ ranges can always contain any non-ASCII characters.</p>
 <dd>
 <p>Parses a language tag into subtags.  This method interprets a language
 tag using the definition in <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-<p>Any parse errors and warnings are reported to the second argument,
-i.e. the <em>$onerror</em> code reference.  Errors are reported in the
-format similar to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
+<p>Any errors and warnings would be reported to the code refeference
+specified as the second argument.</p>
 </dd>
 <dt><strong><a name="parse_rfc4646_tag" class="item">$parsed = Whatpm::LangTag-&gt;parse_rfc4646_tag ($tag, $onerror)</a></strong></dt>
 
@@ -88,9 +88,8 @@ format similar to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <
 <p>Parses a language tag into subtags.  This method interprets a language
 tag using the definition in <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a>.  Note that <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a> is obsoleted
 by <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-<p>Any parse errors and warnings are reported to the second argument,
-i.e. the <em>$onerror</em> code reference.  Errors are reported in the
-format similar to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
+<p>Any errors and warnings would be reported to the code refeference
+specified as the second argument.</p>
 </dd>
 </dl>
 <p>These methods return a hash reference, which contains one or more
@@ -171,40 +170,36 @@ the result string would not be a well-formed language tag.</p>
 <dd>
 <p>Finds conformance errors from a parsed language tag with regard to <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC
 5646</a>.</p>
-<p>Any errors and warnings are reported to the second argument, i.e. the
-<em>$onerror</em> code reference.  Errors are reported in the format similar
-to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
 <p>This method does not report any parse erros, as this method receives a
 <strong>parsed</strong> language tag.</p>
+<p>Any errors and warnings would be reported to the code refeference
+specified as the second argument.</p>
 </dd>
 <dt><strong><a name="check_rfc4646_parsed_tag" class="item">Whatpm::LangTag-&gt;check_rfc4646_parsed_tag ($parsed, $onerror)</a></strong></dt>
 
 <dd>
 <p>Finds conformance errors from a parsed language tag with regard to <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC
 4646</a>.  Note that <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a> is obsoleted by <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-<p>Any errors and warnings are reported to the second argument, i.e. the
-<em>$onerror</em> code reference.  Errors are reported in the format similar
-to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
 <p>This method does not report any parse erros, as this method receives a
 <strong>parsed</strong> language tag.</p>
+<p>Any errors and warnings would be reported to the code refeference
+specified as the second argument.</p>
 </dd>
 <dt><strong><a name="check_rfc3066_tag" class="item">Whatpm::LangTag-&gt;check_rfc3066_tag ($tag, $onerror)</a></strong></dt>
 
 <dd>
 <p>Parses and finds conformance errors in a language tag (a string) with
 regard to <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a>.  Note that <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a> is obsoleted by <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a>.</p>
-<p>Any errors and warnings are reported to the second argument, i.e. the
-<em>$onerror</em> code reference.  Errors are reported in the format similar
-to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
+<p>Any errors and warnings would be reported to the code refeference
+specified as the second argument.</p>
 </dd>
 <dt><strong><a name="check_rfc1766_tag" class="item">Whatpm::LangTag-&gt;check_rfc1766_tag ($tag, $onerror)</a></strong></dt>
 
 <dd>
 <p>Parses and finds conformance errors in a language tag (a string) with
 regard to <a href="http://www.ietf.org/rfc/rfc1766.txt" class="rfc">RFC 1766</a>.  Note that <a href="http://www.ietf.org/rfc/rfc1766.txt" class="rfc">RFC 1766</a> is obsoleted by <a href="http://www.ietf.org/rfc/rfc3046.txt" class="rfc">RFC 3046</a>.</p>
-<p>Any errors and warnings are reported to the second argument, i.e. the
-<em>$onerror</em> code reference.  Errors are reported in the format similar
-to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
+<p>Any errors and warnings would be reported to the code refeference
+specified as the second argument.</p>
 </dd>
 </dl>
 <p>Note that specs sometimes contain semantic or contextual conformance
@@ -290,6 +285,47 @@ information, see <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3
 the tag or not.</p>
 <p>An extended language range is a language tag whose subtags can be
 <code>*</code>s.  (For more information, see <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a> Section 2.2.).</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="errors">ERRORS</a></h1>
+<p>For methods with argument <em>$onerror</em>, any error and warning detected
+during the parsing or conformance checking would be reporeted by
+invoking the specified code reference with the description of the
+error or warning.</p>
+<p>Following name-value pairs describing the error are given to the code
+reference as arguments:</p>
+<dl>
+<dt><strong><a name="type" class="item">type (string, always specified)</a></strong></dt>
+
+<dd>
+<p>A short string describing the kind of the error.  Descriptions of
+error types are available at
+&lt;http://suika.fam.cx/gate/2007/html/error-description#{type}&gt;, where
+<em>{type}</em> is an error type string.</p>
+<p>For the list of error types, see
+&lt;http://suika.fam.cx/gate/2007/html/error-description#langtag-errors&gt;.</p>
+</dd>
+<dt><strong><a name="text" class="item">text (string, possibily missing)</a></strong></dt>
+
+<dd>
+<p>A short string, which arguments the error type.  Its semantics depends
+on the error type.</p>
+</dd>
+<dt><strong><a name="value" class="item">value (string, possibly missing)</a></strong></dt>
+
+<dd>
+<p>A part of the input, in which an error is detected.</p>
+</dd>
+<dt><strong><a name="level" class="item">level (string, always specified)</a></strong></dt>
+
+<dd>
+<p>A character representing the level or severity of the error, which is
+one of the following characters: <code>m</code> (violation to a MUST-level
+requirement), <code>s</code> (violation to a SHOULD-level requirement), <code>w</code> (a
+warning), and <code>i</code> (an informational notification).</p>
 </dd>
 </dl>
 <p>

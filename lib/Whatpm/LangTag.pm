@@ -76,7 +76,7 @@ sub parse_rfc4646_tag ($$;$$) {
           ## (RFC 4646 4.4. 1.), "Private ues subtags, like other
           ## subtags, MUST conform to the format and content
           ## cnstraints in the ABNF." (RFC 4646 4.5.)
-         $onerror->(type => 'langtag:language:syntax',
+          $onerror->(type => 'langtag:language:syntax',
                      value => $r{language},
                      level => $levels->{must});
         }
