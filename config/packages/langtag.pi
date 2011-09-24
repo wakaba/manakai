@@ -1,0 +1,17 @@
+  {
+      main_module_name => 'Whatpm::LangTag',
+      file_names => [qw(
+          lib/Whatpm/LangTag.pm
+          lib/Whatpm/LangTag.pod
+          lib/Whatpm/_LangTagReg.pm
+          lib/Whatpm/mklangreg.pl
+          t/langtag-1.dat
+          t/LangTag.t
+          t/testfiles.pl
+      )],
+      t_req_modules => {
+          'Path::Class' => 0,
+          'Test::Differences' => 0,
+          'Test::More' => 0,
+      },
+  };

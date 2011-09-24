@@ -4,7 +4,11 @@ use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use base qw(Test::Class);
-require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
+if (-f file (__FILE__)->dir->file ('testfiles')->stringify) {
+  require (file (__FILE__)->dir->file ('testfiles')->stringify);
+} else {
+  require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
+}
 require Whatpm::LangTag;
 use Test::More;
 use Test::Differences;
