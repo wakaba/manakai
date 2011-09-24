@@ -15,6 +15,7 @@ my $default_error_levels = {
 
 ## Versioning flags
 our $RFC5646;
+our $RFC1766;
 
 my $Grandfathered5646 = {map { $_ => 1 } qw(
   en-gb-oed i-ami i-bnn i-default i-enochian i-hak i-klingon i-lux
@@ -689,6 +690,8 @@ sub check_rfc4646_parsed_tag ($$$;$) {
         ## (RFC 4646 3.7.) - We don't check this, since there is no
         ## extension defined.
 
+        ## XXX Implement extension 'u'
+
         #delete $result->{valid} if $RFC4646 and extension is invalid.
 
         my $ext_type = $ext->[0];
@@ -771,14 +774,20 @@ sub check_rfc3066_tag ($$;$$) {
 
   my @tag = split /-/, $tag, -1;
 
-  if ($tag[0] =~ /\A[0-9]+\z/) {
+  if (not $RFC1766 and $tag[0] =~ /\A[0-9]+\z/) {
     $onerror->(type => 'langtag:illegal',
                value => $tag[0],
                level => $levels->{langtag_fact});
   }
 
   for (@tag) {
-    unless (/\A[A-Za-z0-9]{1,8}\z/) {
+    if (/\A[A-Za-z0-9]{1,8}\z/) {
+      #
+    } elsif ($RFC1766 and $tag[1] =~ /[0-9]/) {
+      $onerror->(type => 'langtag:illegal',
+                 value => $_,
+                 level => $levels->{langtag_fact});
+    } else {
       $onerror->(type => 'langtag:illegal',
                  value => $_,
                  level => $levels->{langtag_fact});
@@ -792,7 +801,7 @@ sub check_rfc3066_tag ($$;$$) {
                  value => $tag[0],
                  level => $levels->{good});
     }
-  } elsif ($tag[0] =~ /\A[A-Za-z]{3}\z/) {
+  } elsif (not $RFC1766 and $tag[0] =~ /\A[A-Za-z]{3}\z/) {
     ## TODO: ISO 639-2
     ## TODO: Is there any recommendation on case?
     ## TODO: MUST use 2-letter code if any
@@ -820,7 +829,6 @@ sub check_rfc3066_tag ($$;$$) {
 
   if (@tag >= 1) {
     if ($tag[1] =~ /\A[0-9A-Za-z]{2}\z/) {
-      ## TODO: ISO 3166
       if ($tag[1] =~ /[a-z]/) {
         $onerror->(type => 'langtag:region:case',
                    value => $tag[1],
@@ -830,6 +838,9 @@ sub check_rfc3066_tag ($$;$$) {
         $onerror->(type => 'langtag:region:private',
                    value => $tag[1],
                    level => $levels->{must});
+      } elsif ($tag[1] =~ /\A([A-Za-z]{2})\z/) {
+        ## TODO: ISO 3166
+        ## XXX
       }
     } elsif (length $tag[1] == 1) {
       $onerror->(type => 'langtag:region:nosemantics', 
@@ -843,7 +854,12 @@ sub check_rfc3066_tag ($$;$$) {
 
   ## TODO: Non-registered tags should be warned.
   ## $fact_level for i-*, $good_level for others.
-} # check_rfc3066_language_tag
+} # check_rfc3066_tag
+
+sub check_rfc1766_tag ($$;$$) {
+  local $RFC1766 = 1;
+  return shift->check_rfc3066_tag (@_);
+} # check_rfc1766_tag
 
 # ------ Normalization ------
 
@@ -942,9 +958,6 @@ sub to_extlang_form_rfc5646_tag ($$) {
   }
   return $tag;
 } # to_extlang_form_rfc5646_tag
-
-## XXX document error types
-## XXX RFC 1766 support
 
 # ------ Comparison ------
 

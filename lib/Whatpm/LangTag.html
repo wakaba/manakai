@@ -197,6 +197,15 @@ regard to <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a>
 <em>$onerror</em> code reference.  Errors are reported in the format similar
 to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
 </dd>
+<dt><strong><a name="check_rfc1766_tag" class="item">Whatpm::LangTag-&gt;check_rfc1766_tag ($tag, $onerror)</a></strong></dt>
+
+<dd>
+<p>Parses and finds conformance errors in a language tag (a string) with
+regard to <a href="http://www.ietf.org/rfc/rfc1766.txt" class="rfc">RFC 1766</a>.  Note that <a href="http://www.ietf.org/rfc/rfc1766.txt" class="rfc">RFC 1766</a> is obsoleted by <a href="http://www.ietf.org/rfc/rfc3046.txt" class="rfc">RFC 3046</a>.</p>
+<p>Any errors and warnings are reported to the second argument, i.e. the
+<em>$onerror</em> code reference.  Errors are reported in the format similar
+to <a href="../Whatpm/HTML.html">the Whatpm::HTML manpage</a>'s <em>$onerror</em> callbacks.</p>
+</dd>
 </dl>
 <p>Note that specs sometimes contain semantic or contextual conformance
 rules, such as: &quot;strongly RECOMMENDED that users not define their own
@@ -287,6 +296,7 @@ the tag or not.</p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
+<p>RFC 1766 &lt;http://tools.ietf.org/html/rfc1766&gt;.</p>
 <p>RFC 3066 &lt;http://tools.ietf.org/html/rfc3066&gt;.</p>
 <p>RFC 4646 &lt;http://tools.ietf.org/html/rfc4646&gt;.</p>
 <p>RFC 4647 &lt;http://tools.ietf.org/html/rfc4647&gt;.</p>

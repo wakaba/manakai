@@ -150,6 +150,15 @@ Any errors and warnings are reported to the second argument, i.e. the
 I<$onerror> code reference.  Errors are reported in the format similar
 to L<Whatpm::HTML>'s I<$onerror> callbacks.
 
+=item Whatpm::LangTag->check_rfc1766_tag ($tag, $onerror)
+
+Parses and finds conformance errors in a language tag (a string) with
+regard to RFC 1766.  Note that RFC 1766 is obsoleted by RFC 3046.
+
+Any errors and warnings are reported to the second argument, i.e. the
+I<$onerror> code reference.  Errors are reported in the format similar
+to L<Whatpm::HTML>'s I<$onerror> callbacks.
+
 =back
 
 Note that specs sometimes contain semantic or contextual conformance
@@ -242,6 +251,8 @@ C<*>s.  (For more information, see RFC 4647 Section 2.2.).
 =back
 
 =head1 SEE ALSO
+
+RFC 1766 <http://tools.ietf.org/html/rfc1766>.
 
 RFC 3066 <http://tools.ietf.org/html/rfc3066>.
 
