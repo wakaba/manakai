@@ -126,6 +126,10 @@ B<parsed> language tag.
 Any errors and warnings would be reported to the code refeference
 specified as the second argument.
 
+The method returns a hash reference with two keys: C<well-formed> and
+C<valid>.  They represent whether the given language tag is
+well-formed or valid or not as per RFC 5646.
+
 =item Whatpm::LangTag->check_rfc4646_parsed_tag ($parsed, $onerror)
 
 Finds conformance errors from a parsed language tag with regard to RFC
@@ -136,6 +140,10 @@ B<parsed> language tag.
 
 Any errors and warnings would be reported to the code refeference
 specified as the second argument.
+
+The method returns a hash reference with two keys: C<well-formed> and
+C<valid>.  They represent whether the given language tag is
+well-formed or valid or not as per RFC 4646.
 
 =item Whatpm::LangTag->check_rfc3066_tag ($tag, $onerror)
 
