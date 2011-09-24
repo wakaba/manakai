@@ -218,18 +218,18 @@ sub parse_rfc4646_tag ($$;$$) {
 
 # ------ Conformance checking ------
 
-sub check_rfc5646_tag ($$$;$%) {
+sub check_rfc5646_parsed_tag ($$$;$%) {
   local $RFC5646 = 1;
-  return shift->check_rfc4646_tag (@_);
-} # check_rfc5646_tag
+  return shift->check_rfc4646_parsed_tag (@_);
+} # check_rfc5646_parsed_tag
 
 # Compat
-*check_rfc4646_langtag = \&check_rfc4646_tag;
+*check_rfc4646_langtag = \&check_rfc4646_parsed_tag;
 
 ## NOTE: This method, with appropriate $onerror handler, is intended
 ## to be a "validating" processor of language tags, as defined in RFC
 ## 4646, if an output of the |parse_rfc4646_tag| method is inputed.
-sub check_rfc4646_tag ($$$;$) {
+sub check_rfc4646_parsed_tag ($$$;$) {
   my (undef, $tag_o, $onerror, $levels) = @_;
   $levels ||= $default_error_levels;
 
@@ -738,7 +738,7 @@ sub check_rfc4646_tag ($$$;$) {
   }
 
   return $result;
-} # check_rfc4646_tag
+} # check_rfc4646_parsed_tag
 
 # Compat
 *check_rfc3066_language_tag = \&check_rfc3066_tag;

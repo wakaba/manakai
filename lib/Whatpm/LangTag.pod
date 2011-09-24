@@ -7,7 +7,7 @@ Whatpm::LangTag - Language Tag Parsing, Conformance Checking, and Normalization
   use Whatpm::LangTag;
   
   $parsed = Whatpm::LangTag->parse_rfc5646_tag ($tag, $onerror);
-  Whatpm::LangTag->check_rfc5646_tag ($parsed, $onerror);
+  Whatpm::LangTag->check_rfc5646_parsed_tag ($parsed, $onerror);
   $tag = Whatpm::LangTag->normalize_rfc5646_tag ($tag);
 
 =head1 DESCRIPTION
@@ -96,7 +96,7 @@ C<i-default>.
 
 =over 4
 
-=item Whatpm::LangTag->check_rfc5646_tag ($parsed, $onerror)
+=item Whatpm::LangTag->check_rfc5646_parsed_tag ($parsed, $onerror)
 
 Finds conformance errors from a parsed language tag with regard to RFC
 5646.
@@ -108,7 +108,7 @@ to L<Whatpm::HTML>'s I<$onerror> callbacks.
 This method does not report any parse erros, as this method receives a
 B<parsed> language tag.
 
-=item Whatpm::LangTag->check_rfc4646_tag ($parsed, $onerror)
+=item Whatpm::LangTag->check_rfc4646_parsed_tag ($parsed, $onerror)
 
 Finds conformance errors from a parsed language tag with regard to RFC
 4646.  Note that RFC 4646 is obsoleted by RFC 5646.

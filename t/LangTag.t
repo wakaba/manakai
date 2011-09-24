@@ -31,7 +31,8 @@ sub _parse : Tests {
 
       my $parsed = Whatpm::LangTag->parse_rfc4646_tag
           ($test->{data}->[0], $onerror);
-      my $result = Whatpm::LangTag->check_rfc4646_tag ($parsed, $onerror);
+      my $result = Whatpm::LangTag->check_rfc4646_parsed_tag
+          ($parsed, $onerror);
       
       my $expected = $test->{4646};
       if ($expected) {
@@ -52,7 +53,8 @@ sub _parse : Tests {
       
       my $parsed = Whatpm::LangTag->parse_rfc5646_tag
           ($test->{data}->[0], $onerror);
-      my $result = Whatpm::LangTag->check_rfc5646_tag ($parsed, $onerror);
+      my $result = Whatpm::LangTag->check_rfc5646_parsed_tag
+          ($parsed, $onerror);
 
       my $expected = $test->{5646} || $test->{4646};
       if ($expected) {
