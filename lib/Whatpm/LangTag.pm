@@ -781,13 +781,11 @@ sub check_rfc3066_tag ($$;$$) {
   }
 
   for (@tag) {
-    if (/\A[A-Za-z0-9]{1,8}\z/) {
-      #
-    } elsif ($RFC1766 and $tag[1] =~ /[0-9]/) {
+    unless (/\A[A-Za-z0-9]{1,8}\z/) {
       $onerror->(type => 'langtag:illegal',
                  value => $_,
                  level => $levels->{langtag_fact});
-    } else {
+    } elsif ($RFC1766 and /[0-9]/) {
       $onerror->(type => 'langtag:illegal',
                  value => $_,
                  level => $levels->{langtag_fact});
