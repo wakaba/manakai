@@ -8,7 +8,9 @@ RM = rm
 RMALL = $(RM) -fr
 
 LANGUAGE_SUBTAG_REGISTRY = language-subtag-registry
+LANGUAGE_TAGEXT_REGISTRY = language-tag-extensions-registry
 LANGUAGE_SUBTAG_REGISTRY_PM = _LangTagReg.pm
+LANGUAGE_SUBTAG_REGISTRY_FULL_PM = _LangTagReg_Full.pm
 
 all: \
   _update \
@@ -40,7 +42,8 @@ ContentChecker-all:
 update: update-remove-old _update
 
 _update:_NamedEntityList.pm _LinkTypeList.pm \
-  $(LANGUAGE_SUBTAG_REGISTRY_PM)
+  $(LANGUAGE_SUBTAG_REGISTRY_PM) \
+  $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM)
 
 update-remove-old: update-_NamedEntityList.pm \
   update-_LinkTypeList.pm \
@@ -91,9 +94,15 @@ RelExtensions.html:
 
 $(LANGUAGE_SUBTAG_REGISTRY):
 	$(WGET) http://www.iana.org/assignments/language-subtag-registry -O $@
+$(LANGUAGE_TAGEXT_REGISTRY):
+	$(WGET) http://www.iana.org/assignments/language-tag-extensions-registry -O $@
 
 $(LANGUAGE_SUBTAG_REGISTRY_PM): $(LANGUAGE_SUBTAG_REGISTRY) mklangreg.pl
 	perl mklangreg.pl $< > $@
+
+$(LANGUAGE_SUBTAG_REGISTRY_FULL_PM): \
+  $(LANGUAGE_SUBTAG_REGISTRY) $(LANGUAGE_TAGEXT_REGISTRY) mklangreg.pl
+	MKLANGREG_FULL=1 perl mklangreg.pl $< $(LANGUAGE_TAGEXT_REGISTRY) > $@
 
 update-$(LANGUAGE_SUBTAG_REGISTRY_PM):
 	$(RMALL) $(LANGUAGE_SUBTAG_REGISTRY)

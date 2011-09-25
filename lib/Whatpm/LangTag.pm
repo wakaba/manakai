@@ -1024,6 +1024,20 @@ sub extended_filtering_rfc4647_range ($$$) {
   return !@range;
 } # extended_filtering_rfc4647_range
 
+# ------ Tag registry data ------
+
+*tag_registry_data_rfc5646 = \&tag_registry_data_rfc4646;
+
+sub tag_registry_data_rfc4646 ($$$) {
+  my ($class, $type, $tag) = @_;
+  $tag =~ tr/A-Z/a-z/;
+
+  require Whatpm::_LangTagReg_Full;
+  our $RegistryFull;
+
+  return $RegistryFull->{$type} ? $RegistryFull->{$type}->{$tag} : undef;
+} # tag_registry_data_rfc4646
+
 =head1 LICENSE
 
 Copyright 2007-2011 Wakaba <w@suika.fam.cx>.

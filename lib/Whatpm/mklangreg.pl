@@ -2,15 +2,16 @@
 use strict;
 use warnings;
 
+my $full = $ENV{MKLANGREG_FULL};
 my $subtags;
 
-my $langreg_source_file_name = shift;
 {
+  my $langreg_source_file_name = shift;
   open my $langreg_source_file, '<', $langreg_source_file_name or
       die "$0: $langreg_source_file_name: $!";
   local $/ = undef;
 
-  ## NOTE: Based on RFC 4646 3.1.'s syntax, but more error-torelant.
+  ## NOTE: Based on RFC 4646 3.1.'s syntax, but more error-tolerant.
   for (split /\x0D?+\x0A%%\x0D?+\x0A/, <$langreg_source_file>) {
     my $fields = [['' => '']];
     for (split /\x0D?+\x0A/, $_) {
@@ -66,23 +67,82 @@ my $langreg_source_file_name = shift;
   }
 }
 
+## Extensions
+if ($full) {
+  my $langreg_source_file_name = shift;
+  open my $langreg_source_file, '<', $langreg_source_file_name or
+      die "$0: $langreg_source_file_name: $!";
+  local $/ = undef;
+
+  ## NOTE: Based on RFC 4646 3.1.'s syntax, but more error-tolerant.
+  for (split /\x0D?+\x0A%%\x0D?+\x0A/, <$langreg_source_file>) {
+    my $fields = [['' => '']];
+    for (split /\x0D?+\x0A/, $_) {
+      if (/^\s/) { ## Part of continuous line
+        $fields->[-1]->[1] .= $_;
+      } elsif (s/^([^:\s]++)\s*+:\s*+//) { ## The first line of a |field|
+        push @$fields, [$1 => $_];
+      } else { ## An errorneous line
+        push @$fields, ['' => $_];
+      }
+    }
+    my $subtag;
+    shift @$fields if $fields->[0]->[1] eq ''; # remove dummy if unused
+    for (@$fields) {
+      $subtag->{$_->[0]} ||= [];
+      my $v = $_->[1];
+      $v =~ s/&#x([0-9A-Fa-f]++);/chr hex $1/ge;
+      push @{$subtag->{$_->[0]}}, $v;
+    }
+    if ($subtags->{extension}) {
+      my $tag_name = $subtag->{Identifier}->[0];
+      #$subtag->{_canon} = '_lowercase';
+      if ($subtags->{extension}->{$tag_name}) {
+        warn "Duplicate tag: $tag_name\n";
+      } else {
+        $subtags->{extension}->{$tag_name} = $subtag;
+      }
+    } else { ## The first record
+      $subtags->{extheader} = $subtag;
+      $subtags->{extension} = {};
+    }
+  }
+}
+
 ## Remove unused data
 
 $subtags->{_file_date} = $subtags->{header}->{'File-Date'}->[0];
 delete $subtags->{header};
+if ($full) {
+  $subtags->{_ext_file_date} = $subtags->{extheader}->{'File-Date'}->[0];
+  delete $subtags->{extheader};
+}
 
 for my $type (grep {!/^_/} keys %{$subtags}) {
   for my $tag (keys %{$subtags->{$type}}) {
     my $subtag = $subtags->{$type}->{$tag};
-    delete $subtag->{Comments};
-    delete $subtag->{Description};
+
+    if ($full) {
+      $subtag->{_added} = $subtag->{Added}->[0];
+      $subtag->{_macro} = $subtag->{Macrolanguage}->[0]
+          if $subtag->{Macrolanguage};
+    } else {
+      delete $subtag->{Comments};
+      delete $subtag->{Description};
+      delete $subtag->{Scope};
+    }
     delete $subtag->{Added};
     delete $subtag->{Tag};
     delete $subtag->{Subtag};
     delete $subtag->{Type};
     delete $subtag->{Macrolanguage};
-    delete $subtag->{Scope};
-    
+    delete $subtag->{Identifier};
+    delete $subtag->{RFC};
+    delete $subtag->{Authority};
+    delete $subtag->{Contact_Email};
+    delete $subtag->{Mailing_List};
+    delete $subtag->{URL};
+
     $subtag->{_deprecated} = 1 if $subtag->{Deprecated};
     delete $subtag->{Deprecated};
 
@@ -102,6 +162,7 @@ for my $type (grep {!/^_/} keys %{$subtags}) {
       tr/A-Z/a-z/;
     }
 
+    ## Sort for the ease of validation process
     $subtag->{Prefix} = [sort {length $b <=> length $a or $a cmp $b}
                              @{$subtag->{Prefix}}] if $subtag->{Prefix};
   }
@@ -128,7 +189,11 @@ use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 $Data::Dumper::Purity = 1;
 my $value = Dumper $subtags;
-$value =~ s/\$VAR1\b/\$Whatpm::LangTag::Registry/g;
+if ($full) {
+  $value =~ s/\$VAR1\b/\$Whatpm::LangTag::RegistryFull/g;
+} else {
+  $value =~ s/\$VAR1\b/\$Whatpm::LangTag::Registry/g;
+}
 
 print $value;
 print "1;\n";
@@ -136,17 +201,20 @@ print '__DATA__
 
 =head1 NAME
 
-mklangreg.pl - Generate language subtag registry object for langauge
-tag validation
+mklangreg.pl - Generate language subtag registry object for langauge tag validation
 
-_LangTagReg.pm - A language subtag registry data module for language
-tag validation
+_LangTagReg.pm - A language subtag registry data module for language tag validation
+
+_LangTagReg_Full.pm - A language subtag registry data module for language tag validation (including descriptions and additional data)
 
 =head1 DESCRIPTION
 
 The C<_LangTagReg.pm> file contains a list of registered language
 subtags.  It is used by L<Whatpm::LangTag> for the purpose of language
 tag validation.
+
+The C<_LangTagReg_Full.pm> file contains, in addition to the contents
+of C<_LangTagReg.pm>, descriptions and comments in the registry.
 
 The C<mklangreg.pl> script is used to generate the C<_LangTagReg.pm>
 file from the IANA registry.
@@ -155,7 +223,9 @@ file from the IANA registry.
 
 L<Whatpm::LangTag>.
 
-RFC 4646 (BCP 47) Tags for Identifying Languages <urn:ietf:rfc:4646>.
+RFC 4646 <http://tools.ietf.org/html/rfc4646>.
+
+RFC 5646 <http://tools.ietf.org/html/rfc5646>.
 
 IANA Language Subtag Registry
 <http://www.iana.org/assignments/language-subtag-registry>.

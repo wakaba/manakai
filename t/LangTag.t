@@ -225,6 +225,45 @@ sub _extended_filtering_rfc4647_range : Test(68) {
   }
 } # _extended_filtering_rfc4647_range
 
+sub _tag_registry_data : Test(40) {
+  for my $method (qw(
+    tag_registry_data_rfc4646
+    tag_registry_data_rfc5646
+  )) {
+    my $ja = Whatpm::LangTag->$method (language => 'ja');
+    ok !$ja->{_canon};
+    is $ja->{_added}, '2005-10-16';
+    is $ja->{_suppress}, 'jpan';
+    ok !$ja->{_deprecated};
+    ok !$ja->{_preferred};
+    ok !$ja->{Prefix};
+    eq_or_diff $ja->{Description}, ['Japanese'];
+    
+    my $us = Whatpm::LangTag->$method (region => 'us');
+    is $us->{_canon}, '_uppercase';
+    is $us->{_added}, '2005-10-16';
+    ok !$us->{_suppress};
+    ok !$us->{_deprecated};
+    ok !$us->{_preferred};
+    ok !$us->{Prefix};
+    eq_or_diff $us->{Description}, ['United States'];
+    
+    my $not_registered = Whatpm::LangTag->$method (script => 123);
+    is $not_registered, undef;
+    
+    my $no_type = Whatpm::LangTag->$method (bad => 'ja');
+    is $no_type, undef;
+    
+    my $grandfathered = Whatpm::LangTag->$method (grandfathered => 'i-ami');
+    ok $grandfathered->{_deprecated};
+    is $grandfathered->{_preferred}, 'ami';
+    
+    my $redundant = Whatpm::LangTag->$method (redundant => 'zh-yue');
+    ok $redundant->{_deprecated};
+    is $redundant->{_preferred}, 'yue';
+  }
+} # tag_registry_data
+
 __PACKAGE__->runtests;
 
 ## License: Public Domain.

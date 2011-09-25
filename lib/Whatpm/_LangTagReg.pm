@@ -12831,17 +12831,20 @@ __DATA__
 
 =head1 NAME
 
-mklangreg.pl - Generate language subtag registry object for langauge
-tag validation
+mklangreg.pl - Generate language subtag registry object for langauge tag validation
 
-_LangTagReg.pm - A language subtag registry data module for language
-tag validation
+_LangTagReg.pm - A language subtag registry data module for language tag validation
+
+_LangTagReg_Full.pm - A language subtag registry data module for language tag validation (including descriptions and additional data)
 
 =head1 DESCRIPTION
 
 The C<_LangTagReg.pm> file contains a list of registered language
 subtags.  It is used by L<Whatpm::LangTag> for the purpose of language
 tag validation.
+
+The C<_LangTagReg_Full.pm> file contains, in addition to the contents
+of C<_LangTagReg.pm>, descriptions and comments in the registry.
 
 The C<mklangreg.pl> script is used to generate the C<_LangTagReg.pm>
 file from the IANA registry.
@@ -12850,7 +12853,9 @@ file from the IANA registry.
 
 L<Whatpm::LangTag>.
 
-RFC 4646 (BCP 47) Tags for Identifying Languages <urn:ietf:rfc:4646>.
+RFC 4646 <http://tools.ietf.org/html/rfc4646>.
+
+RFC 5646 <http://tools.ietf.org/html/rfc5646>.
 
 IANA Language Subtag Registry
 <http://www.iana.org/assignments/language-subtag-registry>.
