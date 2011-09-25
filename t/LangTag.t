@@ -84,6 +84,28 @@ sub _parse : Tests {
   ];
 } # _parse
 
+sub _parse_zh_min_nan : Test(2) {
+  my $parsed1 = Whatpm::LangTag->parse_rfc4646_tag ('zh-min-nan');
+  eq_or_diff $parsed1, {
+    language => 'zh',
+    extlang => [qw(min nan)],
+    variant => [],
+    illegal => [],
+    privateuse => [],
+    extension => [],
+  };
+
+  my $parsed2 = Whatpm::LangTag->parse_rfc5646_tag ('zh-min-nan');
+  eq_or_diff $parsed2, {
+    extlang => [],
+    variant => [],
+    illegal => [],
+    privateuse => [],
+    extension => [],
+    grandfathered => 'zh-min-nan',
+  };
+} # _parse_zh_min_nan
+
 sub _normalize : Test(13) {
   for (
     ['', ''],

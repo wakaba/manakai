@@ -54,11 +54,20 @@ sub parse_rfc4646_tag ($$;$$) {
 
   my $tag_l = $tag;
   $tag_l =~ tr/A-Z/a-z/;
-  my $grandfathered =
-      $RFC5646 
-          ? $Grandfathered5646->{$tag_l}
-          : $tag =~ /\A[A-Za-z]{1,3}(?>-[A-Za-z0-9]{2,8}){1,2}\z/;
-  
+
+  if ($RFC5646 and $Grandfathered5646->{$tag_l}) {
+    return {
+      extlang => [],
+      variant => [],
+      extension => [],
+      privateuse => [],
+      grandfathered => $tag,
+      illegal => [],      
+    };
+  }
+
+  my $grandfathered = !$RFC5646 && $tag =~ /\A[A-Za-z]{1,3}(?>-[A-Za-z0-9]{2,8}){1,2}\z/;
+
   if ($r{language} and $r{language} =~ /\A[A-Za-z]+\z/) {
     if (length $r{language} == 1) {
       if ($r{language} =~ /\A[Xx]\z/) {
