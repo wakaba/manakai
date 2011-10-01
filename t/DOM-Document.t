@@ -423,7 +423,49 @@ sub _adopt_note : Test(19) {
   is $attr2->owner_document, $doc2, 'Document->adopt_node->od [3]';
   is $attr2->owner_element, undef, 'Document->adopt_node->oe [3]';
   is 0+@{$parent->attributes}, 0, 'Document->adopt_node parent->a @{} 0+ [3]';
-} # _adopt_note
+} # _adopt_node
+
+sub _adopt_node_document_type_not_in_document : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $dt = $dom->create_document_type ('dt');
+  $dt->manakai_set_read_only (0);
+  my $return = $doc->adopt_node ($dt);
+  
+  is $return, $dt;
+  is $dt->owner_document, $doc;
+} # _adopt_node_document_type_not_in_document
+
+sub _adopt_node_document_type_in_another_document : Test(3) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+
+  my $dt = $dom->create_document_type ('dt');
+  $dt->manakai_set_read_only (0);
+  my $doc2 = $dom->create_document;
+  $doc2->append_child ($dt);
+  is $dt->owner_document, $doc2;
+
+  my $return = $doc->adopt_node ($dt);
+  
+  is $return, $dt;
+  is $dt->owner_document, $doc;
+} # _adopt_node_document_type_in_another_document
+
+sub _adopt_node_document_type_in_same_document : Test(3) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+
+  my $dt = $dom->create_document_type ('dt');
+  $dt->manakai_set_read_only (0);
+  $doc->append_child ($dt);
+  is $dt->owner_document, $doc;
+
+  my $return = $doc->adopt_node ($dt);
+  
+  is $return, $dt;
+  is $dt->owner_document, $doc;
+} # _adopt_node_document_type_in_same_document
 
 ## TODO: manakai_entity_base_uri
 
@@ -457,9 +499,9 @@ __PACKAGE__->runtests;
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>
 
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

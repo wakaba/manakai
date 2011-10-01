@@ -209,9 +209,9 @@ sub adopt_node ($$) {
           -type => 'NO_MODIFICATION_ALLOWED_ERR',
           -subtype => 'READ_ONLY_NODE_ERR';
     }
-  } elsif ($nt == 9 or $nt == 10 or $nt == 6 or $nt == 12 or
+  } elsif ($nt == 9 or $nt == 6 or $nt == 12 or
            $nt == 81001 or $nt == 81002) {
-    # DOCUMENT_NODE, DOCUMENT_TYPE_NODE, ENTITY_NODE, NOTATION_NODE,
+    # DOCUMENT_NODE, ENTITY_NODE, NOTATION_NODE,
     # ELEMENT_TYPE_DEFINITION_NODE, ATTRIBUTE_DEFINITION_NODE
     report Message::DOM::DOMException
         -object => $self,
@@ -1287,10 +1287,10 @@ sub create_document ($;$$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>
 
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
