@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->stringify;
+use Message::DOM::DOMImplementation;
 
 my $full = $ENV{MKLANGREG_FULL};
 my $subtags;
@@ -109,6 +112,37 @@ if ($full) {
   }
 }
 
+my $dom = Message::DOM::DOMImplementation->new;
+for my $xml_file_name (@ARGV) {
+  local $/ = undef;
+  open my $file, '<', $xml_file_name or die "$0: $xml_file_name: $!";
+
+  my $doc = $dom->create_document;
+  $doc->inner_html (scalar <$file>);
+
+  my $keys = $doc->query_selector_all ('key');
+  for my $key (@$keys) {
+    my $key_ext = $key->get_attribute ('extension') || 'u';
+    $key_ext =~ tr/A-Z/a-z/;
+    my $key_name = $key->get_attribute ('name');
+    $key_name =~ tr/A-Z/a-z/;
+    my $key_desc = $key->get_attribute ('description');
+    $subtags->{$key_ext . '_key'}->{$key_name} = {
+      Description => [$key_desc],
+    };
+    my $types = $key->query_selector_all ('type');
+    for my $type (@$types) {
+      my $type_name = $type->get_attribute ('name');
+      $type_name =~ tr/A-Z/a-z/;
+      next if $type_name eq 'codepoints';
+      my $type_desc = $type->get_attribute ('description');
+      $subtags->{$key_ext . '_' . $key_name}->{$type_name} = {
+        Description => [$type_desc],
+      };
+    }
+  }
+}
+
 ## Remove unused data
 
 $subtags->{_file_date} = $subtags->{header}->{'File-Date'}->[0];
@@ -123,7 +157,8 @@ for my $type (grep {!/^_/} keys %{$subtags}) {
     my $subtag = $subtags->{$type}->{$tag};
 
     if ($full) {
-      $subtag->{_added} = $subtag->{Added}->[0];
+      $subtag->{_added} = $subtag->{Added}->[0]
+          if $subtag->{Added}->[0];
       $subtag->{_macro} = $subtag->{Macrolanguage}->[0]
           if $subtag->{Macrolanguage};
     } else {
@@ -229,6 +264,13 @@ RFC 5646 <http://tools.ietf.org/html/rfc5646>.
 
 IANA Language Subtag Registry
 <http://www.iana.org/assignments/language-subtag-registry>.
+
+UTS #35: Unicode Locale Data Markup Language
+<http://unicode.org/reports/tr35/>.
+
+Unicode Locale Extension (‘u’) for BCP 47
+<http://cldr.unicode.org/index/bcp47-extension>,
+<http://unicode.org/repos/cldr/trunk/common/bcp47/>.
 
 =head1 LICENSE
 

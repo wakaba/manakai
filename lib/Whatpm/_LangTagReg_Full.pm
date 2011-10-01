@@ -36515,7 +36515,7 @@ $Whatpm::LangTag::RegistryFull = {
                                      'Scope' => [
                                                   'private-use'
                                                 ],
-                                     '_added' => undef
+                                     '_added' => '2005-10-16'
                                    },
                           'qab' => {},
                           'qac' => {},
@@ -53843,7 +53843,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   'Description' => [
                                                      'Private use'
                                                    ],
-                                  '_added' => undef,
+                                  '_added' => '2005-10-16',
                                   '_canon' => '_uppercase'
                                 },
                         'qn' => {},
@@ -54286,7 +54286,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   'Description' => [
                                                      'Private use'
                                                    ],
-                                  '_added' => undef,
+                                  '_added' => '2005-10-16',
                                   '_canon' => '_uppercase'
                                 },
                         'xb' => {},
@@ -55193,7 +55193,7 @@ $Whatpm::LangTag::RegistryFull = {
                                     'Description' => [
                                                        'Private use'
                                                      ],
-                                    '_added' => undef,
+                                    '_added' => '2005-10-16',
                                     '_canon' => '_titlecase'
                                   },
                         'qaab' => {},
@@ -55596,6 +55596,4285 @@ $Whatpm::LangTag::RegistryFull = {
                                     '_canon' => '_titlecase'
                                   }
                       },
+          't_key' => {
+                       'm0' => {
+                                 'Description' => [
+                                                    'Transliteration extension mechanism'
+                                                  ]
+                               }
+                     },
+          't_m0' => {
+                      'alaloc' => {
+                                    'Description' => [
+                                                       'American Library Association-Library of Congress'
+                                                     ]
+                                  },
+                      'bgn' => {
+                                 'Description' => [
+                                                    'US Board on Geographic Names'
+                                                  ]
+                               },
+                      'din' => {
+                                 'Description' => [
+                                                    'Deutsches Institut für Normung'
+                                                  ]
+                               },
+                      'gost' => {
+                                  'Description' => [
+                                                     'Euro-Asian Council for Standardization, Metrology and Certification'
+                                                   ]
+                                },
+                      'iso' => {
+                                 'Description' => [
+                                                    'International Organization for Standardization'
+                                                  ]
+                               },
+                      'mcst' => {
+                                  'Description' => [
+                                                     'Korean Ministry of Culture, Sports and Tourism'
+                                                   ]
+                                },
+                      'ungegn' => {
+                                    'Description' => [
+                                                       'United Nations Group of Experts on Geographical Names'
+                                                     ]
+                                  }
+                    },
+          'u_ca' => {
+                      'buddhist' => {
+                                      'Description' => [
+                                                         'Thai Buddhist calendar'
+                                                       ]
+                                    },
+                      'chinese' => {
+                                     'Description' => [
+                                                        'Traditional Chinese calendar'
+                                                      ]
+                                   },
+                      'coptic' => {
+                                    'Description' => [
+                                                       'Coptic calendar'
+                                                     ]
+                                  },
+                      'ethioaa' => {
+                                     'Description' => [
+                                                        'Ethiopic calendar, Amete Alem (epoch approx. 5493 B.C.E)'
+                                                      ]
+                                   },
+                      'ethiopic' => {
+                                      'Description' => [
+                                                         'Ethiopic calendar, Amete Mihret (epoch approx, 8 C.E.)'
+                                                       ]
+                                    },
+                      'gregory' => {
+                                     'Description' => [
+                                                        'Gregorian calendar'
+                                                      ]
+                                   },
+                      'hebrew' => {
+                                    'Description' => [
+                                                       'Traditional Hebrew calendar'
+                                                     ]
+                                  },
+                      'indian' => {
+                                    'Description' => [
+                                                       'Indian calendar'
+                                                     ]
+                                  },
+                      'islamic' => {
+                                     'Description' => [
+                                                        'Astronomical Arabic calendar'
+                                                      ]
+                                   },
+                      'islamicc' => {
+                                      'Description' => [
+                                                         'Civil (algorithmic) Arabic calendar'
+                                                       ]
+                                    },
+                      'iso8601' => {
+                                     'Description' => [
+                                                        'ISO calendar (Gregorian calendar using the ISO 8601 calendar week rules)'
+                                                      ]
+                                   },
+                      'japanese' => {
+                                      'Description' => [
+                                                         'Japanese Imperial calendar'
+                                                       ]
+                                    },
+                      'persian' => {
+                                     'Description' => [
+                                                        'Persian calendar'
+                                                      ]
+                                   },
+                      'roc' => {
+                                 'Description' => [
+                                                    'Republic of China calendar'
+                                                  ]
+                               }
+                    },
+          'u_co' => {
+                      'big5han' => {
+                                     'Description' => [
+                                                        'Pinyin ordering for Latin, big5 charset ordering for CJK characters (used in Chinese)'
+                                                      ]
+                                   },
+                      'dict' => {
+                                  'Description' => [
+                                                     'Dictionary style ordering (such as in Sinhala)'
+                                                   ]
+                                },
+                      'direct' => {
+                                    'Description' => [
+                                                       'Binary code point order (used in Hindi)'
+                                                     ]
+                                  },
+                      'ducet' => {
+                                   'Description' => [
+                                                      'The default Unicode collation element table order'
+                                                    ]
+                                 },
+                      'gb2312' => {
+                                    'Description' => [
+                                                       'Pinyin ordering for Latin, gb2312han charset ordering for CJK characters (used in Chinese)'
+                                                     ]
+                                  },
+                      'phonebk' => {
+                                     'Description' => [
+                                                        'Phonebook style ordering (such as in German)'
+                                                      ]
+                                   },
+                      'phonetic' => {
+                                      'Description' => [
+                                                         'Phonetic ordering (sorting based on pronunciation)'
+                                                       ]
+                                    },
+                      'pinyin' => {
+                                    'Description' => [
+                                                       'Pinyin ordering for Latin and for CJK characters (used in Chinese)'
+                                                     ]
+                                  },
+                      'reformed' => {
+                                      'Description' => [
+                                                         'Reformed ordering (such as in Swedish)'
+                                                       ]
+                                    },
+                      'search' => {
+                                    'Description' => [
+                                                       'Special collation type for string search'
+                                                     ]
+                                  },
+                      'searchjl' => {
+                                      'Description' => [
+                                                         'Special collation type for Korean initial consonant search'
+                                                       ]
+                                    },
+                      'standard' => {
+                                      'Description' => [
+                                                         'Default ordering for each language'
+                                                       ]
+                                    },
+                      'stroke' => {
+                                    'Description' => [
+                                                       'Pinyin ordering for Latin, stroke order for CJK characters (used in Chinese)'
+                                                     ]
+                                  },
+                      'trad' => {
+                                  'Description' => [
+                                                     'Traditional style ordering (such as in Spanish)'
+                                                   ]
+                                },
+                      'unihan' => {
+                                    'Description' => [
+                                                       'Pinyin ordering for Latin, Unihan radical-stroke ordering for CJK characters (used in Chinese)'
+                                                     ]
+                                  }
+                    },
+          'u_cu' => {
+                      'adp' => {
+                                 'Description' => [
+                                                    'Andorran Peseta'
+                                                  ]
+                               },
+                      'aed' => {
+                                 'Description' => [
+                                                    'United Arab Emirates Dirham'
+                                                  ]
+                               },
+                      'afa' => {
+                                 'Description' => [
+                                                    'Afghan Afghani (1927-2002)'
+                                                  ]
+                               },
+                      'afn' => {
+                                 'Description' => [
+                                                    'Afghan Afghani'
+                                                  ]
+                               },
+                      'alk' => {
+                                 'Description' => [
+                                                    'Albanian Lek (1946-1965)'
+                                                  ]
+                               },
+                      'all' => {
+                                 'Description' => [
+                                                    'Albanian Lek'
+                                                  ]
+                               },
+                      'amd' => {
+                                 'Description' => [
+                                                    'Armenian Dram'
+                                                  ]
+                               },
+                      'ang' => {
+                                 'Description' => [
+                                                    'Netherlands Antillean Guilder'
+                                                  ]
+                               },
+                      'aoa' => {
+                                 'Description' => [
+                                                    'Angolan Kwanza'
+                                                  ]
+                               },
+                      'aok' => {
+                                 'Description' => [
+                                                    'Angolan Kwanza (1977-1991)'
+                                                  ]
+                               },
+                      'aon' => {
+                                 'Description' => [
+                                                    'Angolan New Kwanza (1990-2000)'
+                                                  ]
+                               },
+                      'aor' => {
+                                 'Description' => [
+                                                    'Angolan Readjusted Kwanza (1995-1999)'
+                                                  ]
+                               },
+                      'ara' => {
+                                 'Description' => [
+                                                    'Argentine Austral'
+                                                  ]
+                               },
+                      'arl' => {
+                                 'Description' => [
+                                                    'Argentine Peso Ley (1970-1983)'
+                                                  ]
+                               },
+                      'arm' => {
+                                 'Description' => [
+                                                    'Argentine Peso (1881-1970)'
+                                                  ]
+                               },
+                      'arp' => {
+                                 'Description' => [
+                                                    'Argentine Peso (1983-1985)'
+                                                  ]
+                               },
+                      'ars' => {
+                                 'Description' => [
+                                                    'Argentine Peso'
+                                                  ]
+                               },
+                      'ats' => {
+                                 'Description' => [
+                                                    'Austrian Schilling'
+                                                  ]
+                               },
+                      'aud' => {
+                                 'Description' => [
+                                                    'Australian Dollar'
+                                                  ]
+                               },
+                      'awg' => {
+                                 'Description' => [
+                                                    'Aruban Florin'
+                                                  ]
+                               },
+                      'azm' => {
+                                 'Description' => [
+                                                    'Azerbaijani Manat (1993-2006)'
+                                                  ]
+                               },
+                      'azn' => {
+                                 'Description' => [
+                                                    'Azerbaijani Manat'
+                                                  ]
+                               },
+                      'bad' => {
+                                 'Description' => [
+                                                    'Bosnia-Herzegovina Dinar (1992-1994)'
+                                                  ]
+                               },
+                      'bam' => {
+                                 'Description' => [
+                                                    'Bosnia-Herzegovina Convertible Mark'
+                                                  ]
+                               },
+                      'ban' => {
+                                 'Description' => [
+                                                    'Bosnia-Herzegovina New Dinar (1994-1997)'
+                                                  ]
+                               },
+                      'bbd' => {
+                                 'Description' => [
+                                                    'Barbadian Dollar'
+                                                  ]
+                               },
+                      'bdt' => {
+                                 'Description' => [
+                                                    'Bangladeshi Taka'
+                                                  ]
+                               },
+                      'bec' => {
+                                 'Description' => [
+                                                    'Belgian Franc (convertible)'
+                                                  ]
+                               },
+                      'bef' => {
+                                 'Description' => [
+                                                    'Belgian Franc'
+                                                  ]
+                               },
+                      'bel' => {
+                                 'Description' => [
+                                                    'Belgian Franc (financial)'
+                                                  ]
+                               },
+                      'bgl' => {
+                                 'Description' => [
+                                                    'Bulgarian Hard Lev'
+                                                  ]
+                               },
+                      'bgm' => {
+                                 'Description' => [
+                                                    'Bulgarian Socialist Lev'
+                                                  ]
+                               },
+                      'bgn' => {
+                                 'Description' => [
+                                                    'Bulgarian Lev'
+                                                  ]
+                               },
+                      'bgo' => {
+                                 'Description' => [
+                                                    'Bulgarian Lev (1879-1952)'
+                                                  ]
+                               },
+                      'bhd' => {
+                                 'Description' => [
+                                                    'Bahraini Dinar'
+                                                  ]
+                               },
+                      'bif' => {
+                                 'Description' => [
+                                                    'Burundian Franc'
+                                                  ]
+                               },
+                      'bmd' => {
+                                 'Description' => [
+                                                    'Bermudan Dollar'
+                                                  ]
+                               },
+                      'bnd' => {
+                                 'Description' => [
+                                                    'Brunei Dollar'
+                                                  ]
+                               },
+                      'bob' => {
+                                 'Description' => [
+                                                    'Bolivian Boliviano'
+                                                  ]
+                               },
+                      'bol' => {
+                                 'Description' => [
+                                                    'Bolivian Boliviano (1863-1963)'
+                                                  ]
+                               },
+                      'bop' => {
+                                 'Description' => [
+                                                    'Bolivian Peso'
+                                                  ]
+                               },
+                      'bov' => {
+                                 'Description' => [
+                                                    'Bolivian Mvdol'
+                                                  ]
+                               },
+                      'brb' => {
+                                 'Description' => [
+                                                    'Brazilian New Cruzeiro (1967-1986)'
+                                                  ]
+                               },
+                      'brc' => {
+                                 'Description' => [
+                                                    'Brazilian Cruzado (1986-1989)'
+                                                  ]
+                               },
+                      'bre' => {
+                                 'Description' => [
+                                                    'Brazilian Cruzeiro (1990-1993)'
+                                                  ]
+                               },
+                      'brl' => {
+                                 'Description' => [
+                                                    'Brazilian Real'
+                                                  ]
+                               },
+                      'brn' => {
+                                 'Description' => [
+                                                    'Brazilian New Cruzado (1989-1990)'
+                                                  ]
+                               },
+                      'brr' => {
+                                 'Description' => [
+                                                    'Brazilian Cruzeiro (1993-1994)'
+                                                  ]
+                               },
+                      'brz' => {
+                                 'Description' => [
+                                                    'Brazilian Cruzeiro (1942-1967)'
+                                                  ]
+                               },
+                      'bsd' => {
+                                 'Description' => [
+                                                    'Bahamian Dollar'
+                                                  ]
+                               },
+                      'btn' => {
+                                 'Description' => [
+                                                    'Bhutanese Ngultrum'
+                                                  ]
+                               },
+                      'buk' => {
+                                 'Description' => [
+                                                    'Burmese Kyat'
+                                                  ]
+                               },
+                      'bwp' => {
+                                 'Description' => [
+                                                    'Botswanan Pula'
+                                                  ]
+                               },
+                      'byb' => {
+                                 'Description' => [
+                                                    'Belarusian New Ruble (1994-1999)'
+                                                  ]
+                               },
+                      'byr' => {
+                                 'Description' => [
+                                                    'Belarusian Ruble'
+                                                  ]
+                               },
+                      'bzd' => {
+                                 'Description' => [
+                                                    'Belize Dollar'
+                                                  ]
+                               },
+                      'cad' => {
+                                 'Description' => [
+                                                    'Canadian Dollar'
+                                                  ]
+                               },
+                      'cdf' => {
+                                 'Description' => [
+                                                    'Congolese Franc'
+                                                  ]
+                               },
+                      'che' => {
+                                 'Description' => [
+                                                    'WIR Euro'
+                                                  ]
+                               },
+                      'chf' => {
+                                 'Description' => [
+                                                    'Swiss Franc'
+                                                  ]
+                               },
+                      'chw' => {
+                                 'Description' => [
+                                                    'WIR Franc'
+                                                  ]
+                               },
+                      'cle' => {
+                                 'Description' => [
+                                                    'Chilean Escudo'
+                                                  ]
+                               },
+                      'clf' => {
+                                 'Description' => [
+                                                    'Chilean Unit of Account (UF)'
+                                                  ]
+                               },
+                      'clp' => {
+                                 'Description' => [
+                                                    'Chilean Peso'
+                                                  ]
+                               },
+                      'cnx' => {
+                                 'Description' => [
+                                                    'Chinese People’s Bank Dollar'
+                                                  ]
+                               },
+                      'cny' => {
+                                 'Description' => [
+                                                    'Chinese Yuan'
+                                                  ]
+                               },
+                      'cop' => {
+                                 'Description' => [
+                                                    'Colombian Peso'
+                                                  ]
+                               },
+                      'cou' => {
+                                 'Description' => [
+                                                    'Colombian Real Value Unit'
+                                                  ]
+                               },
+                      'crc' => {
+                                 'Description' => [
+                                                    'Costa Rican Colón'
+                                                  ]
+                               },
+                      'csd' => {
+                                 'Description' => [
+                                                    'Serbian Dinar (2002-2006)'
+                                                  ]
+                               },
+                      'csk' => {
+                                 'Description' => [
+                                                    'Czechoslovak Hard Koruna'
+                                                  ]
+                               },
+                      'cuc' => {
+                                 'Description' => [
+                                                    'Cuban Convertible Peso'
+                                                  ]
+                               },
+                      'cup' => {
+                                 'Description' => [
+                                                    'Cuban Peso'
+                                                  ]
+                               },
+                      'cve' => {
+                                 'Description' => [
+                                                    'Cape Verdean Escudo'
+                                                  ]
+                               },
+                      'cyp' => {
+                                 'Description' => [
+                                                    'Cypriot Pound'
+                                                  ]
+                               },
+                      'czk' => {
+                                 'Description' => [
+                                                    'Czech Republic Koruna'
+                                                  ]
+                               },
+                      'ddm' => {
+                                 'Description' => [
+                                                    'East German Mark'
+                                                  ]
+                               },
+                      'dem' => {
+                                 'Description' => [
+                                                    'German Mark'
+                                                  ]
+                               },
+                      'djf' => {
+                                 'Description' => [
+                                                    'Djiboutian Franc'
+                                                  ]
+                               },
+                      'dkk' => {
+                                 'Description' => [
+                                                    'Danish Krone'
+                                                  ]
+                               },
+                      'dop' => {
+                                 'Description' => [
+                                                    'Dominican Peso'
+                                                  ]
+                               },
+                      'dzd' => {
+                                 'Description' => [
+                                                    'Algerian Dinar'
+                                                  ]
+                               },
+                      'ecs' => {
+                                 'Description' => [
+                                                    'Ecuadorian Sucre'
+                                                  ]
+                               },
+                      'ecv' => {
+                                 'Description' => [
+                                                    'Ecuadorian Unit of Constant Value'
+                                                  ]
+                               },
+                      'eek' => {
+                                 'Description' => [
+                                                    'Estonian Kroon'
+                                                  ]
+                               },
+                      'egp' => {
+                                 'Description' => [
+                                                    'Egyptian Pound'
+                                                  ]
+                               },
+                      'ern' => {
+                                 'Description' => [
+                                                    'Eritrean Nakfa'
+                                                  ]
+                               },
+                      'esa' => {
+                                 'Description' => [
+                                                    'Spanish Peseta (A account)'
+                                                  ]
+                               },
+                      'esb' => {
+                                 'Description' => [
+                                                    'Spanish Peseta (convertible account)'
+                                                  ]
+                               },
+                      'esp' => {
+                                 'Description' => [
+                                                    'Spanish Peseta'
+                                                  ]
+                               },
+                      'etb' => {
+                                 'Description' => [
+                                                    'Ethiopian Birr'
+                                                  ]
+                               },
+                      'eur' => {
+                                 'Description' => [
+                                                    'Euro'
+                                                  ]
+                               },
+                      'fim' => {
+                                 'Description' => [
+                                                    'Finnish Markka'
+                                                  ]
+                               },
+                      'fjd' => {
+                                 'Description' => [
+                                                    'Fijian Dollar'
+                                                  ]
+                               },
+                      'fkp' => {
+                                 'Description' => [
+                                                    'Falkland Islands Pound'
+                                                  ]
+                               },
+                      'frf' => {
+                                 'Description' => [
+                                                    'French Franc'
+                                                  ]
+                               },
+                      'gbp' => {
+                                 'Description' => [
+                                                    'British Pound Sterling'
+                                                  ]
+                               },
+                      'gek' => {
+                                 'Description' => [
+                                                    'Georgian Kupon Larit'
+                                                  ]
+                               },
+                      'gel' => {
+                                 'Description' => [
+                                                    'Georgian Lari'
+                                                  ]
+                               },
+                      'ghc' => {
+                                 'Description' => [
+                                                    'Ghanaian Cedi (1979-2007)'
+                                                  ]
+                               },
+                      'ghs' => {
+                                 'Description' => [
+                                                    'Ghanaian Cedi'
+                                                  ]
+                               },
+                      'gip' => {
+                                 'Description' => [
+                                                    'Gibraltar Pound'
+                                                  ]
+                               },
+                      'gmd' => {
+                                 'Description' => [
+                                                    'Gambian Dalasi'
+                                                  ]
+                               },
+                      'gnf' => {
+                                 'Description' => [
+                                                    'Guinean Franc'
+                                                  ]
+                               },
+                      'gns' => {
+                                 'Description' => [
+                                                    'Guinean Syli'
+                                                  ]
+                               },
+                      'gqe' => {
+                                 'Description' => [
+                                                    'Equatorial Guinean Ekwele'
+                                                  ]
+                               },
+                      'grd' => {
+                                 'Description' => [
+                                                    'Greek Drachma'
+                                                  ]
+                               },
+                      'gtq' => {
+                                 'Description' => [
+                                                    'Guatemalan Quetzal'
+                                                  ]
+                               },
+                      'gwe' => {
+                                 'Description' => [
+                                                    'Portuguese Guinea Escudo'
+                                                  ]
+                               },
+                      'gwp' => {
+                                 'Description' => [
+                                                    'Guinea-Bissau Peso'
+                                                  ]
+                               },
+                      'gyd' => {
+                                 'Description' => [
+                                                    'Guyanaese Dollar'
+                                                  ]
+                               },
+                      'hkd' => {
+                                 'Description' => [
+                                                    'Hong Kong Dollar'
+                                                  ]
+                               },
+                      'hnl' => {
+                                 'Description' => [
+                                                    'Honduran Lempira'
+                                                  ]
+                               },
+                      'hrd' => {
+                                 'Description' => [
+                                                    'Croatian Dinar'
+                                                  ]
+                               },
+                      'hrk' => {
+                                 'Description' => [
+                                                    'Croatian Kuna'
+                                                  ]
+                               },
+                      'htg' => {
+                                 'Description' => [
+                                                    'Haitian Gourde'
+                                                  ]
+                               },
+                      'huf' => {
+                                 'Description' => [
+                                                    'Hungarian Forint'
+                                                  ]
+                               },
+                      'idr' => {
+                                 'Description' => [
+                                                    'Indonesian Rupiah'
+                                                  ]
+                               },
+                      'iep' => {
+                                 'Description' => [
+                                                    'Irish Pound'
+                                                  ]
+                               },
+                      'ilp' => {
+                                 'Description' => [
+                                                    'Israeli Pound'
+                                                  ]
+                               },
+                      'ilr' => {
+                                 'Description' => [
+                                                    'Israeli Sheqel (1980-1985)'
+                                                  ]
+                               },
+                      'ils' => {
+                                 'Description' => [
+                                                    'Israeli New Sheqel'
+                                                  ]
+                               },
+                      'inr' => {
+                                 'Description' => [
+                                                    'Indian Rupee'
+                                                  ]
+                               },
+                      'iqd' => {
+                                 'Description' => [
+                                                    'Iraqi Dinar'
+                                                  ]
+                               },
+                      'irr' => {
+                                 'Description' => [
+                                                    'Iranian Rial'
+                                                  ]
+                               },
+                      'isj' => {
+                                 'Description' => [
+                                                    'Icelandic Króna (1918-1981)'
+                                                  ]
+                               },
+                      'isk' => {
+                                 'Description' => [
+                                                    'Icelandic Króna'
+                                                  ]
+                               },
+                      'itl' => {
+                                 'Description' => [
+                                                    'Italian Lira'
+                                                  ]
+                               },
+                      'jmd' => {
+                                 'Description' => [
+                                                    'Jamaican Dollar'
+                                                  ]
+                               },
+                      'jod' => {
+                                 'Description' => [
+                                                    'Jordanian Dinar'
+                                                  ]
+                               },
+                      'jpy' => {
+                                 'Description' => [
+                                                    'Japanese Yen'
+                                                  ]
+                               },
+                      'kes' => {
+                                 'Description' => [
+                                                    'Kenyan Shilling'
+                                                  ]
+                               },
+                      'kgs' => {
+                                 'Description' => [
+                                                    'Kyrgystani Som'
+                                                  ]
+                               },
+                      'khr' => {
+                                 'Description' => [
+                                                    'Cambodian Riel'
+                                                  ]
+                               },
+                      'kmf' => {
+                                 'Description' => [
+                                                    'Comorian Franc'
+                                                  ]
+                               },
+                      'kpw' => {
+                                 'Description' => [
+                                                    'North Korean Won'
+                                                  ]
+                               },
+                      'krh' => {
+                                 'Description' => [
+                                                    'South Korean Hwan (1953-1962)'
+                                                  ]
+                               },
+                      'kro' => {
+                                 'Description' => [
+                                                    'South Korean Won (1945-1953)'
+                                                  ]
+                               },
+                      'krw' => {
+                                 'Description' => [
+                                                    'South Korean Won'
+                                                  ]
+                               },
+                      'kwd' => {
+                                 'Description' => [
+                                                    'Kuwaiti Dinar'
+                                                  ]
+                               },
+                      'kyd' => {
+                                 'Description' => [
+                                                    'Cayman Islands Dollar'
+                                                  ]
+                               },
+                      'kzt' => {
+                                 'Description' => [
+                                                    'Kazakhstani Tenge'
+                                                  ]
+                               },
+                      'lak' => {
+                                 'Description' => [
+                                                    'Laotian Kip'
+                                                  ]
+                               },
+                      'lbp' => {
+                                 'Description' => [
+                                                    'Lebanese Pound'
+                                                  ]
+                               },
+                      'lkr' => {
+                                 'Description' => [
+                                                    'Sri Lankan Rupee'
+                                                  ]
+                               },
+                      'lrd' => {
+                                 'Description' => [
+                                                    'Liberian Dollar'
+                                                  ]
+                               },
+                      'lsl' => {
+                                 'Description' => [
+                                                    'Lesotho Loti'
+                                                  ]
+                               },
+                      'ltl' => {
+                                 'Description' => [
+                                                    'Lithuanian Litas'
+                                                  ]
+                               },
+                      'ltt' => {
+                                 'Description' => [
+                                                    'Lithuanian Talonas'
+                                                  ]
+                               },
+                      'luc' => {
+                                 'Description' => [
+                                                    'Luxembourgian Convertible Franc'
+                                                  ]
+                               },
+                      'luf' => {
+                                 'Description' => [
+                                                    'Luxembourgian Franc'
+                                                  ]
+                               },
+                      'lul' => {
+                                 'Description' => [
+                                                    'Luxembourg Financial Franc'
+                                                  ]
+                               },
+                      'lvl' => {
+                                 'Description' => [
+                                                    'Latvian Lats'
+                                                  ]
+                               },
+                      'lvr' => {
+                                 'Description' => [
+                                                    'Latvian Ruble'
+                                                  ]
+                               },
+                      'lyd' => {
+                                 'Description' => [
+                                                    'Libyan Dinar'
+                                                  ]
+                               },
+                      'mad' => {
+                                 'Description' => [
+                                                    'Moroccan Dirham'
+                                                  ]
+                               },
+                      'maf' => {
+                                 'Description' => [
+                                                    'Moroccan Franc'
+                                                  ]
+                               },
+                      'mcf' => {
+                                 'Description' => [
+                                                    'Monegasque Franc'
+                                                  ]
+                               },
+                      'mdc' => {
+                                 'Description' => [
+                                                    'Moldovan Cupon'
+                                                  ]
+                               },
+                      'mdl' => {
+                                 'Description' => [
+                                                    'Moldovan Leu'
+                                                  ]
+                               },
+                      'mga' => {
+                                 'Description' => [
+                                                    'Malagasy Ariary'
+                                                  ]
+                               },
+                      'mgf' => {
+                                 'Description' => [
+                                                    'Malagasy Franc'
+                                                  ]
+                               },
+                      'mkd' => {
+                                 'Description' => [
+                                                    'Macedonian Denar'
+                                                  ]
+                               },
+                      'mkn' => {
+                                 'Description' => [
+                                                    'Macedonian Denar (1992-1993)'
+                                                  ]
+                               },
+                      'mlf' => {
+                                 'Description' => [
+                                                    'Malian Franc'
+                                                  ]
+                               },
+                      'mmk' => {
+                                 'Description' => [
+                                                    'Myanma Kyat'
+                                                  ]
+                               },
+                      'mnt' => {
+                                 'Description' => [
+                                                    'Mongolian Tugrik'
+                                                  ]
+                               },
+                      'mop' => {
+                                 'Description' => [
+                                                    'Macanese Pataca'
+                                                  ]
+                               },
+                      'mro' => {
+                                 'Description' => [
+                                                    'Mauritanian Ouguiya'
+                                                  ]
+                               },
+                      'mtl' => {
+                                 'Description' => [
+                                                    'Maltese Lira'
+                                                  ]
+                               },
+                      'mtp' => {
+                                 'Description' => [
+                                                    'Maltese Pound'
+                                                  ]
+                               },
+                      'mur' => {
+                                 'Description' => [
+                                                    'Mauritian Rupee'
+                                                  ]
+                               },
+                      'mvp' => {
+                                 'Description' => [
+                                                    'Maldivian Rupee'
+                                                  ]
+                               },
+                      'mvr' => {
+                                 'Description' => [
+                                                    'Maldivian Rufiyaa'
+                                                  ]
+                               },
+                      'mwk' => {
+                                 'Description' => [
+                                                    'Malawian Kwacha'
+                                                  ]
+                               },
+                      'mxn' => {
+                                 'Description' => [
+                                                    'Mexican Peso'
+                                                  ]
+                               },
+                      'mxp' => {
+                                 'Description' => [
+                                                    'Mexican Silver Peso (1861-1992)'
+                                                  ]
+                               },
+                      'mxv' => {
+                                 'Description' => [
+                                                    'Mexican Investment Unit'
+                                                  ]
+                               },
+                      'myr' => {
+                                 'Description' => [
+                                                    'Malaysian Ringgit'
+                                                  ]
+                               },
+                      'mze' => {
+                                 'Description' => [
+                                                    'Mozambican Escudo'
+                                                  ]
+                               },
+                      'mzm' => {
+                                 'Description' => [
+                                                    'Mozambican Metical (1980-2006)'
+                                                  ]
+                               },
+                      'mzn' => {
+                                 'Description' => [
+                                                    'Mozambican Metical'
+                                                  ]
+                               },
+                      'nad' => {
+                                 'Description' => [
+                                                    'Namibian Dollar'
+                                                  ]
+                               },
+                      'ngn' => {
+                                 'Description' => [
+                                                    'Nigerian Naira'
+                                                  ]
+                               },
+                      'nic' => {
+                                 'Description' => [
+                                                    'Nicaraguan Córdoba (1988-1991)'
+                                                  ]
+                               },
+                      'nio' => {
+                                 'Description' => [
+                                                    'Nicaraguan Córdoba'
+                                                  ]
+                               },
+                      'nlg' => {
+                                 'Description' => [
+                                                    'Dutch Guilder'
+                                                  ]
+                               },
+                      'nok' => {
+                                 'Description' => [
+                                                    'Norwegian Krone'
+                                                  ]
+                               },
+                      'npr' => {
+                                 'Description' => [
+                                                    'Nepalese Rupee'
+                                                  ]
+                               },
+                      'nzd' => {
+                                 'Description' => [
+                                                    'New Zealand Dollar'
+                                                  ]
+                               },
+                      'omr' => {
+                                 'Description' => [
+                                                    'Omani Rial'
+                                                  ]
+                               },
+                      'pab' => {
+                                 'Description' => [
+                                                    'Panamanian Balboa'
+                                                  ]
+                               },
+                      'pei' => {
+                                 'Description' => [
+                                                    'Peruvian Inti'
+                                                  ]
+                               },
+                      'pen' => {
+                                 'Description' => [
+                                                    'Peruvian Nuevo Sol'
+                                                  ]
+                               },
+                      'pes' => {
+                                 'Description' => [
+                                                    'Peruvian Sol (1863-1965)'
+                                                  ]
+                               },
+                      'pgk' => {
+                                 'Description' => [
+                                                    'Papua New Guinean Kina'
+                                                  ]
+                               },
+                      'php' => {
+                                 'Description' => [
+                                                    'Philippine Peso'
+                                                  ]
+                               },
+                      'pkr' => {
+                                 'Description' => [
+                                                    'Pakistani Rupee'
+                                                  ]
+                               },
+                      'pln' => {
+                                 'Description' => [
+                                                    'Polish Zloty'
+                                                  ]
+                               },
+                      'plz' => {
+                                 'Description' => [
+                                                    'Polish Zloty (1950-1995)'
+                                                  ]
+                               },
+                      'pte' => {
+                                 'Description' => [
+                                                    'Portuguese Escudo'
+                                                  ]
+                               },
+                      'pyg' => {
+                                 'Description' => [
+                                                    'Paraguayan Guarani'
+                                                  ]
+                               },
+                      'qar' => {
+                                 'Description' => [
+                                                    'Qatari Rial'
+                                                  ]
+                               },
+                      'rhd' => {
+                                 'Description' => [
+                                                    'Rhodesian Dollar'
+                                                  ]
+                               },
+                      'rol' => {
+                                 'Description' => [
+                                                    'Romanian Leu (1952-2006)'
+                                                  ]
+                               },
+                      'ron' => {
+                                 'Description' => [
+                                                    'Romanian Leu'
+                                                  ]
+                               },
+                      'rsd' => {
+                                 'Description' => [
+                                                    'Serbian Dinar'
+                                                  ]
+                               },
+                      'rub' => {
+                                 'Description' => [
+                                                    'Russian Ruble'
+                                                  ]
+                               },
+                      'rur' => {
+                                 'Description' => [
+                                                    'Russian Ruble (1991-1998)'
+                                                  ]
+                               },
+                      'rwf' => {
+                                 'Description' => [
+                                                    'Rwandan Franc'
+                                                  ]
+                               },
+                      'sar' => {
+                                 'Description' => [
+                                                    'Saudi Riyal'
+                                                  ]
+                               },
+                      'sbd' => {
+                                 'Description' => [
+                                                    'Solomon Islands Dollar'
+                                                  ]
+                               },
+                      'scr' => {
+                                 'Description' => [
+                                                    'Seychellois Rupee'
+                                                  ]
+                               },
+                      'sdd' => {
+                                 'Description' => [
+                                                    'Sudanese Dinar (1992-2007)'
+                                                  ]
+                               },
+                      'sdg' => {
+                                 'Description' => [
+                                                    'Sudanese Pound'
+                                                  ]
+                               },
+                      'sdp' => {
+                                 'Description' => [
+                                                    'Sudanese Pound (1957-1998)'
+                                                  ]
+                               },
+                      'sek' => {
+                                 'Description' => [
+                                                    'Swedish Krona'
+                                                  ]
+                               },
+                      'sgd' => {
+                                 'Description' => [
+                                                    'Singapore Dollar'
+                                                  ]
+                               },
+                      'shp' => {
+                                 'Description' => [
+                                                    'Saint Helena Pound'
+                                                  ]
+                               },
+                      'sit' => {
+                                 'Description' => [
+                                                    'Slovenian Tolar'
+                                                  ]
+                               },
+                      'skk' => {
+                                 'Description' => [
+                                                    'Slovak Koruna'
+                                                  ]
+                               },
+                      'sll' => {
+                                 'Description' => [
+                                                    'Sierra Leonean Leone'
+                                                  ]
+                               },
+                      'sos' => {
+                                 'Description' => [
+                                                    'Somali Shilling'
+                                                  ]
+                               },
+                      'srd' => {
+                                 'Description' => [
+                                                    'Surinamese Dollar'
+                                                  ]
+                               },
+                      'srg' => {
+                                 'Description' => [
+                                                    'Surinamese Guilder'
+                                                  ]
+                               },
+                      'std' => {
+                                 'Description' => [
+                                                    'São Tomé and Príncipe Dobra'
+                                                  ]
+                               },
+                      'sur' => {
+                                 'Description' => [
+                                                    'Soviet Rouble'
+                                                  ]
+                               },
+                      'svc' => {
+                                 'Description' => [
+                                                    'Salvadoran Colón'
+                                                  ]
+                               },
+                      'syp' => {
+                                 'Description' => [
+                                                    'Syrian Pound'
+                                                  ]
+                               },
+                      'szl' => {
+                                 'Description' => [
+                                                    'Swazi Lilangeni'
+                                                  ]
+                               },
+                      'thb' => {
+                                 'Description' => [
+                                                    'Thai Baht'
+                                                  ]
+                               },
+                      'tjr' => {
+                                 'Description' => [
+                                                    'Tajikistani Ruble'
+                                                  ]
+                               },
+                      'tjs' => {
+                                 'Description' => [
+                                                    'Tajikistani Somoni'
+                                                  ]
+                               },
+                      'tmm' => {
+                                 'Description' => [
+                                                    'Turkmenistani Manat (1993-2009)'
+                                                  ]
+                               },
+                      'tmt' => {
+                                 'Description' => [
+                                                    'Turkmenistani Manat'
+                                                  ]
+                               },
+                      'tnd' => {
+                                 'Description' => [
+                                                    'Tunisian Dinar'
+                                                  ]
+                               },
+                      'top' => {
+                                 'Description' => [
+                                                    'Tongan Paʻanga'
+                                                  ]
+                               },
+                      'tpe' => {
+                                 'Description' => [
+                                                    'Timorese Escudo'
+                                                  ]
+                               },
+                      'trl' => {
+                                 'Description' => [
+                                                    'Turkish Lira (1922-2005)'
+                                                  ]
+                               },
+                      'try' => {
+                                 'Description' => [
+                                                    'Turkish Lira'
+                                                  ]
+                               },
+                      'ttd' => {
+                                 'Description' => [
+                                                    'Trinidad and Tobago Dollar'
+                                                  ]
+                               },
+                      'twd' => {
+                                 'Description' => [
+                                                    'New Taiwan Dollar'
+                                                  ]
+                               },
+                      'tzs' => {
+                                 'Description' => [
+                                                    'Tanzanian Shilling'
+                                                  ]
+                               },
+                      'uah' => {
+                                 'Description' => [
+                                                    'Ukrainian Hryvnia'
+                                                  ]
+                               },
+                      'uak' => {
+                                 'Description' => [
+                                                    'Ukrainian Karbovanets'
+                                                  ]
+                               },
+                      'ugs' => {
+                                 'Description' => [
+                                                    'Ugandan Shilling (1966-1987)'
+                                                  ]
+                               },
+                      'ugx' => {
+                                 'Description' => [
+                                                    'Ugandan Shilling'
+                                                  ]
+                               },
+                      'usd' => {
+                                 'Description' => [
+                                                    'US Dollar'
+                                                  ]
+                               },
+                      'usn' => {
+                                 'Description' => [
+                                                    'US Dollar (Next day)'
+                                                  ]
+                               },
+                      'uss' => {
+                                 'Description' => [
+                                                    'US Dollar (Same day)'
+                                                  ]
+                               },
+                      'uyi' => {
+                                 'Description' => [
+                                                    'Uruguayan Peso (Indexed Units)'
+                                                  ]
+                               },
+                      'uyp' => {
+                                 'Description' => [
+                                                    'Uruguayan Peso (1975-1993)'
+                                                  ]
+                               },
+                      'uyu' => {
+                                 'Description' => [
+                                                    'Uruguayan Peso'
+                                                  ]
+                               },
+                      'uzs' => {
+                                 'Description' => [
+                                                    'Uzbekistan Som'
+                                                  ]
+                               },
+                      'veb' => {
+                                 'Description' => [
+                                                    'Venezuelan Bolívar (1871-2008)'
+                                                  ]
+                               },
+                      'vef' => {
+                                 'Description' => [
+                                                    'Venezuelan Bolívar'
+                                                  ]
+                               },
+                      'vnd' => {
+                                 'Description' => [
+                                                    'Vietnamese Dong'
+                                                  ]
+                               },
+                      'vnn' => {
+                                 'Description' => [
+                                                    'Vietnamese Dong (1978-1985)'
+                                                  ]
+                               },
+                      'vuv' => {
+                                 'Description' => [
+                                                    'Vanuatu Vatu'
+                                                  ]
+                               },
+                      'wst' => {
+                                 'Description' => [
+                                                    'Samoan Tala'
+                                                  ]
+                               },
+                      'xaf' => {
+                                 'Description' => [
+                                                    'CFA Franc BEAC'
+                                                  ]
+                               },
+                      'xag' => {
+                                 'Description' => [
+                                                    'Silver'
+                                                  ]
+                               },
+                      'xau' => {
+                                 'Description' => [
+                                                    'Gold'
+                                                  ]
+                               },
+                      'xba' => {
+                                 'Description' => [
+                                                    'European Composite Unit'
+                                                  ]
+                               },
+                      'xbb' => {
+                                 'Description' => [
+                                                    'European Monetary Unit'
+                                                  ]
+                               },
+                      'xbc' => {
+                                 'Description' => [
+                                                    'European Unit of Account 9'
+                                                  ]
+                               },
+                      'xbd' => {
+                                 'Description' => [
+                                                    'European Unit of Account 17'
+                                                  ]
+                               },
+                      'xcd' => {
+                                 'Description' => [
+                                                    'East Caribbean Dollar'
+                                                  ]
+                               },
+                      'xdr' => {
+                                 'Description' => [
+                                                    'Special Drawing Rights'
+                                                  ]
+                               },
+                      'xeu' => {
+                                 'Description' => [
+                                                    'European Currency Unit'
+                                                  ]
+                               },
+                      'xfo' => {
+                                 'Description' => [
+                                                    'French Gold Franc'
+                                                  ]
+                               },
+                      'xfu' => {
+                                 'Description' => [
+                                                    'French UIC-Franc'
+                                                  ]
+                               },
+                      'xof' => {
+                                 'Description' => [
+                                                    'CFA Franc BCEAO'
+                                                  ]
+                               },
+                      'xpd' => {
+                                 'Description' => [
+                                                    'Palladium'
+                                                  ]
+                               },
+                      'xpf' => {
+                                 'Description' => [
+                                                    'CFP Franc'
+                                                  ]
+                               },
+                      'xpt' => {
+                                 'Description' => [
+                                                    'Platinum'
+                                                  ]
+                               },
+                      'xre' => {
+                                 'Description' => [
+                                                    'RINET Funds'
+                                                  ]
+                               },
+                      'xts' => {
+                                 'Description' => [
+                                                    'Testing Currency Code'
+                                                  ]
+                               },
+                      'xxx' => {
+                                 'Description' => [
+                                                    'Unknown Currency'
+                                                  ]
+                               },
+                      'ydd' => {
+                                 'Description' => [
+                                                    'Yemeni Dinar'
+                                                  ]
+                               },
+                      'yer' => {
+                                 'Description' => [
+                                                    'Yemeni Rial'
+                                                  ]
+                               },
+                      'yud' => {
+                                 'Description' => [
+                                                    'Yugoslavian Hard Dinar (1966-1990)'
+                                                  ]
+                               },
+                      'yum' => {
+                                 'Description' => [
+                                                    'Yugoslavian New Dinar (1994-2002)'
+                                                  ]
+                               },
+                      'yun' => {
+                                 'Description' => [
+                                                    'Yugoslavian Convertible Dinar (1990-1992)'
+                                                  ]
+                               },
+                      'yur' => {
+                                 'Description' => [
+                                                    'Yugoslavian Reformed Dinar (1992-1993)'
+                                                  ]
+                               },
+                      'zal' => {
+                                 'Description' => [
+                                                    'South African Rand (financial)'
+                                                  ]
+                               },
+                      'zar' => {
+                                 'Description' => [
+                                                    'South African Rand'
+                                                  ]
+                               },
+                      'zmk' => {
+                                 'Description' => [
+                                                    'Zambian Kwacha'
+                                                  ]
+                               },
+                      'zrn' => {
+                                 'Description' => [
+                                                    'Zairean New Zaire (1993-1998)'
+                                                  ]
+                               },
+                      'zrz' => {
+                                 'Description' => [
+                                                    'Zairean Zaire (1971-1993)'
+                                                  ]
+                               },
+                      'zwd' => {
+                                 'Description' => [
+                                                    'Zimbabwean Dollar (1980-2008)'
+                                                  ]
+                               },
+                      'zwl' => {
+                                 'Description' => [
+                                                    'Zimbabwean Dollar (2009)'
+                                                  ]
+                               },
+                      'zwr' => {
+                                 'Description' => [
+                                                    'Zimbabwean Dollar (2008)'
+                                                  ]
+                               }
+                    },
+          'u_ka' => {
+                      'noignore' => {
+                                      'Description' => [
+                                                         'Variable collation elements are not reset to ignorable'
+                                                       ]
+                                    },
+                      'shifted' => {
+                                     'Description' => [
+                                                        'Variable collation elements are reset to zero at levels one through three'
+                                                      ]
+                                   }
+                    },
+          'u_kb' => {
+                      'false' => {
+                                   'Description' => [
+                                                      'No backwards (the second level to be forwards)'
+                                                    ]
+                                 },
+                      'true' => {
+                                  'Description' => [
+                                                     'The second level to be backwards'
+                                                   ]
+                                }
+                    },
+          'u_kc' => {
+                      'false' => {
+                                   'Description' => [
+                                                      'No special case level handling'
+                                                    ]
+                                 },
+                      'true' => {
+                                  'Description' => [
+                                                     'The case level is inserted in front of tertiary'
+                                                   ]
+                                }
+                    },
+          'u_key' => {
+                       'ca' => {
+                                 'Description' => [
+                                                    'Calendar algorithm key'
+                                                  ]
+                               },
+                       'co' => {
+                                 'Description' => [
+                                                    'Collation type key'
+                                                  ]
+                               },
+                       'cu' => {
+                                 'Description' => [
+                                                    'Currency type key'
+                                                  ]
+                               },
+                       'ka' => {
+                                 'Description' => [
+                                                    'Collation parameter key for alternate handling'
+                                                  ]
+                               },
+                       'kb' => {
+                                 'Description' => [
+                                                    'Collation parameter key for backward collation weight'
+                                                  ]
+                               },
+                       'kc' => {
+                                 'Description' => [
+                                                    'Collation parameter key for case level'
+                                                  ]
+                               },
+                       'kf' => {
+                                 'Description' => [
+                                                    'Collation parameter key for ordering by case'
+                                                  ]
+                               },
+                       'kh' => {
+                                 'Description' => [
+                                                    'Collation parameter key for special Hiragana handling'
+                                                  ]
+                               },
+                       'kk' => {
+                                 'Description' => [
+                                                    'Collation parameter key for normalization'
+                                                  ]
+                               },
+                       'kn' => {
+                                 'Description' => [
+                                                    'Collation parameter key for numeric handling'
+                                                  ]
+                               },
+                       'ks' => {
+                                 'Description' => [
+                                                    'Collation parameter key for collation strength'
+                                                  ]
+                               },
+                       'nu' => {
+                                 'Description' => [
+                                                    'Numbering system type key'
+                                                  ]
+                               },
+                       'tz' => {
+                                 'Description' => [
+                                                    'Time zone key'
+                                                  ]
+                               },
+                       'va' => {
+                                 'Description' => [
+                                                    'Common locale variant type key'
+                                                  ]
+                               },
+                       'vt' => {
+                                 'Description' => [
+                                                    'Collation parameter key for variable top'
+                                                  ]
+                               }
+                     },
+          'u_kf' => {
+                      'false' => {
+                                   'Description' => [
+                                                      'No special case ordering'
+                                                    ]
+                                 },
+                      'lower' => {
+                                   'Description' => [
+                                                      'Lower case to be sorted before upper case'
+                                                    ]
+                                 },
+                      'upper' => {
+                                   'Description' => [
+                                                      'Upper case to be sorted before lower case'
+                                                    ]
+                                 }
+                    },
+          'u_kh' => {
+                      'false' => {
+                                   'Description' => [
+                                                      'No special handling for Hiragana'
+                                                    ]
+                                 },
+                      'true' => {
+                                  'Description' => [
+                                                     'Hiragana to be sorted before all non-variable on quaternary level'
+                                                   ]
+                                }
+                    },
+          'u_kk' => {
+                      'false' => {
+                                   'Description' => [
+                                                      'Skip normalization'
+                                                    ]
+                                 },
+                      'true' => {
+                                  'Description' => [
+                                                     'Convert text into Normalization Form D before calculating collation weights'
+                                                   ]
+                                }
+                    },
+          'u_kn' => {
+                      'false' => {
+                                   'Description' => [
+                                                      'No special handling for numeric ordering'
+                                                    ]
+                                 },
+                      'true' => {
+                                  'Description' => [
+                                                     'A sequence of decimal digits is sorted at primary level with its numeric value'
+                                                   ]
+                                }
+                    },
+          'u_ks' => {
+                      'identic' => {
+                                     'Description' => [
+                                                        'The identical level'
+                                                      ]
+                                   },
+                      'level1' => {
+                                    'Description' => [
+                                                       'The primary level'
+                                                     ]
+                                  },
+                      'level2' => {
+                                    'Description' => [
+                                                       'The secondary level'
+                                                     ]
+                                  },
+                      'level3' => {
+                                    'Description' => [
+                                                       'The tertiary level'
+                                                     ]
+                                  },
+                      'level4' => {
+                                    'Description' => [
+                                                       'The quaternary level'
+                                                     ]
+                                  }
+                    },
+          'u_nu' => {
+                      'arab' => {
+                                  'Description' => [
+                                                     'Arabic-Indic digits'
+                                                   ]
+                                },
+                      'arabext' => {
+                                     'Description' => [
+                                                        'Extended Arabic-Indic digits'
+                                                      ]
+                                   },
+                      'armn' => {
+                                  'Description' => [
+                                                     'Armenian upper case numerals'
+                                                   ]
+                                },
+                      'armnlow' => {
+                                     'Description' => [
+                                                        'Armenian lower case numerals'
+                                                      ]
+                                   },
+                      'beng' => {
+                                  'Description' => [
+                                                     'Bengali digits'
+                                                   ]
+                                },
+                      'deva' => {
+                                  'Description' => [
+                                                     'Devanagari digits'
+                                                   ]
+                                },
+                      'ethi' => {
+                                  'Description' => [
+                                                     'Ethiopic numerals'
+                                                   ]
+                                },
+                      'finance' => {
+                                     'Description' => [
+                                                        'Financial numerals'
+                                                      ]
+                                   },
+                      'fullwide' => {
+                                      'Description' => [
+                                                         'Full width digits'
+                                                       ]
+                                    },
+                      'geor' => {
+                                  'Description' => [
+                                                     'Georgian numerals'
+                                                   ]
+                                },
+                      'grek' => {
+                                  'Description' => [
+                                                     'Greek upper case numerals'
+                                                   ]
+                                },
+                      'greklow' => {
+                                     'Description' => [
+                                                        'Greek lower case numerals'
+                                                      ]
+                                   },
+                      'gujr' => {
+                                  'Description' => [
+                                                     'Gujarati digits'
+                                                   ]
+                                },
+                      'guru' => {
+                                  'Description' => [
+                                                     'Gurmukhi digits'
+                                                   ]
+                                },
+                      'hanidec' => {
+                                     'Description' => [
+                                                        'Positional decimal system using Chinese number ideographs as digits'
+                                                      ]
+                                   },
+                      'hans' => {
+                                  'Description' => [
+                                                     'Simplified Chinese numerals'
+                                                   ]
+                                },
+                      'hansfin' => {
+                                     'Description' => [
+                                                        'Simplified Chinese financial numerals'
+                                                      ]
+                                   },
+                      'hant' => {
+                                  'Description' => [
+                                                     'Traditional Chinese numerals'
+                                                   ]
+                                },
+                      'hantfin' => {
+                                     'Description' => [
+                                                        'Traditional Chinese financial numerals'
+                                                      ]
+                                   },
+                      'hebr' => {
+                                  'Description' => [
+                                                     'Hebrew numerals'
+                                                   ]
+                                },
+                      'jpan' => {
+                                  'Description' => [
+                                                     'Japanese numerals'
+                                                   ]
+                                },
+                      'jpanfin' => {
+                                     'Description' => [
+                                                        'Japanese financial numerals'
+                                                      ]
+                                   },
+                      'khmr' => {
+                                  'Description' => [
+                                                     'Khmer digits'
+                                                   ]
+                                },
+                      'knda' => {
+                                  'Description' => [
+                                                     'Kannada digits'
+                                                   ]
+                                },
+                      'laoo' => {
+                                  'Description' => [
+                                                     'Lao digits'
+                                                   ]
+                                },
+                      'latn' => {
+                                  'Description' => [
+                                                     'Latin digits'
+                                                   ]
+                                },
+                      'mlym' => {
+                                  'Description' => [
+                                                     'Malayalam digits'
+                                                   ]
+                                },
+                      'mong' => {
+                                  'Description' => [
+                                                     'Mongolian digits'
+                                                   ]
+                                },
+                      'mymr' => {
+                                  'Description' => [
+                                                     'Myanmar digits'
+                                                   ]
+                                },
+                      'native' => {
+                                    'Description' => [
+                                                       'Native digits'
+                                                     ]
+                                  },
+                      'orya' => {
+                                  'Description' => [
+                                                     'Oriya digits'
+                                                   ]
+                                },
+                      'roman' => {
+                                   'Description' => [
+                                                      'Roman upper case numerals'
+                                                    ]
+                                 },
+                      'romanlow' => {
+                                      'Description' => [
+                                                         'Roman lowercase numerals'
+                                                       ]
+                                    },
+                      'taml' => {
+                                  'Description' => [
+                                                     'Tamil numerals'
+                                                   ]
+                                },
+                      'tamldec' => {
+                                     'Description' => [
+                                                        'Modern Tamil decimal digits'
+                                                      ]
+                                   },
+                      'telu' => {
+                                  'Description' => [
+                                                     'Telugu digits'
+                                                   ]
+                                },
+                      'thai' => {
+                                  'Description' => [
+                                                     'Thai digits'
+                                                   ]
+                                },
+                      'tibt' => {
+                                  'Description' => [
+                                                     'Tibetan digits'
+                                                   ]
+                                },
+                      'traditio' => {
+                                      'Description' => [
+                                                         'Traditional numerals'
+                                                       ]
+                                    }
+                    },
+          'u_tz' => {
+                      'adalv' => {
+                                   'Description' => [
+                                                      'Andorra'
+                                                    ]
+                                 },
+                      'aedxb' => {
+                                   'Description' => [
+                                                      'Dubai, United Arab Emirates'
+                                                    ]
+                                 },
+                      'afkbl' => {
+                                   'Description' => [
+                                                      'Kabul, Afghanistan'
+                                                    ]
+                                 },
+                      'aganu' => {
+                                   'Description' => [
+                                                      'Antigua'
+                                                    ]
+                                 },
+                      'aiaxa' => {
+                                   'Description' => [
+                                                      'Anguilla'
+                                                    ]
+                                 },
+                      'altia' => {
+                                   'Description' => [
+                                                      'Tirane, Albania'
+                                                    ]
+                                 },
+                      'amevn' => {
+                                   'Description' => [
+                                                      'Yerevan, Armenia'
+                                                    ]
+                                 },
+                      'ancur' => {
+                                   'Description' => [
+                                                      'Curaçao'
+                                                    ]
+                                 },
+                      'aolad' => {
+                                   'Description' => [
+                                                      'Luanda, Angola'
+                                                    ]
+                                 },
+                      'aqams' => {
+                                   'Description' => [
+                                                      'Amundsen-Scott Station, South Pole'
+                                                    ]
+                                 },
+                      'aqcas' => {
+                                   'Description' => [
+                                                      'Casey Station, Bailey Peninsula'
+                                                    ]
+                                 },
+                      'aqdav' => {
+                                   'Description' => [
+                                                      'Davis Station, Vestfold Hills'
+                                                    ]
+                                 },
+                      'aqddu' => {
+                                   'Description' => [
+                                                      'Dumont d\'Urville Station, Terre Adélie'
+                                                    ]
+                                 },
+                      'aqmaw' => {
+                                   'Description' => [
+                                                      'Mawson Station, Holme Bay'
+                                                    ]
+                                 },
+                      'aqmcm' => {
+                                   'Description' => [
+                                                      'McMurdo Station, Ross Island'
+                                                    ]
+                                 },
+                      'aqplm' => {
+                                   'Description' => [
+                                                      'Palmer Station, Anvers Island'
+                                                    ]
+                                 },
+                      'aqrot' => {
+                                   'Description' => [
+                                                      'Rothera Station, Adelaide Island'
+                                                    ]
+                                 },
+                      'aqsyw' => {
+                                   'Description' => [
+                                                      'Syowa Station, East Ongul Island'
+                                                    ]
+                                 },
+                      'aqvos' => {
+                                   'Description' => [
+                                                      'Vostok Station, Lake Vostok'
+                                                    ]
+                                 },
+                      'arbue' => {
+                                   'Description' => [
+                                                      'Buenos Aires, Argentina'
+                                                    ]
+                                 },
+                      'arcor' => {
+                                   'Description' => [
+                                                      'Córdoba, Argentina'
+                                                    ]
+                                 },
+                      'arctc' => {
+                                   'Description' => [
+                                                      'Catamarca, Argentina'
+                                                    ]
+                                 },
+                      'arirj' => {
+                                   'Description' => [
+                                                      'La Rioja, Argentina'
+                                                    ]
+                                 },
+                      'arjuj' => {
+                                   'Description' => [
+                                                      'Jujuy, Argentina'
+                                                    ]
+                                 },
+                      'arluq' => {
+                                   'Description' => [
+                                                      'San Luis, Argentina'
+                                                    ]
+                                 },
+                      'armdz' => {
+                                   'Description' => [
+                                                      'Mendoza, Argentina'
+                                                    ]
+                                 },
+                      'arrgl' => {
+                                   'Description' => [
+                                                      'Río Gallegos, Argentina'
+                                                    ]
+                                 },
+                      'arsla' => {
+                                   'Description' => [
+                                                      'Salta, Argentina'
+                                                    ]
+                                 },
+                      'artuc' => {
+                                   'Description' => [
+                                                      'Tucumán, Argentina'
+                                                    ]
+                                 },
+                      'aruaq' => {
+                                   'Description' => [
+                                                      'San Juan, Argentina'
+                                                    ]
+                                 },
+                      'arush' => {
+                                   'Description' => [
+                                                      'Ushuaia, Argentina'
+                                                    ]
+                                 },
+                      'asppg' => {
+                                   'Description' => [
+                                                      'Pago Pago, American Samoa'
+                                                    ]
+                                 },
+                      'atvie' => {
+                                   'Description' => [
+                                                      'Vienna, Austria'
+                                                    ]
+                                 },
+                      'auadl' => {
+                                   'Description' => [
+                                                      'Adelaide, Australia'
+                                                    ]
+                                 },
+                      'aubhq' => {
+                                   'Description' => [
+                                                      'Broken Hill, Australia'
+                                                    ]
+                                 },
+                      'aubne' => {
+                                   'Description' => [
+                                                      'Brisbane, Australia'
+                                                    ]
+                                 },
+                      'audrw' => {
+                                   'Description' => [
+                                                      'Darwin, Australia'
+                                                    ]
+                                 },
+                      'aueuc' => {
+                                   'Description' => [
+                                                      'Eucla, Australia'
+                                                    ]
+                                 },
+                      'auhba' => {
+                                   'Description' => [
+                                                      'Hobart, Australia'
+                                                    ]
+                                 },
+                      'aukns' => {
+                                   'Description' => [
+                                                      'Currie, Australia'
+                                                    ]
+                                 },
+                      'auldc' => {
+                                   'Description' => [
+                                                      'Lindeman Island, Australia'
+                                                    ]
+                                 },
+                      'auldh' => {
+                                   'Description' => [
+                                                      'Lord Howe Island, Australia'
+                                                    ]
+                                 },
+                      'aumel' => {
+                                   'Description' => [
+                                                      'Melbourne, Australia'
+                                                    ]
+                                 },
+                      'aumqi' => {
+                                   'Description' => [
+                                                      'Macquarie Island Station, Macquarie Island'
+                                                    ]
+                                 },
+                      'auper' => {
+                                   'Description' => [
+                                                      'Perth, Australia'
+                                                    ]
+                                 },
+                      'ausyd' => {
+                                   'Description' => [
+                                                      'Sydney, Australia'
+                                                    ]
+                                 },
+                      'awaua' => {
+                                   'Description' => [
+                                                      'Aruba'
+                                                    ]
+                                 },
+                      'azbak' => {
+                                   'Description' => [
+                                                      'Baku, Azerbaijan'
+                                                    ]
+                                 },
+                      'basjj' => {
+                                   'Description' => [
+                                                      'Sarajevo, Bosnia and Herzegovina'
+                                                    ]
+                                 },
+                      'bbbgi' => {
+                                   'Description' => [
+                                                      'Barbados'
+                                                    ]
+                                 },
+                      'bddac' => {
+                                   'Description' => [
+                                                      'Dhaka, Bangladesh'
+                                                    ]
+                                 },
+                      'bebru' => {
+                                   'Description' => [
+                                                      'Brussels, Belgium'
+                                                    ]
+                                 },
+                      'bfoua' => {
+                                   'Description' => [
+                                                      'Ouagadougou, Burkina Faso'
+                                                    ]
+                                 },
+                      'bgsof' => {
+                                   'Description' => [
+                                                      'Sofia, Bulgaria'
+                                                    ]
+                                 },
+                      'bhbah' => {
+                                   'Description' => [
+                                                      'Bahrain'
+                                                    ]
+                                 },
+                      'bibjm' => {
+                                   'Description' => [
+                                                      'Bujumbura, Burundi'
+                                                    ]
+                                 },
+                      'bjptn' => {
+                                   'Description' => [
+                                                      'Porto-Novo, Benin'
+                                                    ]
+                                 },
+                      'bmbda' => {
+                                   'Description' => [
+                                                      'Bermuda'
+                                                    ]
+                                 },
+                      'bnbwn' => {
+                                   'Description' => [
+                                                      'Brunei'
+                                                    ]
+                                 },
+                      'bolpb' => {
+                                   'Description' => [
+                                                      'La Paz, Bolivia'
+                                                    ]
+                                 },
+                      'braux' => {
+                                   'Description' => [
+                                                      'Araguaína, Brazil'
+                                                    ]
+                                 },
+                      'brbel' => {
+                                   'Description' => [
+                                                      'Belém, Brazil'
+                                                    ]
+                                 },
+                      'brbvb' => {
+                                   'Description' => [
+                                                      'Boa Vista, Brazil'
+                                                    ]
+                                 },
+                      'brcgb' => {
+                                   'Description' => [
+                                                      'Cuiabá, Brazil'
+                                                    ]
+                                 },
+                      'brcgr' => {
+                                   'Description' => [
+                                                      'Campo Grande, Brazil'
+                                                    ]
+                                 },
+                      'brern' => {
+                                   'Description' => [
+                                                      'Eirunepé, Brazil'
+                                                    ]
+                                 },
+                      'brfen' => {
+                                   'Description' => [
+                                                      'Fernando de Noronha, Brazil'
+                                                    ]
+                                 },
+                      'brfor' => {
+                                   'Description' => [
+                                                      'Fortaleza, Brazil'
+                                                    ]
+                                 },
+                      'brmao' => {
+                                   'Description' => [
+                                                      'Manaus, Brazil'
+                                                    ]
+                                 },
+                      'brmcz' => {
+                                   'Description' => [
+                                                      'Maceió, Brazil'
+                                                    ]
+                                 },
+                      'brpvh' => {
+                                   'Description' => [
+                                                      'Porto Velho, Brazil'
+                                                    ]
+                                 },
+                      'brrbr' => {
+                                   'Description' => [
+                                                      'Rio Branco, Brazil'
+                                                    ]
+                                 },
+                      'brrec' => {
+                                   'Description' => [
+                                                      'Recife, Brazil'
+                                                    ]
+                                 },
+                      'brsao' => {
+                                   'Description' => [
+                                                      'São Paulo, Brazil'
+                                                    ]
+                                 },
+                      'brssa' => {
+                                   'Description' => [
+                                                      'Bahia, Brazil'
+                                                    ]
+                                 },
+                      'brstm' => {
+                                   'Description' => [
+                                                      'Santarém, Brazil'
+                                                    ]
+                                 },
+                      'bsnas' => {
+                                   'Description' => [
+                                                      'Nassau, Bahamas'
+                                                    ]
+                                 },
+                      'btthi' => {
+                                   'Description' => [
+                                                      'Thimphu, Bhutan'
+                                                    ]
+                                 },
+                      'bwgbe' => {
+                                   'Description' => [
+                                                      'Gaborone, Botswana'
+                                                    ]
+                                 },
+                      'bymsq' => {
+                                   'Description' => [
+                                                      'Minsk, Belarus'
+                                                    ]
+                                 },
+                      'bzbze' => {
+                                   'Description' => [
+                                                      'Belize'
+                                                    ]
+                                 },
+                      'caedm' => {
+                                   'Description' => [
+                                                      'Edmonton, Canada'
+                                                    ]
+                                 },
+                      'caffs' => {
+                                   'Description' => [
+                                                      'Rainy River, Canada'
+                                                    ]
+                                 },
+                      'caglb' => {
+                                   'Description' => [
+                                                      'Glace Bay, Canada'
+                                                    ]
+                                 },
+                      'cagoo' => {
+                                   'Description' => [
+                                                      'Goose Bay, Canada'
+                                                    ]
+                                 },
+                      'cahal' => {
+                                   'Description' => [
+                                                      'Halifax, Canada'
+                                                    ]
+                                 },
+                      'caiql' => {
+                                   'Description' => [
+                                                      'Iqaluit, Canada'
+                                                    ]
+                                 },
+                      'camon' => {
+                                   'Description' => [
+                                                      'Moncton, Canada'
+                                                    ]
+                                 },
+                      'camtr' => {
+                                   'Description' => [
+                                                      'Montreal, Canada'
+                                                    ]
+                                 },
+                      'canpg' => {
+                                   'Description' => [
+                                                      'Nipigon, Canada'
+                                                    ]
+                                 },
+                      'capnt' => {
+                                   'Description' => [
+                                                      'Pangnirtung, Canada'
+                                                    ]
+                                 },
+                      'careb' => {
+                                   'Description' => [
+                                                      'Resolute, Canada'
+                                                    ]
+                                 },
+                      'careg' => {
+                                   'Description' => [
+                                                      'Regina, Canada'
+                                                    ]
+                                 },
+                      'casjf' => {
+                                   'Description' => [
+                                                      'St. John\'s, Canada'
+                                                    ]
+                                 },
+                      'cathu' => {
+                                   'Description' => [
+                                                      'Thunder Bay, Canada'
+                                                    ]
+                                 },
+                      'cator' => {
+                                   'Description' => [
+                                                      'Toronto, Canada'
+                                                    ]
+                                 },
+                      'cavan' => {
+                                   'Description' => [
+                                                      'Vancouver, Canada'
+                                                    ]
+                                 },
+                      'cawnp' => {
+                                   'Description' => [
+                                                      'Winnipeg, Canada'
+                                                    ]
+                                 },
+                      'caybx' => {
+                                   'Description' => [
+                                                      'Blanc-Sablon, Canada'
+                                                    ]
+                                 },
+                      'caycb' => {
+                                   'Description' => [
+                                                      'Cambridge Bay, Canada'
+                                                    ]
+                                 },
+                      'cayda' => {
+                                   'Description' => [
+                                                      'Dawson, Canada'
+                                                    ]
+                                 },
+                      'caydq' => {
+                                   'Description' => [
+                                                      'Dawson Creek, Canada'
+                                                    ]
+                                 },
+                      'cayek' => {
+                                   'Description' => [
+                                                      'Rankin Inlet, Canada'
+                                                    ]
+                                 },
+                      'cayev' => {
+                                   'Description' => [
+                                                      'Inuvik, Canada'
+                                                    ]
+                                 },
+                      'cayxy' => {
+                                   'Description' => [
+                                                      'Whitehorse, Canada'
+                                                    ]
+                                 },
+                      'cayyn' => {
+                                   'Description' => [
+                                                      'Swift Current, Canada'
+                                                    ]
+                                 },
+                      'cayzf' => {
+                                   'Description' => [
+                                                      'Yellowknife, Canada'
+                                                    ]
+                                 },
+                      'cayzs' => {
+                                   'Description' => [
+                                                      'Atikokan, Canada'
+                                                    ]
+                                 },
+                      'cccck' => {
+                                   'Description' => [
+                                                      'Cocos (Keeling) Islands'
+                                                    ]
+                                 },
+                      'cdfbm' => {
+                                   'Description' => [
+                                                      'Lubumbashi, Democratic Republic of the Congo'
+                                                    ]
+                                 },
+                      'cdfih' => {
+                                   'Description' => [
+                                                      'Kinshasa, Democratic Republic of the Congo'
+                                                    ]
+                                 },
+                      'cfbgf' => {
+                                   'Description' => [
+                                                      'Bangui, Central African Republic'
+                                                    ]
+                                 },
+                      'cgbzv' => {
+                                   'Description' => [
+                                                      'Brazzaville, Republic of the Congo'
+                                                    ]
+                                 },
+                      'chzrh' => {
+                                   'Description' => [
+                                                      'Zurich, Switzerland'
+                                                    ]
+                                 },
+                      'ciabj' => {
+                                   'Description' => [
+                                                      'Abidjan, Côte d\'Ivoire'
+                                                    ]
+                                 },
+                      'ckrar' => {
+                                   'Description' => [
+                                                      'Rarotonga, Cook Islands'
+                                                    ]
+                                 },
+                      'clipc' => {
+                                   'Description' => [
+                                                      'Easter Island, Chile'
+                                                    ]
+                                 },
+                      'clscl' => {
+                                   'Description' => [
+                                                      'Santiago, Chile'
+                                                    ]
+                                 },
+                      'cmdla' => {
+                                   'Description' => [
+                                                      'Douala, Cameroon'
+                                                    ]
+                                 },
+                      'cnckg' => {
+                                   'Description' => [
+                                                      'Chongqing, China'
+                                                    ]
+                                 },
+                      'cnhrb' => {
+                                   'Description' => [
+                                                      'Harbin, China'
+                                                    ]
+                                 },
+                      'cnkhg' => {
+                                   'Description' => [
+                                                      'Kashgar, China'
+                                                    ]
+                                 },
+                      'cnsha' => {
+                                   'Description' => [
+                                                      'Shanghai, China'
+                                                    ]
+                                 },
+                      'cnurc' => {
+                                   'Description' => [
+                                                      'Ürümqi, China'
+                                                    ]
+                                 },
+                      'cobog' => {
+                                   'Description' => [
+                                                      'Bogotá, Colombia'
+                                                    ]
+                                 },
+                      'crsjo' => {
+                                   'Description' => [
+                                                      'Costa Rica'
+                                                    ]
+                                 },
+                      'cst6cdt' => {
+                                     'Description' => [
+                                                        'POSIX style time zone for US Central Time'
+                                                      ]
+                                   },
+                      'cuhav' => {
+                                   'Description' => [
+                                                      'Havana, Cuba'
+                                                    ]
+                                 },
+                      'cvrai' => {
+                                   'Description' => [
+                                                      'Cape Verde'
+                                                    ]
+                                 },
+                      'cxxch' => {
+                                   'Description' => [
+                                                      'Christmas Island'
+                                                    ]
+                                 },
+                      'cynic' => {
+                                   'Description' => [
+                                                      'Nicosia, Cyprus'
+                                                    ]
+                                 },
+                      'czprg' => {
+                                   'Description' => [
+                                                      'Prague, Czech Republic'
+                                                    ]
+                                 },
+                      'deber' => {
+                                   'Description' => [
+                                                      'Berlin, Germany'
+                                                    ]
+                                 },
+                      'djjib' => {
+                                   'Description' => [
+                                                      'Djibouti'
+                                                    ]
+                                 },
+                      'dkcph' => {
+                                   'Description' => [
+                                                      'Copenhagen, Denmark'
+                                                    ]
+                                 },
+                      'dmdom' => {
+                                   'Description' => [
+                                                      'Dominica'
+                                                    ]
+                                 },
+                      'dosdq' => {
+                                   'Description' => [
+                                                      'Santo Domingo, Dominican Republic'
+                                                    ]
+                                 },
+                      'dzalg' => {
+                                   'Description' => [
+                                                      'Algiers, Algeria'
+                                                    ]
+                                 },
+                      'ecgps' => {
+                                   'Description' => [
+                                                      'Galápagos Islands, Ecuador'
+                                                    ]
+                                 },
+                      'ecgye' => {
+                                   'Description' => [
+                                                      'Guayaquil, Ecuador'
+                                                    ]
+                                 },
+                      'eetll' => {
+                                   'Description' => [
+                                                      'Tallinn, Estonia'
+                                                    ]
+                                 },
+                      'egcai' => {
+                                   'Description' => [
+                                                      'Cairo, Egypt'
+                                                    ]
+                                 },
+                      'eheai' => {
+                                   'Description' => [
+                                                      'El Aaiún, Western Sahara'
+                                                    ]
+                                 },
+                      'erasm' => {
+                                   'Description' => [
+                                                      'Asmara, Eritrea'
+                                                    ]
+                                 },
+                      'esceu' => {
+                                   'Description' => [
+                                                      'Ceuta, Spain'
+                                                    ]
+                                 },
+                      'eslpa' => {
+                                   'Description' => [
+                                                      'Canary Islands, Spain'
+                                                    ]
+                                 },
+                      'esmad' => {
+                                   'Description' => [
+                                                      'Madrid, Spain'
+                                                    ]
+                                 },
+                      'est5edt' => {
+                                     'Description' => [
+                                                        'POSIX style time zone for US Eastern Time'
+                                                      ]
+                                   },
+                      'etadd' => {
+                                   'Description' => [
+                                                      'Addis Ababa, Ethiopia'
+                                                    ]
+                                 },
+                      'fihel' => {
+                                   'Description' => [
+                                                      'Helsinki, Finland'
+                                                    ]
+                                 },
+                      'fimhq' => {
+                                   'Description' => [
+                                                      'Mariehamn, Åland, Finland'
+                                                    ]
+                                 },
+                      'fjsuv' => {
+                                   'Description' => [
+                                                      'Fiji'
+                                                    ]
+                                 },
+                      'fkpsy' => {
+                                   'Description' => [
+                                                      'Stanley, Falkland Islands'
+                                                    ]
+                                 },
+                      'fmksa' => {
+                                   'Description' => [
+                                                      'Kosrae, Micronesia'
+                                                    ]
+                                 },
+                      'fmpni' => {
+                                   'Description' => [
+                                                      'Pohnpei, Micronesia'
+                                                    ]
+                                 },
+                      'fmtkk' => {
+                                   'Description' => [
+                                                      'Chuuk, Micronesia'
+                                                    ]
+                                 },
+                      'fotho' => {
+                                   'Description' => [
+                                                      'Faroe Islands'
+                                                    ]
+                                 },
+                      'frpar' => {
+                                   'Description' => [
+                                                      'Paris, France'
+                                                    ]
+                                 },
+                      'galbv' => {
+                                   'Description' => [
+                                                      'Libreville, Gabon'
+                                                    ]
+                                 },
+                      'gaza' => {
+                                  'Description' => [
+                                                     'Gaza Strip, Palestinian Territories'
+                                                   ]
+                                },
+                      'gblon' => {
+                                   'Description' => [
+                                                      'London, United Kingdom'
+                                                    ]
+                                 },
+                      'gdgnd' => {
+                                   'Description' => [
+                                                      'Grenada'
+                                                    ]
+                                 },
+                      'getbs' => {
+                                   'Description' => [
+                                                      'Tbilisi, Georgia'
+                                                    ]
+                                 },
+                      'gfcay' => {
+                                   'Description' => [
+                                                      'Cayenne, French Guiana'
+                                                    ]
+                                 },
+                      'gggci' => {
+                                   'Description' => [
+                                                      'Guernsey'
+                                                    ]
+                                 },
+                      'ghacc' => {
+                                   'Description' => [
+                                                      'Accra, Ghana'
+                                                    ]
+                                 },
+                      'gigib' => {
+                                   'Description' => [
+                                                      'Gibraltar'
+                                                    ]
+                                 },
+                      'gldkshvn' => {
+                                      'Description' => [
+                                                         'Danmarkshavn, Greenland'
+                                                       ]
+                                    },
+                      'glgoh' => {
+                                   'Description' => [
+                                                      'Nuuk (Godthåb), Greenland'
+                                                    ]
+                                 },
+                      'globy' => {
+                                   'Description' => [
+                                                      'Ittoqqortoormiit (Scoresbysund), Greenland'
+                                                    ]
+                                 },
+                      'glthu' => {
+                                   'Description' => [
+                                                      'Qaanaaq (Thule), Greenland'
+                                                    ]
+                                 },
+                      'gmbjl' => {
+                                   'Description' => [
+                                                      'Banjul, Gambia'
+                                                    ]
+                                 },
+                      'gncky' => {
+                                   'Description' => [
+                                                      'Conakry, Guinea'
+                                                    ]
+                                 },
+                      'gpbbr' => {
+                                   'Description' => [
+                                                      'Guadeloupe'
+                                                    ]
+                                 },
+                      'gpmsb' => {
+                                   'Description' => [
+                                                      'Marigot, Saint Martin'
+                                                    ]
+                                 },
+                      'gpsbh' => {
+                                   'Description' => [
+                                                      'Saint Barthélemy'
+                                                    ]
+                                 },
+                      'gqssg' => {
+                                   'Description' => [
+                                                      'Malabo, Equatorial Guinea'
+                                                    ]
+                                 },
+                      'grath' => {
+                                   'Description' => [
+                                                      'Athens, Greece'
+                                                    ]
+                                 },
+                      'gsgrv' => {
+                                   'Description' => [
+                                                      'South Georgia and the South Sandwich Islands'
+                                                    ]
+                                 },
+                      'gtgua' => {
+                                   'Description' => [
+                                                      'Guatemala'
+                                                    ]
+                                 },
+                      'gugum' => {
+                                   'Description' => [
+                                                      'Guam'
+                                                    ]
+                                 },
+                      'gwoxb' => {
+                                   'Description' => [
+                                                      'Bissau, Guinea-Bissau'
+                                                    ]
+                                 },
+                      'gygeo' => {
+                                   'Description' => [
+                                                      'Guyana'
+                                                    ]
+                                 },
+                      'hebron' => {
+                                    'Description' => [
+                                                       'West Bank, Palestinian Territories'
+                                                     ]
+                                  },
+                      'hkhkg' => {
+                                   'Description' => [
+                                                      'Hong Kong SAR China'
+                                                    ]
+                                 },
+                      'hntgu' => {
+                                   'Description' => [
+                                                      'Tegucigalpa, Honduras'
+                                                    ]
+                                 },
+                      'hrzag' => {
+                                   'Description' => [
+                                                      'Zagreb, Croatia'
+                                                    ]
+                                 },
+                      'htpap' => {
+                                   'Description' => [
+                                                      'Port-au-Prince, Haiti'
+                                                    ]
+                                 },
+                      'hubud' => {
+                                   'Description' => [
+                                                      'Budapest, Hungary'
+                                                    ]
+                                 },
+                      'iddjj' => {
+                                   'Description' => [
+                                                      'Jayapura, Indonesia'
+                                                    ]
+                                 },
+                      'idjkt' => {
+                                   'Description' => [
+                                                      'Jakarta, Indonesia'
+                                                    ]
+                                 },
+                      'idmak' => {
+                                   'Description' => [
+                                                      'Makassar, Indonesia'
+                                                    ]
+                                 },
+                      'idpnk' => {
+                                   'Description' => [
+                                                      'Pontianak, Indonesia'
+                                                    ]
+                                 },
+                      'iedub' => {
+                                   'Description' => [
+                                                      'Dublin, Ireland'
+                                                    ]
+                                 },
+                      'imdgs' => {
+                                   'Description' => [
+                                                      'Isle of Man'
+                                                    ]
+                                 },
+                      'inccu' => {
+                                   'Description' => [
+                                                      'Kolkata, India'
+                                                    ]
+                                 },
+                      'iodga' => {
+                                   'Description' => [
+                                                      'Chagos Archipelago'
+                                                    ]
+                                 },
+                      'iqbgw' => {
+                                   'Description' => [
+                                                      'Baghdad, Iraq'
+                                                    ]
+                                 },
+                      'irthr' => {
+                                   'Description' => [
+                                                      'Tehran, Iran'
+                                                    ]
+                                 },
+                      'isrey' => {
+                                   'Description' => [
+                                                      'Reykjavik, Iceland'
+                                                    ]
+                                 },
+                      'itrom' => {
+                                   'Description' => [
+                                                      'Rome, Italy'
+                                                    ]
+                                 },
+                      'jeruslm' => {
+                                     'Description' => [
+                                                        'Jerusalem'
+                                                      ]
+                                   },
+                      'jesth' => {
+                                   'Description' => [
+                                                      'Jersey'
+                                                    ]
+                                 },
+                      'jmkin' => {
+                                   'Description' => [
+                                                      'Jamaica'
+                                                    ]
+                                 },
+                      'joamm' => {
+                                   'Description' => [
+                                                      'Amman, Jordan'
+                                                    ]
+                                 },
+                      'jptyo' => {
+                                   'Description' => [
+                                                      'Tokyo, Japan'
+                                                    ]
+                                 },
+                      'kenbo' => {
+                                   'Description' => [
+                                                      'Nairobi, Kenya'
+                                                    ]
+                                 },
+                      'kgfru' => {
+                                   'Description' => [
+                                                      'Bishkek, Kyrgyzstan'
+                                                    ]
+                                 },
+                      'khpnh' => {
+                                   'Description' => [
+                                                      'Phnom Penh, Cambodia'
+                                                    ]
+                                 },
+                      'kicxi' => {
+                                   'Description' => [
+                                                      'Kiritimati, Kiribati'
+                                                    ]
+                                 },
+                      'kipho' => {
+                                   'Description' => [
+                                                      'Enderbury Island, Kiribati'
+                                                    ]
+                                 },
+                      'kitrw' => {
+                                   'Description' => [
+                                                      'Tarawa, Kiribati'
+                                                    ]
+                                 },
+                      'kmyva' => {
+                                   'Description' => [
+                                                      'Comoros'
+                                                    ]
+                                 },
+                      'knbas' => {
+                                   'Description' => [
+                                                      'Saint Kitts'
+                                                    ]
+                                 },
+                      'kpfnj' => {
+                                   'Description' => [
+                                                      'Pyongyang, North Korea'
+                                                    ]
+                                 },
+                      'krsel' => {
+                                   'Description' => [
+                                                      'Seoul, South Korea'
+                                                    ]
+                                 },
+                      'kwkwi' => {
+                                   'Description' => [
+                                                      'Kuwait'
+                                                    ]
+                                 },
+                      'kygec' => {
+                                   'Description' => [
+                                                      'Cayman Islands'
+                                                    ]
+                                 },
+                      'kzaau' => {
+                                   'Description' => [
+                                                      'Aqtau, Kazakhstan'
+                                                    ]
+                                 },
+                      'kzakx' => {
+                                   'Description' => [
+                                                      'Aqtobe, Kazakhstan'
+                                                    ]
+                                 },
+                      'kzala' => {
+                                   'Description' => [
+                                                      'Almaty, Kazakhstan'
+                                                    ]
+                                 },
+                      'kzkzo' => {
+                                   'Description' => [
+                                                      'Kyzylorda, Kazakhstan'
+                                                    ]
+                                 },
+                      'kzura' => {
+                                   'Description' => [
+                                                      'Oral, Kazakhstan'
+                                                    ]
+                                 },
+                      'lavte' => {
+                                   'Description' => [
+                                                      'Vientiane, Laos'
+                                                    ]
+                                 },
+                      'lbbey' => {
+                                   'Description' => [
+                                                      'Beirut, Lebanon'
+                                                    ]
+                                 },
+                      'lccas' => {
+                                   'Description' => [
+                                                      'Saint Lucia'
+                                                    ]
+                                 },
+                      'livdz' => {
+                                   'Description' => [
+                                                      'Vaduz, Liechtenstein'
+                                                    ]
+                                 },
+                      'lkcmb' => {
+                                   'Description' => [
+                                                      'Colombo, Sri Lanka'
+                                                    ]
+                                 },
+                      'lrmlw' => {
+                                   'Description' => [
+                                                      'Monrovia, Liberia'
+                                                    ]
+                                 },
+                      'lsmsu' => {
+                                   'Description' => [
+                                                      'Maseru, Lesotho'
+                                                    ]
+                                 },
+                      'ltvno' => {
+                                   'Description' => [
+                                                      'Vilnius, Lithuania'
+                                                    ]
+                                 },
+                      'lulux' => {
+                                   'Description' => [
+                                                      'Luxembourg'
+                                                    ]
+                                 },
+                      'lvrix' => {
+                                   'Description' => [
+                                                      'Riga, Latvia'
+                                                    ]
+                                 },
+                      'lytip' => {
+                                   'Description' => [
+                                                      'Tripoli, Libya'
+                                                    ]
+                                 },
+                      'macas' => {
+                                   'Description' => [
+                                                      'Casablanca, Morocco'
+                                                    ]
+                                 },
+                      'mcmon' => {
+                                   'Description' => [
+                                                      'Monaco'
+                                                    ]
+                                 },
+                      'mdkiv' => {
+                                   'Description' => [
+                                                      'Chişinău, Moldova'
+                                                    ]
+                                 },
+                      'metgd' => {
+                                   'Description' => [
+                                                      'Podgorica, Montenegro'
+                                                    ]
+                                 },
+                      'mgtnr' => {
+                                   'Description' => [
+                                                      'Antananarivo, Madagascar'
+                                                    ]
+                                 },
+                      'mhkwa' => {
+                                   'Description' => [
+                                                      'Kwajalein, Marshall Islands'
+                                                    ]
+                                 },
+                      'mhmaj' => {
+                                   'Description' => [
+                                                      'Majuro, Marshall Islands'
+                                                    ]
+                                 },
+                      'mkskp' => {
+                                   'Description' => [
+                                                      'Skopje, Macedonia'
+                                                    ]
+                                 },
+                      'mlbko' => {
+                                   'Description' => [
+                                                      'Bamako, Mali'
+                                                    ]
+                                 },
+                      'mmrgn' => {
+                                   'Description' => [
+                                                      'Yangon (Rangoon), Burma'
+                                                    ]
+                                 },
+                      'mncoq' => {
+                                   'Description' => [
+                                                      'Choibalsan, Mongolia'
+                                                    ]
+                                 },
+                      'mnhvd' => {
+                                   'Description' => [
+                                                      'Khovd (Hovd), Mongolia'
+                                                    ]
+                                 },
+                      'mnuln' => {
+                                   'Description' => [
+                                                      'Ulaanbaatar (Ulan Bator), Mongolia'
+                                                    ]
+                                 },
+                      'momfm' => {
+                                   'Description' => [
+                                                      'Macau SAR China'
+                                                    ]
+                                 },
+                      'mpspn' => {
+                                   'Description' => [
+                                                      'Saipan, Northern Mariana Islands'
+                                                    ]
+                                 },
+                      'mqfdf' => {
+                                   'Description' => [
+                                                      'Martinique'
+                                                    ]
+                                 },
+                      'mrnkc' => {
+                                   'Description' => [
+                                                      'Nouakchott, Mauritania'
+                                                    ]
+                                 },
+                      'msmni' => {
+                                   'Description' => [
+                                                      'Montserrat'
+                                                    ]
+                                 },
+                      'mst7mdt' => {
+                                     'Description' => [
+                                                        'POSIX style time zone for US Mountain Time'
+                                                      ]
+                                   },
+                      'mtmla' => {
+                                   'Description' => [
+                                                      'Malta'
+                                                    ]
+                                 },
+                      'muplu' => {
+                                   'Description' => [
+                                                      'Mauritius'
+                                                    ]
+                                 },
+                      'mvmle' => {
+                                   'Description' => [
+                                                      'Maldives'
+                                                    ]
+                                 },
+                      'mwblz' => {
+                                   'Description' => [
+                                                      'Blantyre, Malawi'
+                                                    ]
+                                 },
+                      'mxchi' => {
+                                   'Description' => [
+                                                      'Chihuahua, Mexico'
+                                                    ]
+                                 },
+                      'mxcun' => {
+                                   'Description' => [
+                                                      'Cancún, Mexico'
+                                                    ]
+                                 },
+                      'mxhmo' => {
+                                   'Description' => [
+                                                      'Hermosillo, Mexico'
+                                                    ]
+                                 },
+                      'mxmam' => {
+                                   'Description' => [
+                                                      'Matamoros, Mexico'
+                                                    ]
+                                 },
+                      'mxmex' => {
+                                   'Description' => [
+                                                      'Mexico City, Mexico'
+                                                    ]
+                                 },
+                      'mxmid' => {
+                                   'Description' => [
+                                                      'Mérida, Mexico'
+                                                    ]
+                                 },
+                      'mxmty' => {
+                                   'Description' => [
+                                                      'Monterrey, Mexico'
+                                                    ]
+                                 },
+                      'mxmzt' => {
+                                   'Description' => [
+                                                      'Mazatlán, Mexico'
+                                                    ]
+                                 },
+                      'mxoji' => {
+                                   'Description' => [
+                                                      'Ojinaga, Mexico'
+                                                    ]
+                                 },
+                      'mxpvr' => {
+                                   'Description' => [
+                                                      'Bahía de Banderas, Mexico'
+                                                    ]
+                                 },
+                      'mxstis' => {
+                                    'Description' => [
+                                                       'Santa Isabel (Baja California), Mexico'
+                                                     ]
+                                  },
+                      'mxtij' => {
+                                   'Description' => [
+                                                      'Tijuana, Mexico'
+                                                    ]
+                                 },
+                      'mykch' => {
+                                   'Description' => [
+                                                      'Kuching, Malaysia'
+                                                    ]
+                                 },
+                      'mykul' => {
+                                   'Description' => [
+                                                      'Kuala Lumpur, Malaysia'
+                                                    ]
+                                 },
+                      'mzmpm' => {
+                                   'Description' => [
+                                                      'Maputo, Mozambique'
+                                                    ]
+                                 },
+                      'nawdh' => {
+                                   'Description' => [
+                                                      'Windhoek, Namibia'
+                                                    ]
+                                 },
+                      'ncnou' => {
+                                   'Description' => [
+                                                      'Noumea, New Caledonia'
+                                                    ]
+                                 },
+                      'nenim' => {
+                                   'Description' => [
+                                                      'Niamey, Niger'
+                                                    ]
+                                 },
+                      'nfnlk' => {
+                                   'Description' => [
+                                                      'Norfolk Island'
+                                                    ]
+                                 },
+                      'nglos' => {
+                                   'Description' => [
+                                                      'Lagos, Nigeria'
+                                                    ]
+                                 },
+                      'nimga' => {
+                                   'Description' => [
+                                                      'Managua, Nicaragua'
+                                                    ]
+                                 },
+                      'nlams' => {
+                                   'Description' => [
+                                                      'Amsterdam, Netherlands'
+                                                    ]
+                                 },
+                      'noosl' => {
+                                   'Description' => [
+                                                      'Oslo, Norway'
+                                                    ]
+                                 },
+                      'npktm' => {
+                                   'Description' => [
+                                                      'Kathmandu, Nepal'
+                                                    ]
+                                 },
+                      'nrinu' => {
+                                   'Description' => [
+                                                      'Nauru'
+                                                    ]
+                                 },
+                      'nuiue' => {
+                                   'Description' => [
+                                                      'Niue'
+                                                    ]
+                                 },
+                      'nzakl' => {
+                                   'Description' => [
+                                                      'Auckland, New Zealand'
+                                                    ]
+                                 },
+                      'nzcht' => {
+                                   'Description' => [
+                                                      'Chatham Islands, New Zealand'
+                                                    ]
+                                 },
+                      'ommct' => {
+                                   'Description' => [
+                                                      'Muscat, Oman'
+                                                    ]
+                                 },
+                      'papty' => {
+                                   'Description' => [
+                                                      'Panama'
+                                                    ]
+                                 },
+                      'pelim' => {
+                                   'Description' => [
+                                                      'Lima, Peru'
+                                                    ]
+                                 },
+                      'pfgmr' => {
+                                   'Description' => [
+                                                      'Gambiera Islands, French Polynesia'
+                                                    ]
+                                 },
+                      'pfnhv' => {
+                                   'Description' => [
+                                                      'Marquesas Islands, French Polynesia'
+                                                    ]
+                                 },
+                      'pfppt' => {
+                                   'Description' => [
+                                                      'Tahiti, French Polynesia'
+                                                    ]
+                                 },
+                      'pgpom' => {
+                                   'Description' => [
+                                                      'Port Moresby, Papua New Guinea'
+                                                    ]
+                                 },
+                      'phmnl' => {
+                                   'Description' => [
+                                                      'Manila, Philippines'
+                                                    ]
+                                 },
+                      'pkkhi' => {
+                                   'Description' => [
+                                                      'Karachi, Pakistan'
+                                                    ]
+                                 },
+                      'plwaw' => {
+                                   'Description' => [
+                                                      'Warsaw, Poland'
+                                                    ]
+                                 },
+                      'pmmqc' => {
+                                   'Description' => [
+                                                      'Saint Pierre and Miquelon'
+                                                    ]
+                                 },
+                      'pnpcn' => {
+                                   'Description' => [
+                                                      'Pitcairn Islands'
+                                                    ]
+                                 },
+                      'prsju' => {
+                                   'Description' => [
+                                                      'Puerto Rico'
+                                                    ]
+                                 },
+                      'pst8pdt' => {
+                                     'Description' => [
+                                                        'POSIX style time zone for US Pacific Time'
+                                                      ]
+                                   },
+                      'ptfnc' => {
+                                   'Description' => [
+                                                      'Madeira, Portugal'
+                                                    ]
+                                 },
+                      'ptlis' => {
+                                   'Description' => [
+                                                      'Lisbon, Portugal'
+                                                    ]
+                                 },
+                      'ptpdl' => {
+                                   'Description' => [
+                                                      'Azores, Portugal'
+                                                    ]
+                                 },
+                      'pwror' => {
+                                   'Description' => [
+                                                      'Palau'
+                                                    ]
+                                 },
+                      'pyasu' => {
+                                   'Description' => [
+                                                      'Asunción, Paraguay'
+                                                    ]
+                                 },
+                      'qadoh' => {
+                                   'Description' => [
+                                                      'Qatar'
+                                                    ]
+                                 },
+                      'rereu' => {
+                                   'Description' => [
+                                                      'Réunion'
+                                                    ]
+                                 },
+                      'robuh' => {
+                                   'Description' => [
+                                                      'Bucharest, Romania'
+                                                    ]
+                                 },
+                      'rsbeg' => {
+                                   'Description' => [
+                                                      'Belgrade, Serbia'
+                                                    ]
+                                 },
+                      'rudyr' => {
+                                   'Description' => [
+                                                      'Anadyr, Russia'
+                                                    ]
+                                 },
+                      'rugdx' => {
+                                   'Description' => [
+                                                      'Magadan, Russia'
+                                                    ]
+                                 },
+                      'ruikt' => {
+                                   'Description' => [
+                                                      'Irkutsk, Russia'
+                                                    ]
+                                 },
+                      'rukgd' => {
+                                   'Description' => [
+                                                      'Kaliningrad, Russia'
+                                                    ]
+                                 },
+                      'rukra' => {
+                                   'Description' => [
+                                                      'Krasnoyarsk, Russia'
+                                                    ]
+                                 },
+                      'rukuf' => {
+                                   'Description' => [
+                                                      'Samara, Russia'
+                                                    ]
+                                 },
+                      'rumow' => {
+                                   'Description' => [
+                                                      'Moscow, Russia'
+                                                    ]
+                                 },
+                      'runoz' => {
+                                   'Description' => [
+                                                      'Novokuznetsk, Russia'
+                                                    ]
+                                 },
+                      'ruoms' => {
+                                   'Description' => [
+                                                      'Omsk, Russia'
+                                                    ]
+                                 },
+                      'ruovb' => {
+                                   'Description' => [
+                                                      'Novosibirsk, Russia'
+                                                    ]
+                                 },
+                      'rupkc' => {
+                                   'Description' => [
+                                                      'Kamchatka Peninsula, Russia'
+                                                    ]
+                                 },
+                      'ruuus' => {
+                                   'Description' => [
+                                                      'Sakhalin, Russia'
+                                                    ]
+                                 },
+                      'ruvog' => {
+                                   'Description' => [
+                                                      'Volgograd, Russia'
+                                                    ]
+                                 },
+                      'ruvvo' => {
+                                   'Description' => [
+                                                      'Vladivostok, Russia'
+                                                    ]
+                                 },
+                      'ruyek' => {
+                                   'Description' => [
+                                                      'Yekaterinburg, Russia'
+                                                    ]
+                                 },
+                      'ruyks' => {
+                                   'Description' => [
+                                                      'Yakutsk, Russia'
+                                                    ]
+                                 },
+                      'rwkgl' => {
+                                   'Description' => [
+                                                      'Kigali, Rwanda'
+                                                    ]
+                                 },
+                      'saruh' => {
+                                   'Description' => [
+                                                      'Riyadh, Saudi Arabia'
+                                                    ]
+                                 },
+                      'sbhir' => {
+                                   'Description' => [
+                                                      'Guadalcanal, Solomon Islands'
+                                                    ]
+                                 },
+                      'scmaw' => {
+                                   'Description' => [
+                                                      'Mahé, Seychelles'
+                                                    ]
+                                 },
+                      'sdkrt' => {
+                                   'Description' => [
+                                                      'Khartoum, Sudan'
+                                                    ]
+                                 },
+                      'sesto' => {
+                                   'Description' => [
+                                                      'Stockholm, Sweden'
+                                                    ]
+                                 },
+                      'sgsin' => {
+                                   'Description' => [
+                                                      'Singapore'
+                                                    ]
+                                 },
+                      'shshn' => {
+                                   'Description' => [
+                                                      'Saint Helena'
+                                                    ]
+                                 },
+                      'silju' => {
+                                   'Description' => [
+                                                      'Ljubljana, Slovenia'
+                                                    ]
+                                 },
+                      'sjlyr' => {
+                                   'Description' => [
+                                                      'Longyearbyen, Svalbard'
+                                                    ]
+                                 },
+                      'skbts' => {
+                                   'Description' => [
+                                                      'Bratislava, Slovakia'
+                                                    ]
+                                 },
+                      'slfna' => {
+                                   'Description' => [
+                                                      'Freetown, Sierra Leone'
+                                                    ]
+                                 },
+                      'smsai' => {
+                                   'Description' => [
+                                                      'San Marino'
+                                                    ]
+                                 },
+                      'sndkr' => {
+                                   'Description' => [
+                                                      'Dakar, Senegal'
+                                                    ]
+                                 },
+                      'somgq' => {
+                                   'Description' => [
+                                                      'Mogadishu, Somalia'
+                                                    ]
+                                 },
+                      'srpbm' => {
+                                   'Description' => [
+                                                      'Paramaribo, Suriname'
+                                                    ]
+                                 },
+                      'ssjub' => {
+                                   'Description' => [
+                                                      'Juba, South Sudan'
+                                                    ]
+                                 },
+                      'sttms' => {
+                                   'Description' => [
+                                                      'São Tomé, São Tomé and Príncipe'
+                                                    ]
+                                 },
+                      'svsal' => {
+                                   'Description' => [
+                                                      'El Salvador'
+                                                    ]
+                                 },
+                      'sydam' => {
+                                   'Description' => [
+                                                      'Damascus, Syria'
+                                                    ]
+                                 },
+                      'szqmn' => {
+                                   'Description' => [
+                                                      'Mbabane, Swaziland'
+                                                    ]
+                                 },
+                      'tcgdt' => {
+                                   'Description' => [
+                                                      'Grand Turk, Turks and Caicos Islands'
+                                                    ]
+                                 },
+                      'tdndj' => {
+                                   'Description' => [
+                                                      'N\'Djamena, Chad'
+                                                    ]
+                                 },
+                      'tfpfr' => {
+                                   'Description' => [
+                                                      'Kerguelen Islands, French Southern Territories'
+                                                    ]
+                                 },
+                      'tglfw' => {
+                                   'Description' => [
+                                                      'Lomé, Togo'
+                                                    ]
+                                 },
+                      'thbkk' => {
+                                   'Description' => [
+                                                      'Bangkok, Thailand'
+                                                    ]
+                                 },
+                      'tjdyu' => {
+                                   'Description' => [
+                                                      'Dushanbe, Tajikistan'
+                                                    ]
+                                 },
+                      'tkfko' => {
+                                   'Description' => [
+                                                      'Fakaofo, Tokelau'
+                                                    ]
+                                 },
+                      'tldil' => {
+                                   'Description' => [
+                                                      'Dili, East Timor'
+                                                    ]
+                                 },
+                      'tmasb' => {
+                                   'Description' => [
+                                                      'Ashgabat, Turkmenistan'
+                                                    ]
+                                 },
+                      'tntun' => {
+                                   'Description' => [
+                                                      'Tunis, Tunisia'
+                                                    ]
+                                 },
+                      'totbu' => {
+                                   'Description' => [
+                                                      'Tongatapu, Tonga'
+                                                    ]
+                                 },
+                      'trist' => {
+                                   'Description' => [
+                                                      'Istanbul, Turkey'
+                                                    ]
+                                 },
+                      'ttpos' => {
+                                   'Description' => [
+                                                      'Port of Spain, Trinidad and Tobago'
+                                                    ]
+                                 },
+                      'tvfun' => {
+                                   'Description' => [
+                                                      'Funafuti, Tuvalu'
+                                                    ]
+                                 },
+                      'twtpe' => {
+                                   'Description' => [
+                                                      'Taipei, Taiwan'
+                                                    ]
+                                 },
+                      'tzdar' => {
+                                   'Description' => [
+                                                      'Dar es Salaam, Tanzania'
+                                                    ]
+                                 },
+                      'uaiev' => {
+                                   'Description' => [
+                                                      'Kiev, Ukraine'
+                                                    ]
+                                 },
+                      'uaozh' => {
+                                   'Description' => [
+                                                      'Zaporizhia (Zaporozhye), Ukraine'
+                                                    ]
+                                 },
+                      'uasip' => {
+                                   'Description' => [
+                                                      'Simferopol, Ukraine'
+                                                    ]
+                                 },
+                      'uauzh' => {
+                                   'Description' => [
+                                                      'Uzhhorod (Uzhgorod), Ukraine'
+                                                    ]
+                                 },
+                      'ugkla' => {
+                                   'Description' => [
+                                                      'Kampala, Uganda'
+                                                    ]
+                                 },
+                      'umawk' => {
+                                   'Description' => [
+                                                      'Wake Island, U.S. Minor Outlying Islands'
+                                                    ]
+                                 },
+                      'umjon' => {
+                                   'Description' => [
+                                                      'Johnston Atoll, U.S. Minor Outlying Islands'
+                                                    ]
+                                 },
+                      'ummdy' => {
+                                   'Description' => [
+                                                      'Midway Islands, U.S. Minor Outlying Islands'
+                                                    ]
+                                 },
+                      'unk' => {
+                                 'Description' => [
+                                                    'Unknown time zone'
+                                                  ]
+                               },
+                      'usadk' => {
+                                   'Description' => [
+                                                      'Adak (Alaska), United States'
+                                                    ]
+                                 },
+                      'usaeg' => {
+                                   'Description' => [
+                                                      'Marengo (Indiana), United States'
+                                                    ]
+                                 },
+                      'usanc' => {
+                                   'Description' => [
+                                                      'Anchorage, United States'
+                                                    ]
+                                 },
+                      'usboi' => {
+                                   'Description' => [
+                                                      'Boise (Idaho), United States'
+                                                    ]
+                                 },
+                      'uschi' => {
+                                   'Description' => [
+                                                      'Chicago, United States'
+                                                    ]
+                                 },
+                      'usden' => {
+                                   'Description' => [
+                                                      'Denver, United States'
+                                                    ]
+                                 },
+                      'usdet' => {
+                                   'Description' => [
+                                                      'Detroit, United States'
+                                                    ]
+                                 },
+                      'ushnl' => {
+                                   'Description' => [
+                                                      'Honolulu, United States'
+                                                    ]
+                                 },
+                      'usind' => {
+                                   'Description' => [
+                                                      'Indianapolis, United States'
+                                                    ]
+                                 },
+                      'usinvev' => {
+                                     'Description' => [
+                                                        'Vevay (Indiana), United States'
+                                                      ]
+                                   },
+                      'usjnu' => {
+                                   'Description' => [
+                                                      'Juneau (Alaska), United States'
+                                                    ]
+                                 },
+                      'usknx' => {
+                                   'Description' => [
+                                                      'Knox (Indiana), United States'
+                                                    ]
+                                 },
+                      'uslax' => {
+                                   'Description' => [
+                                                      'Los Angeles, United States'
+                                                    ]
+                                 },
+                      'uslui' => {
+                                   'Description' => [
+                                                      'Louisville (Kentucky), United States'
+                                                    ]
+                                 },
+                      'usmnm' => {
+                                   'Description' => [
+                                                      'Menominee (Michigan), United States'
+                                                    ]
+                                 },
+                      'usmoc' => {
+                                   'Description' => [
+                                                      'Monticello (Kentucky), United States'
+                                                    ]
+                                 },
+                      'usmtm' => {
+                                   'Description' => [
+                                                      'Metlakatla (Alaska), United States'
+                                                    ]
+                                 },
+                      'usnavajo' => {
+                                      'Description' => [
+                                                         'Shiprock (Navajo), United States'
+                                                       ]
+                                    },
+                      'usndcnt' => {
+                                     'Description' => [
+                                                        'Center (North Dakota), United States'
+                                                      ]
+                                   },
+                      'usndnsl' => {
+                                     'Description' => [
+                                                        'New Salem (North Dakota), United States'
+                                                      ]
+                                   },
+                      'usnyc' => {
+                                   'Description' => [
+                                                      'New York, United States'
+                                                    ]
+                                 },
+                      'usoea' => {
+                                   'Description' => [
+                                                      'Vincennes (Indiana), United States'
+                                                    ]
+                                 },
+                      'usome' => {
+                                   'Description' => [
+                                                      'Nome (Alaska), United States'
+                                                    ]
+                                 },
+                      'usphx' => {
+                                   'Description' => [
+                                                      'Phoenix, United States'
+                                                    ]
+                                 },
+                      'ussit' => {
+                                   'Description' => [
+                                                      'Sitka (Alaska), United States'
+                                                    ]
+                                 },
+                      'ustel' => {
+                                   'Description' => [
+                                                      'Tell City (Indiana), United States'
+                                                    ]
+                                 },
+                      'uswlz' => {
+                                   'Description' => [
+                                                      'Winamac (Indiana), United States'
+                                                    ]
+                                 },
+                      'uswsq' => {
+                                   'Description' => [
+                                                      'Petersburg (Indiana), United States'
+                                                    ]
+                                 },
+                      'usxul' => {
+                                   'Description' => [
+                                                      'Beulah (North Dakota), United States'
+                                                    ]
+                                 },
+                      'usyak' => {
+                                   'Description' => [
+                                                      'Yakutat (Alaska), United States'
+                                                    ]
+                                 },
+                      'utc' => {
+                                 'Description' => [
+                                                    'UTC (Coordinated Universal Time)'
+                                                  ]
+                               },
+                      'utce01' => {
+                                    'Description' => [
+                                                       '1 hour ahead of UTC'
+                                                     ]
+                                  },
+                      'utce02' => {
+                                    'Description' => [
+                                                       '2 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce03' => {
+                                    'Description' => [
+                                                       '3 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce04' => {
+                                    'Description' => [
+                                                       '4 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce05' => {
+                                    'Description' => [
+                                                       '5 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce06' => {
+                                    'Description' => [
+                                                       '6 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce07' => {
+                                    'Description' => [
+                                                       '7 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce08' => {
+                                    'Description' => [
+                                                       '8 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce09' => {
+                                    'Description' => [
+                                                       '9 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce10' => {
+                                    'Description' => [
+                                                       '10 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce11' => {
+                                    'Description' => [
+                                                       '11 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce12' => {
+                                    'Description' => [
+                                                       '12 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce13' => {
+                                    'Description' => [
+                                                       '13hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utce14' => {
+                                    'Description' => [
+                                                       '14 hours ahead of UTC'
+                                                     ]
+                                  },
+                      'utcw01' => {
+                                    'Description' => [
+                                                       '1 hour behind UTC'
+                                                     ]
+                                  },
+                      'utcw02' => {
+                                    'Description' => [
+                                                       '2 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw03' => {
+                                    'Description' => [
+                                                       '3 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw04' => {
+                                    'Description' => [
+                                                       '4 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw05' => {
+                                    'Description' => [
+                                                       '5 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw06' => {
+                                    'Description' => [
+                                                       '6 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw07' => {
+                                    'Description' => [
+                                                       '7 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw08' => {
+                                    'Description' => [
+                                                       '8 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw09' => {
+                                    'Description' => [
+                                                       '9 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw10' => {
+                                    'Description' => [
+                                                       '10 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw11' => {
+                                    'Description' => [
+                                                       '11 hours behind UTC'
+                                                     ]
+                                  },
+                      'utcw12' => {
+                                    'Description' => [
+                                                       '12 hours behind UTC'
+                                                     ]
+                                  },
+                      'uymvd' => {
+                                   'Description' => [
+                                                      'Montevideo, Uruguay'
+                                                    ]
+                                 },
+                      'uzskd' => {
+                                   'Description' => [
+                                                      'Samarkand, Uzbekistan'
+                                                    ]
+                                 },
+                      'uztas' => {
+                                   'Description' => [
+                                                      'Tashkent, Uzbekistan'
+                                                    ]
+                                 },
+                      'vavat' => {
+                                   'Description' => [
+                                                      'Vatican City'
+                                                    ]
+                                 },
+                      'vcsvd' => {
+                                   'Description' => [
+                                                      'Saint Vincent, Saint Vincent and the Grenadines'
+                                                    ]
+                                 },
+                      'veccs' => {
+                                   'Description' => [
+                                                      'Caracas, Venezuela'
+                                                    ]
+                                 },
+                      'vgtov' => {
+                                   'Description' => [
+                                                      'Tortola, British Virgin Islands'
+                                                    ]
+                                 },
+                      'vistt' => {
+                                   'Description' => [
+                                                      'Saint Thomas, U.S. Virgin Islands'
+                                                    ]
+                                 },
+                      'vnsgn' => {
+                                   'Description' => [
+                                                      'Ho Chi Minh City, Vietnam'
+                                                    ]
+                                 },
+                      'vuvli' => {
+                                   'Description' => [
+                                                      'Efate, Vanuatu'
+                                                    ]
+                                 },
+                      'wfmau' => {
+                                   'Description' => [
+                                                      'Wallis Islands, Wallis and Futuna'
+                                                    ]
+                                 },
+                      'wsapw' => {
+                                   'Description' => [
+                                                      'Apia, Samoa'
+                                                    ]
+                                 },
+                      'yeade' => {
+                                   'Description' => [
+                                                      'Aden, Yemen'
+                                                    ]
+                                 },
+                      'ytmam' => {
+                                   'Description' => [
+                                                      'Mayotte'
+                                                    ]
+                                 },
+                      'zajnb' => {
+                                   'Description' => [
+                                                      'Johannesburg, South Africa'
+                                                    ]
+                                 },
+                      'zmlun' => {
+                                   'Description' => [
+                                                      'Lusaka, Zambia'
+                                                    ]
+                                 },
+                      'zwhre' => {
+                                   'Description' => [
+                                                      'Harare, Zimbabwe'
+                                                    ]
+                                 }
+                    },
+          'u_va' => {
+                      'posix' => {
+                                   'Description' => [
+                                                      'POSIX style locale variant'
+                                                    ]
+                                 }
+                    },
           'variant' => {
                          '1606nict' => {
                                          'Comments' => [
@@ -56841,6 +61120,13 @@ RFC 5646 <http://tools.ietf.org/html/rfc5646>.
 
 IANA Language Subtag Registry
 <http://www.iana.org/assignments/language-subtag-registry>.
+
+UTS #35: Unicode Locale Data Markup Language
+<http://unicode.org/reports/tr35/>.
+
+Unicode Locale Extension (‘u’) for BCP 47
+<http://cldr.unicode.org/index/bcp47-extension>,
+<http://unicode.org/repos/cldr/trunk/common/bcp47/>.
 
 =head1 LICENSE
 

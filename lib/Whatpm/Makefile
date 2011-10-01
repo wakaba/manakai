@@ -12,6 +12,15 @@ LANGUAGE_TAGEXT_REGISTRY = language-tag-extensions-registry
 LANGUAGE_SUBTAG_REGISTRY_PM = _LangTagReg.pm
 LANGUAGE_SUBTAG_REGISTRY_FULL_PM = _LangTagReg_Full.pm
 
+LANGTAG_XML_FILES = \
+  ../../data/langtag/cldr-bcp47/calendar.xml \
+  ../../data/langtag/cldr-bcp47/collation.xml \
+  ../../data/langtag/cldr-bcp47/currency.xml \
+  ../../data/langtag/cldr-bcp47/number.xml \
+  ../../data/langtag/cldr-bcp47/timezone.xml \
+  ../../data/langtag/cldr-bcp47/variant.xml \
+  ../../data/langtag/cldr-bcp47/transform.xml
+
 all: \
   _update \
   Atom-all Charset-all CSS-all HTML-all XML-all ContentChecker-all \
@@ -97,15 +106,27 @@ $(LANGUAGE_SUBTAG_REGISTRY):
 $(LANGUAGE_TAGEXT_REGISTRY):
 	$(WGET) http://www.iana.org/assignments/language-tag-extensions-registry -O $@
 
-$(LANGUAGE_SUBTAG_REGISTRY_PM): $(LANGUAGE_SUBTAG_REGISTRY) mklangreg.pl
-	perl mklangreg.pl $< > $@
+$(LANGUAGE_SUBTAG_REGISTRY_PM): $(LANGUAGE_SUBTAG_REGISTRY) mklangreg.pl \
+  langtag-data $(LANGTAG_XML_FILES)
+	perl mklangreg.pl $< $(LANGTAG_XML_FILES) > $@
 
 $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM): \
-  $(LANGUAGE_SUBTAG_REGISTRY) $(LANGUAGE_TAGEXT_REGISTRY) mklangreg.pl
-	MKLANGREG_FULL=1 perl mklangreg.pl $< $(LANGUAGE_TAGEXT_REGISTRY) > $@
+  $(LANGUAGE_SUBTAG_REGISTRY) $(LANGUAGE_TAGEXT_REGISTRY) mklangreg.pl \
+  langtag-data $(LANGTAG_XML_FILES)
+	MKLANGREG_FULL=1 perl mklangreg.pl $< $(LANGUAGE_TAGEXT_REGISTRY) \
+	  $(LANGTAG_XML_FILES) > $@
 
-update-$(LANGUAGE_SUBTAG_REGISTRY_PM):
+langtag-data:
+	cd ../../data && make langtag
+
+update-langtag: update-$(LANGUAGE_SUBTAG_REGISTRY_PM) \
+  $(LANGUAGE_SUBTAG_REGISTRY_PM) $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM)
+
+update-$(LANGUAGE_SUBTAG_REGISTRY_PM): update-langtag-data
 	$(RMALL) $(LANGUAGE_SUBTAG_REGISTRY)
+
+update-langtag-data:
+	cd ../../data && make langtag/update
 
 clean: Charset-clean CSS-clean HTML-clean XML-clean
 	$(RMALL) *~ *.bak *.tmp

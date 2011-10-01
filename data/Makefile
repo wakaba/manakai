@@ -1,0 +1,17 @@
+all: langtag
+
+update: langtag/update
+
+langtag: langtag/cldr-bcp47
+
+langtag/update: langtag/cldr-bcp47/update
+
+langtag/cldr-bcp47:
+	svn co http://www.unicode.org/repos/cldr/trunk/common/bcp47 $@
+
+langtag/cldr-bcp47/update:
+	cd langtag/cldr-bcp47 && svn update
+
+always:
+
+## License: Public domain.

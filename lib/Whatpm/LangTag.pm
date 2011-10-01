@@ -1,7 +1,7 @@
 package Whatpm::LangTag;
 use strict;
 use warnings;
-our $VERSION = '2.0';
+our $VERSION = '3.0';
 
 my $default_error_levels = {
   langtag_fact => 'm',
@@ -791,7 +791,8 @@ sub check_rfc4646_parsed_tag ($$$;$) {
 
         $prev = '';
         for (1..$#{$tag_o->{u}}) {
-          my $key = $tag_o->{u}->[$_]->[0];
+          my $keyword = $tag_o->{u}->[$_];
+          my $key = $keyword->[0];
           $key =~ tr/A-Z/a-z/;
           if (($prev cmp $key) > 0) {
             $onerror->(type => 'langtag:extension:u:key:order',
@@ -800,6 +801,57 @@ sub check_rfc4646_parsed_tag ($$$;$) {
                        level => $levels->{warn}); # Canonical form
           }
           $prev = $key;
+
+          if ($key eq 'vt') {
+            ## UTS #35 Appendix Q.
+            if (not defined $keyword->[1]) {
+              $onerror->(type => 'langtag:extension:u:vt:notype',
+                         level => $levels->{langtag_fact});
+            }
+
+            for (@$keyword[1, 2]) {
+              next unless defined;
+              if (not /\A[0-9A-Fa-f]{4,6}\z/ or
+                  0x10FFFF < hex) {
+                $onerror->(type => 'langtag:extension:u:vt:invalid',
+                           value => $_,
+                           level => $levels->{langtag_fact}); # may
+              }
+            }
+
+            for (@$keyword[3..$#$keyword]) {
+              $onerror->(type => 'langtag:extension:u:vt:nosemantics',
+                         value => $_,
+                         level => $levels->{langtag_fact});
+            }
+          } elsif ($Registry->{u_key}->{$key}) {
+            my $type = $keyword->[1];
+            $type =~ tr/A-Z/a-z/ if defined $type;
+            if (not defined $type) {
+              if ($Registry->{'u_' . $key}->{true}) {
+                #
+              } else {
+                ## Semantics is not defined anywhere
+                $onerror->(type => 'langtag:extension:u:'.$key.':notype',
+                           level => $levels->{langtag_fact});
+              }
+            } elsif ($Registry->{'u_' . $key}->{$type}) {
+              for (@{$keyword}[2..$#$keyword]) {
+                ## Semantics is not defined anywhere
+                $onerror->(type => 'langtag:extension:u:'.$key.':nosemantics',
+                           value => $_,
+                           level => $levels->{langtag_fact});
+              }
+            } else {
+              $onerror->(type => 'langtag:extension:u:'.$key.':invalid',
+                         value => $type,
+                         level => $levels->{langtag_fact});
+            }
+          } else {
+            $onerror->(type => 'langtag:extension:u:key:invalid',
+                       value => $key,
+                       level => $levels->{langtag_fact});
+          }
         }
 
         ## According to RFC 4646 (but not in RFC 5646), if a language
