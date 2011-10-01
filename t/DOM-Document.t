@@ -493,6 +493,15 @@ sub _ready_state_changed : Test(3) {
   is $doc->ready_state, 'complete';
 } # _ready_state_changed
 
+sub _inner_html_xml_setter_multiple_nodes : Test(3) {
+  my $doc = Message::DOM::DOMImplementation->new->create_document;
+  
+  $doc->inner_html (q{<!DOCTYPE hoge><hoge/>});
+  is $doc->child_nodes->length, 2;
+  is $doc->first_child->node_type, 10;
+  is $doc->last_child->node_type, 1;
+} # _inner_html_xml_setter_multiple_nodes
+
 __PACKAGE__->runtests;
 
 1;

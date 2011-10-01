@@ -1195,7 +1195,7 @@ sub inner_html ($;$) {
       ## TODO: strict-document-children option?
 
       ## Step 7, 8, 9, 10
-      for my $node (@{$doc->child_nodes}) {
+      for my $node (map { $_ } @{$doc->child_nodes}) {
         $self->append_child ($self->adopt_node ($node));
       }
 
