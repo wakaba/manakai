@@ -1,40 +1,43 @@
 #data
 en-u-abc
 #4646
-XXX
-XXX
+langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-abc-def
 #4646
-XXX
-XXX
+langtag:extension:u:attr:invalid;;abc;m
+langtag:extension:u:attr:invalid;;def;m
 
 #data
 en-u-def-abc
 #4646
-XXX
-XXX
+langtag:extension:order;u:attr:def;abc;w
+langtag:extension:u:attr:invalid;;def;m
+langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-Def-abc
 #4646
-XXX
-XXX
+langtag:extension:u:case;;Def;w
+langtag:extension:order;u:attr:def;abc;w
+langtag:extension:u:attr:invalid;;def;m
+langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-abc-abc
 #4646
 langtag:extension:u:attr:duplication;;abc;m
-XXX
-XXX
+langtag:extension:u:attr:invalid;;abc;m
+langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-abc-ABC
 #4646
+langtag:extension:u:case;;ABC;w
 langtag:extension:u:key:duplication;;abc;m
-XXX
-XXX
+langtag:extension:u:attr:invalid;;abc;m
+langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-ab-abc
@@ -62,6 +65,7 @@ XXX
 #data
 en-u-ab-abc-Ab-xyz
 #4646
+langtag:extension:u:case;;Ab;w
 langtag:extension:u:key:duplication;;ab;m
 XXX
 XXX
@@ -75,8 +79,8 @@ XXX
 #data
 en-u-xyz-de-zzz
 #4646
-XXX
-XXX
+langtag:extension:u:attr:invalid;;xyz;mX
+XX
 
 #data
 en-u-ab
@@ -92,14 +96,15 @@ XXX
 #data
 en-u-ac-xyz-ab-cdf
 #4646
-XXX
+langtag:extension:u:key:order;ac;ab;w
 XXX
 XXX
 
 #data
 en-u-Ac-xyz-ab-cdf
 #4646
-XXX
+langtag:extension:u:case;;Ac;w
+langtag:extension:u:key:order;ac;ab;w
 XXX
 XXX
 
@@ -115,18 +120,25 @@ langtag:language:und;;;s
 
 #data
 en-u-foo-bar-nu-thai-ca-buddhist
-#4646 invalid
-#5646
+#4646
+langtag:extension:u:key:order;nu;ca;w
+langtag:extension:u:attr:order;foo;bar;w
+langtag:extension:u:attr:invalid;;foo;m
+langtag:extension:u:attr:invalid;;bar;m
 
 #data
 en-u-bar-foo-ca-buddhist-nu-thai
 #4646
+langtag:extension:u:attr:invalid;;bar;m
+langtag:extension:u:attr:invalid;;foo;m
 
 #data
 de-DE-u-attr-co-phonebk
 #4646
+langtag:extension:u:attr:invalid;;attr;m
 
 #data
 en-US-u-islamCal
 #4646
-langtag:extension:unknown;;u-islamCal;m
+langtag:extension:u:case;;islamCal;w
+langtag:extension:u:attr:invalid;;islamcal;m

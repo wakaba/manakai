@@ -152,6 +152,7 @@ sub parse_rfc4646_tag ($$;$$) {
       }
       push @{$r{extension}}, $ext;
 
+      ## RFC 6067 / UTS #35
       if ($exttag eq 'u' and $has_extension{$exttag} == 1) {
         $r{u} = [[]];
         my $key = undef;
@@ -164,7 +165,7 @@ sub parse_rfc4646_tag ($$;$$) {
             if ($has_key{$key}) {
               $onerror->(type => 'langtag:extension:u:key:duplication',
                          value => $key,
-                         level => $levels->{must});
+                         level => $levels->{must}); ## RFC 6067
             }
             $has_key{$key}++;
             push @{$r{u}}, [$ext->[$i]];
@@ -175,7 +176,7 @@ sub parse_rfc4646_tag ($$;$$) {
               if ($has_attribute{$attr}) {
                 $onerror->(type => 'langtag:extension:u:attr:duplication',
                            value => $attr,
-                           level => $levels->{must});
+                           level => $levels->{langtag_fact}); ## RFC 6067
               }
               $has_attribute{$attr}++;
             }
@@ -713,30 +714,25 @@ sub check_rfc4646_parsed_tag ($$$;$) {
       my $max_ext = 0x00;
       my %has_ext;
       for my $ext (@{$tag_o->{extension}}) {
-        ## NOTE: Extension subtag.  At the time of writing of this
-        ## code, there is no defined extension subtag.
+        my $ext_type = $ext->[0];
+        $ext_type =~ tr/A-Z/a-z/;
         $onerror->(type => 'langtag:extension:unknown',
                    value => (join '-', @{$ext}),
-                   level => $levels->{langtag_fact});
-
-        ## NOTE: Whether a language tag with unsupported extension is
-        ## valid or not is unclear from the reading of RFC 4646.
+                   level => $levels->{langtag_fact})
+            unless $ext_type eq 'u';
         
-        ## NOTE: We don't check whether the case is lowercase or not
-        ## (see note above on the case of invalid subtags).
-
         ## NOTE: "When a language tag is to be used in a specific,
         ## known, protocol, it is RECOMMENDED that the language tag
         ## not contain extensions not supported by that protocol."
-        ## (RFC 4646 3.7.) - We don't check this, since there is no
-        ## extension defined.
+        ## (RFC 4646 3.7.) - We don't check this as we don't know
+        ## where the language tag is used.  (In fact we don't want to
+        ## implement this kind of meaningless requirement.  Any tag
+        ## not supported by a particular system (not restricted to
+        ## extensions) should not be used for the document or protocol
+        ## specifically targetted for the system cannot be used, but
+        ## making it a conformance requirement does not contribute to
+        ## interoperability.)
 
-        ## XXX Implement extension 'u'
-
-        #delete $result->{valid} if $RFC4646 and extension is invalid.
-
-        my $ext_type = $ext->[0];
-        $ext_type =~ tr/A-Z/a-z/;
         if ($max_ext > ord $ext_type) {
           ## NOTE: "=" is excluded, since duplicate extension subtags
           ## are checked at the parse time.
@@ -757,6 +753,59 @@ sub check_rfc4646_parsed_tag ($$$;$) {
           $max_ext = ord $ext_type;
           $has_ext{$ext_type} = 1;
         }
+
+        ## NOTE: We don't check whether the case is lowercase or not
+        ## for unknown extensions (see note above on the case of
+        ## invalid subtags).
+        if ($ext_type eq 'u') {
+          ## The "u" extension (UTS #35 and RFC 6067)
+          for (@{$ext}[1..$#$ext]) {
+            if (/[A-Z]/) {
+              $onerror->(type => 'langtag:extension:u:case',
+                         value => $_,
+                         level => $levels->{warn}); # Canonical form
+            }
+          }
+        }
+      }
+
+      ## The "u" extension (UTS #35 and RFC 6067)
+      if ($tag_o->{u}) {
+        my $prev = '';
+        for (0..$#{$tag_o->{u}->[0]}) {
+          my $attr = $tag_o->{u}->[0]->[$_];
+          $attr =~ tr/A-Z/a-z/;
+          if (($prev cmp $attr) > 0) {
+            $onerror->(type => 'langtag:extension:u:attr:order',
+                       text => $prev,
+                       value => $attr,
+                       level => $levels->{warn}); # Canonical form
+          }
+          $prev = $attr;
+
+          ## At the moment attribute is not used at all.
+          $onerror->(type => 'langtag:extension:u:attr:invalid',
+                     value => $attr,
+                     level => $levels->{langtag_fact});
+        }
+
+        $prev = '';
+        for (1..$#{$tag_o->{u}}) {
+          my $key = $tag_o->{u}->[$_]->[0];
+          $key =~ tr/A-Z/a-z/;
+          if (($prev cmp $key) > 0) {
+            $onerror->(type => 'langtag:extension:u:key:order',
+                       text => $prev,
+                       value => $key,
+                       level => $levels->{warn}); # Canonical form
+          }
+          $prev = $key;
+        }
+
+        ## According to RFC 4646 (but not in RFC 5646), if a language
+        ## tag contains an extension which is not valid, the entire
+        ## language tag is invalid.  However, for the "u" extension
+        ## validity is not clearly defined.
       }
 
       if (@{$tag_o->{privateuse}}) {
