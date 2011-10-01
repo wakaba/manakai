@@ -128,6 +128,13 @@ update-$(LANGUAGE_SUBTAG_REGISTRY_PM): update-langtag-data
 update-langtag-data:
 	cd ../../data && make langtag/update
 
+dataautoupdate: \
+  update-$(LANGUAGE_SUBTAG_REGISTRY_PM) \
+  $(LANGUAGE_SUBTAG_REGISTRY_PM) $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM)
+	git add \
+	    $(LANGUAGE_SUBTAG_REGISTRY_PM) \
+	    $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM)
+
 clean: Charset-clean CSS-clean HTML-clean XML-clean
 	$(RMALL) *~ *.bak *.tmp
 	$(RMALL) $(LANGUAGE_SUBTAG_REGISTRY)

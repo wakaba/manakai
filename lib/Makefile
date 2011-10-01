@@ -17,6 +17,9 @@ Whatpm-all:
 %.html: %.pm
 	$(POD2HTML) $< > $@
 
+dataautoupdate:
+	$(CD) Whatpm && $(MAKE) dataautoupdate
+
 clean:
 	$(RMALL) *~ .*~ *.BAK .*.BAK *.tmp .*.tmp
 	$(CD) Message/ && $(MAKE) clean
