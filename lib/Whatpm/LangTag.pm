@@ -151,6 +151,38 @@ sub parse_rfc4646_tag ($$;$$) {
         push @$ext, shift @tag;
       }
       push @{$r{extension}}, $ext;
+
+      if ($exttag eq 'u' and $has_extension{$exttag} == 1) {
+        $r{u} = [[]];
+        my $key = undef;
+        my %has_attribute;
+        my %has_key;
+        for my $i (1..$#$ext) {
+          if (2 == length $ext->[$i]) {
+            $key = $ext->[$i];
+            $key =~ tr/A-Z/a-z/;
+            if ($has_key{$key}) {
+              $onerror->(type => 'langtag:extension:u:key:duplication',
+                         value => $key,
+                         level => $levels->{must});
+            }
+            $has_key{$key}++;
+            push @{$r{u}}, [$ext->[$i]];
+          } else {
+            if (not defined $key) {
+              my $attr = $ext->[$i];
+              $attr =~ tr/A-Z/a-z/;
+              if ($has_attribute{$attr}) {
+                $onerror->(type => 'langtag:extension:u:attr:duplication',
+                           value => $attr,
+                           level => $levels->{must});
+              }
+              $has_attribute{$attr}++;
+            }
+            push @{$r{u}->[-1]}, $ext->[$i];
+          }
+        }
+      }
     }
   }
 

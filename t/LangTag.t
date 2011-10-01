@@ -81,6 +81,7 @@ sub _parse : Tests {
     }
   }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[
     langtag-1.dat
+    langtag-u-1.dat
   ];
 } # _parse
 
@@ -105,6 +106,32 @@ sub _parse_zh_min_nan : Test(2) {
     grandfathered => 'zh-min-nan',
   };
 } # _parse_zh_min_nan
+
+sub _parse_u_extension : Test(10) {
+  for (
+    ['en-u-ab', [qw[u ab]], [[], [qw[ab]]]],
+    ['en-u-ab-cde-fgh', [qw[u ab cde fgh]], [[], [qw[ab cde fgh]]]],
+    ['en-u-ab-cd', [qw[u ab cd]], [[], [qw[ab]], [qw[cd]]]],
+    ['en-u-ab-cde-ab', [qw[u ab cde ab]], [[], [qw[ab cde]], [qw[ab]]]],
+    ['en-u-ab-12-xyz-AB', [qw[u ab 12 xyz AB]], [[], [qw[ab]], [qw[12 xyz]], [qw[AB]]]],
+    ['en-u-abc', [qw[u abc]], [[qw[abc]]]],
+    ['en-u-abc-def', [qw[u abc def]], [[qw[abc def]]]],
+    ['en-u-abc-12', [qw[u abc 12]], [[qw[abc]], [qw[12]]]],
+    ['en-U-abc', [qw[U abc]], [[qw[abc]]]],
+    ['en-u-1ab', [qw[u 1ab]], [[qw[1ab]]]],
+  ) {
+    my $parsed = Whatpm::LangTag->parse_rfc5646_tag ($_->[0]);
+    eq_or_diff $parsed, {
+      language => 'en',
+      extlang => [],
+      variant => [],
+      illegal => [],
+      privateuse => [],
+      extension => [$_->[1]],
+      u => $_->[2],
+  };
+  }
+} # _parse_u_extension
 
 sub _normalize : Test(13) {
   for (
