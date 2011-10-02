@@ -15,6 +15,107 @@ use Test::Differences;
 
 sub _parse : Tests {
   execute_test ($_, {
+    1766 => {is_list => 1},
+    3066 => {is_list => 1},
+    4646 => {is_list => 1},
+    5646 => {is_list => 1},
+  }, sub {
+    my $test = shift;
+    
+    our @errors = ();
+    my $onerror = sub {
+      my %opt = @_;
+      push @errors, join ';',
+          $opt{type},
+          defined $opt{text} ? $opt{text} : '',
+          defined $opt{value} ? $opt{value} : '',
+          $opt{level};
+    }; # $onerror
+    
+    {
+      local @errors;
+
+      my $parsed = Whatpm::LangTag->parse_rfc4646_tag
+          ($test->{data}->[0], $onerror);
+      my $result = Whatpm::LangTag->check_rfc4646_parsed_tag
+          ($parsed, $onerror);
+      
+      my $expected = $test->{4646};
+      if ($expected) {
+        eq_or_diff join ("\n", sort {$a cmp $b} @errors),
+            join ("\n", sort {$a cmp $b} @{$expected->[0]}),
+            '_parse ' . $test->{data}->[0];
+        is !$result->{well_formed},
+            !! grep { $_ eq 'ill-formed' } @{$expected->[1] or []};
+        is !$result->{valid},
+            !! grep { $_ eq 'ill-formed' or $_ eq 'invalid' } @{$expected->[1] or []};
+      } else {
+        warn qq[No test item: "$test->{data}->[0]];
+      }
+    }
+
+    {
+      local @errors;
+      
+      my $parsed = Whatpm::LangTag->parse_rfc5646_tag
+          ($test->{data}->[0], $onerror);
+      my $result = Whatpm::LangTag->check_rfc5646_parsed_tag
+          ($parsed, $onerror);
+
+      my $expected = $test->{5646} || $test->{4646};
+      if ($expected) {
+        eq_or_diff join ("\n", sort {$a cmp $b} @errors),
+            join ("\n", sort {$a cmp $b} @{$expected->[0]}),
+            '_parse ' . $test->{data}->[0];
+        is !$result->{well_formed},
+            !! grep { $_ eq 'ill-formed' } @{$expected->[1]};
+        is !$result->{valid},
+            !! grep { $_ eq 'ill-formed' or $_ eq 'invalid' } @{$expected->[1]};
+
+        my $canon = Whatpm::LangTag->canonicalize_rfc5646_tag
+            ($test->{data}->[0]);
+        is $canon, ($test->{canon5646} || $test->{data})->[0];
+
+        my $extlang = Whatpm::LangTag->to_extlang_form_rfc5646_tag
+            ($test->{data}->[0]);
+        is $extlang, ($test->{extlang5646} || $test->{canon5646} || $test->{data})->[0];
+      }
+    }
+
+    {
+      local @errors;
+      
+      my $result = Whatpm::LangTag->check_rfc3066_tag
+          ($test->{data}->[0], $onerror);
+
+      my $expected = $test->{3066} || [['']];
+      if ($expected) {
+        eq_or_diff join ("\n", sort {$a cmp $b} @errors),
+            join ("\n", sort {$a cmp $b} @{$expected->[0]}),
+            '_check3066 ' . $test->{data}->[0];
+      }
+    }
+
+    {
+      local @errors;
+      
+      my $result = Whatpm::LangTag->check_rfc1766_tag
+          ($test->{data}->[0], $onerror);
+
+      my $expected = $test->{1766} || $test->{3066} || [['']];
+      if ($expected) {
+        eq_or_diff join ("\n", sort {$a cmp $b} @errors),
+            join ("\n", sort {$a cmp $b} @{$expected->[0]}),
+            '_check1766 ' . $test->{data}->[0];
+      }
+    }
+  }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[
+    langtag-1.dat
+  ];
+} # _parse
+
+sub _parse_check_extension : Tests {
+  execute_test ($_, {
     4646 => {is_list => 1},
     5646 => {is_list => 1},
   }, sub {
@@ -80,7 +181,6 @@ sub _parse : Tests {
       }
     }
   }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[
-    langtag-1.dat
     langtag-u-1.dat
   ];
 } # _parse

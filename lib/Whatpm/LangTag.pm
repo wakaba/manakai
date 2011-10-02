@@ -917,18 +917,11 @@ sub check_rfc3066_tag ($$;$$) {
   my $tag = $_[1];
   my $onerror = $_[2] || sub { };
   my $levels = $_[3] || $default_error_levels;
-
-  ## TODO: Should we raise a different type of error for empty language tags?
-
-  ## TODO: If ISO 639 and 3166 have strong recommendation
-  ## for case of codes, bad-case-error should be $should_level.
-  ## NOTE: They are marked as $good_level for now, since
-  ## RFC 3066 sais that there are "recommended" case for them
-  ## and it itself does not "recommend" any case.
-  ## NOTE: In RFC 1766 case convention is "recommended", but
-  ## without RFC 2119 wording.
-
+  
   my @tag = split /-/, $tag, -1;
+
+  require Whatpm::_LangTagReg;
+  our $Registry;
 
   if (not $RFC1766 and $tag[0] =~ /\A[0-9]+\z/) {
     $onerror->(type => 'langtag:illegal',
@@ -949,25 +942,46 @@ sub check_rfc3066_tag ($$;$$) {
   }
 
   if ($tag[0] =~ /\A[A-Za-z]{2}\z/) {
-    ## TODO: ISO 639-1
     if ($tag[0] =~ /[A-Z]/) {
       $onerror->(type => 'langtag:language:case',
                  value => $tag[0],
                  level => $levels->{good});
     }
+
+    my $lang = $tag[0];
+    $lang =~ tr/A-Z/a-z/;
+    unless ($Registry->{language}->{$lang}) {
+      ## ISO 639-1 language tag
+      $onerror->(type => 'langtag:language:invalid',
+                 value => $tag[0],
+                 level => $levels->{langtag_fact});
+    }
   } elsif (not $RFC1766 and $tag[0] =~ /\A[A-Za-z]{3}\z/) {
-    ## TODO: ISO 639-2
-    ## TODO: Is there any recommendation on case?
-    ## TODO: MUST use 2-letter code if any
-    ## TODO: MUST use /T code, if any, rather than /B code.
-    if ($tag[0] =~ /\A[Uu][Nn][Dd]\z/) {
+    if ($tag[0] =~ /[A-Z]/) {
+      $onerror->(type => 'langtag:language:case',
+                 value => $tag[0],
+                 level => $levels->{good}); # Recommendation of source stds
+    }
+
+    my $lang = $tag[0];
+    $lang =~ tr/A-Z/a-z/;
+    unless ($Registry->{language}->{$lang}) {
+      ## - ISO 639-2 language tag (fact)
+      ## - Prefer 2-letter code, if any (MUST)
+      ## - Prefer /T code to /B code, if any (MUST)
+      $onerror->(type => 'langtag:lang:invalid',
+                 value => $tag[0],
+                 level => $levels->{langtag_fact});
+    } elsif ($lang eq 'und') {
       $onerror->(type => 'langtag:language:und',
                  level => $levels->{should});
-      ## NOTE: SHOULD NOT, unless the protocol in use forces to give a value.
-    } elsif ($tag[0] =~ /\A[Mm][Uu][Ll]\z/) {
+    } elsif ($lang eq 'mul') {
       $onerror->(type => 'langtag:language:mul',
                  level => $levels->{should});
-      ## NOTE: SHOULD NOT, if the protocol allows specifying multiple langs.
+    } elsif ($lang =~ /\Aq[a-t][a-z]\z/) {
+      $onerror->(type => 'langtag:language:private',
+                 value => $tag[0],
+                 level => $levels->{warn});
     }
   } elsif ($tag[0] =~ /\A[Ii]\z/) {
     #
@@ -981,20 +995,30 @@ sub check_rfc3066_tag ($$;$$) {
                level => $levels->{langtag_fact});
   }
 
-  if (@tag >= 1) {
+  if (@tag >= 2 and
+      ## This is a willful violation to RFC 1766/3066 - This
+      ## interpretation is maybe the real intention of these specs.
+      $tag[0] !~ /\A[IiXx]\z/) {
     if ($tag[1] =~ /\A[0-9A-Za-z]{2}\z/) {
       if ($tag[1] =~ /[a-z]/) {
         $onerror->(type => 'langtag:region:case',
                    value => $tag[1],
-                   level => $levels->{good});
-      }      
+                   level => $levels->{good}); # Recommendation of source stds
+      }
       if ($tag[1] =~ /\A(?>[Aa][Aa]|[Qq][M-Zm-z]|[Xx][A-Za-z]|[Zz][Zz])\z/) {
         $onerror->(type => 'langtag:region:private',
                    value => $tag[1],
-                   level => $levels->{must});
+                   level => $RFC1766
+                       ? $levels->{warn} : $levels->{must}); # RFC 3066 2.2.
       } elsif ($tag[1] =~ /\A([A-Za-z]{2})\z/) {
-        ## TODO: ISO 3166
-        ## XXX
+        my $region = $1;
+        $region =~ tr/A-Z/a-z/;
+        unless ($Registry->{region}->{$region}) {
+          ## ISO 3166 country code (fact)
+          $onerror->(type => 'langtag:region:invalid',
+                     value => $tag[1],
+                     level => $levels->{langtag_fact});
+        }
       }
     } elsif (length $tag[1] == 1) {
       $onerror->(type => 'langtag:region:nosemantics', 
@@ -1003,11 +1027,36 @@ sub check_rfc3066_tag ($$;$$) {
     }
   }
 
-  ## TODO: MUST use ISO tag rather than i-* tag.
-  ## TODO: some i-* tags are deprecated. (fact_level)
-
-  ## TODO: Non-registered tags should be warned.
-  ## $fact_level for i-*, $good_level for others.
+  if (($tag[0] eq 'i' or $tag[0] eq 'I' or
+       @tag >= 3 or
+       (@tag == 2 and 3 <= length $tag[1])) and
+      not $tag[0] eq 'x' and
+      not $tag[0] eq 'X') {
+    my $tag_l = $tag;
+    $tag_l =~ tr/A-Z/a-z/;
+    my $def = $Registry->{grandfathered}->{$tag_l} ||
+        $Registry->{redundant}->{$tag_l};
+    if ($def) {
+      if ($def->{_deprecated}) {
+        my $level = $levels->{warn};
+        ## MUST use ISO tag rather than i-* tag (RFC 3066 2.3)
+        $level = $levels->{must}
+            if not $RFC1766 and
+               $tag_l =~ /^i-/ and
+               $def->{_preferred} and
+               $def->{_preferred} =~ /^[A-Za-z]{2,3}$/;
+        $onerror->(type => 'langtag:deprecated',
+                   text => $def->{_preferred}, # or undef
+                   value => $tag,
+                   level => $level);
+      }
+    } else {
+      $onerror->(type => 'langtag:notregistered',
+                 value => $tag,
+                 level => $tag_l =~ /^i-/
+                     ? $levels->{langtag_fact} : $levels->{warn});
+    }
+  }
 } # check_rfc3066_tag
 
 sub check_rfc1766_tag ($$;$$) {
