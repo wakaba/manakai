@@ -25,11 +25,11 @@ sub _parse : Tests {
   execute_test ($_, {
     data => {is_prefixed => 1},
     errors => {is_list => 1},
-    cssom => {is_prefixed => 0},
-    csstext => {is_prefixed => 0},
-    computed => {is_prefixed => 0},
-    computedtext => {is_prefixed => 0},
-    html => {is_prefixed => 0},
+    cssom => {is_prefixed => 1},
+    csstext => {is_prefixed => 1},
+    computed => {is_prefixed => 1},
+    computedtext => {is_prefixed => 1},
+    html => {is_prefixed => 1},
   }, sub {
     my $data = shift;
     
@@ -257,53 +257,53 @@ BEGIN {
   z-index: auto;
 ];
   $DefaultComputed = $DefaultComputedText;
-  $DefaultComputed =~ s/^  /| /gm;
+  $DefaultComputed =~ s/^  //gm;
   $DefaultComputed =~ s/;$//gm;
-  $DefaultComputed .= q[| -manakai-border-spacing-x: 0px
-| -manakai-border-spacing-y: 0px
-| -moz-opacity: 1
-| background-attachment: scroll
-| background-color: transparent
-| background-image: none
-| background-position: 0% 0%
-| background-position-x: 0%
-| background-position-y: 0%
-| background-repeat: repeat
-| border-top: 0px none -manakai-default
-| border-right: 0px none -manakai-default
-| border-bottom: 0px none -manakai-default
-| border-left: 0px none -manakai-default
-| border-bottom-color: -manakai-default
-| border-bottom-style: none
-| border-bottom-width: 0px
-| border-left-color: -manakai-default
-| border-left-style: none
-| border-left-width: 0px
-| border-right-color: -manakai-default
-| border-right-style: none
-| border-right-width: 0px
-| border-top-color: -manakai-default
-| border-top-style: none
-| border-top-width: 0px
-| border-color: -manakai-default
-| border-style: none
-| border-width: 0px
-| float: none
-| font: 400 16px -manakai-default
-| list-style: disc none outside
-| margin-top: 0px
-| margin-right: 0px
-| margin-bottom: 0px
-| margin-left: 0px
-| outline-color: invert
-| outline-style: none
-| outline-width: 0px
-| overflow-x: visible
-| overflow-y: visible
-| padding-bottom: 0px
-| padding-left: 0px
-| padding-right: 0px
-| padding-top: 0px];
+  $DefaultComputed .= q[-manakai-border-spacing-x: 0px
+-manakai-border-spacing-y: 0px
+-moz-opacity: 1
+background-attachment: scroll
+background-color: transparent
+background-image: none
+background-position: 0% 0%
+background-position-x: 0%
+background-position-y: 0%
+background-repeat: repeat
+border-top: 0px none -manakai-default
+border-right: 0px none -manakai-default
+border-bottom: 0px none -manakai-default
+border-left: 0px none -manakai-default
+border-bottom-color: -manakai-default
+border-bottom-style: none
+border-bottom-width: 0px
+border-left-color: -manakai-default
+border-left-style: none
+border-left-width: 0px
+border-right-color: -manakai-default
+border-right-style: none
+border-right-width: 0px
+border-top-color: -manakai-default
+border-top-style: none
+border-top-width: 0px
+border-color: -manakai-default
+border-style: none
+border-width: 0px
+float: none
+font: 400 16px -manakai-default
+list-style: disc none outside
+margin-top: 0px
+margin-right: 0px
+margin-bottom: 0px
+margin-left: 0px
+outline-color: invert
+outline-style: none
+outline-width: 0px
+overflow-x: visible
+overflow-y: visible
+padding-bottom: 0px
+padding-left: 0px
+padding-right: 0px
+padding-top: 0px];
 }
 
 sub get_parser ($) {
@@ -466,7 +466,30 @@ sub get_parser ($) {
   return ($p, $css_options);
 } # get_parser
 
-sub serialize_rule ($$);
+sub serialize_rule ($$) {
+  my ($rule, $indent) = @_;
+  my $v = '';
+  if ($rule->type == $rule->STYLE_RULE) {
+    $v .= $indent . '<' . $rule->selector_text . ">\n";
+    $v .= serialize_style ($rule->style, $indent . '  ');
+  } elsif ($rule->type == $rule->MEDIA_RULE) {
+    $v .= $indent . '@media ' . $rule->media . "\n";
+    $v .= serialize_rule ($_, $indent . '  ') for @{$rule->css_rules};
+  } elsif ($rule->type == $rule->NAMESPACE_RULE) {
+    $v .= $indent . '@namespace ';
+    my $prefix = $rule->prefix;
+    $v .= $prefix . ': ' if length $prefix;
+    $v .= '<' . $rule->namespace_uri . ">\n";
+  } elsif ($rule->type == $rule->IMPORT_RULE) {
+    $v .= $indent . '@import <' . $rule->href . '> ' . $rule->media;
+    $v .= "\n";
+  } elsif ($rule->type == $rule->CHARSET_RULE) {
+    $v .= $indent . '@charset ' . $rule->encoding . "\n";
+  } else {
+    die "Rule type @{[$rule->type]} is not supported";
+  }
+  return $v;
+} # serialize_rule
 
 sub serialize_cssom ($) {
   my $ss = shift;
@@ -486,31 +509,6 @@ sub serialize_cssom ($) {
     return '(undef)';
   }
 } # serialize_cssom
-
-sub serialize_rule ($$) {
-  my ($rule, $indent) = @_;
-  my $v = '';
-  if ($rule->type == $rule->STYLE_RULE) {
-    $v .= '| ' . $indent . '<' . $rule->selector_text . ">\n";
-    $v .= serialize_style ($rule->style, $indent . '  ');
-  } elsif ($rule->type == $rule->MEDIA_RULE) {
-    $v .= '| ' . $indent . '@media ' . $rule->media . "\n";
-    $v .= serialize_rule ($_, $indent . '  ') for @{$rule->css_rules};
-  } elsif ($rule->type == $rule->NAMESPACE_RULE) {
-    $v .= '| ' . $indent . '@namespace ';
-    my $prefix = $rule->prefix;
-    $v .= $prefix . ': ' if length $prefix;
-    $v .= '<' . $rule->namespace_uri . ">\n";
-  } elsif ($rule->type == $rule->IMPORT_RULE) {
-    $v .= '| ' . $indent . '@import <' . $rule->href . '> ' . $rule->media;
-    $v .= "\n";
-  } elsif ($rule->type == $rule->CHARSET_RULE) {
-    $v .= '| ' . $indent . '@charset ' . $rule->encoding . "\n";
-  } else {
-    die "Rule type @{[$rule->type]} is not supported";
-  }
-  return $v;
-} # serialize_rule
 
 sub get_computed_style ($$$$$$) {
   my ($all_test, $doc_id, $selectors, $dom, $css_options, $ss) = @_;
@@ -548,7 +546,7 @@ sub serialize_style ($$) {
         if defined $v[-1]->[3] and length $v[-1]->[3];
   }
   return join '',
-      map {"| $indent$_->[0]: @{[defined $_->[2] ? $_->[2] : '']}@{[defined $_->[3] ? $_->[3] : '']}\n"}
+      map {"$indent$_->[0]: @{[defined $_->[2] ? $_->[2] : '']}@{[defined $_->[3] ? $_->[3] : '']}\n"}
       sort {$a->[0] cmp $b->[0]}
       grep {defined $_->[2] and length $_->[2]} @v;
 } # serialize_style
@@ -569,9 +567,9 @@ sub apply_diff ($$$) {
   my @expected = split /[\x0D\x0A]+/, $expected;
   my @diff = split /[\x0D\x0A]+/, $diff;
   for (@diff) {
-    if (s/^-//) {
+    if (s/^-(?:\| )?//) {
       push @actual, $_;
-    } elsif (s/^\+//) {
+    } elsif (s/^\+(?:\| )?//) {
       push @expected, $_;
     } else {
       die "Invalid diff line: $_";
