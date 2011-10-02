@@ -1,24 +1,38 @@
 #data
 en-u-abc
-#4646
+#4646 invalid
+langtag:extension:u:attr:invalid;;abc;m
+#5646
 langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-abc-def
-#4646
+#4646 invalid
+langtag:extension:u:attr:invalid;;abc;m
+langtag:extension:u:attr:invalid;;def;m
+#5646
 langtag:extension:u:attr:invalid;;abc;m
 langtag:extension:u:attr:invalid;;def;m
 
 #data
 en-u-def-abc
-#4646
+#4646 invalid
+langtag:extension:u:attr:order;def;abc;w
+langtag:extension:u:attr:invalid;;def;m
+langtag:extension:u:attr:invalid;;abc;m
+#5646
 langtag:extension:u:attr:order;def;abc;w
 langtag:extension:u:attr:invalid;;def;m
 langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-Def-abc
-#4646
+#4646 invalid
+langtag:extension:u:case;;Def;w
+langtag:extension:u:attr:order;def;abc;w
+langtag:extension:u:attr:invalid;;def;m
+langtag:extension:u:attr:invalid;;abc;m
+#5646
 langtag:extension:u:case;;Def;w
 langtag:extension:u:attr:order;def;abc;w
 langtag:extension:u:attr:invalid;;def;m
@@ -26,14 +40,23 @@ langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-abc-abc
-#4646
+#4646 invalid
+langtag:extension:u:attr:duplication;;abc;m
+langtag:extension:u:attr:invalid;;abc;m
+langtag:extension:u:attr:invalid;;abc;m
+#5646
 langtag:extension:u:attr:duplication;;abc;m
 langtag:extension:u:attr:invalid;;abc;m
 langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-abc-ABC
-#4646
+#4646 invalid
+langtag:extension:u:case;;ABC;w
+langtag:extension:u:attr:duplication;;abc;m
+langtag:extension:u:attr:invalid;;abc;m
+langtag:extension:u:attr:invalid;;abc;m
+#5646
 langtag:extension:u:case;;ABC;w
 langtag:extension:u:attr:duplication;;abc;m
 langtag:extension:u:attr:invalid;;abc;m
@@ -41,30 +64,46 @@ langtag:extension:u:attr:invalid;;abc;m
 
 #data
 en-u-ab-abc
-#4646
+#4646 invalid
+langtag:extension:u:key:invalid;;ab;m
+#5646
 langtag:extension:u:key:invalid;;ab;m
 
 #data
 en-u-ab-abc-def
-#4646
+#4646 invalid
+langtag:extension:u:key:invalid;;ab;m
+#5646
 langtag:extension:u:key:invalid;;ab;m
 
 #data
 en-u-ab-abc-de-xyz
-#4646
+#4646 invalid
+langtag:extension:u:key:invalid;;ab;m
+langtag:extension:u:key:invalid;;de;m
+#5646
 langtag:extension:u:key:invalid;;ab;m
 langtag:extension:u:key:invalid;;de;m
 
 #data
 en-u-ab-abc-ab-xyz
-#4646
+#4646 invalid
+langtag:extension:u:key:duplication;;ab;m
+langtag:extension:u:key:invalid;;ab;m
+langtag:extension:u:key:invalid;;ab;m
+#5646
 langtag:extension:u:key:duplication;;ab;m
 langtag:extension:u:key:invalid;;ab;m
 langtag:extension:u:key:invalid;;ab;m
 
 #data
 en-u-ab-abc-Ab-xyz
-#4646
+#4646 invalid
+langtag:extension:u:case;;Ab;w
+langtag:extension:u:key:duplication;;ab;m
+langtag:extension:u:key:invalid;;ab;m
+langtag:extension:u:key:invalid;;ab;m
+#5646
 langtag:extension:u:case;;Ab;w
 langtag:extension:u:key:duplication;;ab;m
 langtag:extension:u:key:invalid;;ab;m
@@ -72,37 +111,57 @@ langtag:extension:u:key:invalid;;ab;m
 
 #data
 en-u-ab-abc-xb-abc
-#4646
+#4646 invalid
+langtag:extension:u:key:invalid;;ab;m
+langtag:extension:u:key:invalid;;xb;m
+#5646
 langtag:extension:u:key:invalid;;ab;m
 langtag:extension:u:key:invalid;;xb;m
 
 #data
 en-u-xyz-de-zzz
-#4646
+#4646 invalid
+langtag:extension:u:attr:invalid;;xyz;m
+langtag:extension:u:key:invalid;;de;m
+#5646
 langtag:extension:u:attr:invalid;;xyz;m
 langtag:extension:u:key:invalid;;de;m
 
 #data
 en-u-ab
-#4646
+#4646 invalid
+langtag:extension:u:key:invalid;;ab;m
+#5646
 langtag:extension:u:key:invalid;;ab;m
 
 #data
 en-u-ab-cdf-ac-xyz
-#4646
+#4646 invalid
+langtag:extension:u:key:invalid;;ab;m
+langtag:extension:u:key:invalid;;ac;m
+#5646
 langtag:extension:u:key:invalid;;ab;m
 langtag:extension:u:key:invalid;;ac;m
 
 #data
 en-u-ac-xyz-ab-cdf
-#4646
+#4646 invalid
+langtag:extension:u:key:order;ac;ab;w
+langtag:extension:u:key:invalid;;ac;m
+langtag:extension:u:key:invalid;;ab;m
+#5646
 langtag:extension:u:key:order;ac;ab;w
 langtag:extension:u:key:invalid;;ac;m
 langtag:extension:u:key:invalid;;ab;m
 
 #data
 en-u-Ac-xyz-ab-cdf
-#4646
+#4646 invalid
+langtag:extension:u:case;;Ac;w
+langtag:extension:u:key:order;ac;ab;w
+langtag:extension:u:key:invalid;;ac;m
+langtag:extension:u:key:invalid;;ab;m
+#5646
 langtag:extension:u:case;;Ac;w
 langtag:extension:u:key:order;ac;ab;w
 langtag:extension:u:key:invalid;;ac;m
@@ -120,7 +179,12 @@ langtag:language:und;;;s
 
 #data
 en-u-foo-bar-nu-thai-ca-buddhist
-#4646
+#4646 invalid
+langtag:extension:u:key:order;nu;ca;w
+langtag:extension:u:attr:order;foo;bar;w
+langtag:extension:u:attr:invalid;;foo;m
+langtag:extension:u:attr:invalid;;bar;m
+#5646
 langtag:extension:u:key:order;nu;ca;w
 langtag:extension:u:attr:order;foo;bar;w
 langtag:extension:u:attr:invalid;;foo;m
@@ -128,18 +192,26 @@ langtag:extension:u:attr:invalid;;bar;m
 
 #data
 en-u-bar-foo-ca-buddhist-nu-thai
-#4646
+#4646 invalid
+langtag:extension:u:attr:invalid;;bar;m
+langtag:extension:u:attr:invalid;;foo;m
+#5646
 langtag:extension:u:attr:invalid;;bar;m
 langtag:extension:u:attr:invalid;;foo;m
 
 #data
 de-DE-u-attr-co-phonebk
-#4646
+#4646 invalid
+langtag:extension:u:attr:invalid;;attr;m
+#5646
 langtag:extension:u:attr:invalid;;attr;m
 
 #data
 en-US-u-islamCal
-#4646
+#4646 invalid
+langtag:extension:u:case;;islamCal;w
+langtag:extension:u:attr:invalid;;islamcal;m
+#5646
 langtag:extension:u:case;;islamCal;w
 langtag:extension:u:attr:invalid;;islamcal;m
 
@@ -157,8 +229,10 @@ fr-u-tz-aedxb
 
 #data
 en-u-ca
-#4646
-langtag:extension:u:ca:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;ca;;m
+#5646
+langtag:extension:u:type:missing;ca;;m
 
 #data
 en-u-ca-buddhist
@@ -174,18 +248,24 @@ en-u-ca-iso8601
 
 #data
 en-u-ca-unknown
-#4646
-langtag:extension:u:ca:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;ca;unknown;m
+#5646
+langtag:extension:u:type:invalid;ca;unknown;m
 
 #data
 en-u-ca-roc-iso8601
-#4646
-langtag:extension:u:ca:nosemantics;;iso8601;m
+#4646 invalid
+langtag:extension:u:type:nosemantics;ca;iso8601;m
+#5646
+langtag:extension:u:type:nosemantics;ca;iso8601;m
 
 #data
 en-u-co
-#4646
-langtag:extension:u:co:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;co;;m
+#5646
+langtag:extension:u:type:missing;co;;m
 
 #data
 en-u-co-big5han
@@ -198,13 +278,15 @@ en-u-co-search
 #data
 en-u-co-phonebook
 #4646 ill-formed
-langtag:extension:u:co:notype;;;m
+langtag:extension:u:type:missing;co;;m
 langtag:illegal;;phonebook;m
 
 #data
 en-u-co-unknown
-#4646
-langtag:extension:u:co:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;co;unknown;m
+#5646
+langtag:extension:u:type:invalid;co;unknown;m
 
 #data
 en-u-ka-noignore
@@ -217,13 +299,17 @@ langtag:extension:u:case;;Shifted;w
 
 #data
 en-u-ka
-#4646
-langtag:extension:u:ka:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;ka;;m
+#5646
+langtag:extension:u:type:missing;ka;;m
 
 #data
 en-u-ka-false
-#4646
-langtag:extension:u:ka:invalid;;false;m
+#4646 invalid
+langtag:extension:u:type:invalid;ka;false;m
+#5646
+langtag:extension:u:type:invalid;ka;false;m
 
 #data
 en-u-kb-true
@@ -239,8 +325,10 @@ en-u-kb
 
 #data
 en-u-kb-unknown
-#4646
-langtag:extension:u:kb:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;kb;unknown;m
+#5646
+langtag:extension:u:type:invalid;kb;unknown;m
 
 #data
 en-u-kc-true
@@ -256,13 +344,17 @@ en-u-kc
 
 #data
 en-u-kc-unknown
-#4646
-langtag:extension:u:kc:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;kc;unknown;m
+#5646
+langtag:extension:u:type:invalid;kc;unknown;m
 
 #data
 en-u-kf-true
-#4646
-langtag:extension:u:kf:invalid;;true;m
+#4646 invalid
+langtag:extension:u:type:invalid;kf;true;m
+#5646
+langtag:extension:u:type:invalid;kf;true;m
 
 #data
 en-u-kf-false
@@ -278,13 +370,17 @@ en-u-kf-lower
 
 #data
 en-u-kf
-#4646
-langtag:extension:u:kf:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;kf;;m
+#5646
+langtag:extension:u:type:missing;kf;;m
 
 #data
 en-u-kf-unknown
-#4646
-langtag:extension:u:kf:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;kf;unknown;m
+#5646
+langtag:extension:u:type:invalid;kf;unknown;m
 
 #data
 en-u-kh-true
@@ -300,8 +396,10 @@ en-u-kh
 
 #data
 en-u-kh-unknown
-#4646
-langtag:extension:u:kh:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;kh;unknown;m
+#5646
+langtag:extension:u:type:invalid;kh;unknown;m
 
 #data
 en-u-kk-true
@@ -317,8 +415,10 @@ en-u-kk
 
 #data
 en-u-kk-unknown
-#4646
-langtag:extension:u:kk:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;kk;unknown;m
+#5646
+langtag:extension:u:type:invalid;kk;unknown;m
 
 #data
 en-u-kn-true
@@ -334,18 +434,24 @@ en-u-kn
 
 #data
 en-u-kn-unknown
-#4646
-langtag:extension:u:kn:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;kn;unknown;m
+#5646
+langtag:extension:u:type:invalid;kn;unknown;m
 
 #data
 en-u-kn-yes
-#4646
-langtag:extension:u:kn:invalid;;yes;m
+#4646 invalid
+langtag:extension:u:type:invalid;kn;yes;m
+#5646
+langtag:extension:u:type:invalid;kn;yes;m
 
 #data
 en-u-ks
-#4646
-langtag:extension:u:ks:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;ks;;m
+#5646
+langtag:extension:u:type:missing;ks;;m
 
 #data
 en-u-ks-level1
@@ -369,19 +475,24 @@ en-u-ks-identic
 
 #data
 en-u-ks-identic-hoge-fuga
-#4646
-langtag:extension:u:ks:nosemantics;;hoge;m
-langtag:extension:u:ks:nosemantics;;fuga;m
+#4646 invalid
+langtag:extension:u:type:nosemantics;ks;hoge;m
+langtag:extension:u:type:nosemantics;ks;fuga;m
+#5646
+langtag:extension:u:type:nosemantics;ks;hoge;m
+langtag:extension:u:type:nosemantics;ks;fuga;m
 
 #data
 en-u-vt
-#4646
-langtag:extension:u:vt:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;vt;;m
+#5646
+langtag:extension:u:type:missing;vt;;m
 
 #data
 en-u-vt-codepoints
 #4646 ill-formed
-langtag:extension:u:vt:notype;;;m
+langtag:extension:u:type:missing;vt;;m
 langtag:illegal;;codepoints;m
 
 #data
@@ -407,8 +518,10 @@ langtag:extension:u:case;;10FFFF;w
 
 #data
 en-u-vt-123456
-#4646
-langtag:extension:u:vt:invalid;;123456;m
+#4646 invalid
+langtag:extension:u:type:invalid;vt;123456;m
+#5646
+langtag:extension:u:type:invalid;vt;123456;m
 
 #data
 en-u-vt-0000
@@ -420,9 +533,12 @@ en-u-vt-000000
 
 #data
 en-u-vt-0000-FFFFFF
-#4646
+#4646 invalid
 langtag:extension:u:case;;FFFFFF;w
-langtag:extension:u:vt:invalid;;FFFFFF;m
+langtag:extension:u:type:invalid;vt;FFFFFF;m
+#5646
+langtag:extension:u:case;;FFFFFF;w
+langtag:extension:u:type:invalid;vt;FFFFFF;m
 
 #data
 en-u-vt-10ffff
@@ -430,18 +546,24 @@ en-u-vt-10ffff
 
 #data
 en-u-vt-110000
-#4646
-langtag:extension:u:vt:invalid;;110000;m
+#4646 invalid
+langtag:extension:u:type:invalid;vt;110000;m
+#5646
+langtag:extension:u:type:invalid;vt;110000;m
 
 #data
 en-u-vt-0000000
-#4646
-langtag:extension:u:vt:invalid;;0000000;m
+#4646 invalid
+langtag:extension:u:type:invalid;vt;0000000;m
+#5646
+langtag:extension:u:type:invalid;vt;0000000;m
 
 #data
 en-u-vt-u005c
-#4646
-langtag:extension:u:vt:invalid;;u005c;m
+#4646 invalid
+langtag:extension:u:type:invalid;vt;u005c;m
+#5646
+langtag:extension:u:type:invalid;vt;u005c;m
 
 #data
 en-u-vt-d800
@@ -449,31 +571,44 @@ en-u-vt-d800
 
 #data
 en-u-vt-4e
-#4646
+#4646 invalid
 langtag:extension:u:key:invalid;;4e;m
 langtag:extension:u:key:order;vt;4e;w
-langtag:extension:u:vt:notype;;;m
+langtag:extension:u:type:missing;vt;;m
+#5646
+langtag:extension:u:key:invalid;;4e;m
+langtag:extension:u:key:order;vt;4e;w
+langtag:extension:u:type:missing;vt;;m
 
 #data
 en-u-vt-0000-1111-2222
-#4646
-langtag:extension:u:vt:nosemantics;;2222;m
+#4646 invalid
+langtag:extension:u:type:nosemantics;vt;2222;m
+#5646
+langtag:extension:u:type:nosemantics;vt;2222;m
 
 #data
 en-u-vt-001-1211-1231
-#4646
-langtag:extension:u:vt:invalid;;001;m
-langtag:extension:u:vt:nosemantics;;1231;m
+#4646 invalid
+langtag:extension:u:type:invalid;vt;001;m
+langtag:extension:u:type:nosemantics;vt;1231;m
+#5646
+langtag:extension:u:type:invalid;vt;001;m
+langtag:extension:u:type:nosemantics;vt;1231;m
 
 #data
 en-u-vt-true
-#4646
-langtag:extension:u:vt:invalid;;true;m
+#4646 invalid
+langtag:extension:u:type:invalid;vt;true;m
+#5646
+langtag:extension:u:type:invalid;vt;true;m
 
 #data
 en-u-cu
-#4646
-langtag:extension:u:cu:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;cu;;m
+#5646
+langtag:extension:u:type:missing;cu;;m
 
 #data
 en-u-cu-adp
@@ -485,18 +620,24 @@ en-u-cu-xxx
 
 #data
 en-u-cu-unknown
-#4646
-langtag:extension:u:cu:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;cu;unknown;m
+#5646
+langtag:extension:u:type:invalid;cu;unknown;m
 
 #data
 en-u-cu-adp-aed
-#4646
-langtag:extension:u:cu:nosemantics;;aed;m
+#4646 invalid
+langtag:extension:u:type:nosemantics;cu;aed;m
+#5646
+langtag:extension:u:type:nosemantics;cu;aed;m
 
 #data
 en-u-nu
-#4646
-langtag:extension:u:nu:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;nu;;m
+#5646
+langtag:extension:u:type:missing;nu;;m
 
 #data
 en-u-nu-arab
@@ -508,18 +649,24 @@ en-u-nu-arabext
 
 #data
 en-u-nu-unknown
-#4646
-langtag:extension:u:nu:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;nu;unknown;m
+#5646
+langtag:extension:u:type:invalid;nu;unknown;m
 
 #data
 en-u-nu-armn-armnlow
-#4646
-langtag:extension:u:nu:nosemantics;;armnlow;m
+#4646 invalid
+langtag:extension:u:type:nosemantics;nu;armnlow;m
+#5646
+langtag:extension:u:type:nosemantics;nu;armnlow;m
 
 #data
 en-u-tz
-#4646
-langtag:extension:u:tz:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;tz;;m
+#5646
+langtag:extension:u:type:missing;tz;;m
 
 #data
 en-u-tz-bfoua
@@ -535,18 +682,24 @@ en-u-tz-unk
 
 #data
 en-u-tz-unknown
-#4646
-langtag:extension:u:tz:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;tz;unknown;m
+#5646
+langtag:extension:u:type:invalid;tz;unknown;m
 
 #data
 en-u-tz-bjptn-brssa
-#4646
-langtag:extension:u:tz:nosemantics;;brssa;m
+#4646 invalid
+langtag:extension:u:type:nosemantics;tz;brssa;m
+#5646
+langtag:extension:u:type:nosemantics;tz;brssa;m
 
 #data
 en-u-va
-#4646
-langtag:extension:u:va:notype;;;m
+#4646 invalid
+langtag:extension:u:type:missing;va;;m
+#5646
+langtag:extension:u:type:missing;va;;m
 
 #data
 en-u-va-posix
@@ -554,15 +707,21 @@ en-u-va-posix
 
 #data
 en-u-va-unknown
-#4646
-langtag:extension:u:va:invalid;;unknown;m
+#4646 invalid
+langtag:extension:u:type:invalid;va;unknown;m
+#5646
+langtag:extension:u:type:invalid;va;unknown;m
 
 #data
 en-u-va-posix-posix
-#4646
-langtag:extension:u:va:nosemantics;;posix;m
+#4646 invalid
+langtag:extension:u:type:nosemantics;va;posix;m
+#5646
+langtag:extension:u:type:nosemantics;va;posix;m
 
 #data
 en-u-m0-ungegn
-#4646
+#4646 invalid
+langtag:extension:u:key:invalid;;m0;m
+#5646
 langtag:extension:u:key:invalid;;m0;m

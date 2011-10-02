@@ -787,6 +787,7 @@ sub check_rfc4646_parsed_tag ($$$;$) {
           $onerror->(type => 'langtag:extension:u:attr:invalid',
                      value => $attr,
                      level => $levels->{langtag_fact});
+          delete $result->{valid} unless $RFC5646;
         }
 
         $prev = '';
@@ -805,24 +806,30 @@ sub check_rfc4646_parsed_tag ($$$;$) {
           if ($key eq 'vt') {
             ## UTS #35 Appendix Q.
             if (not defined $keyword->[1]) {
-              $onerror->(type => 'langtag:extension:u:vt:notype',
+              $onerror->(type => 'langtag:extension:u:type:missing',
+                         text => 'vt',
                          level => $levels->{langtag_fact});
+              delete $result->{valid} unless $RFC5646;
             }
 
             for (@$keyword[1, 2]) {
               next unless defined;
               if (not /\A[0-9A-Fa-f]{4,6}\z/ or
                   0x10FFFF < hex) {
-                $onerror->(type => 'langtag:extension:u:vt:invalid',
+                $onerror->(type => 'langtag:extension:u:type:invalid',
+                           text => 'vt',
                            value => $_,
                            level => $levels->{langtag_fact}); # may
+                delete $result->{valid} unless $RFC5646;
               }
             }
 
             for (@$keyword[3..$#$keyword]) {
-              $onerror->(type => 'langtag:extension:u:vt:nosemantics',
+              $onerror->(type => 'langtag:extension:u:type:nosemantics',
+                         text => 'vt',
                          value => $_,
                          level => $levels->{langtag_fact});
+              delete $result->{valid} unless $RFC5646;
             }
           } elsif ($Registry->{u_key}->{$key}) {
             my $type = $keyword->[1];
@@ -832,25 +839,32 @@ sub check_rfc4646_parsed_tag ($$$;$) {
                 #
               } else {
                 ## Semantics is not defined anywhere
-                $onerror->(type => 'langtag:extension:u:'.$key.':notype',
+                $onerror->(type => 'langtag:extension:u:type:missing',
+                           text => $key,
                            level => $levels->{langtag_fact});
+                delete $result->{valid} unless $RFC5646;
               }
             } elsif ($Registry->{'u_' . $key}->{$type}) {
               for (@{$keyword}[2..$#$keyword]) {
                 ## Semantics is not defined anywhere
-                $onerror->(type => 'langtag:extension:u:'.$key.':nosemantics',
+                $onerror->(type => 'langtag:extension:u:type:nosemantics',
+                           text => $key,
                            value => $_,
                            level => $levels->{langtag_fact});
+                delete $result->{valid} unless $RFC5646;
               }
             } else {
-              $onerror->(type => 'langtag:extension:u:'.$key.':invalid',
+              $onerror->(type => 'langtag:extension:u:type:invalid',
+                         text => $key,
                          value => $type,
                          level => $levels->{langtag_fact});
+              delete $result->{valid} unless $RFC5646;
             }
           } else {
             $onerror->(type => 'langtag:extension:u:key:invalid',
                        value => $key,
                        level => $levels->{langtag_fact});
+            delete $result->{valid} unless $RFC5646;
           }
         }
 
@@ -1172,6 +1186,7 @@ sub extended_filtering_rfc4647_range ($$$) {
 
 sub tag_registry_data_rfc4646 ($$$) {
   my ($class, $type, $tag) = @_;
+  $type =~ tr/A-Z/a-z/;
   $tag =~ tr/A-Z/a-z/;
 
   require Whatpm::_LangTagReg_Full;
