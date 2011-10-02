@@ -7,6 +7,8 @@ use base qw(Test::Class);
 use Test::More;
 use Test::Differences;
 
+require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
+
 require Whatpm::CSS::Parser;
 require Message::DOM::Window;
 
@@ -19,69 +21,59 @@ my $DefaultComputedText;
 sub apply_diff ($$$);
 
 sub _parse : Tests {
-
-for my $file_name (map {"t/$_"} qw(
-  css-1.dat
-  css-2.dat
-  css-3.dat
-  css-4.dat
-  css-visual.dat
-  css-generated.dat
-  css-paged.dat
-  css-text.dat
-  css-font.dat
-  css-table.dat
-  css-interactive.dat
-)) {
-  print "# $file_name\n";
-  open my $file, '<:utf8', $file_name or die "$0: $file_name: $!";
-
   my $all_test = {document => {}, test => []};
-  my $test;
-  my $mode = 'data';
-  my $doc_id;
-  my $selectors;
-  while (<$file>) {
-    s/\x0D\x0A/\x0A/;
-    if (/^#data$/) {
-      undef $test;
-      $test->{data} = '';
-      push @{$all_test->{test}}, $test;
-      $mode = 'data';
-    } elsif (/#(csstext|cssom)$/) {
-      $test->{$1} = '';
-      $mode = $1;
-    } elsif (/#(computed(?>text)?) (\S+) (.+)$/) {
-      $test->{$1}->{$doc_id = $2}->{$selectors = $3} = '';
-      $mode = $1;
-    } elsif (/^#html (\S+)$/) {
-      undef $test;
-      $test->{format} = 'html';
-      $test->{data} = '';
-      $all_test->{document}->{$1} = $test;
-      $mode = 'data';
-    } elsif (/^#errors$/) {
-      $test->{errors} = [];
-      $mode = 'errors';
-      $test->{data} =~ s/\x0D?\x0A\z//;
-    } elsif (/^#option q$/) {
-      $test->{option}->{parse_mode} = 'q';
-    } elsif (defined $test->{data} and /^$/) {
-      undef $test;
-    } else {
-      if ({data => 1, cssom => 1, csstext => 1}->{$mode}) {
-        $test->{$mode} .= $_;
-      } elsif ($mode eq 'computed' or $mode eq 'computedtext') {
-        $test->{$mode}->{$doc_id}->{$selectors} .= $_;
-      } elsif ($mode eq 'errors') {
-        tr/\x0D\x0A//d;
-        push @{$test->{errors}}, $_;
-      } else {
-        die "Line $.: $_";
+  execute_test ($_, {
+    data => {is_prefixed => 1},
+    errors => {is_list => 1},
+    cssom => {is_prefixed => 0},
+    csstext => {is_prefixed => 0},
+    computed => {is_prefixed => 0},
+    computedtext => {is_prefixed => 0},
+    html => {is_prefixed => 0},
+  }, sub {
+    my $data = shift;
+    
+    if ($data->{data}) {
+      my $test = {
+        data => $data->{data}->[0],
+        csstext => $data->{csstext}->[0],
+        cssom => $data->{cssom}->[0],
+        errors => $data->{errors}->[0],
+      };
+      for (qw(cssom csstext)) {
+        $test->{$_} .= "\n" if defined $test->{$_} and length $test->{$_};
       }
+      for my $key (qw(computed computedtext)) {
+        if ($data->{$key}) {
+          my $id = $data->{$key}->[1]->[0];
+          my $sel = join ' ', @{$data->{$key}->[1]}[1..$#{$data->{$key}->[1]}];
+          $test->{$key}->{$id}->{$sel} = $data->{$key}->[0];
+        }
+      }
+      if ($data->{option} and $data->{option}->[1]->[0] eq 'q') {
+        $test->{option}->{parse_mode} = 'q';
+      }
+      push @{$all_test->{test}}, $test;
+    } elsif ($data->{html}) {
+      $all_test->{document}->{$data->{html}->[1]->[0]} = {
+        data => $data->{html}->[0],
+        format => 'html',
+      };
     }
-  }
-
+  }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[
+    css-1.dat
+    css-2.dat
+    css-3.dat
+    css-4.dat
+    css-visual.dat
+    css-generated.dat
+    css-paged.dat
+    css-text.dat
+    css-font.dat
+    css-table.dat
+    css-interactive.dat
+  ];
+    
   for my $data (values %{$all_test->{document}}) {
     if ($data->{format} eq 'html') {
       my $doc = $dom->create_document;
@@ -156,8 +148,6 @@ for my $file_name (map {"t/$_"} qw(
       }
     }
   }
-}
-
 } # _parse
 
 my @longhand;
