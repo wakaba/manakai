@@ -1,11 +1,11 @@
-#!/usr/bin/perl
+package test::Whatpm::CSS::Parser;
 use strict;
-
-use lib qw[/home/wakaba/work/manakai2/lib]; ## TODO: ...
-
-use Test;
-
-BEGIN { plan tests => 2210 }
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use base qw(Test::Class);
+use Test::More;
+use Test::Differences;
 
 require Whatpm::CSS::Parser;
 require Message::DOM::Window;
@@ -15,6 +15,10 @@ my $dom = Message::DOM::DOMImplementation->new;
 
 my $DefaultComputed;
 my $DefaultComputedText;
+
+sub apply_diff ($$$);
+
+sub _parse : Tests {
 
 for my $file_name (map {"t/$_"} qw(
   css-1.dat
@@ -106,17 +110,18 @@ for my $file_name (map {"t/$_"} qw(
 
     my $ss = $p->parse_char_string ($test->{data});
 
-    ok ((join "\n", @actual_error), (join "\n", @{$test->{errors} or []}),
-        "#result ($test->{data})");
+    eq_or_diff
+        ((join "\n", @actual_error), (join "\n", @{$test->{errors} or []}),
+         "#result ($test->{data})");
 
     if (defined $test->{cssom}) {
       my $actual = serialize_cssom ($ss);
-      ok $actual, $test->{cssom}, "#cssom ($test->{data})";
+      eq_or_diff $actual, $test->{cssom}, "#cssom ($test->{data})";
     }
 
     if (defined $test->{csstext}) {
       my $actual = $ss->css_text;
-      ok $actual, $test->{csstext}, "#csstext ($test->{data})";
+      eq_or_diff $actual, $test->{csstext}, "#csstext ($test->{data})";
     }
 
     for my $doc_id (keys %{$test->{computed} or {}}) {
@@ -130,7 +135,7 @@ for my $file_name (map {"t/$_"} qw(
         my $expected = $DefaultComputed;
         my $diff = $test->{computed}->{$doc_id}->{$selectors};
         ($actual, $expected) = apply_diff ($actual, $expected, $diff);
-        ok $actual, $expected,
+        eq_or_diff $actual, $expected,
             "#computed $doc_id $selectors ($test->{data})";
       }
     }
@@ -146,13 +151,14 @@ for my $file_name (map {"t/$_"} qw(
         my $expected = $DefaultComputedText;
         my $diff = $test->{computedtext}->{$doc_id}->{$selectors};
         ($actual, $expected) = apply_diff ($actual, $expected, $diff);
-            "#computedtext $doc_id $selectors ($test->{data})";
-        ok $actual, $expected,
+        eq_or_diff $actual, $expected,
             "#computedtext $doc_id $selectors ($test->{data})";
       }
     }
   }
 }
+
+} # _parse
 
 my @longhand;
 my @shorthand;
@@ -461,7 +467,7 @@ sub get_parser ($) {
   };
 
   $p->init;
-  if ($parse_mode eq 'q') {
+  if ($parse_mode and $parse_mode eq 'q') {
     $p->{unitless_px} = 1;
     $p->{hashless_color} = 1;
   }
@@ -469,6 +475,8 @@ sub get_parser ($) {
 
   return ($p, $css_options);
 } # get_parser
+
+sub serialize_rule ($$);
 
 sub serialize_cssom ($) {
   my $ss = shift;
@@ -546,10 +554,13 @@ sub serialize_style ($$) {
     my $dom = $_->[1];
     push @v, [$_->[0], $dom, $style->$dom,
               $style->get_property_priority ($_->[0])];
-    $v[-1]->[3] = ' !' . $v[-1]->[3] if length $v[-1]->[3];
+    $v[-1]->[3] = ' !' . $v[-1]->[3]
+        if defined $v[-1]->[3] and length $v[-1]->[3];
   }
-  return join '', map {"| $indent$_->[0]: $_->[2]$_->[3]\n"}
-      sort {$a->[0] cmp $b->[0]} grep {length $_->[2]} @v;
+  return join '',
+      map {"| $indent$_->[0]: @{[defined $_->[2] ? $_->[2] : '']}@{[defined $_->[3] ? $_->[3] : '']}\n"}
+      sort {$a->[0] cmp $b->[0]}
+      grep {defined $_->[2] and length $_->[2]} @v;
 } # serialize_style
 
 sub get_dom_names ($) {
@@ -580,3 +591,17 @@ sub apply_diff ($$$) {
   $expected = join "\n", sort {$a cmp $b} @expected;
   ($actual, $expected);
 } # apply_diff
+
+__PACKAGE__->runtests;
+
+1;
+
+=head1 LICENSE
+
+Copyright 2008-2011 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
