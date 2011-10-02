@@ -28,19 +28,25 @@ ranges can always contain any non-ASCII characters.
 
 =over 4
 
+=item $parsed = Whatpm::LangTag->parse_tag ($tag, $onerror)
+
+Parses a language tag into subtags.  This method interprets the
+language tag using the latest version of the language tag
+specification.  At the time of writing, the latest version is RFC
+5646.
+
 =item $parsed = Whatpm::LangTag->parse_rfc5646_tag ($tag, $onerror)
 
-Parses a language tag into subtags.  This method interprets a language
-tag using the definition in RFC 5646.
+Parses a language tag into subtags.  This method interprets the
+language tag using the definition in RFC 5646.
 
 Any errors and warnings would be reported to the code refeference
 specified as the second argument.
 
 =item $parsed = Whatpm::LangTag->parse_rfc4646_tag ($tag, $onerror)
 
-Parses a language tag into subtags.  This method interprets a language
-tag using the definition in RFC 4646.  Note that RFC 4646 is obsoleted
-by RFC 5646.
+Parses a language tag into subtags.  This method interprets the
+language tag using the definition in RFC 4646.
 
 Any errors and warnings would be reported to the code refeference
 specified as the second argument.
@@ -94,6 +100,16 @@ E.g. C<['1234', 'xyz', 'abc']> for input C<1234-xyz-abc>.
 "Grandfathered" language tag.  E.g. C<'i-default'> for input
 C<i-default>.
 
+=item u
+
+If the tag contains a C<u> extension, parse result of the extension is
+contained here.  The value is an array reference of array references
+of strings.  The first inner array reference contains the attributes
+in the extension.  The remaining inner array references, if any,
+represents the keywords (i.e. the key-type pairs) in the extension in
+order.  E.g. C<[[], ['ca', 'japanese'], ['va', '0061', '0061']]> for
+input C<ja-u-ca-japanese-va-0061-0061>.
+
 =back
 
 =head2 SERIALIZATION
@@ -115,9 +131,15 @@ the result string would not be a well-formed language tag.
 
 =over 4
 
+=item Whatpm::LangTag->check_parsed_tag ($parsed, $onerror)
+
+Checks for conformance errors in the parsed language tag, against the
+latest version of the language tag specification.  At the time of
+writing, the latest version is RFC 5646.
+
 =item Whatpm::LangTag->check_rfc5646_parsed_tag ($parsed, $onerror)
 
-Finds conformance errors from a parsed language tag with regard to RFC
+Checks for conformance errors in the parsed language tag, against RFC
 5646.
 
 This method does not report any parse erros, as this method receives a
@@ -132,8 +154,8 @@ well-formed or valid or not as per RFC 5646.
 
 =item Whatpm::LangTag->check_rfc4646_parsed_tag ($parsed, $onerror)
 
-Finds conformance errors from a parsed language tag with regard to RFC
-4646.  Note that RFC 4646 is obsoleted by RFC 5646.
+Checks for conformance errors in the parsed language tag, against RFC
+4646.
 
 This method does not report any parse erros, as this method receives a
 B<parsed> language tag.
@@ -147,16 +169,16 @@ well-formed or valid or not as per RFC 4646.
 
 =item Whatpm::LangTag->check_rfc3066_tag ($tag, $onerror)
 
-Parses and finds conformance errors in a language tag (a string) with
-regard to RFC 3066.  Note that RFC 3066 is obsoleted by RFC 4646.
+Parses and checks for conformance errors in the parsed language tag,
+against RFC 3066.
 
 Any errors and warnings would be reported to the code refeference
 specified as the second argument.
 
 =item Whatpm::LangTag->check_rfc1766_tag ($tag, $onerror)
 
-Parses and finds conformance errors in a language tag (a string) with
-regard to RFC 1766.  Note that RFC 1766 is obsoleted by RFC 3046.
+Parses and checks for conformance errors in the parsed language tag,
+against RFC 1766.
 
 Any errors and warnings would be reported to the code refeference
 specified as the second argument.
@@ -177,34 +199,52 @@ these rules.
 
 =over 4
 
+=item $tag = Whatpm::LangTag->normalize_tag ($tag_orig)
+
+Normalize the language tag by folding cases, following the latest
+version of the language tag specification.  At the time of writing,
+the latest version is RFC 5646.
+
 =item $tag = Whatpm::LangTag->normalize_rfc5646_tag ($tag_orig)
 
-Normalize a language tag by folding cases, following RFC 5646 2.1. and
-2.2.6.  Note that this method does not replace any subtag into its
-preferred alternative; this method does not rearrange ordering of
-subtags.
+Normalize the language tag by folding cases, following RFC 5646
+2.1. and 2.2.6.  Note that this method does not replace any subtag
+into its preferred alternative; this method does not rearrange
+ordering of subtags.
 
 Although this method does not completely convert language tags into
 their canonical form, its result will be good enough for comparison in
 most usual situations.
 
+=item $tag = Whatpm::LangTag->canonicalize_tag ($tag_orig)
+
+Normalize the language tag into its canonicalized form, as per the
+latest version of the language tag specification.  At the time of
+writing, the latest version is RFC 5646.
+
 =item $tag = Whatpm::LangTag->canonicalize_rfc5646_tag ($tag_orig)
 
-Normalize a language tag into its canonicalized form, as per RFC 5646
-4.5.  That is, replace any subtag into its Preferred-Value form if
-possible and sort any extension subtags.  Note that this method does
-NOT do any case folding.  In addition, the "canonicalized form" of a
-langauge tag is not necessary a fully canonicalized form at all - for
-example, variant subtags might not be in the recommended order.
+Normalize the language tag into its canonicalized form, as per RFC
+5646 4.5.  That is, replace any subtag into its Preferred-Value form
+if possible and sort any extension subtags.  Note that this method
+does NOT do any case folding.  In addition, the "canonicalized form"
+of a langauge tag is not necessary a fully canonicalized form at all -
+for example, variant subtags might not be in the recommended order.
 
 Note that if the input is not a well-formed language tag according to
 RFC 5646, the result string might not be a well-formed language tag as
 well.  Sometimes the canonicalization would turn a valid langauge tag
 into an invalid language tag.
 
+=item $tag = Whatpm::LangTag->to_extlang_form_tag ($tag_orig)
+
+Normalize the language tag into its extlang form, as per the latest
+version of the language tag specification.  At the time of writing,
+the latest version is RFC 5646.
+
 =item $tag = Whatpm::LangTag->to_extlang_form_rfc5646_tag ($tag_orig)
 
-Normalize a language tag into its extlang form, as per RFC 5646 4.5.
+Normalize the language tag into its extlang form, as per RFC 5646 4.5.
 The extlang form is same as the canonicalized form, except that use of
 extlang subtags is preferred to language-only (or extlang-free)
 representation.
@@ -220,9 +260,15 @@ into an invalid language tag.
 
 =over 4
 
+=item BOOL = Whatpm::LangTag->basic_filtering_range ($range, $tag)
+
+Compares a basic language range to a language tag, according to the
+latest version of the language range specification.  At the time of
+writing, the latest version is RFC 4645.
+
 =item BOOL = Whatpm::LangTag->basic_filtering_rfc4647_range ($range, $tag)
 
-Compares a basic language range to a language tag according to RFC
+Compares a basic language range to a language tag, according to RFC
 4647 Section 3.3.1.  This method returns whether the range matches to
 the tag or not.
 
@@ -241,11 +287,17 @@ information, see RFC 3066 2.5).
 Note that this method is equivalent to
 C<basic_filtering_rfc4647_range> by definition.
 
+=item BOOL = Whatpm::LangTag->extended_filtering_range ($range, $tag)
+
+Compares an extended language range to a language tag, according to
+the latest version of the language range specification.  At the time
+of writing, the latest version is RFC 4647.
+
 =item BOOL = Whatpm::LangTag->extended_filtering_rfc4647_range ($range, $tag)
 
-Compares an extended language range to a language tag according to RFC
-4647 Section 3.3.2.  This method returns whether the range matches to
-the tag or not.
+Compares an extended language range to a language tag, according to
+RFC 4647 Section 3.3.2.  This method returns whether the range matches
+to the tag or not.
 
 An extended language range is a language tag whose subtags can be
 C<*>s.  (For more information, see RFC 4647 Section 2.2.).
@@ -335,6 +387,11 @@ Implemented RFC 5646.  Implemented comparison.  Implemented RFC 1766.
 =item 2011-10-01
 
 Implemented the C<u> extension.
+
+=item 2011-10-02
+
+Implemented full validation of RFC 3066 and RFC 1766 language tags.
+Added unversioned aliases for operations.
 
 =back
 

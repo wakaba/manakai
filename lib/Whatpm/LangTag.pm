@@ -1,7 +1,7 @@
 package Whatpm::LangTag;
 use strict;
 use warnings;
-our $VERSION = '3.0';
+our $VERSION = '4.0';
 
 my $default_error_levels = {
   langtag_fact => 'm',
@@ -25,6 +25,8 @@ my $Grandfathered5646 = {map { $_ => 1 } qw(
 )};
 
 # ------ Parsing ------
+
+*parse_tag = \&parse_rfc5646_tag;
 
 sub parse_rfc5646_tag ($$;$$) {
   local $RFC5646 = 1;
@@ -279,6 +281,8 @@ sub serialize_parsed_tag ($$) {
 } # serialize_parsed_tag
 
 # ------ Conformance checking ------
+
+*check_parsed_tag = \&check_rfc5646_parsed_tag;
 
 sub check_rfc5646_parsed_tag ($$$;$%) {
   local $RFC5646 = 1;
@@ -1066,6 +1070,8 @@ sub check_rfc1766_tag ($$;$$) {
 
 # ------ Normalization ------
 
+*normalize_tag = \&normalize_rfc5646_tag;
+
 ## Note: RFC 5646 2.1., 2.2.6.
 sub normalize_rfc5646_tag ($$) {
   my @tag = map { tr/A-Z/a-z/; $_ } split /-/, $_[1], -1;
@@ -1083,6 +1089,8 @@ sub normalize_rfc5646_tag ($$) {
   }
   return join '-', @tag;
 } # normalize_rfc5646_tag
+
+*canonicalize_tag = \&canonicalize_rfc5646_tag;
 
 sub canonicalize_rfc5646_tag ($$) {
   my $class = shift;
@@ -1145,6 +1153,8 @@ sub canonicalize_rfc5646_tag ($$) {
   return Whatpm::LangTag->serialize_parsed_tag ($parsed_tag);
 } # canonicalize_rfc5646_tag
 
+*to_extlang_form_tag = \&to_extlang_form_rfc5646_tag;
+
 sub to_extlang_form_rfc5646_tag ($$) {
   my $tag = $_[0]->canonicalize_rfc5646_tag ($_[1]);
   if ($tag =~ /^([A-Za-z]{3})(?=-|$)(?!-[A-Za-z]{3}(?=-|$))/) {
@@ -1164,6 +1174,8 @@ sub to_extlang_form_rfc5646_tag ($$) {
 
 # ------ Comparison ------
 
+*basic_filtering_range = \&basic_filtering_rfc4647_range;
+
 *match_rfc3066_range = \&basic_filtering_rfc4647_range;
 
 sub basic_filtering_rfc4647_range ($$$) {
@@ -1178,6 +1190,8 @@ sub basic_filtering_rfc4647_range ($$$) {
   
   return $range eq $tag || $tag =~ /^\Q$range\E-/;
 } # basic_filtering_rfc4647_range
+
+*extended_filtering_range = \&extended_filtering_rfc4647_range;
 
 sub extended_filtering_rfc4647_range ($$$) {
   my (undef, $range, $tag) = @_;
@@ -1230,6 +1244,8 @@ sub extended_filtering_rfc4647_range ($$$) {
 } # extended_filtering_rfc4647_range
 
 # ------ Tag registry data ------
+
+*tag_registry_data = \&tag_registry_data_rfc5646;
 
 *tag_registry_data_rfc5646 = \&tag_registry_data_rfc4646;
 

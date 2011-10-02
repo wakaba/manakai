@@ -185,7 +185,7 @@ sub _parse_check_extension : Tests {
   ];
 } # _parse
 
-sub _parse_zh_min_nan : Test(2) {
+sub _parse_zh_min_nan : Test(5) {
   my $parsed1 = Whatpm::LangTag->parse_rfc4646_tag ('zh-min-nan');
   eq_or_diff $parsed1, {
     language => 'zh',
@@ -205,6 +205,21 @@ sub _parse_zh_min_nan : Test(2) {
     extension => [],
     grandfathered => 'zh-min-nan',
   };
+
+  my $parsed3 = Whatpm::LangTag->parse_tag ('zh-min-nan');
+  eq_or_diff $parsed3, {
+    extlang => [],
+    variant => [],
+    illegal => [],
+    privateuse => [],
+    extension => [],
+    grandfathered => 'zh-min-nan',
+  };
+
+  my $error3 = 0;
+  my $result3 = Whatpm::LangTag->check_parsed_tag ($parsed3, sub { $error3++ });
+  eq_or_diff $result3, {well_formed => 1, valid => 1};
+  is $error3, 1;
 } # _parse_zh_min_nan
 
 sub _parse_u_extension : Test(10) {
@@ -233,7 +248,7 @@ sub _parse_u_extension : Test(10) {
   }
 } # _parse_u_extension
 
-sub _normalize : Test(13) {
+sub _normalize : Test(26) {
   for (
     ['', ''],
     ['ja', 'ja'],
@@ -250,10 +265,16 @@ sub _normalize : Test(13) {
     ['ja-latn-jp-x-ja-JP-Latn' => 'ja-Latn-JP-x-ja-JP-Latn'],
   ) {
     is +Whatpm::LangTag->normalize_rfc5646_tag ($_->[0]), $_->[1];
+    is +Whatpm::LangTag->normalize_tag ($_->[0]), $_->[1];
   }
 } # _normalize
 
-sub _basic_filtering_rfc4647_range : Test(70) {
+sub _canonicalize : Test(2) {
+  is +Whatpm::LangTag->canonicalize_tag ('zh-min-nan'), 'nan';
+  is +Whatpm::LangTag->to_extlang_form_tag ('zh-min-nan'), 'zh-nan';
+} # _canonicalize
+
+sub _basic_filtering_rfc4647_range : Test(105) {
   for (
      [undef, undef, 1],
      ['*', undef, 1],
@@ -291,6 +312,8 @@ sub _basic_filtering_rfc4647_range : Test(70) {
      ['x', 'x-hoge-fuga', 1],
      ['x-', 'x-hoge-fuga', 0],
   ) {
+    is !!Whatpm::LangTag->basic_filtering_range ($_->[0], $_->[1]),
+       !!$_->[2];
     is !!Whatpm::LangTag->basic_filtering_rfc4647_range ($_->[0], $_->[1]),
        !!$_->[2];
     is !!Whatpm::LangTag->match_rfc3066_range ($_->[0], $_->[1]),
@@ -298,7 +321,7 @@ sub _basic_filtering_rfc4647_range : Test(70) {
   }
 } # _basic_filtering_rfc4647_range
 
-sub _extended_filtering_rfc4647_range : Test(68) {
+sub _extended_filtering_rfc4647_range : Test(136) {
   for (
      [undef, undef, 1],
      ['*', undef, 1],
@@ -369,15 +392,18 @@ sub _extended_filtering_rfc4647_range : Test(68) {
      ['x', 'x-latn', 1],
      ['latn', 'x-latn', 0],
   ) {
+    is !!Whatpm::LangTag->extended_filtering_range ($_->[0], $_->[1]),
+       !!$_->[2];
     is !!Whatpm::LangTag->extended_filtering_rfc4647_range ($_->[0], $_->[1]),
        !!$_->[2];
   }
 } # _extended_filtering_rfc4647_range
 
-sub _tag_registry_data : Test(40) {
+sub _tag_registry_data : Test(60) {
   for my $method (qw(
     tag_registry_data_rfc4646
     tag_registry_data_rfc5646
+    tag_registry_data
   )) {
     my $ja = Whatpm::LangTag->$method (language => 'ja');
     ok !$ja->{_canon};
