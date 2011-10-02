@@ -973,7 +973,7 @@ sub check_rfc3066_tag ($$;$$) {
       ## - ISO 639-2 language tag (fact)
       ## - Prefer 2-letter code, if any (MUST)
       ## - Prefer /T code to /B code, if any (MUST)
-      $onerror->(type => 'langtag:lang:invalid',
+      $onerror->(type => 'langtag:language:invalid',
                  value => $tag[0],
                  level => $levels->{langtag_fact});
     } elsif ($lang eq 'und') {
