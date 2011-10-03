@@ -1,6 +1,7 @@
 package Whatpm::CSS::SelectorsParser;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.12 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.13';
 
 require Exporter;
 push our @ISA, 'Exporter';
@@ -162,8 +163,13 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                 RPAREN_TOKEN, 1, # :not(a ->> ) <<-
                }->{$t->{type}}) {
         $in_negation = 1 if $in_negation;
-        push @$sss, [NAMESPACE_SELECTOR, $default_namespace]
-            if defined $default_namespace;
+        if (defined $default_namespace) {
+          if (length $default_namespace) {
+            push @$sss, [NAMESPACE_SELECTOR, $default_namespace];
+          } else {
+            push @$sss, [NAMESPACE_SELECTOR, undef];
+          }
+        }
 
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
         # Reprocess.
@@ -238,8 +244,13 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else { ## Type or universal selector w/o namespace prefix
-        push @$sss, [NAMESPACE_SELECTOR, $default_namespace]
-            if defined $default_namespace;
+        if (defined $default_namespace) {
+          if (length $default_namespace) {
+            push @$sss, [NAMESPACE_SELECTOR, $default_namespace];
+          } else {
+            push @$sss, [NAMESPACE_SELECTOR, undef];
+          }
+        }
         push @$sss, [LOCAL_NAME_SELECTOR, $name] if defined $name;
 
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
@@ -977,12 +988,11 @@ sub get_selector_specificity ($$) {
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
 1;
-# $Date: 2008/08/16 07:35:23 $

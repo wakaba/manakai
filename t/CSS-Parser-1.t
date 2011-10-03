@@ -30,6 +30,7 @@ sub _parse : Tests {
     computed => {is_prefixed => 1},
     computedtext => {is_prefixed => 1},
     html => {is_prefixed => 1},
+    xml => {is_prefixed => 1},
   }, sub {
     my $data = shift;
     
@@ -59,6 +60,11 @@ sub _parse : Tests {
         data => $data->{html}->[0],
         format => 'html',
       };
+    } elsif ($data->{xml}) {
+      $all_test->{document}->{$data->{xml}->[1]->[0]} = {
+        data => $data->{xml}->[0],
+        format => 'xml',
+      };
     }
   }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[
     css-1.dat
@@ -78,6 +84,10 @@ sub _parse : Tests {
     if ($data->{format} eq 'html') {
       my $doc = $dom->create_document;
       $doc->manakai_is_html (1);
+      $doc->inner_html ($data->{data});
+      $data->{document} = $doc;
+    } elsif ($data->{format} eq 'xml') {
+      my $doc = $dom->create_document;
       $doc->inner_html ($data->{data});
       $data->{document} = $doc;
     } else {

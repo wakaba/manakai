@@ -88,3 +88,48 @@ x|y {}
 x|y {
 }
 
+#xml nullns
+<o>
+  <x/>
+</o>
+
+#data
+| |x { color : blue; border-color: -manakai-default }
+#cssom
+| <|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+| |x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+@namespace '';
+x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace <>
+| <|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+@namespace url();
+| |x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)

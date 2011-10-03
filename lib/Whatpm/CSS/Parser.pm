@@ -1,5 +1,7 @@
 package Whatpm::CSS::Parser;
 use strict;
+use warnings;
+our $VERSION = '2.0';
 use Whatpm::CSS::Tokenizer qw(:token);
 require Whatpm::CSS::SelectorsParser;
 require Whatpm::CSS::MediaQueryParser;
@@ -6950,5 +6952,13 @@ $Prop->{page} = {
   compute => $compute_as_specified,
 };
 
+=head1 LICENSE
+
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
 1;
-## $Date: 2008/09/17 07:19:30 $
