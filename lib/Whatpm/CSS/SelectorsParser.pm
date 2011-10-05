@@ -11,9 +11,12 @@ use Whatpm::CSS::Tokenizer qw(:token);
 sub new ($) {
   my $self = bless {
     onerror => sub { },
+
+    ## See |Whatpm::CSS::Parser| for usage.
     lookup_namespace_uri => sub {
       return undef;
     },
+
     level => {
       must => 'm',
       uncertain => 'u',

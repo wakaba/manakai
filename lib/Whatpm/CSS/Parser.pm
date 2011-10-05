@@ -121,9 +121,23 @@ sub parse_char_string ($$) {
   $mp->{level} = $self->{level};
 
   my $nsmap = {prefix_to_uri => {}, uri_to_prefixes => {}};
+
   # $nsmap->{prefix_to_uri}->{p/""} = uri/undef
+  #
+  ## A mapping from namespace prefixes to namespace URLs.  The empty
+  ## string as the namespace prefix (or the key of the hash)
+  ## represents the default namespace.  The empty string as the
+  ## namespace URL represents the null namespace, while the |undef|
+  ## value as the namespace URL represents the missing of the
+  ## namespace prefix declaration.
+
   # $nsmap->{uri_to_prefixes}->{uri} = ["p|"/"",...]/undef
   # $nsmap->{has_namespace} = 1/0
+
+  ## See the note for the |prefix_to_uri| value above.
+  ##
+  ## XXX empty vs null should not be distinguished for compat with
+  ## DOM's |lookupNamespaceURI| method.
   $self->{lookup_namespace_uri} = 
   $sp->{lookup_namespace_uri} = sub { ## TODO: case
     return $nsmap->{prefix_to_uri}->{lc $_[0]}; # $_[0] is '' (default) or prefix
