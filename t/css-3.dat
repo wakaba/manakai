@@ -93,6 +93,30 @@ x|y {
   <x/>
 </o>
 
+#xml ns1
+<o>
+  <x xmlns="http://ns1/"/>
+</o>
+
+#data
+| x { color : blue; border-color: -manakai-default }
+#cssom
+| <x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+| x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
 #data
 | |x { color : blue; border-color: -manakai-default }
 #cssom
@@ -133,3 +157,247 @@ x { color : blue; border-color: -manakai-default }
 #computed nullns x
 -color: -manakai-default
 +color: rgb(0, 0, 255)
+
+#data
+@namespace url();
+x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace <>
+| <|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+@namespace url();
+| |x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+@namespace '';
+x { color : blue; border-color: -manakai-default }
+#computed ns1 x
+
+#data
+| @namespace 'http://ns1/';
+| @namespace '';
+| x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace <http://ns1/>
+| @namespace <>
+| <|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+| @namespace url(http://ns1/);
+| @namespace url();
+| |x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+| @namespace 'http://ns1/';
+| @namespace '';
+| x { color : blue; border-color: -manakai-default }
+#computed ns1 x
+
+#data
+| @namespace '';
+| @namespace 'http://ns1/';
+| x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace <>
+| @namespace <http://ns1/>
+| <x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+| @namespace url();
+| @namespace url(http://ns1/);
+| x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed ns1 x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+| @namespace '';
+| @namespace 'http://ns1/';
+| x { color : blue; border-color: -manakai-default }
+#computed nullns x
+
+#data
+@namespace hoge '';
+hoge|x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace hoge: <>
+| <|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+@namespace hoge url();
+| |x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+@namespace hoge url();
+hoge|x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace hoge: <>
+| <|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+@namespace hoge url();
+| |x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+@namespace hoge '';
+hoge|x { color : blue; border-color: -manakai-default }
+#computed ns1 x
+
+#data
+| @namespace hoge 'http://ns1/';
+| @namespace hoge '';
+| hoge|x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace hoge: <http://ns1/>
+| @namespace hoge: <>
+| <|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+| @namespace hoge url(http://ns1/);
+| @namespace hoge url();
+| |x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+| @namespace hoge 'http://ns1/';
+| @namespace hoge '';
+| hoge|x { color : blue; border-color: -manakai-default }
+#computed ns1 x
+
+#data
+| @namespace hoge '';
+| @namespace hoge 'http://ns1/';
+| hoge|x { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace hoge: <>
+| @namespace hoge: <http://ns1/>
+| <hoge|x>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+| @namespace hoge url();
+| @namespace hoge url(http://ns1/);
+| hoge|x {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed ns1 x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+| @namespace hoge '';
+| @namespace hoge 'http://ns1/';
+| hoge|x { color : blue; border-color: -manakai-default }
+#computed nullns x
+
+#data
+| @namespace hoge '';
+| hoge|* { color : blue; border-color: -manakai-default }
+#computed nullns x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#xml nullnsattr
+<o>
+  <x y=""/>
+</o>
+
+#xml ns1attr
+<o xmlns:ns1="http://ns1/">
+  <x ns1:y=""/>
+</o>
+
+#data
+| @namespace hoge '';
+| [hoge|y] { color : blue; border-color: -manakai-default }
+#cssom
+| @namespace hoge: <>
+| <[y]>
+|   border-bottom-color: -manakai-default
+|   border-color: -manakai-default
+|   border-left-color: -manakai-default
+|   border-right-color: -manakai-default
+|   border-top-color: -manakai-default
+|   color: blue
+#csstext
+| @namespace hoge url();
+| [y] {
+|   border-color: -manakai-default;
+|   color: blue;
+| }
+#computed nullnsattr x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+| @namespace hoge '';
+| [hoge|y] { color : blue; border-color: -manakai-default }
+#computed ns1attr x

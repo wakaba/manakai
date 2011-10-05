@@ -269,6 +269,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                                value => $name);
             return ($t, undef);
           }
+          undef $uri unless length $uri;
           push @$sss, [NAMESPACE_SELECTOR, $uri];
         }
         push @$sss, [LOCAL_NAME_SELECTOR, $t->{value}];
@@ -287,6 +288,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                                value => $name);
             return ($t, undef);
           }
+          undef $uri unless length $uri;
           push @$sss, [NAMESPACE_SELECTOR, $uri];
         }
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
@@ -517,7 +519,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                                value => $name);
             return ($t, undef);
           }
-          $simple_selector->[1] = $uri;
+          $simple_selector->[1] = $uri; # null namespace if $uri is empty
         }
 
         $state = BEFORE_ATTR_LOCAL_NAME_STATE;
