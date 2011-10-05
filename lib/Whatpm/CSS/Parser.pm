@@ -1807,14 +1807,14 @@ $Prop->{overflow} = {
   dom => 'overflow',
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
-    my ($t, $pv) = $one_keyword_parser->($self, $prop_name, $tt, $t, $onerror);
+    my ($t2, $pv) = $one_keyword_parser->($self, $prop_name, $tt, $t, $onerror);
     if (defined $pv) {
-      return ($t, {'overflow-x' => $pv->{overflow},
+      return ($t2, {'overflow-x' => $pv->{overflow},
                    'overflow-y' => $pv->{overflow}});
     } else {
-      return ($t, $pv);
+      return ($t2, $pv);
     }
-  },
+  }, # parse
   keyword => $Prop->{'overflow-x'}->{keyword},
   serialize_multiple => $Prop->{'overflow-x'}->{serialize_multiple},
 };
