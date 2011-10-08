@@ -66,11 +66,11 @@ sub _parse : Tests {
         format => 'xml',
       };
     }
-  }) for map { file (__FILE__)->dir->file ($_)->stringify } qw[
+  }) for map { file (__FILE__)->dir->subdir ('css')->file ($_)->stringify } qw[
     css-1.dat
-    css-2.dat
-    css-3.dat
-    css-4.dat
+    css-media.dat
+    css-namespace.dat
+    css-import.dat
     css-visual.dat
     css-generated.dat
     css-paged.dat
