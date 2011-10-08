@@ -139,8 +139,8 @@ sub parse_char_string ($$) {
   ## XXX empty vs null should not be distinguished for compat with
   ## DOM's |lookupNamespaceURI| method.
   $self->{lookup_namespace_uri} = 
-  $sp->{lookup_namespace_uri} = sub { ## TODO: case
-    return $nsmap->{prefix_to_uri}->{lc $_[0]}; # $_[0] is '' (default) or prefix
+  $sp->{lookup_namespace_uri} = sub {
+    return $nsmap->{prefix_to_uri}->{$_[0]}; # $_[0] is '' (default) or prefix
   }; # $sp->{lookup_namespace_uri}
 
   require Message::DOM::CSSStyleSheet;
@@ -182,15 +182,13 @@ sub parse_char_string ($$) {
 
       if ($t->{type} == ATKEYWORD_TOKEN) {
         my $at_rule_name = lc $t->{value}; ## TODO: case
-        if ($at_rule_name eq 'namespace') {
+        if ($at_rule_name eq 'namespace') { # @namespace
           $t = $tt->get_next_token;
           $t = $tt->get_next_token while $t->{type} == S_TOKEN;
 
           my $prefix;
           if ($t->{type} == IDENT_TOKEN) {
-            $prefix = lc $t->{value};
-            ## TODO: case (Unicode lowercase)
-            
+            $prefix = $t->{value};
             $t = $tt->get_next_token;
             $t = $tt->get_next_token while $t->{type} == S_TOKEN;
           }
@@ -200,10 +198,6 @@ sub parse_char_string ($$) {
             
             $t = $tt->get_next_token;
             $t = $tt->get_next_token while $t->{type} == S_TOKEN;
-
-            ## ISSUE: On handling of empty namespace URI, Firefox 2 and
-            ## Opera 9 work differently (See SuikaWiki:namespace).
-            ## TODO: We need to check what we do once it is specced.
 
             if ($t->{type} == SEMICOLON_TOKEN) {
               if ($namespace_allowed) {

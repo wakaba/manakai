@@ -595,6 +595,17 @@ sub apply_diff ($$$) {
 
 __PACKAGE__->runtests;
 
+=head1
+
+# XXXtest
+
+> The namespace prefix is declared only within the style sheet in
+which its @namespace rule appears. It is not declared in any style
+sheets importing or imported by that style sheet, nor in any other
+style sheets applying to the document.
+
+=cut
+
 1;
 
 =head1 LICENSE

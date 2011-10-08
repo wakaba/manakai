@@ -1,3 +1,18 @@
+#xml nullns
+<o>
+  <x/>
+</o>
+
+#xml ns1
+<o>
+  <x xmlns="http://ns1/"/>
+</o>
+
+#xml ns2
+<o>
+  <x xmlns="http://ns2/"/>
+</o>
+
 #data
 @namespace
 a {}
@@ -293,13 +308,13 @@ x|y {
 
 #data
 @namespace X 'about:';
-x|y {}
+X|y {}
 #cssom
-| @namespace x: <about:>
-| <x|y>
+| @namespace X: <about:>
+| <X|y>
 #csstext
-@namespace x url(about:);
-x|y {
+@namespace X url(about:);
+X|y {
 }
 
 #data
@@ -308,23 +323,31 @@ x|y {
 x|y {}
 #cssom
 | @namespace x: <about:>
-| @namespace x: <opera:>
+| @namespace X: <opera:>
 | <x|y>
 #csstext
 @namespace x url(about:);
-@namespace x url(opera:);
+@namespace X url(opera:);
 x|y {
 }
 
-#xml nullns
-<o>
-  <x/>
-</o>
-
-#xml ns1
-<o>
-  <x xmlns="http://ns1/"/>
-</o>
+#data
+@namespace x 'about:';
+@namespace X 'opera:';
+x|y {}
+X|y {}
+#cssom
+| @namespace x: <about:>
+| @namespace X: <opera:>
+| <x|y>
+| <X|y>
+#csstext
+@namespace x url(about:);
+@namespace X url(opera:);
+x|y {
+}
+X|y {
+}
 
 #data
 | x { color : blue; border-color: -manakai-default }
@@ -866,3 +889,35 @@ a|c{}
 ;2;20;m;at-rule not allowed;namespace
 ;3;1;m;namespace prefix:not declared
 #cssom
+
+#data
+@namespace aBc 'http://ns1/';
+@namespace abc 'http://ns2/';
+abc|x { color : blue; border-color: -manakai-default }
+#computed ns1 x
+
+#data
+@namespace aBc 'http://ns1/';
+@namespace abc 'http://ns2/';
+aBc|x { color : blue; border-color: -manakai-default }
+#computed ns1 x
+-color: -manakai-default
++color: rgb(0, 0, 255)
+
+#data
+@namespace aBc 'http://ns1/';
+abc|x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;namespace prefix:not declared
+#cssom
+@namespace aBc: <http://ns1/>
+
+#data
+@namespace aBc 'http://ns1/';
+@namespace abc 'http://ns2/';
+aBc|o abc|x {  }
+#errors
+#cssom
+@namespace aBc: <http://ns1/>
+@namespace abc: <http://ns2/>
+<aBc|o abc|x>
