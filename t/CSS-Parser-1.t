@@ -18,6 +18,8 @@ my $dom = Message::DOM::DOMImplementation->new;
 my $DefaultComputed;
 my $DefaultComputedText;
 
+my $test_file_pattern = qr/@{[$ENV{TEST_FILE_PATTERN} || '.*']}/;
+
 sub apply_diff ($$$);
 
 sub _parse : Tests {
@@ -66,7 +68,8 @@ sub _parse : Tests {
         format => 'xml',
       };
     }
-  }) for map { file (__FILE__)->dir->subdir ('css')->file ($_)->stringify } qw[
+  }) for map { file (__FILE__)->dir->subdir ('css')->file ($_)->stringify }
+         grep { /$test_file_pattern/ } qw[
     css-1.dat
     css-media.dat
     css-namespace.dat
@@ -488,7 +491,7 @@ sub serialize_rule ($$) {
   } elsif ($rule->type == $rule->NAMESPACE_RULE) {
     $v .= $indent . '@namespace ';
     my $prefix = $rule->prefix;
-    $v .= $prefix . ': ' if length $prefix;
+    $v .= $prefix . ': ' if defined $prefix and length $prefix;
     $v .= '<' . $rule->namespace_uri . ">\n";
   } elsif ($rule->type == $rule->IMPORT_RULE) {
     $v .= $indent . '@import <' . $rule->href . '> ' . $rule->media;
