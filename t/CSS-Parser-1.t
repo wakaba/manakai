@@ -3,11 +3,11 @@ use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 use base qw(Test::Class);
 use Test::More;
 use Test::Differences;
-
-require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
+use Test::HTCT::Parser;
 
 require Whatpm::CSS::Parser;
 require Message::DOM::Window;
@@ -24,7 +24,7 @@ sub apply_diff ($$$);
 
 sub _parse : Tests {
   my $all_test = {document => {}, test => []};
-  execute_test ($_, {
+  for_each_test ($_, {
     data => {is_prefixed => 1},
     errors => {is_list => 1},
     cssom => {is_prefixed => 1},

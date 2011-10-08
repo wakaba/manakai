@@ -1,18 +1,17 @@
-#!/usr/bin/perl
 use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 use Whatpm::HTML::ScriptChecker;
 use Test;
+use Test::HTCT::Parser;
 
 BEGIN { plan tests => 47 }
 
-BEGIN { require 'testfiles.pl' };
-
 my $text_input_f = file (__FILE__)->dir->subdir ('html-misc')->file ('script-text.dat');
-execute_test $text_input_f, {
+for_each_test $text_input_f, {
   data => {is_prefixed => 1},
   errors => {is_list => 1},
 }, sub ($) {
@@ -31,7 +30,7 @@ execute_test $text_input_f, {
 };
 
 my $inline_input_f = file (__FILE__)->dir->subdir ('html-misc')->file ('script-inline-docs.dat');
-execute_test $inline_input_f, {
+for_each_test $inline_input_f, {
   data => {is_prefixed => 1},
   errors => {is_list => 1},
 }, sub ($) {

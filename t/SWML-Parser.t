@@ -3,8 +3,10 @@ use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 use base qw(Test::Class);
 use Test::Differences;
+use Test::HTCT::Parser;
 
 my $test_d = file (__FILE__)->dir->subdir ('swml');
 
@@ -71,10 +73,8 @@ my @FILES = map { $test_d->file ($_)->stringify } qw[
   forms-generic-1.dat
 ];
 
-require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
-
 sub _test : Tests {
-  execute_test ($_, {
+  for_each_test ($_, {
     data => {is_prefixed => 1},
     errors => {is_list => 1},
     document => {is_prefixed => 1},

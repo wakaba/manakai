@@ -3,18 +3,15 @@ use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 use base qw(Test::Class);
-if (-f file (__FILE__)->dir->file ('testfiles')->stringify) {
-  require (file (__FILE__)->dir->file ('testfiles')->stringify);
-} else {
-  require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
-}
 require Whatpm::LangTag;
 use Test::More;
 use Test::Differences;
+use Test::HTCT::Parser;
 
 sub _parse : Tests {
-  execute_test ($_, {
+  for_each_test ($_, {
     1766 => {is_list => 1},
     3066 => {is_list => 1},
     4646 => {is_list => 1},
@@ -115,7 +112,7 @@ sub _parse : Tests {
 } # _parse
 
 sub _parse_check_extension : Tests {
-  execute_test ($_, {
+  for_each_test ($_, {
     4646 => {is_list => 1},
     5646 => {is_list => 1},
   }, sub {

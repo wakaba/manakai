@@ -1,12 +1,13 @@
-#!/usr/bin/perl
 package test::Message::MIME::Type;
 use strict;
 use warnings;
 use base qw(Test::Class);
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 use Test::More;
 use Test::Differences;
+use Test::HTCT::Parser;
 
 use Message::MIME::Type;
 
@@ -33,9 +34,7 @@ sub _new_from_type_and_subtype_2 : Test(5) {
 } # _new_from_type_and_subtype_2
 
 sub _parser : Test(63) {
-  require (file (__FILE__)->dir->file ('testfiles.pl')->stringify);
-  
-  execute_test (file (__FILE__)->dir->subdir ('mime')->file ('types.dat'), {
+  for_each_test (file (__FILE__)->dir->subdir ('mime')->file ('types.dat'), {
     data => {is_prefixed => 1},
     errors => {is_list => 1},
     result => {is_prefixed => 1},

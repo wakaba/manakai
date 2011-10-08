@@ -1,8 +1,10 @@
 use strict;
 use warnings;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 
 use Test::More;
 use Test::Differences;
+use Test::HTCT::Parser;
 
 require Whatpm::ContentChecker;
 require Whatpm::XML::Parser;
@@ -16,8 +18,7 @@ require Message::DOM::Atom::AtomElement;
 sub test_files (@) {
   my @FILES = @_;
 
-  require 'testfiles.pl';
-  execute_test ($_, {
+  for_each_test ($_, {
     data => {is_prefixed => 1},
     errors => {is_list => 1},
   }, \&test) for @FILES;

@@ -3,8 +3,10 @@ use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 use Test::More;
 use Test::Differences;
+use Test::HTCT::Parser;
 use Encode;
 sub bytes ($) { encode 'utf8', $_[0] }
 my $DEBUG = $ENV{DEBUG};
@@ -166,8 +168,7 @@ my @FILES = grep {$_} split /\s+/, qq[
                       ${test_dir_name}tree-test-foreign.dat
                      ];
 
-require 't/testfiles.pl';
-execute_test ($_, {
+for_each_test ($_, {
   errors => {is_list => 1},
   shoulds => {is_list => 1},
   document => {is_prefixed => 1},
