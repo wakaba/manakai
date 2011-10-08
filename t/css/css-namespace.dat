@@ -921,3 +921,124 @@ aBc|o abc|x {  }
 @namespace aBc: <http://ns1/>
 @namespace abc: <http://ns2/>
 <aBc|o abc|x>
+
+#data
+@namespace hoge 'h';
+@namespace 'h';
+p {
+  content:attr(hoge|fuga);
+}
+#errors
+#cssom
+@namespace hoge: <h>
+@namespace <h>
+<hoge|p>
+  content: attr(hoge|fuga)
+
+#data
+@namespace hoge 'h';
+@namespace fuga 'h';
+p {
+  content:attr(hoge|fuga);
+}
+#errors
+#cssom
+@namespace hoge: <h>
+@namespace fuga: <h>
+<*|p>
+  content: attr(hoge|fuga)
+
+#data
+@namespace fuga 'h';
+@namespace hoge 'h';
+p {
+  content:attr(hoge|fuga);
+}
+#errors
+#cssom
+@namespace fuga: <h>
+@namespace hoge: <h>
+<*|p>
+  content: attr(fuga|fuga)
+
+#data
+@namespace 'h';
+@namespace hoge 'h';
+p {
+  content:attr(hoge|fuga);
+}
+#errors
+#cssom
+@namespace <h>
+@namespace hoge: <h>
+<p>
+  content: attr(hoge|fuga)
+
+#data
+p {
+  content:attr(hoge|fuga);
+}
+#errors
+;2;16;m;namespace prefix:not declared
+#cssom
+<p>
+
+#data
+@namespace foo '';
+p {
+  content:attr(foo|bar);
+}
+#errors
+#cssom
+@namespace foo: <>
+<*|p>
+  content: attr(bar)
+
+#data
+@namespace foo 'hoge';
+p {
+  content:attr(foo|bar);
+}
+#errors
+#cssom
+@namespace foo: <hoge>
+<*|p>
+  content: attr(foo|bar)
+
+#data
+p {
+  content:attr(bar);
+}
+#errors
+#cssom
+<p>
+  content: attr(bar)
+
+#data
+p {
+  content:attr(|bar);
+}
+#errors
+#cssom
+<p>
+  content: attr(bar)
+
+#data
+p {
+  content:attr(*|bar);
+}
+#errors
+;2;16;m;CSS syntax error;'content'
+#cssom
+<p>
+
+#data
+@namespace 'hoge';
+p {
+  content: attr(hoge);
+}
+#errors
+#cssom
+@namespace <hoge>
+<p>
+  content: attr(hoge)

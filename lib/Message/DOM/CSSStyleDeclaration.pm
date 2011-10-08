@@ -51,7 +51,32 @@ my $serialize_value = sub ($$$) {
       $_->[0] eq 'KEYWORD' ? $_->[1] :
       $_->[0] eq 'STRING' ? '"' . $_->[1] . '"' :
       $_->[0] eq 'URI' ? 'url(' . $_->[1] . ')' :
-      $_->[0] eq 'ATTR' ? 'attr(' . $_->[2] . ')' : ## TODO: prefix
+      $_->[0] eq 'ATTR' ? do {
+        if (defined $_->[1]) {
+          my $rule = $self->parent_rule;
+          if ($rule) {
+            my $ss = $rule->parent_style_sheet;
+            if ($ss) {
+              my $map = $$ss->{_nsmap};
+              my $prefix = [grep { length } @{$map->{uri_to_prefixes}->{$_->[1]} or []}]->[0];
+              if (defined $prefix) {
+                'attr(' . $prefix . $_->[2] . ')';
+              } else {
+                ## Not serializable!
+                'attr(' . $_->[2] . ')';
+              }
+            } else {
+              ## Not serializable!
+              'attr(' . $_->[2] . ')';
+            }
+          } else {
+            ## Not serializable!
+            'attr(' . $_->[2] . ')';
+          }
+        } else {
+          'attr(' . $_->[2] . ')';
+        }
+      } :
       $_->[0] eq 'COUNTER' ? 'counter(' . $_->[1] . ', ' . $_->[3] . ')' :
       $_->[0] eq 'COUNTERS' ? 'counters(' . $_->[1] . ', "' . $_->[2] . '", ' . $_->[3] . ')' :
       ''

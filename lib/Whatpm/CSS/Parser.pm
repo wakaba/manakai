@@ -6426,6 +6426,7 @@ $Prop->{content} = {
                                      value => $pfx);
                   return ($t, undef);
                 }
+                undef $uri unless length $uri;
                 push @v, ['ATTR', $uri, $t_ln->{value}];
               } else {
                 push @v, ['ATTR', undef, $t_ln->{value}];
