@@ -181,6 +181,7 @@ sub parse_char_string ($$) {
               $t->{type} == CDC_TOKEN;
 
       if ($t->{type} == ATKEYWORD_TOKEN) {
+        my $t_at = $t;
         my $at_rule_name = lc $t->{value}; ## TODO: case
         if ($at_rule_name eq 'namespace') { # @namespace
           $t = $tt->get_next_token;
@@ -204,9 +205,22 @@ sub parse_char_string ($$) {
                 my $p = $prefix;
                 $nsmap->{has_namespace} = 1;
                 if (defined $prefix) {
+                  if (defined $nsmap->{prefix_to_uri}->{$prefix}) {
+                    $onerror->(type => 'duplicate @namespace',
+                               value => $prefix,
+                               level => $self->{level}->{must},
+                               uri => \$self->{href},
+                               token => $t_at);
+                  }
                   $nsmap->{prefix_to_uri}->{$prefix} = $uri;
                   $p .= '|';
                 } else {
+                  if (defined $nsmap->{prefix_to_uri}->{''}) {
+                    $onerror->(type => 'duplicate @namespace',
+                               level => $self->{level}->{must},
+                               uri => \$self->{href},
+                               token => $t_at);
+                  }
                   $nsmap->{prefix_to_uri}->{''} = $uri;
                   $p = '';
                 }

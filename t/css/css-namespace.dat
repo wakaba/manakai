@@ -440,6 +440,8 @@ x { color : blue; border-color: -manakai-default }
 | @namespace 'http://ns1/';
 | @namespace '';
 | x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #cssom
 | @namespace <http://ns1/>
 | @namespace <>
@@ -465,12 +467,16 @@ x { color : blue; border-color: -manakai-default }
 | @namespace 'http://ns1/';
 | @namespace '';
 | x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #computed ns1 x
 
 #data
 | @namespace '';
 | @namespace 'http://ns1/';
 | x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #cssom
 | @namespace <>
 | @namespace <http://ns1/>
@@ -496,6 +502,8 @@ x { color : blue; border-color: -manakai-default }
 | @namespace '';
 | @namespace 'http://ns1/';
 | x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #computed nullns x
 
 #data
@@ -551,6 +559,8 @@ hoge|x { color : blue; border-color: -manakai-default }
 | @namespace hoge 'http://ns1/';
 | @namespace hoge '';
 | hoge|x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #cssom
 | @namespace hoge: <http://ns1/>
 | @namespace hoge: <>
@@ -576,12 +586,16 @@ hoge|x { color : blue; border-color: -manakai-default }
 | @namespace hoge 'http://ns1/';
 | @namespace hoge '';
 | hoge|x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #computed ns1 x
 
 #data
 | @namespace hoge '';
 | @namespace hoge 'http://ns1/';
 | hoge|x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #cssom
 | @namespace hoge: <>
 | @namespace hoge: <http://ns1/>
@@ -607,6 +621,8 @@ hoge|x { color : blue; border-color: -manakai-default }
 | @namespace hoge '';
 | @namespace hoge 'http://ns1/';
 | hoge|x { color : blue; border-color: -manakai-default }
+#errors
+;2;1;m;duplicate @namespace
 #computed nullns x
 
 #data
