@@ -1,20 +1,21 @@
-#!/usr/bin/perl
+package test::Message::DOM::selectors_api;
 use strict;
-
-use lib qw[/home/httpd/html/www/markup/html/whatpm]; ## TODO: ...
-
-use Test;
-
-BEGIN { plan tests => 548 }
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use base qw(Test::Class);
+use Test::Differences;
 
 require Message::DOM::DOMImplementation;
 my $dom = Message::DOM::DOMImplementation->new;
 
+sub _query_selector : Tests {
 for my $file_name (qw(
   selectors-test-1.dat
 )) {
   print "# $file_name\n";
-  open my $file, '<', $file_name or die "$0: $file_name: $!";
+  open my $file, '<', file (__FILE__)->dir->file ($file_name)
+      or die "$0: $file_name: $!";
 
   my $all_test = {document => {}, test => []};
   my $test;
@@ -96,18 +97,19 @@ for my $file_name (qw(
         my $actual = join "\n", map {
           get_node_path ($_)
         } @{$root_node->query_selector_all ($test->{data}, $ns)};
-        ok $actual, $expected, "$test->{data} $label $root all";
+        eq_or_diff $actual, $expected, "$test->{data} $label $root all";
 
         ## query_selector
         $expected = $test->{result}->{$label}->{$root}->[0];
         undef $actual;
         my $node = $root_node->query_selector ($test->{data}, $ns);
         $actual = get_node_path ($node) if defined $node;
-        ok $actual, $expected, "$test->{data} $label $root one";
+        eq_or_diff $actual, $expected, "$test->{data} $label $root one";
       }
     }
   }
 }
+} # _query_selector
 
 sub get_node_path ($) {
   my $node = shift;
@@ -137,3 +139,7 @@ sub get_node_by_path ($$) {
     return $doc;
   }
 } # get_node_by_path
+
+__PACKAGE__->runtests;
+
+1;
