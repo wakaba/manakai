@@ -11,7 +11,7 @@ my $dom = Message::DOM::DOMImplementation->new;
 
 sub _query_selector : Tests {
 for my $file_name (qw(
-  selectors-test-1.dat
+  selectors/query-1.dat
 )) {
   print "# $file_name\n";
   open my $file, '<', file (__FILE__)->dir->file ($file_name)
@@ -143,3 +143,12 @@ sub get_node_by_path ($$) {
 __PACKAGE__->runtests;
 
 1;
+
+=head1 LICENSE
+
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
