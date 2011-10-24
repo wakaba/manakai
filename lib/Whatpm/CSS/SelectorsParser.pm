@@ -106,7 +106,9 @@ sub parse_string ($$) {
   }; # $tt->{get_char}
   $tt->init;
 
-  $self->_parse_selectors_with_tokenizer ($tt, EOF_TOKEN);
+  my ($next_token, $selectors)
+      = $self->_parse_selectors_with_tokenizer ($tt, EOF_TOKEN);
+  return $selectors; # or undef
 } # parse_string
 
 sub _parse_selectors_with_tokenizer ($$$;$) {
