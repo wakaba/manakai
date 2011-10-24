@@ -11,6 +11,48 @@ use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
 my $data_d = file (__FILE__)->dir;
 
+sub serialize_simple_selector ($);
+sub serialize_simple_selector ($) {
+  local $_ = $_[0];
+  my $result = '';
+
+  ## A simple selector
+  if ($_->[0] == LOCAL_NAME_SELECTOR) {
+    $result .= "<" . $_->[1] . ">\n";
+  } elsif ($_->[0] == ATTRIBUTE_SELECTOR) {
+    $result .= "[{" . ($_->[1] // '') . "}"; # XXX
+    $result .= $_->[2] . "]\n";
+    if (defined $_->[3]) {
+      $result .= {
+        EQUALS_MATCH, '=',
+        INCLUDES_MATCH, '~=',
+        DASH_MATCH, '|=',
+        PREFIX_MATCH, '^=',
+        SUFFIX_MATCH, '$=',
+        SUBSTRING_MATCH, '*=',
+      }->{$_->[3]} || $_->[3];
+      $result .= $_->[4] . "\n";
+    }
+  } elsif ($_->[0] == NAMESPACE_SELECTOR) {
+    $result .= "{" . (defined $_->[1] ? $_->[1] : '') . "}\n"; # XXX
+  } else {
+    $result .= {
+      ID_SELECTOR, '#',
+      CLASS_SELECTOR, '.',
+      PSEUDO_CLASS_SELECTOR, ':',
+      PSEUDO_ELEMENT_SELECTOR, '::',
+    }->{$_->[0]} || $_->[0];
+    if (exists $_->[1]) {
+      $result .= $_->[1];
+    }
+    $result .= "\n";
+    if (exists $_->[2]) {
+      $result .= "  " . serialize_simple_selector $_->[2];
+    }
+  }
+  return $result;
+} # serialize_simple_selector
+
 sub serialize_selector_object ($) {
   my $selectors = shift;
   my $result = '';
@@ -35,37 +77,7 @@ sub serialize_selector_object ($) {
 
       ## A simple selector sequence
       for (@$sss) {
-        ## A simple selector
-        if ($_->[0] == LOCAL_NAME_SELECTOR) {
-          $result .= "<" . $_->[1] . ">\n";
-        } elsif ($_->[0] == ATTRIBUTE_SELECTOR) {
-          $result .= "{" . $_->[1] . "}\n" if defined $_->[1] and length $_->[1]; # XXX
-          $result .= "[" . $_->[2] . "]\n";
-          if (defined $_->[3]) {
-            $result .= {
-              EQUALS_MATCH, '=',
-              INCLUDES_MATCH, '~=',
-              DASH_MATCH, '|=',
-              PREFIX_MATCH, '^=',
-              SUFFIX_MATCH, '$=',
-              SUBSTRING_MATCH, '*=',
-            }->{$_->[3]} || $_->[3];
-            $result .= $_->[4] . "\n";
-          }
-        } elsif ($_->[0] == NAMESPACE_SELECTOR) {
-          $result .= "{" . (defined $_->[1] ? $_->[1] : '') . "}\n"; # XXX
-        } else {
-          $result .= {
-            ID_SELECTOR, '#',
-            CLASS_SELECTOR, '.',
-            PSEUDO_CLASS_SELECTOR, ':',
-            PSEUDO_ELEMENT_SELECTOR, '::',
-          }->{$_->[0]} || $_->[0];
-          if (exists $_->[1]) {
-            $result .= $_->[1];
-          }
-          $result .= "\n";
-        }
+        $result .= serialize_simple_selector $_;
       }
     }
   }
@@ -76,8 +88,10 @@ sub serialize_selector_object ($) {
 sub _parse_string : Tests {
   for_each_test ($_, {
     data => {is_prefixed => 1},
+    ns => {is_list => 1},
     errors => {is_list => 1},
     parsed => {is_prefixed => 1},
+    supported => {is_list => 1},
   }, sub {
     my $test = shift;
 
@@ -93,13 +107,34 @@ sub _parse_string : Tests {
           $args{value},
           $args{level};
     }; # onerror
+
+    for (@{$test->{supported}->[0] or []}) {
+      if (/^::(\S+)$/) {
+        $parser->{pseudo_element}->{$1} = 1;
+      } elsif (/^:(\S+)$/) {
+        $parser->{pseudo_class}->{$1} = 1;
+      }
+    }
+
+    my %ns;
+    for (@{$test->{ns}->[0] or []}) {
+      if (/^(\S+)\s+(\S+)$/) {
+        $ns{$1} = $2;
+      } elsif (/^(\S+)$/) {
+        $ns{''} = $1;
+      }
+    }
+    $parser->{lookup_namespace_uri} = sub {
+      return $ns{$_[0] // ''};
+    }; # lookup_namespace_uri
+
     my $selectors = $parser->parse_string ($test->{data}->[0]);
 
     my $serialized_selectors = serialize_selector_object $selectors;
     eq_or_diff $serialized_selectors, $test->{parsed}->[0];
 
     my $aerrors = join "\n", sort { $a cmp $b } @error;
-    my $xerrors = join "\n", sort { $a cmp $b } @{$test->{errors}->[0]};
+    my $xerrors = join "\n", sort { $a cmp $b } @{$test->{errors}->[0] or []};
     eq_or_diff $aerrors, $xerrors;
   }) for map { $data_d->subdir ('selectors')->file ($_)->stringify } qw(
     parse-1.dat

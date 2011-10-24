@@ -21,8 +21,11 @@ sub new ($) {
       must => 'm',
       uncertain => 'u',
     },
+
+    #href => \(URL in which the selectors appear),
+    #pseudo_class => {supported_class_name => 1, ...},
+    #pseudo_element => {supported_class_name => 1, ...},
   }, shift;
-  #$self->{href} = \(uri in which the selectors appears);
   return $self;
 } # new
 

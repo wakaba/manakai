@@ -32,20 +32,20 @@ h1,h2
 [hoge]
 #errors
 #parsed
-[hoge]
+[{}hoge]
 
 #data
 [hoge=fuga]
 #errors
 #parsed
-[hoge]
+[{}hoge]
 =fuga
 
 #data
 [hoge^=fuga]
 #errors
 #parsed
-[hoge]
+[{}hoge]
 ^=fuga
 
 #data
@@ -83,3 +83,102 @@ a,*
 #parsed
 {}
 <a>
+
+#data
+:first-child
+#supported
+#errors
+;;unknown pseudo-class;;first-child;u
+#parsed
+
+#data
+:first-child
+#supported
+:first-child
+#errors
+#parsed
+:first-child
+
+#data
+:FIRST-Child
+#supported
+:first-child
+#errors
+#parsed
+:first-child
+
+#data
+:not(a)
+#supported
+:not
+#errors
+#parsed
+:not
+  <a>
+
+#data
+:not(.b)
+#supported
+:not
+#errors
+#parsed
+:not
+  .b
+
+#data
+:not(.b).c
+#supported
+:not
+#errors
+#parsed
+:not
+  .b
+.c
+
+#data
+::before
+#supported
+::before
+#errors
+#parsed
+::before
+
+#data
+p::before
+#supported
+::before
+#errors
+#parsed
+<p>
+::before
+
+#data
+a|b
+#ns
+a http://test/
+#errors
+#parsed
+{http://test/}
+<b>
+
+#data
+a|*
+#ns
+a http://test/
+#errors
+#parsed
+{http://test/}
+
+#data
+[a|b]
+#ns
+a http://test/
+#errors
+#parsed
+[{http://test/}b]
+
+#data
+[|b]
+#errors
+#parsed
+[{}b]
