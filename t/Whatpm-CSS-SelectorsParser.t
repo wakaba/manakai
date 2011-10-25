@@ -138,6 +138,9 @@ sub _parse_string : Tests {
     eq_or_diff $aerrors, $xerrors;
   }) for map { $data_d->subdir ('selectors')->file ($_)->stringify } qw(
     parse-1.dat
+    parse-spaces-1.dat
+    parse-escapes-1.dat
+    parse-invalid-1.dat
   );
 } # _parse_string
 

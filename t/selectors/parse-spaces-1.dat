@@ -1,0 +1,74 @@
+#data escaped
+  h1   \u0020
+#errors
+#parsed
+<h1>
+
+#data escaped
+\u0009\u000A\u000D\u000C  h1   \u0020 \u0009\u000A\u000D\u000C
+#errors
+#parsed
+<h1>
+
+#data escaped
+h1\u0009\u000C\u000A \u000D,\u0009\u000C\u000A \u000Dh2
+#errors
+#parsed
+<h1>
+------
+<h2>
+
+#data escaped
+h1\u0009\u000C\u000A \u000D\u0009\u000C\u000A \u000Dh2
+#errors
+#parsed
+<h1>
+<h2>
+
+#data escaped
+h1\u0009\u000C\u000A \u000D>\u0009\u000C\u000A \u000Dh2
+#errors
+#parsed
+<h1>
+>
+<h2>
+
+#data escaped
+h1\u0009\u000C\u000A \u000D+\u0009\u000C\u000A \u000Dh2
+#errors
+#parsed
+<h1>
++
+<h2>
+
+#data escaped
+h1\u0009\u000C\u000A \u000D~\u0009\u000C\u000A \u000Dh2
+#errors
+#parsed
+<h1>
+~
+<h2>
+
+#data escaped
+h1\u3000h2
+#errors
+#parsed escaped
+<h1\u3000h2>
+
+#data escaped
+h1\u000bh2
+#errors
+1;3;no combinator;;;m
+#parsed escaped
+
+#data escaped
+h1\u0000h2
+#errors
+1;3;no combinator;;;m
+#parsed escaped
+
+#data escaped
+h1\u2003h2
+#errors
+#parsed escaped
+<h1\u2003h2>

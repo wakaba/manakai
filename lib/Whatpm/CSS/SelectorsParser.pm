@@ -97,13 +97,33 @@ sub parse_string ($$) {
   
   my $s = $_[1];
   pos ($s) = 0;
+  my $line = 1;
+  my $column = 0;
 
   my $tt = Whatpm::CSS::Tokenizer->new;
   $tt->{onerror} = $self->{onerror};
-  $tt->{get_char} = sub {
+  $tt->{get_char} = sub ($) {
     if (pos $s < length $s) {
-      return ord substr $s, pos ($s)++, 1;
+      my $c = ord substr $s, pos ($s)++, 1;
+      if ($c == 0x000A) {
+        $line++;
+        $column = 0;
+      } elsif ($c == 0x000D) {
+        unless (substr ($s, pos ($s), 1) eq "\x0A") {
+          $line++;
+          $column = 0;
+        } else {
+          $column++;
+        }
+      } else {
+        $column++;
+      }
+      $_[0]->{line} = $line;
+      $_[0]->{column} = $column;
+      return $c;
     } else {
+      $_[0]->{line} = $line;
+      $_[0]->{column} = $column + 1; ## Set the same number always.
       return -1;
     }
   }; # $tt->{get_char}

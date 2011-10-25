@@ -104,6 +104,7 @@ sub parse_char_string ($$) {
       $_[0]->{column} = $column;
       return $c;
     } else {
+      $_[0]->{line} = $line;
       $_[0]->{column} = $column + 1; ## Set the same number always.
       return -1;
     }
