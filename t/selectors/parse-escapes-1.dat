@@ -17,3 +17,272 @@ h1\30 2
 \0001\u0009abc
 #parsed escaped
 <\u0001abc>
+
+#data
+abc\20xyz
+#parsed
+<abc xyz>
+
+#data
+abc\20 xyz
+#parsed
+<abc xyz>
+
+#data
+abc\000020 xyz
+#parsed
+<abc xyz>
+
+#data
+abc\20  xyz
+#parsed
+<abc >
+<xyz>
+
+#data
+abc\0000020 xyz
+#parsed escaped
+<abc\u00020>
+<xyz>
+
+#data escaped
+abc\20\u0009xyz
+#parsed
+<abc xyz>
+
+#data escaped
+abc\20\u000Axyz
+#parsed
+<abc xyz>
+
+#data escaped
+abc\20\u000Cxyz
+#parsed
+<abc xyz>
+
+#data escaped
+abc\20\u000D\u000Cxyz
+#parsed
+<abc >
+<xyz>
+
+#data escaped
+abc\20\u000Dxyz
+#parsed
+<abc xyz>
+
+#data escaped
+abc\20\u000D\u000Axyz
+#parsed
+<abc xyz>
+
+#data escaped
+abc\21\u000D\u000Axyz
+#parsed
+<abc!xyz>
+
+#data escaped
+abc\20\u0020xyz
+#parsed
+<abc xyz>
+
+#data
+\20abc
+#parsed escaped
+<\U00020ABC>
+
+#data
+\20 abc
+#parsed escaped
+< abc>
+
+#data
+\20  abc
+#parsed escaped
+< >
+<abc>
+
+#data escaped
+\20\u000D\u000Aabc
+#parsed escaped
+< abc>
+
+#data escaped
+\20\u000D\u000A\u000D\u000Aabc
+#parsed escaped
+< >
+<abc>
+
+#data
+\21
+#parsed
+<!>
+
+#data escaped
+\21\u000D
+#parsed
+<!>
+
+#data escaped
+\21\u000D\u000A
+#parsed
+<!>
+
+#data escaped
+\21\u000C
+#parsed
+<!>
+
+#data escaped
+\21\u000D\u0020
+#parsed
+<!>
+
+#data escaped
+\
+#errors
+1;1;no sss;;;m
+#parsed
+
+#data escaped
+\\u0020
+#parsed
+< >
+
+#data
+\\
+#parsed
+<\>
+
+#data
+\\20
+#parsed
+<\20>
+
+#data
+\p q
+#parsed
+<p>
+<q>
+
+#data
+\p\ \q
+#parsed
+<p q>
+
+#data escaped
+a\\u000Db
+#errors
+1;2;no combinator;;;m
+#parsed
+
+#data escaped
+a\\u000Ab
+#errors
+1;2;no combinator;;;m
+#parsed
+
+#data escaped
+a\\u000D\u000Ab
+#errors
+1;2;no combinator;;;m
+#parsed
+
+#data escaped
+a\\u000Cb
+#errors
+1;2;no combinator;;;m
+#parsed
+
+#data escaped
+a\\u0020b
+#errors
+#parsed
+<a b>
+
+#data escaped
+a\\u0009b
+#errors
+#parsed escaped
+<a\u0009b>
+
+#data escaped
+a\\u000bb
+#errors
+#parsed escaped
+<a\u000Bb>
+
+#data
+a\0 x
+#errors
+1;3;css:escape:null;;;m
+#parsed escaped
+<a\u0000x>
+
+#data
+a\0+x
+#errors
+1;3;css:escape:null;;;m
+#parsed escaped
+<a\u0000>
++
+<x>
+
+#data escaped
+a\0\u000Dx
+#errors
+1;3;css:escape:null;;;m
+#parsed escaped
+<a\u0000x>
+
+#data escaped
+a\\u0000b
+#parsed escaped
+<a\u0000b>
+
+#data escaped
+a\0\u000D\u000Ax
+#errors
+1;3;css:escape:null;;;m
+#parsed escaped
+<a\u0000x>
+
+#data
+a\000000x
+#errors
+1;8;css:escape:null;;;m
+#parsed escaped
+<a\u0000x>
+
+#data
+a\110000x
+#errors
+1;8;css:escape:not unicode;;;s
+#parsed escaped
+<a\uFFFDx>
+
+#data
+a\FFFFFFx
+#errors
+1;8;css:escape:not unicode;;;s
+#parsed escaped
+<a\uFFFDx>
+
+#data
+a\FFFFFFfx
+#errors
+1;8;css:escape:not unicode;;;s
+#parsed escaped
+<a\uFFFDfx>
+
+#data
+a\D800\DC00x
+#errors
+#parsed escaped
+<a\U00010000x>
+
+#data
+a\D800y\DC00x
+#errors
+#parsed escaped
+<a\uD800y\uDC00x>

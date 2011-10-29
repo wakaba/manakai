@@ -10,6 +10,7 @@ sub new ($) {
   my $self = bless {
     level => {
       must => 'm',
+      should => 's',
       uncertain => 'u',
     },
     lookup_namespace_uri => sub { undef },
@@ -84,6 +85,8 @@ sub parse_char_string ($$) {
   
   my $tt = Whatpm::CSS::Tokenizer->new;
   my $onerror = $tt->{onerror} = $self->{onerror};
+  $tt->{href} = $self->{href};
+  $tt->{level} = $self->{level};
   $tt->{get_char} = sub ($) {
     if (pos $s < length $s) {
       my $c = ord substr $s, pos ($s)++, 1;
@@ -100,15 +103,21 @@ sub parse_char_string ($$) {
       } else {
         $column++;
       }
+      $_[0]->{line_prev} = $_[0]->{line};
+      $_[0]->{column_prev} = $_[0]->{column};
       $_[0]->{line} = $line;
       $_[0]->{column} = $column;
       return $c;
     } else {
+      $_[0]->{line_prev} = $_[0]->{line};
+      $_[0]->{column_prev} = $_[0]->{column};
       $_[0]->{line} = $line;
       $_[0]->{column} = $column + 1; ## Set the same number always.
       return -1;
     }
   }; # $tt->{get_char}
+  $tt->{line} = $line;
+  $tt->{column} = $column;
   $tt->init;
 
   my $sp = Whatpm::CSS::SelectorsParser->new;

@@ -946,13 +946,11 @@ sub get_next_token ($) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
-                                        line => $self->{line},
-                                        column => $self->{column} - 2};
+                                        line => $self->{line_prev},
+                                        column => $self->{column_prev} - 1};
             unshift @{$self->{token}}, {type => MINUS_TOKEN,
-                                        line => $self->{line},
-                                        column => $self->{column} - 1};
-            ## BUG: line and column might be wrong if they are on the
-            ## line boundary.
+                                        line => $self->{line_prev},
+                                        column => $self->{column_prev}};
             $self->{t}->{type} = NUMBER_TOKEN;
             $self->{t}->{value} = '';
             return $self->{t};
@@ -961,20 +959,16 @@ sub get_next_token ($) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
-                                        line => $self->{line},
-                                        column => $self->{column} - 1};
-            ## BUG: line and column might be wrong if they are on the
-            ## line boundary.
+                                        line => $self->{line_prev},
+                                        column => $self->{column_prev}};
             return $self->{t};
             #redo A;
           } else {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
-                                        line => $self->{line},
-                                        column => $self->{column} - 1};
-            ## BUG: line and column might be wrong if they are on the
-            ## line boundary.
+                                        line => $self->{line_prev},
+                                        column => $self->{column_prev}};
             $self->{t}->{type} = NUMBER_TOKEN;
             $self->{t}->{value} = '';
             return $self->{t};
@@ -988,29 +982,23 @@ sub get_next_token ($) {
                                         line => $self->{line},
                                         column => $self->{column} - 2};
             return {type => MINUS_TOKEN,
-                    line => $self->{line},
-                    column => $self->{column} - 1};
-            ## BUG: line and column might be wrong if they are on the
-            ## line boundary.
+                    line => $self->{line_prev},
+                    column => $self->{column_prev}};
             #redo A;
           } elsif (length $self->{t}->{value}) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
-                                        line => $self->{line},
-                                        column => $self->{column} - 1};
-            ## BUG: line and column might be wrong if they are on the
-            ## line boundary.
+                                        line => $self->{line_prev},
+                                        column => $self->{column_prev}};
             return $self->{t};
             #redo A;
           } else {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
             return {type => DELIM_TOKEN, value => '\\',
-                    line => $self->{line},
-                    column => $self->{column} - 1};
-            ## BUG: line and column might be wrong if they are on the
-            ## line boundary.
+                    line => $self->{line_prev},
+                    column => $self->{column_prev}};
             #redo A;
           }
         }
@@ -1020,10 +1008,8 @@ sub get_next_token ($) {
         redo A;
       } else {
         unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
-                                    line => $self->{line},
-                                    column => $self->{column} - 1};
-        ## BUG: line and column might be wrong if they are on the
-        ## line boundary.
+                                    line => $self->{line_prev},
+                                    column => $self->{column_prev}};
         $self->{t}->{type} = {
           STRING_TOKEN, INVALID_TOKEN,
           URI_TOKEN, URI_INVALID_TOKEN,
@@ -1055,17 +1041,18 @@ sub get_next_token ($) {
                $self->{c} == 0x000A or # \n
                $self->{c} == 0x0009 or # \t
                $self->{c} == 0x000C) { # \f
-        $self->{t}->{value} .= chr $char;
+        $self->{t}->{value} .= $self->_escaped_char ($char);
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } elsif ($self->{c} == 0x000D) { # \r
+        $self->{t}->{value} .= $self->_escaped_char ($char);
         $self->{state} = ESCAPE_BEFORE_LF_STATE;
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } else {
-        $self->{t}->{value} .= chr $char;
+        $self->{t}->{value} .= $self->_escaped_char ($char);
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         # reconsume
@@ -1077,17 +1064,18 @@ sub get_next_token ($) {
           $self->{c} == 0x000A or # \n
           $self->{c} == 0x0009 or # \t
           $self->{c} == 0x000C) { # \f
-        $self->{t}->{value} .= chr $char;
+        $self->{t}->{value} .= $self->_escaped_char ($char);
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } elsif ($self->{c} == 0x000D) { # \r
+        $self->{t}->{value} .= $self->_escaped_char ($char);
         $self->{state} = ESCAPE_BEFORE_NL_STATE;
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } else {
-        $self->{t}->{value} .= chr $char;
+        $self->{t}->{value} .= $self->_escaped_char ($char);
         $self->{state} = $q == 0 ? NAME_STATE :
             $q == 1 ? URI_UNQUOTED_STATE : STRING_STATE;
         # reconsume
@@ -1315,14 +1303,41 @@ sub serialize_token ($$) {
   }
 } # serialize_token
 
+sub _escaped_char {
+  if ($_[1] == 0x0000) {
+    $_[0]->{onerror}->(type => 'css:escape:null',
+                       level => $_[0]->{level}->{must},
+                       uri => \$_[0]->{href},
+                       line => $_[0]->{line_prev},
+                       column => $_[0]->{column_prev});
+    return chr $_[1];
+  } elsif ($_[1] > 0x10FFFF) {
+    $_[0]->{onerror}->(type => 'css:escape:not unicode',
+                       level => $_[0]->{level}->{should},
+                       uri => \$_[0]->{href},
+                       line => $_[0]->{line_prev},
+                       column => $_[0]->{column_prev});
+    return "\x{FFFD}";
+  } else {
+    return chr $_[1];
+  }
+} # _escaped_char
+
+use Encode;
+sub normalize_surrogate {
+  ## XXX bad impl...
+  $_[1] =~ s{((?:[\x{D800}-\x{DBFF}][\x{DC00}-\x{DF00}])+)}{
+    decode 'utf-16be', join '', map { pack 'CC', int ((ord $_) / 0x100), ((ord $_) % 0x100) } split //, $1;
+  }ge if defined $_[1];
+} # _normalize_surrogate
+
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
 1;
-# $Date: 2008/01/26 14:48:09 $

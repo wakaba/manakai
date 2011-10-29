@@ -19,6 +19,7 @@ sub new ($) {
 
     level => {
       must => 'm',
+      should => 's',
       uncertain => 'u',
     },
 
@@ -102,6 +103,8 @@ sub parse_string ($$) {
 
   my $tt = Whatpm::CSS::Tokenizer->new;
   $tt->{onerror} = $self->{onerror};
+  $tt->{href} = $self->{href};
+  $tt->{level} = $self->{level};
   $tt->{get_char} = sub ($) {
     if (pos $s < length $s) {
       my $c = ord substr $s, pos ($s)++, 1;
@@ -118,15 +121,21 @@ sub parse_string ($$) {
       } else {
         $column++;
       }
+      $_[0]->{line_prev} = $_[0]->{line};
+      $_[0]->{column_prev} = $_[0]->{column};
       $_[0]->{line} = $line;
       $_[0]->{column} = $column;
       return $c;
     } else {
+      $_[0]->{line_prev} = $_[0]->{line};
+      $_[0]->{column_prev} = $_[0]->{column};
       $_[0]->{line} = $line;
       $_[0]->{column} = $column + 1; ## Set the same number always.
       return -1;
     }
   }; # $tt->{get_char}
+  $tt->{line} = $line;
+  $tt->{column} = $column;
   $tt->init;
 
   my ($next_token, $selectors)
@@ -279,6 +288,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             push @$sss, [NAMESPACE_SELECTOR, undef];
           }
         }
+        $tt->normalize_surrogate ($name);
         push @$sss, [LOCAL_NAME_SELECTOR, $name] if defined $name;
 
         $state = BEFORE_SIMPLE_SELECTOR_STATE;

@@ -101,7 +101,8 @@ sub _parse_string : Tests {
     $parser->{onerror} = sub {
       my %args = @_;
       push @error, join ';', map { defined $_ ? $_ : '' }
-          $args{token}->{line}, $args{token}->{column},
+          $args{token}->{line} // $args{line},
+          $args{token}->{column} // $args{column},
           $args{type},
           $args{text},
           $args{value},
