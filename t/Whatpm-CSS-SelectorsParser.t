@@ -1,6 +1,7 @@
 package test::Whatpm::CSS::SelectorsParser;
 use strict;
 use warnings;
+no warnings 'utf8';
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
@@ -142,6 +143,7 @@ sub _parse_string : Tests {
     parse-spaces-1.dat
     parse-escapes-1.dat
     parse-invalid-1.dat
+    parse-simple-1.dat
   );
 } # _parse_string
 

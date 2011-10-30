@@ -212,10 +212,18 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         # Reprocess.
         redo S;
       } else {
-        $self->{onerror}->(type => 'no sss',
-                           level => $self->{level}->{must},
-                           uri => \$self->{href},
-                           token => $t);
+        if ($t->{type} == DELIM_TOKEN and
+            $t->{value} eq '#') {
+          $self->{onerror}->(type => 'selectors:id:empty',
+                             level => $self->{level}->{must},
+                             uri => \$self->{href},
+                             token => $t);
+        } else {
+          $self->{onerror}->(type => 'no sss',
+                             level => $self->{level}->{must},
+                             uri => \$self->{href},
+                             token => $t);
+        }
         return ($t, undef);
       }
     } elsif ($state == BEFORE_SIMPLE_SELECTOR_STATE) {
@@ -288,7 +296,6 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             push @$sss, [NAMESPACE_SELECTOR, undef];
           }
         }
-        $tt->normalize_surrogate ($name);
         push @$sss, [LOCAL_NAME_SELECTOR, $name] if defined $name;
 
         $state = BEFORE_SIMPLE_SELECTOR_STATE;

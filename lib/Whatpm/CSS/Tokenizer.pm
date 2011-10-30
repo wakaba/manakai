@@ -485,6 +485,7 @@ sub get_next_token ($) {
         redo A;
       } elsif ($self->{c} == 0x002D) { # -
         if ($self->{t}->{type} == IDENT_TOKEN) {
+          #$self->normalize_surrogate ($self->{t}->{value});
           $self->{c} = $self->{get_char}->($self);
           if ($self->{c} == 0x003E) { # >
             $self->{state} = BEFORE_TOKEN_STATE;
@@ -716,6 +717,7 @@ sub get_next_token ($) {
           #redo A;
         }
       } else {
+        $self->normalize_surrogate ($self->{t}->{value});
         $self->{state} = BEFORE_TOKEN_STATE;
         # reconsume
         return $self->{t};
@@ -975,32 +977,46 @@ sub get_next_token ($) {
             #redo A;
           }
         } else {
+          ## \ -> [DELIM \]
+          ## #\ -> [DELIM #][DELIM \]
+          ## -\ -> [MINUS][DELIM \]
+          ## #-\ -> [HASH -][DELIM \]
+          ## a\ -> [IDENT a][DELIM \]
+          ## #a\ -> [HASH a][DELIM \]
+
+          unshift @{$self->{token}},
+              {type => DELIM_TOKEN, value => '\\',
+               line => $self->{line_prev}, column => $self->{column_prev}};
+
           if ($self->{t}->{hyphen} and $self->{t}->{value} eq '-') {
+            unshift @{$self->{token}},
+                {type => MINUS_TOKEN,
+                 line => $self->{line_prev},
+                 column => $self->{column_prev} - 1};
+            $self->{t}->{value} = '';
+          }
+
+          if (length $self->{t}->{value}) {
+            $self->normalize_surrogate ($self->{t}->{value});
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
-                                        line => $self->{line},
-                                        column => $self->{column} - 2};
-            return {type => MINUS_TOKEN,
-                    line => $self->{line_prev},
-                    column => $self->{column_prev}};
-            #redo A;
-          } elsif (length $self->{t}->{value}) {
-            $self->{state} = BEFORE_TOKEN_STATE;
-            # reprocess
-            unshift @{$self->{token}}, {type => DELIM_TOKEN, value => '\\',
-                                        line => $self->{line_prev},
-                                        column => $self->{column_prev}};
             return $self->{t};
             #redo A;
-          } else {
+          }
+
+          if ($self->{t}->{type} == HASH_TOKEN) {
             $self->{state} = BEFORE_TOKEN_STATE;
             # reprocess
-            return {type => DELIM_TOKEN, value => '\\',
-                    line => $self->{line_prev},
-                    column => $self->{column_prev}};
+            return {type => DELIM_TOKEN, value => '#',
+                    line => $self->{t}->{line},
+                    column => $self->{t}->{column}};
             #redo A;
           }
+
+          $self->{state} = BEFORE_TOKEN_STATE;
+          # reprocess
+          return shift @{$self->{token}};
+          #redo A;
         }
       } elsif ($q == 1) {
         $self->{state} = URI_UNQUOTED_STATE;
