@@ -26,6 +26,7 @@ WriteMakefile (
       'Test::More' => 0,
       'Test::Class' => 0,
       'Test::Differences' => 0,
+      'JSON' => 2,
     },
     dist         => {COMPRESS => 'gzip', SUFFIX => '.gz'},
     AUTHOR       => q(Wakaba <w@suika.fam.cx>),

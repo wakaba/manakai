@@ -1092,7 +1092,7 @@ sub get_next_token ($) {
         redo A;
       } elsif ($self->{c} == 0x000D) { # \r
         $self->{t}->{value} .= $self->_escaped_char ($char);
-        $self->{state} = ESCAPE_BEFORE_NL_STATE;
+        $self->{state} = ESCAPE_BEFORE_LF_STATE;
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } else {

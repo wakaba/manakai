@@ -1,15 +1,19 @@
-#!/usr/bin/perl
+package test::Whatpm::CSS::Tokenizer;
 use strict;
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use base qw(Test::Class);
+use Test::Differences;
 
 my $test_dir_name = 't/';
-my $dir_name = 't/tokenizer/';
 
-use JSON 1.07;
-$JSON::UnMapping = 1;
-$JSON::UTF8 = 1;
-
-use Test;
-BEGIN { plan tests => 615 }
+use JSON;
+{
+  no warnings 'once';
+  $JSON::UnMapping = 1;
+  $JSON::UTF8 = 1;
+}
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -21,6 +25,7 @@ sub Data::Dumper::qquote {
 
 use Whatpm::CSS::Tokenizer;
 
+sub _test : Tests {
 for my $file_name (grep {$_} split /\s+/, qq[
                       ${test_dir_name}css-token-1.test
                      ]) {
@@ -41,11 +46,12 @@ for my $file_name (grep {$_} split /\s+/, qq[
     $c += ((((hex $1) & 0b1111111111) << 10) | ((hex $2) & 0b1111111111));
     chr $c;
   }gex;
-  my $tests = jsonToObj ($js)->{tests};
+  my $tests = from_json ($js)->{tests};
   TEST: for my $test (@$tests) {
     my $s = $test->{input};
 
     my $p = Whatpm::CSS::Tokenizer->new;
+    $p->{onerror} = sub { };
     
     my $pos = 0;
     my $length = length $s;
@@ -112,10 +118,14 @@ for my $file_name (grep {$_} split /\s+/, qq[
      
     my $expected_dump = Dumper ($test->{output});
     my $parser_dump = Dumper (\@token);
-    ok $parser_dump, $expected_dump,
+    eq_or_diff $parser_dump, $expected_dump,
         $test->{description} . ': ' . Data::Dumper::qquote ($test->{input});
   }
 }
+}
+
+__PACKAGE__->runtests;
+
+1;
 
 ## License: Public Domain.
-## $Date: 2007/09/30 12:03:09 $
