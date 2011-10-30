@@ -1,0 +1,302 @@
+#data
+a
+#errors
+#parsed
+<a>
+
+#data
+a
+#ns
+http://foo/
+#errors
+#parsed
+{http://foo/}
+<a>
+
+#data
+a
+#ns
+<null>
+#errors
+#parsed
+{}
+<a>
+
+#data
+*
+#errors
+#parsed
+
+#data
+*
+#ns
+http://foo/
+#errors
+#parsed
+{http://foo/}
+
+#data
+*
+#ns
+<null>
+#errors
+#parsed
+{}
+
+#data
+*|a
+#errors
+#parsed
+<a>
+
+#data
+*|a
+#ns
+* http://foo/
+#parsed
+<a>
+
+#data
+\*|a
+#ns
+* http://foo/
+#parsed
+{http://foo/}
+<a>
+
+#data
+\*|a
+#errors
+1;1;namespace prefix:not declared;;*;m
+#parsed
+
+#data
+*|*
+#errors
+#parsed
+
+#data
+*|\*
+#errors
+#parsed
+<*>
+
+#data
+|abc
+#errors
+#parsed
+{}
+<abc>
+
+#data
+|abc
+#ns
+http://foo/
+#parsed
+{}
+<abc>
+
+#data
+|*
+#parsed
+{}
+
+#data
+a|b
+#errors
+1;1;namespace prefix:not declared;;a;m
+#parsed
+
+#data
+a|*
+#errors
+1;1;namespace prefix:not declared;;a;m
+#parsed
+
+#data
+a|b
+#ns
+a http://foo/
+#parsed
+{http://foo/}
+<b>
+
+#data
+a|*
+#ns
+a http://foo/
+#parsed
+{http://foo/}
+
+#data
+:not(a|b)
+#errors
+1;6;namespace prefix:not declared;;a;m
+#supported
+:not
+#parsed
+
+#data
+:not(a|b)
+#ns
+a http://foo/
+#supported
+:not
+#parsed
+:not
+  {http://foo/}
+  <b>
+
+#data
+:not(a|*)
+#errors
+1;6;namespace prefix:not declared;;a;m
+#supported
+:not
+#parsed
+
+#data
+:not(a|*)
+#errors
+#ns
+a http://foo/
+#supported
+:not
+#parsed
+:not
+  {http://foo/}
+
+#data
+:not(|a)
+#supported
+:not
+#errors
+#parsed
+:not
+  {}
+  <a>
+
+#data
+:not(|*)
+#supported
+:not
+#errors
+#parsed
+:not
+  {}
+
+#data
+[a|b]
+#errors
+1;2;namespace prefix:not declared;;a;m
+#parsed
+
+#data
+[a|b]
+#ns
+a http://foo/
+#errors
+#parsed
+[{http://foo/}b]
+
+#data
+[|b]
+#errors
+#parsed
+[{}b]
+
+#data
+[b]
+#errors
+#parsed
+[{}b]
+
+#data
+xml|abc
+#errors
+1;1;namespace prefix:not declared;;xml;m
+
+#data
+xmlns|abc
+#errors
+1;1;namespace prefix:not declared;;xmlns;m
+
+#data
+hoge|abc
+#ns
+hoge http://www.w3.org/XML/1998/Namespace
+#errors
+#parsed
+{http://www.w3.org/XML/1998/Namespace}
+<abc>
+
+#data
+hoge|abc
+#ns
+hoge http://www.w3.org/2000/xmlns/
+#errors
+#parsed
+{http://www.w3.org/2000/xmlns/}
+<abc>
+
+#data
+hoge|abc
+#ns
+hoge <null>
+#parsed
+{}
+<abc>
+
+#data
+hoge|*
+#ns
+hoge <null>
+#parsed
+{}
+
+#data
+[hoge|abc]
+#ns
+hoge <null>
+#parsed
+[{}abc]
+
+#data
+ABC|foo
+#ns
+abc http://foo/bar
+ABC http://foo/baz
+#parsed
+{http://foo/baz}
+<foo>
+
+#data
+ABC|foo
+#ns
+abc http://foo/bar
+#errors
+1;1;namespace prefix:not declared;;ABC;m
+#parsed
+
+#data
+abc|foo xyz|bar
+#ns
+abc http://foo/
+#errors
+1;9;namespace prefix:not declared;;xyz;m
+
+#data
+[ABC|foo]
+#ns
+abc http://foo/bar
+#errors
+1;2;namespace prefix:not declared;;ABC;m
+#parsed
+
+#data
+ABC|*
+#ns
+abc http://foo/bar
+#errors
+1;1;namespace prefix:not declared;;ABC;m
+#parsed

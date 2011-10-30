@@ -48,10 +48,12 @@ sub serialize_simple_selector ($) {
     }
     $result .= "\n";
     if (exists $_->[2]) {
-      if (ref $_->[2] eq 'ARRAY') {
-        $result .= "  " . serialize_simple_selector $_->[2];
-      } else {
-        $result .= q<  "> . $_->[2] . qq<"\n>;
+      for (@{$_}[2..$#{$_}]) {
+        if (ref $_ eq 'ARRAY') {
+          $result .= "  " . serialize_simple_selector $_;
+        } else {
+          $result .= q<  "> . $_ . qq<"\n>;
+        }
       }
     }
   }
@@ -125,9 +127,9 @@ sub _parse_string : Tests {
     my %ns;
     for (@{$test->{ns}->[0] or []}) {
       if (/^(\S+)\s+(\S+)$/) {
-        $ns{$1} = $2;
+        $ns{$1} = $2 eq '<null>' ? '' : $2;
       } elsif (/^(\S+)$/) {
-        $ns{''} = $1;
+        $ns{''} = $1 eq '<null>' ? '' : $1;
       }
     }
     $parser->{lookup_namespace_uri} = sub {
@@ -147,6 +149,7 @@ sub _parse_string : Tests {
     parse-spaces-1.dat
     parse-escapes-1.dat
     parse-invalid-1.dat
+    parse-namespaces-1.dat
     parse-simple-1.dat
   );
 } # _parse_string
