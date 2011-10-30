@@ -3468,7 +3468,7 @@ $Prop->{'font-weight'} = {
     if ($t->{type} == NUMBER_TOKEN) {
       ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/font-weight> for
       ## browser compatibility issue.
-      my $value = $t->{number};
+      my $value = $t->{number} + 0;
       $t = $tt->get_next_token;
       if ($value % 100 == 0 and 100 <= $value and $value <= 900) {
         return ($t, {$prop_name => ['WEIGHT', $value, 0]});
