@@ -430,7 +430,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
     } elsif ($state == AFTER_COLON_STATE) {
       if ($t->{type} == IDENT_TOKEN) {
         my $class = $t->{value};
-        $class =~ tr/A-Z/a-z/; ## TODO: ASCII case-insensitivity ok?
+        $class =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
         if ({
               active => 1,
               checked => 1,
@@ -442,7 +442,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
               'first-of-type' => 1,
               focus => 1,
               hover => 1,
-              indeterminate => 1, ## NOTE: Reserved in Selectors Level 3
+              indeterminate => 1,
               'last-child' => 1,
               'last-of-type' => 1,
               link => 1,
@@ -455,7 +455,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           if ($self->{pseudo_class}->{$class}) {
             push @$sss, [PSEUDO_CLASS_SELECTOR, $class];
           } else {
-            $self->{onerror}->(type => 'selectors:pseudo-class:not supported',
+            $self->{onerror}->(type => 'selectors:pseudo-class:ident:not supported',
                                level => $self->{level}->{warning},
                                uri => \$self->{href},
                                token => $t, value => $class);
@@ -467,14 +467,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             push @$sss, [PSEUDO_ELEMENT_SELECTOR, $class];
             $has_pseudo_element = 1;
           } else {
-            $self->{onerror}->(type => 'selectors:pseudo-element:not supported',
+            $self->{onerror}->(type => 'selectors:pseudo-element:ident:not supported',
                                level => $self->{level}->{warning},
                                uri => \$self->{href},
                                token => $t, value => $class);
             return ($t, undef);
           }
         } else {
-          $self->{onerror}->(type => 'unknown pseudo-class',
+          $self->{onerror}->(type => 'selectors:pseudo-class:ident:unknown',
                              level => $self->{level}->{must},
                              uri => \$self->{href},
                              token => $t, value => $class);
@@ -486,41 +486,62 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } elsif ($t->{type} == FUNCTION_TOKEN) {
         my $class = $t->{value};
-        $class =~ tr/A-Z/a-z/; ## TODO: Is ASCII case-insensitivity OK?
+        $class =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
         
-        if ($class eq 'lang' and $self->{pseudo_class}->{$class}) {
-          $state = BEFORE_LANG_TAG_STATE;
-          $t = $tt->get_next_token;
-          redo S;
-        } elsif ($class eq 'not' and $self->{pseudo_class}->{$class} and
-                 not $in_negation) {
-          $in_negation = 1;
-
-          push @$sss, '';
-          $state = BEFORE_TYPE_SELECTOR_STATE;
-          $t = $tt->get_next_token;
-          redo S;
+        my $known;
+        if ($class eq 'lang') {
+          if ($self->{pseudo_class}->{$class}) {
+            $state = BEFORE_LANG_TAG_STATE;
+            $t = $tt->get_next_token;
+            redo S;
+          } else {
+            $known = 1;
+          }
+        } elsif ($class eq 'not' and not $in_negation) {
+          if ($self->{pseudo_class}->{$class}) {
+            $in_negation = 1;
+            
+            push @$sss, '';
+            $state = BEFORE_TYPE_SELECTOR_STATE;
+            $t = $tt->get_next_token;
+            redo S;
+          } else {
+            $known = 1;
+          }
         } elsif ({
                   'nth-child' => 1,
                   'nth-last-child' => 1,
                   'nth-of-type' => 1,
                   'nth-last-of-type' => 1,
-                 }->{$class} and $self->{pseudo_class}->{$class}) {
-          $name = $class;
+                 }->{$class}) {
+          if ($self->{pseudo_class}->{$class}) {
+            $name = $class;
+            
+            $state = BEFORE_AN_STATE;
+            $t = $tt->get_next_token;
+            redo S;
+          } else {
+            $known = 1;
+          }
+        } elsif ($class eq '-manakai-contains') {
+          if ($self->{pseudo_class}->{$class}) {
+            $state = BEFORE_CONTAINS_STRING_STATE;
+            $t = $tt->get_next_token;
+            redo S;
+          } else {
+            $known = 1;
+          }
+        }
 
-          $state = BEFORE_AN_STATE;
-          $t = $tt->get_next_token;
-          ## TODO: syntax of value in the spec is vague; need to reverse
-          ## engineer what Opera 9.5 does.
-          redo S;
-        } elsif ($class eq '-manakai-contains' and
-                 $self->{pseudo_class}->{$class}) {
-          $state = BEFORE_CONTAINS_STRING_STATE;
-          $t = $tt->get_next_token;
-          redo S;
+        if ($known) {
+          $self->{onerror}->(type => 'selectors:pseudo-class:function:not supported',
+                             level => $self->{level}->{warning},
+                             uri => \$self->{href},
+                             token => $t, value => $class);
+          return ($t, undef);
         } else {
-          $self->{onerror}->(type => 'unknown pseudo-class',
-                             level => $self->{level}->{uncertain},
+          $self->{onerror}->(type => 'selectors:pseudo-class:function:unknown',
+                             level => $self->{level}->{must},
                              uri => \$self->{href},
                              token => $t, value => $class);
           return ($t, undef);
@@ -699,8 +720,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } else {
-          $self->{onerror}->(type => 'unknown pseudo-element',
-                             level => $self->{level}->{uncertain},
+          $self->{onerror}->(type => 'selectors:pseudo-element:ident:unknown',
+                             level => $self->{level}->{must},
                              uri => \$self->{href},
                              token => $t, value => $pe);
           return ($t, undef);
