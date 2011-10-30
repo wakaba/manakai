@@ -11,6 +11,7 @@ sub new ($) {
     level => {
       must => 'm',
       should => 's',
+      warning => 'w',
       uncertain => 'u',
     },
     lookup_namespace_uri => sub { undef },

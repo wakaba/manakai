@@ -20,6 +20,7 @@ sub new ($) {
     level => {
       must => 'm',
       should => 's',
+      warning => 'w',
       uncertain => 'u',
     },
 
@@ -423,8 +424,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
       if ($t->{type} == IDENT_TOKEN) {
         my $class = $t->{value};
         $class =~ tr/A-Z/a-z/; ## TODO: ASCII case-insensitivity ok?
-        if ($self->{pseudo_class}->{$class} and 
-            {
+        if ({
               active => 1,
               checked => 1,
               '-manakai-current' => 1,
@@ -445,19 +445,30 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
               target => 1,
               visited => 1,
             }->{$class}) {
-          push @$sss, [PSEUDO_CLASS_SELECTOR, $class];
-        } elsif ($self->{pseudo_element}->{$class} and
-                 {'first-letter' => 1, 'first-line' => 1,
+          if ($self->{pseudo_class}->{$class}) {
+            push @$sss, [PSEUDO_CLASS_SELECTOR, $class];
+          } else {
+            $self->{onerror}->(type => 'selectors:pseudo-class:not supported',
+                               level => $self->{level}->{warning},
+                               uri => \$self->{href},
+                               token => $t, value => $class);
+            return ($t, undef);
+          }
+        } elsif ({'first-letter' => 1, 'first-line' => 1,
                   before => 1, after => 1}->{$class}) {
-          push @$sss, [PSEUDO_ELEMENT_SELECTOR, $class];
-          $has_pseudo_element = 1;
+          if ($self->{pseudo_element}->{$class}) {
+            push @$sss, [PSEUDO_ELEMENT_SELECTOR, $class];
+            $has_pseudo_element = 1;
+          } else {
+            $self->{onerror}->(type => 'selectors:pseudo-element:not supported',
+                               level => $self->{level}->{warning},
+                               uri => \$self->{href},
+                               token => $t, value => $class);
+            return ($t, undef);
+          }
         } else {
-          ## TODO: Should we raise a different kind of error
-          ## if a pseudo class is known but not supported?
-          ## TODO: Maybe we should raise different type of error
-          ## for at least pseudo-classes which requires arguments.
           $self->{onerror}->(type => 'unknown pseudo-class',
-                             level => $self->{level}->{uncertain},
+                             level => $self->{level}->{must},
                              uri => \$self->{href},
                              token => $t, value => $class);
           return ($t, undef);

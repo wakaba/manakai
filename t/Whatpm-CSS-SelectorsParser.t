@@ -68,6 +68,7 @@ sub serialize_selector_object ($) {
   for (@$selectors) {
     $result .= "------\n" if $i++;
     ## A selector
+    my $j = 0;
     my @sel = @$_;
     while (@sel) {
       my ($combinator, $sss) = (shift @sel, shift @sel);
@@ -80,12 +81,20 @@ sub serialize_selector_object ($) {
           GENERAL_SIBLING_COMBINATOR, '~',
         }->{$combinator} || $combinator;
         $result .= "\n";
+      } else {
+        $result .= "***\n" if $j;
       }
 
       ## A simple selector sequence
-      for (@$sss) {
-        $result .= serialize_simple_selector $_;
+      if (@$sss) {
+        for (@$sss) {
+          $result .= serialize_simple_selector $_;
+        }
+      } else {
+        $result .= "*\n";
       }
+
+      $j++;
     }
   }
   $result =~ s/\n$//g;

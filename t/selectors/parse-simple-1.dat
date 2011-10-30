@@ -1,4 +1,171 @@
 #data
+h1
+#errors
+#parsed
+<h1>
+
+#data
+ha/**/bc
+#errors
+1;7;no combinator;;;m
+
+#data escaped
+    h1    \u0009
+#parsed
+<h1>
+
+#data
+*|*
+#parsed
+*
+
+#data
+*/**/|/**/*
+#parsed
+*
+
+#data
+*| *
+#errors
+1;3;no local name selector;;;m
+
+#data
+* |*
+#parsed
+| *
+| ***
+| {}
+
+#data
+a,/**/b/**/|/**/c/**/,d
+#ns
+b http://foo/
+#parsed
+<a>
+------
+{http://foo/}
+<c>
+------
+<d>
+
+#data
+abc|def
+#ns
+abc http://bar/
+#parsed
+{http://bar/}
+<def>
+
+#data
+abc\|def
+#parsed
+<abc|def>
+
+#data
+abc|
+#errors
+1;5;no local name selector;;;m
+
+#data
+*abc
+#errors
+1;2;no combinator;;;m
+
+#data
+*|abc
+#errors
+#parsed
+<abc>
+
+#data
+*\|*
+#errors
+1;2;no combinator;;;m
+
+#data
+|abc
+#errors
+#parsed
+{}
+<abc>
+
+#data
+|*
+#parsed
+{}
+
+#data
+|
+#errors
+1;2;no local name selector;;;m
+
+#data
+-abc
+#errors
+#parsed
+<-abc>
+
+#data
+--abc
+#errors
+1;1;no sss;;;m
+
+#data
+<abc>
+#errors
+1;1;no sss;;;m
+
+#data
+<!--abc-->
+#errors
+1;1;no sss;;;m
+
+#data
+<!---->abc<!---->
+#errors
+1;1;no sss;;;m
+
+#data
+hoge:fuga
+#errors
+1;6;unknown pseudo-class;;fuga;m
+
+#data
+hoge\:fuga
+#parsed
+<hoge:fuga>
+
+#data
+12abc
+#errors
+1;1;no sss;;;m
+
+#data
+120
+#errors
+1;1;no sss;;;m
+
+#data
+\12abc
+#parsed escaped
+<\U00012abc>
+
+#data
+\.class
+#parsed
+<.class>
+
+#data
+a\ \,\ b
+#parsed
+<a , b>
+
+#data escaped
+a\\u000Ab
+#errors
+1;2;no combinator;;;m
+
+#data
 | # a
 #errors
 1;1;selectors:id:empty;;;m
@@ -18,3 +185,62 @@
 #parsed
 :-manakai-contains
   "abc"
+
+#data
+*[abc]
+#errors
+#parsed
+[{}abc]
+
+#data
+*.class
+#errors
+#parsed
+.class
+
+#data
+*:first-child
+#supported
+:first-child
+#parsed
+:first-child
+
+#data
+*:first-child
+#errors
+1;3;selectors:pseudo-class:not supported;;first-child;w
+#parsed
+
+#data
+*#hofe
+#errors
+#parsed
+| #hofe
+
+#data
+div :first-child
+#supported
+:first-child
+#errors
+#parsed
+<div>
+***
+:first-child
+
+#data
+div:first-child
+#supported
+:first-child
+#errors
+#parsed
+<div>
+:first-child
+
+#data
+div/**/:first-child
+#supported
+:first-child
+#errors
+#parsed
+<div>
+:first-child

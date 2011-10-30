@@ -133,10 +133,17 @@ a \, b
 #errors
 #parsed
 <a>
+***
 <,>
+***
 <b>
 
 #data
 h1, h2..foo, h3
 #errors
 1;8;no class name;;;m
+
+#data
+:first-child,abc
+#errors
+1;2;selectors:pseudo-class:not supported;;first-child;w

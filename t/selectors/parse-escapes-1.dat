@@ -37,12 +37,14 @@ abc\000020 xyz
 abc\20  xyz
 #parsed
 <abc >
+***
 <xyz>
 
 #data
 abc\0000020 xyz
 #parsed escaped
 <abc\u00020>
+***
 <xyz>
 
 #data escaped
@@ -64,6 +66,7 @@ abc\20\u000Cxyz
 abc\20\u000D\u000Cxyz
 #parsed
 <abc >
+***
 <xyz>
 
 #data escaped
@@ -100,6 +103,7 @@ abc\20\u0020xyz
 \20  abc
 #parsed escaped
 < >
+***
 <abc>
 
 #data escaped
@@ -111,6 +115,7 @@ abc\20\u0020xyz
 \20\u000D\u000A\u000D\u000Aabc
 #parsed escaped
 < >
+***
 <abc>
 
 #data
@@ -163,6 +168,7 @@ abc\20\u0020xyz
 \p q
 #parsed
 <p>
+***
 <q>
 
 #data

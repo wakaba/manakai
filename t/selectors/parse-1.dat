@@ -9,6 +9,7 @@ h1 h2
 #errors
 #parsed
 <h1>
+***
 <h2>
 
 #data
@@ -52,12 +53,15 @@ h1,h2
 *
 #errors
 #parsed
+*
 
 #data
 *,*
 #errors
 #parsed
+*
 ------
+*
 
 #data
 a,*
@@ -65,11 +69,13 @@ a,*
 #parsed
 <a>
 ------
+*
 
 #data
 *|*
 #errors
 #parsed
+*
 
 #data
 |*
@@ -88,7 +94,7 @@ a,*
 :first-child
 #supported
 #errors
-1;2;unknown pseudo-class;;first-child;u
+1;2;selectors:pseudo-class:not supported;;first-child;w
 #parsed
 
 #data
