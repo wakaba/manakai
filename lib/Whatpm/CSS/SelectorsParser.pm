@@ -253,6 +253,13 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                              token => $t);
           return ($t, undef);
         }
+        if ($t->{not_ident}) {
+          $self->{onerror}->(type => 'selectors:id:not ident',
+                             level => $self->{level}->{must},
+                             uri => \$self->{href},
+                             token => $t);
+          return ($t, undef);
+        }
         push @$sss, [ID_SELECTOR, $t->{value}];
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
         $t = $tt->get_next_token;
@@ -665,6 +672,10 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
     } elsif ($state == AFTER_VALUE_STATE) {
       if ($t->{type} == RBRACKET_TOKEN) {
         $state = BEFORE_SIMPLE_SELECTOR_STATE;
+        $t = $tt->get_next_token;
+        redo S;
+      } elsif ($t->{type} == S_TOKEN) {
+        ## Stay in the state.
         $t = $tt->get_next_token;
         redo S;
       } else {

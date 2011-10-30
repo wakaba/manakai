@@ -111,6 +111,7 @@ sub init ($) {
   #              number => number,
   #              line => ..., column => ...,
   #              hyphen => bool,
+  #              not_ident => bool, # HASH_TOKEN does not contain an identifier
   #              eos => bool};
 } # init
 
@@ -670,6 +671,9 @@ sub get_next_token ($) {
           $self->{c} == 0x002D or # -
           $self->{c} == 0x005F or # _
           $self->{c} > 0x007F) { # nonascii
+        $self->{t}->{not_ident} = 1 if
+            (0x0030 <= $self->{c} and $self->{c} <= 0x0039); # 0..9
+        $self->{t}->{hyphen} = 1 if $self->{c} == 0x002D; # -
         $self->{t}->{value} .= chr $self->{c};
         $self->{state} = NAME_STATE;
         $self->{c} = $self->{get_char}->($self);
@@ -694,6 +698,11 @@ sub get_next_token ($) {
           $self->{c} == 0x005F or # _
           $self->{c} == 0x002D or # -
           $self->{c} > 0x007F) { # nonascii
+        $self->{t}->{not_ident} = 1 if
+            $self->{t}->{hyphen} and
+            $self->{t}->{value} eq '-' and
+            ((0x0030 <= $self->{c} and $self->{c} <= 0x0039) or # 0..9
+             $self->{c} == 0x002D); # -
         $self->{t}->{value} .= chr $self->{c};
         # stay in the state
         $self->{c} = $self->{get_char}->($self);
@@ -724,6 +733,8 @@ sub get_next_token ($) {
           #redo A;
         }
       } else {
+        $self->{t}->{not_ident} = 1
+            if $self->{t}->{value} eq '-' and $self->{t}->{hyphen};
         $self->normalize_surrogate ($self->{t}->{value});
         $self->{state} = BEFORE_TOKEN_STATE;
         # reconsume

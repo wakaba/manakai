@@ -21,7 +21,7 @@ sub serialize_simple_selector ($) {
   if ($_->[0] == LOCAL_NAME_SELECTOR) {
     $result .= "<" . $_->[1] . ">\n";
   } elsif ($_->[0] == ATTRIBUTE_SELECTOR) {
-    $result .= "[{" . ($_->[1] // '') . "}"; # XXX
+    $result .= "[" . (defined $_->[1] ? "{" . ($_->[1]) . "}" : "");
     $result .= $_->[2] . "]\n";
     if (defined $_->[3]) {
       $result .= {
@@ -35,7 +35,7 @@ sub serialize_simple_selector ($) {
       $result .= $_->[4] . "\n";
     }
   } elsif ($_->[0] == NAMESPACE_SELECTOR) {
-    $result .= "{" . (defined $_->[1] ? $_->[1] : '') . "}\n"; # XXX
+    $result .= "{" . (defined $_->[1] ? length $_->[1] ? $_->[1] : '}empty{' : '') . "}" . "\n";
   } else {
     $result .= {
       ID_SELECTOR, '#',

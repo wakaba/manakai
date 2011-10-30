@@ -151,9 +151,47 @@ hoge\:fuga
 <\U00012abc>
 
 #data
-\.class
+-abc|def
+#errors
+1;1;namespace prefix:not declared;;-abc;m
+
+#data
+-abc|def
+#ns
+-abc http://x/
 #parsed
-<.class>
+{http://x/}
+<def>
+
+#data
+-abc|*
+#ns
+-abc http://x/
+#parsed
+{http://x/}
+
+#data
+-x|-a
+#ns
+-x http://y/
+#parsed
+{http://y/}
+<-a>
+
+#data
+-|a
+#errors
+1;1;no sss;;;m
+
+#data
+a|-
+#errors
+1;3;no local name selector;;;m
+
+#data
+-/**/abc
+#errors
+1;1;no sss;;;m
 
 #data
 a\ \,\ b
@@ -166,9 +204,821 @@ a\\u000Ab
 1;2;no combinator;;;m
 
 #data
+foo()
+#errors
+1;1;no sss;;;m
+#parsed
+
+#data
+[att]
+#errors
+#parsed
+[{}att]
+
+#data
+[att=val]
+#parsed
+[{}att]
+=val
+
+#data
+[att~=val]
+#parsed
+[{}att]
+~=val
+
+#data
+[att|=val]
+#parsed
+[{}att]
+|=val
+
+#data
+[att^=val]
+#parsed
+[{}att]
+^=val
+
+#data
+[att$=val]
+#parsed
+[{}att]
+$=val
+
+#data
+[att*=val]
+#parsed
+[{}att]
+*=val
+
+#data
+[|attr]
+#parsed
+[{}attr]
+
+#data
+[hoge|attr]
+#errors
+1;2;namespace prefix:not declared;;hoge;m
+#parsed
+
+#data
+[hoge|attr]
+#ns
+hoge about:
+#parsed
+[{about:}attr]
+
+#data
+[*|attr]
+#parsed
+[attr]
+
+#data
+[a|*]
+#errors
+1;2;namespace prefix:not declared;;a;m
+
+#data
+[a|*]
+#ns
+a http://hoge/
+#errors
+1;4;no attr local name;;;m
+
+#data
+[b]
+#ns
+http://hooge/
+#errors
+#parsed
+{http://hooge/}
+[{}b]
+
+#data
+[
+#errors
+1;2;no attr name;;;m
+
+#data escaped
+[\u0020
+#errors
+1;3;no attr name;;;m
+
+#data
+[hoge
+#errors
+1;6;no attr match;;;m
+
+#data escaped
+[hoge \u0009
+#errors
+1;8;no attr match;;;m
+
+#data escaped
+[  \u000D\u0009\u000A\u000C   hoge    \u000D\u0009\u000C\u000A]
+#errors
+#parsed
+[{}hoge]
+
+#data
+[hoge|]
+#errors
+1;2;namespace prefix:not declared;;hoge;m
+#parsed
+
+#data
+[hoge|]
+#ns
+hoge http://foo/
+#errors
+1;7;no attr local name;;;m
+#parsed
+
+#data
+[hoge| fuga]
+#ns
+hoge http://foo/
+#errors
+1;7;no attr local name;;;m
+
+#data
+[hoge |fuga]
+#errors
+1;7;no attr match;;;m
+
+#data
+[    hoge|]
+#errors
+1;6;namespace prefix:not declared;;hoge;m
+
+#data
+[?hoge]
+#errors
+1;2;no attr name;;;m
+
+#data
+[/**/a/**/|/**/b/**/]
+#ns
+a http://foo/
+#errors
+#parsed
+[{http://foo/}b]
+
+#data
+[/**/*/**/|/**/b/**/]
+#errors
+#parsed
+[b]
+
+#data
+[a||b]
+#ns
+a http://foo/
+#errors
+1;4;no attr local name;;;m
+
+#data
+[a = b]
+#parsed
+[{}a]
+=b
+
+#data
+[a = b  ]
+#parsed
+[{}a]
+=b
+
+#data
+[a=b  ]
+#parsed
+[{}a]
+=b
+
+#data
+[a=b  /**/]/**/  /**/
+#parsed
+[{}a]
+=b
+
+#data
+[a = bcdef]
+#parsed
+[{}a]
+=bcdef
+
+#data
+[a = \1000]
+#parsed escaped
+[{}a]
+=\u1000
+
+#data
+[\2000=abc]
+#parsed escaped
+[{}\u2000]
+=abc
+
+#data
+[a^=  b   ]
+#parsed
+[{}a]
+^=b
+
+#data
+[a $= b cc]
+#errors
+1;9;attr selector not closed;;;m
+
+#data
+[^=a]
+#errors
+1;2;no attr name;;;m
+
+#data
+[a=~b]
+#errors
+1;4;no attr value;;;m
+
+#data
+[a@=b]
+#errors
+1;3;no attr match;;;m
+
+#data
+[a==b]
+#errors
+1;4;no attr value;;;m
+
+#data
+[-abc=-def]
+#errors
+#parsed
+[{}-abc]
+=-def
+
+#data
+[-abc=-]
+#errors
+1;7;no attr value;;;m
+
+#data
+[-=def]
+#errors
+1;2;no attr name;;;m
+
+#data
+[-ab|de]
+#ns
+-ab http://o/
+#parsed
+[{http://o/}de]
+
+#data
+[-|de]
+#ns
+- http://foo/
+#errors
+1;2;no attr name;;;m
+
+#data
+[foo|-ab]
+#ns
+foo http://foo/
+#errors
+#parsed
+[{http://foo/}-ab]
+
+#data
+[|-ab]
+#errors
+#parsed
+[{}-ab]
+
+#data
+[|-/**/ab]
+#errors
+1;3;no attr local name;;;m
+
+#data
+[foo()]
+#errors
+1;2;no attr name;;;m
+
+#data
+[ab/**/^=/**/bc]
+#parsed
+[{}ab]
+^=bc
+
+#data
+[ab*/**/=bc]
+#errors
+1;4;no attr match;;;m
+#parsed
+
+#data
+[abc=\0001]
+#parsed escaped
+[{}abc]
+=\u0001
+
+#data escaped
+[abc=\uD800\uDC00]
+#parsed escaped
+[{}abc]
+=\U00010000
+
+#data escaped
+[\uD800\uDC00]
+#parsed escaped
+[{}\U00010000]
+
+#data
+[ab="def"]
+#parsed
+[{}ab]
+=def
+
+#data
+[ab='def']
+#parsed
+[{}ab]
+=def
+
+#data
+[ab^="def"]
+#parsed
+[{}ab]
+^=def
+
+#data
+[ab=/**/"def"/**/]
+#parsed
+[{}ab]
+=def
+
+#data
+[ab=/**/'def'/**/]
+#parsed
+[{}ab]
+=def
+
+#data
+[ab="def/**/"]
+#parsed
+[{}ab]
+=def/**/
+
+#data escaped
+[ab=  \u0009\u000A "def" \u0020]
+#parsed
+[{}ab]
+=def
+
+#data escaped
+[ab="de\\u000Af"]
+#parsed
+[{}ab]
+=def
+
+#data escaped
+[ab="d\\u000D\u000Aef"]
+#parsed
+[{}ab]
+=def
+
+#data escaped
+[ab="d\\u000Def"]
+#parsed
+[{}ab]
+=def
+
+#data escaped
+[ab="\\u000Cdef"]
+#parsed
+[{}ab]
+=def
+
+#data escaped
+[ab="\\u000A"]
+#parsed
+[{}ab]
+=
+
+#data
+[ab=""]
+#parsed
+[{}ab]
+=
+
+#data
+[ab='']
+#parsed
+[{}ab]
+=
+
+#data
+[ab=]
+#errors
+1;5;no attr value;;;m
+#parsed
+
+#data escaped
+[ab="\u0000"]
+#errors
+#parsed escaped
+[{}ab]
+=\u0000
+
+#data escaped
+[ab="\uD800"]
+#errors
+#parsed escaped
+[{}ab]
+=\uD800
+
+#data escaped
+[ab="\uD800\uDC00"]
+#errors
+#parsed escaped
+[{}ab]
+=\U00010000
+
+#data escaped
+[ab="\D800\DC00"]
+#errors
+#parsed escaped
+[{}ab]
+=\U00010000
+
+#data escaped
+[ab="\0000"]
+#errors
+1;10;css:escape:null;;;m
+#parsed escaped
+[{}ab]
+=\u0000
+
+#data escaped
+[ab="\110000"]
+#errors
+1;12;css:escape:not unicode;;;s
+#parsed escaped
+[{}ab]
+=\uFFFD
+
+#data escaped
+[ab="\110000 "]
+#errors
+1;12;css:escape:not unicode;;;s
+#parsed escaped
+[{}ab]
+=\uFFFD
+
+#data escaped
+[ab="\3 \6x"]
+#errors
+#parsed escaped
+[{}ab]
+=\u0003\u0006x
+
+#data
+[ab="x""y"]
+#errors
+1;8;attr selector not closed;;;m
+
+#data
+["ab"=de]
+#errors
+1;2;no attr name;;;m
+
+#data
+[ab="cd\x"]
+#parsed
+[{}ab]
+=cdx
+
+#data
+[abc="de\"f"]
+#parsed
+[{}abc]
+=de"f
+
+#data
+[a="bc\"]
+#errors
+1;10;attr selector not closed;;;m
+
+#data
+[a='b\'c']
+#parsed
+[{}a]
+=b'c
+
+#data
+[a="bc']
+#errors
+1;9;attr selector not closed;;;m
+
+#data escaped
+[abc="de\u000Af"]
+#errors
+1;6;no attr value;;;m
+
+#data escaped
+[abc='de\u000Af']
+#errors
+1;6;no attr value;;;m
+
+#data
+[abc\=d\]e]
+#parsed
+[{}abc=d]e]
+
+#data
+[abc="def\0001/**/"]
+#parsed escaped
+[{}abc]
+=def\u0001/**/
+
+#data
+[abc="def\0001 /**/"]
+#parsed escaped
+[{}abc]
+=def\u0001/**/
+
+#data
+[a][b]
+#parsed
+[{}a]
+[{}b]
+
+#data
+[a=b][a=c]
+#parsed
+[{}a]
+=b
+[{}a]
+=c
+
+#data
+[a=b(]
+#errors
+1;4;no attr value;;;m
+
+#data
+.foo
+#parsed
+.foo
+
+#data
+.-foo
+#parsed
+.-foo
+
+#data
+.--foo
+#errors
+1;2;no class name;;;m
+
+#data
+.120
+#errors
+1;1;no sss;;;m
+
+#data
+.120em
+#errors
+1;1;no sss;;;m
+
+#data
+..foo
+#errors
+1;2;no class name;;;m
+
+#data
+./**/foo
+#parsed
+.foo
+
+#data
+.-120
+#errors
+1;2;no class name;;;m
+
+#data
+.-120px
+#errors
+1;2;no class name;;;m
+
+#data
+.\-abc
+#parsed
+.-abc
+
+#data
+.\-120
+#parsed
+.-120
+
+#data
+.\-
+#parsed
+.-
+
+#data
+.-
+#errors
+1;2;no class name;;;m
+
+#data
+.
+#errors
+1;2;no class name;;;m
+
+#data
+./**/
+#errors
+1;6;no class name;;;m
+
+#data
+\.class
+#parsed
+<.class>
+
+#data
+.class
+#errors
+#ns
+http://foo/
+#parsed
+{http://foo/}
+.class
+
+#data
+*|*.class
+#ns
+http://foo/
+#parsed
+.class
+
+#data
+|*.class
+#parsed
+{}
+.class
+
+#data
+.class
+#ns
+<null>
+#parsed
+{}
+.class
+
+#data
+| |.class
+#errors
+1;2;no local name selector;;;m
+
+#data
+abc10.class
+#parsed
+<abc10>
+.class
+
+#data
+10.class
+#errors
+1;1;no sss;;;m
+
+#data
+. foo
+#errors
+1;2;no class name;;;m
+
+#data
+./*   
+a
+foo
+*/bar
+#parsed
+.bar
+
+#data
+.foo(
+#errors
+1;2;no class name;;;m
+
+#data
+.\.foo
+#parsed
+..foo
+
+#data
+.\-foo
+#parsed
+.-foo
+
+#data
+.\-120
+#parsed
+.-120
+
+#data
+.\--120
+#parsed
+.--120
+
+#data
+| #foo
+#parsed
+| #foo
+
+#data
 | # a
 #errors
 1;1;selectors:id:empty;;;m
+
+#data
+| #b
+#ns
+http://hoge/
+#parsed
+| {http://hoge/}
+| #b
+
+#data
+| #-foo
+#parsed
+| #-foo
+
+#data
+| #-
+#errors
+1;1;selectors:id:not ident;;;m
+
+#data
+| #-120
+#errors
+1;1;selectors:id:not ident;;;m
+
+#data
+| #--120
+#errors
+1;1;selectors:id:not ident;;;m
+
+#data
+| #-\120
+#parsed escaped
+| #-\u0120
+
+#data
+| #-\xyz
+#parsed
+| #-xyz
+
+#data
+| #\-
+#parsed
+| #-
+
+#data
+| #\1
+#parsed escaped
+| #\u0001
+
+#data
+| #\#
+#parsed
+| ##
+
+#data
+| #\-120
+#parsed
+| #-120
+
+#data
+| #\--ab
+#parsed
+| #--ab
+
+#data
+| #foo(
+#errors
+1;5;no combinator;;;m
+
+#data
+:first-child
+#ns
+http://hoge/
+#supported
+:first-child
+#parsed
+{http://hoge/}
+:first-child
 
 #data
 :-manakai-contains(abc)
