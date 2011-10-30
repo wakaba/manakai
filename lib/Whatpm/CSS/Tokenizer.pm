@@ -1184,7 +1184,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } else {
-        $self->{t}->{number} = 0+$self->{t}->{value};
+        $self->{t}->{number} = $self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess
@@ -1199,7 +1199,7 @@ sub get_next_token ($) {
         redo A;
       } else {
         unshift @{$self->{token}}, {type => DOT_TOKEN};
-        $self->{t}->{number} = 0+$self->{t}->{value};
+        $self->{t}->{number} = $self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = BEFORE_TOKEN_STATE;
         # reprocess
@@ -1230,7 +1230,7 @@ sub get_next_token ($) {
         $self->{c} = $self->{get_char}->($self);
         redo A;
       } else {
-        $self->{t}->{number} = 0+$self->{t}->{value};
+        $self->{t}->{number} = $self->{t}->{value};
         $self->{t}->{value} = '';
         $self->{state} = AFTER_NUMBER_STATE;
         # reprocess

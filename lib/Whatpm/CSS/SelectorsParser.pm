@@ -769,9 +769,9 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
       }
     } elsif ($state == BEFORE_AN_STATE) {
       if ($t->{type} == DIMENSION_TOKEN) {
-        if (int $t->{number} == $t->{number}) {
+        if ($t->{number} =~ /\A[0-9]+\z/) {
           my $n = $t->{value};
-          $n =~ tr/A-Z/a-z/; ## TODO: ascii ?
+          $n =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
           if ($n eq 'n') {
             $simple_selector = [PSEUDO_CLASS_SELECTOR, $name,
                                 0+$t->{number}, 0];
@@ -800,13 +800,13 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           return ($t, undef);
         }
       } elsif ($t->{type} == NUMBER_TOKEN) {
-        if (int $t->{number} == $t->{number}) {
+        if ($t->{number} =~ /\A[0-9]+\z/) {
           push @$sss, [PSEUDO_CLASS_SELECTOR, $name, 0, 0+$t->{number}];
 
           $state = AFTER_B_STATE;
           $t = $tt->get_next_token;
           redo S;
-        } else { ## ISSUE: Is :nth-child(0.0) disallowed?
+        } else {
           $self->{onerror}->(type => 'an+b not integer',
                              level => $self->{level}->{must},
                              uri => \$self->{href},
@@ -829,8 +829,6 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } elsif ($value eq 'n' or $value eq '-n') {
-          ## ISSUE: :nth-child(-n) is not explicitly allowed, but appears
-          ## in an example in the spec.
           $simple_selector = [PSEUDO_CLASS_SELECTOR, $name,
                               $value eq 'n' ? 1 : -1, 0];
 
@@ -850,25 +848,28 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                              token => $t);
           return ($t, undef);
         }
-      } elsif ($t->{type} == MINUS_TOKEN) {
+      } elsif ($t->{type} == MINUS_TOKEN or
+               $t->{type} == PLUS_TOKEN) {
+        my $sign = $t->{type} == MINUS_TOKEN ? -1 : +1;
         ## ISSUE: Is :nth-child(- 1) allowed?
         ## ISSUE: Is :nth-child(n-/**/6) or (-n-/**/6) allowed?
         $t = $tt->get_next_token;
         if ($t->{type} == DIMENSION_TOKEN || $t->{type} == IDENT_TOKEN) {
           my $num = $t->{type} == IDENT_TOKEN ? 1 : $t->{number};
           ## NOTE: :nth-child(-/**/n)
-          if (int $num == $num) {
+          if ($num =~ /\A[0-9]+\z/) {
             my $n = $t->{value};
-            $n =~ tr/A-Z/a-z/; ## TODO: ASCII?
+            $n =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
             if ($n eq 'n') {
-              $simple_selector = [PSEUDO_CLASS_SELECTOR, $name, -$num, 0];
+              $simple_selector = [PSEUDO_CLASS_SELECTOR, $name,
+                                  $sign * $num, 0];
               
               $state = AFTER_AN_STATE;
               $t = $tt->get_next_token;
               redo S;
             } elsif ($n =~ /\An-([0-9]+)\z/) {
               $simple_selector = [PSEUDO_CLASS_SELECTOR, $name,
-                                  -$num, -$1];
+                                  $sign * $num, -$1];
 
               $state = AFTER_AN_STATE;
               $t = $tt->get_next_token;
@@ -889,7 +890,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           }
         } elsif ($t->{type} == NUMBER_TOKEN) {
           if (int $t->{number} == $t->{number}) {
-            push @$sss, [PSEUDO_CLASS_SELECTOR, $name, 0, -$t->{number}];
+            push @$sss, [PSEUDO_CLASS_SELECTOR, $name,
+                         0, $sign * $t->{number}];
 
             $state = AFTER_B_STATE;
             $t = $tt->get_next_token;

@@ -364,6 +364,638 @@
 1;2;selectors:pseudo-class:function:unknown;;root;m
 
 #data
+:nth-child
+#supported
+:nth-child
+#errors
+1;2;selectors:pseudo-class:ident:unknown;;nth-child;m
+
+#data
+:nth-child(
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child()
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(abc)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(4)
+#supported
+#errors
+1;2;selectors:pseudo-class:function:not supported;;nth-child;w
+
+#data
+:nth-child(4)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "4"
+
+#data
+:nth-child(+4)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "4"
+
+#data
+:nth-child(-4)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "-4"
+
+#data
+:nth-child(/**/10/**/)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "10"
+
+#data
+:nth-child(  /**/  10  /**/  )
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "10"
+
+#data
+:nth-child(/**/+/**/10/**/)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "10"
+
+#data
+:nth-child(/**/-/**/10/**/)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "-10"
+
+#data
+:nth-child(+ 10)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(- 10)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(+)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(-)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(10.0)
+#supported
+:nth-child
+#errors
+1;12;an+b not integer;;10.0;m
+
+#data
+:nth-child(10.1)
+#supported
+:nth-child
+#errors
+1;12;an+b not integer;;10.1;m
+
+#data
+:nth-child(0001)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "1"
+
+#data
+:nth-child(-0001)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "-1"
+
+#data
+:nth-child(00000000)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(3n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "3"
+  "0"
+
+#data
+:nth-child(-3n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-3"
+  "0"
+
+#data
+:nth-child(+3n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "3"
+  "0"
+
+#data
+:nth-child(+/**/3n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "3"
+  "0"
+
+#data
+:nth-child(-/**/3n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-3"
+  "0"
+
+#data
+:nth-child(+ 3n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(- 3n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(10.2n)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(10.000n)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(+10.2n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(+10.000n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(-10.2n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(-10.000n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(+/**/10.2n)
+#supported
+:nth-child
+#errors
+1;17;an+b syntax error;;;m
+
+#data
+:nth-child(+/**/10.000n)
+#supported
+:nth-child
+#errors
+1;17;an+b syntax error;;;m
+
+#data
+:nth-child(-/**/10.2n)
+#supported
+:nth-child
+#errors
+1;17;an+b syntax error;;;m
+
+#data
+:nth-child(-/**/10.000n)
+#supported
+:nth-child
+#errors
+1;17;an+b syntax error;;;m
+
+#data
+:nth-child(000n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(+000n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(-000n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(10/**/n)
+#supported
+:nth-child
+#errors
+1;18;an+b not closed;;;m
+
+#data
+:nth-child(+10/**/n)
+#supported
+:nth-child
+#errors
+1;19;an+b not closed;;;m
+
+#data
+:nth-child(-10/**/n)
+#supported
+:nth-child
+#errors
+1;19;an+b not closed;;;m
+
+#data
+:nth-child(10N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "10"
+  "0"
+
+#data
+:nth-child(+10N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "10"
+  "0"
+
+#data
+:nth-child(-10N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-10"
+  "0"
+
+#data
+:nth-child(10\N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "10"
+  "0"
+
+#data
+:nth-child(+10\N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "10"
+  "0"
+
+#data
+:nth-child(-10\N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-10"
+  "0"
+
+#data
+:nth-child(10\4e)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "10"
+  "0"
+
+#data
+:nth-child(-10\4e)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-10"
+  "0"
+
+#data
+:nth-child(-10/**/\4e)
+#supported
+:nth-child
+#errors
+1;19;an+b not closed;;;m
+
+#data
+:nth-child(n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "1"
+  "0"
+
+#data
+:nth-child(N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "1"
+  "0"
+
+#data
+:nth-child(\N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "1"
+  "0"
+
+#data
+:nth-child(\6e)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "1"
+  "0"
+
+#data
+:nth-child(+n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "1"
+  "0"
+
+#data
+:nth-child(-n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-1"
+  "0"
+
+#data
+:nth-child(+/**/n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "1"
+  "0"
+
+#data
+:nth-child(-/**/n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-1"
+  "0"
+
+#data
+:nth-child(+N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "1"
+  "0"
+
+#data
+:nth-child(-N)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-1"
+  "0"
+
+#data
+:nth-child(-\6e)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-1"
+  "0"
+
+#data
+:nth-child(+ n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(- n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(nm)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(10nm)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(-nm)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(-10nm)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(\-n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-1"
+  "0"
+
+#data
+:nth-child(\-\n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-1"
+  "0"
+
+#data
+:nth-child(\+n)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(\+10n)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(\-10n)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(10\30n)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(-10\30n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(+10\30n)
+#supported
+:nth-child
+#errors
+1;13;an+b syntax error;;;m
+
+#data
+:nth-child(+12n/**/)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "12"
+  "0"
+
+#data
 :first-child
 #ns
 http://hoge/
