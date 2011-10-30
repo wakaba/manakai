@@ -151,6 +151,7 @@ sub _parse_string : Tests {
     parse-invalid-1.dat
     parse-namespaces-1.dat
     parse-simple-1.dat
+    parse-combinators-1.dat
   );
 } # _parse_string
 
