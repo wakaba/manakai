@@ -631,7 +631,9 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         return ($t, undef);
       }
     } elsif ($state == BEFORE_VALUE_STATE) {
-      if ($t->{type} == IDENT_TOKEN or $t->{type} == STRING_TOKEN) {
+      if ($t->{type} == IDENT_TOKEN or
+          $t->{type} == STRING_TOKEN or
+          ($t->{type} == INVALID_TOKEN and $t->{eos})) {
         $simple_selector->[4] = $t->{value};
         push @$sss, $simple_selector;
 
@@ -716,7 +718,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
-        $self->{onerror}->(type => 'lang selector not closed',
+        $self->{onerror}->(type => 'selectors:pseudo:argument not closed',
                            level => $self->{level}->{must},
                            uri => \$self->{href},
                            token => $t);
@@ -971,7 +973,9 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         return ($t, undef);
       }
     } elsif ($state == BEFORE_CONTAINS_STRING_STATE) {
-      if ($t->{type} == STRING_TOKEN or $t->{type} == IDENT_TOKEN) {
+      if ($t->{type} == STRING_TOKEN or
+          $t->{type} == IDENT_TOKEN or
+          ($t->{type} == INVALID_TOKEN and $t->{eos})) {
         push @$sss, [PSEUDO_CLASS_SELECTOR, '-manakai-contains', $t->{value}];
         
         $state = AFTER_LANG_TAG_STATE;

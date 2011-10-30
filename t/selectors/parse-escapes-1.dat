@@ -679,3 +679,355 @@ x\U00900000y http://fuga/
 \uDC00\uD800 http://hoge/
 #parsed escaped
 [{http://hoge/}abc]
+
+#data
+[a="x\0y"]
+#errors
+1;7;css:escape:null;;;m
+#parsed escaped
+[{}a]
+=x\u0000y
+
+#data
+[a="x\51y"]
+#errors
+#parsed escaped
+[{}a]
+=x\u0051y
+
+#data
+[a="x\510000y"]
+#errors
+1;12;css:escape:not unicode;;;s
+#parsed escaped
+[{}a]
+=x\uFFFDy
+
+#data
+[a="x\D800\DC00y"]
+#errors
+#parsed escaped
+[{}a]
+=x\U00010000y
+
+#data
+[a="\D800\DC00y"]
+#errors
+#parsed escaped
+[{}a]
+=\U00010000y
+
+#data
+[a="x\D800\DC00"]
+#errors
+#parsed escaped
+[{}a]
+=x\U00010000
+
+#data
+[a="x\D800\DC00 y"]
+#errors
+#parsed escaped
+[{}a]
+=x\U00010000y
+
+#data
+[a="x\D800y"]
+#errors
+#parsed escaped
+[{}a]
+=x\uD800y
+
+#data
+[a='x\0y']
+#errors
+1;7;css:escape:null;;;m
+#parsed escaped
+[{}a]
+=x\u0000y
+
+#data
+[a='x\51y']
+#errors
+#parsed escaped
+[{}a]
+=x\u0051y
+
+#data
+[a='x\510000y']
+#errors
+1;12;css:escape:not unicode;;;s
+#parsed escaped
+[{}a]
+=x\uFFFDy
+
+#data
+[a='x\D800\DC00y']
+#errors
+#parsed escaped
+[{}a]
+=x\U00010000y
+
+#data
+[a='\D800\DC00y']
+#errors
+#parsed escaped
+[{}a]
+=\U00010000y
+
+#data
+[a='x\D800\DC00']
+#errors
+#parsed escaped
+[{}a]
+=x\U00010000
+
+#data
+[a='x\D800\DC00 y']
+#errors
+#parsed escaped
+[{}a]
+=x\U00010000y
+
+#data
+[a='x\D800y']
+#errors
+#parsed escaped
+[{}a]
+=x\uD800y
+
+#data
+[a="b\"c"]
+#parsed
+[{}a]
+=b"c
+
+#data
+[a="b\'c"]
+#parsed
+[{}a]
+=b'c
+
+#data
+[a='b\'c']
+#parsed
+[{}a]
+=b'c
+
+#data
+[a='b\'']
+#parsed
+[{}a]
+=b'
+
+#data
+[a="b"c"]
+#errors
+1;7;attr selector not closed;;;m
+#parsed
+
+#data
+[a="b
+c"]
+#errors
+1;4;no attr value;;;m
+
+#data
+[a="b
+#errors
+1;6;attr selector not closed;;;m
+
+#data
+[a='b
+c']
+#errors
+1;4;no attr value;;;m
+
+#data
+[a='b
+#errors
+1;6;attr selector not closed;;;m
+
+#data escaped
+[a="b\\u000Dc"]
+#errors
+#parsed escaped
+[{}a]
+=bc
+
+#data escaped
+[a="b\\u000D\u000Ac"]
+#errors
+#parsed escaped
+[{}a]
+=bc
+
+#data escaped
+[a="b\\u000Ac"]
+#errors
+#parsed escaped
+[{}a]
+=bc
+
+#data escaped
+[a="b\\u0009c"]
+#errors
+#parsed escaped
+[{}a]
+=b\u0009c
+
+#data escaped
+[a="b\\u0020c"]
+#errors
+#parsed escaped
+[{}a]
+=b c
+
+#data escaped
+[a="b\\u000Cc"]
+#errors
+#parsed escaped
+[{}a]
+=bc
+
+#data escaped
+[a="b\\u000Bc"]
+#errors
+#parsed escaped
+[{}a]
+=b\u000Bc
+
+#data escaped
+[a="b\\u000D c"]
+#errors
+#parsed escaped
+[{}a]
+=b c
+
+#data escaped
+[a="b\21 c"]
+#errors
+#parsed escaped
+[{}a]
+=b!c
+
+#data escaped
+[a="b\\u000D"]
+#errors
+#parsed escaped
+[{}a]
+=b
+
+#data escaped
+[a='b\\u000D']
+#errors
+#parsed escaped
+[{}a]
+=b
+
+#data escaped
+[a="b\\u000D\\u000A"]
+#errors
+#parsed escaped
+[{}a]
+=b
+
+#data escaped
+[a="b\\u0000"]
+#errors
+#parsed escaped
+[{}a]
+=b\u0000
+
+#data
+:-manakai-contains(abc\0)
+#supported
+:-manakai-contains
+#errors
+1;24;css:escape:null;;;m
+#parsed escaped
+:-manakai-contains
+  "abc\u0000"
+
+#data
+:-manakai-contains("abc\0")
+#supported
+:-manakai-contains
+#errors
+1;25;css:escape:null;;;m
+#parsed escaped
+:-manakai-contains
+  "abc\u0000"
+
+#data
+:-manakai-contains(abc\d800)
+#supported
+:-manakai-contains
+#errors
+#parsed escaped
+:-manakai-contains
+  "abc\uD800"
+
+#data
+:-manakai-contains(abc\dC00)
+#supported
+:-manakai-contains
+#errors
+#parsed escaped
+:-manakai-contains
+  "abc\uDC00"
+
+#data
+:-manakai-contains(abc\d800\dc00)
+#supported
+:-manakai-contains
+#errors
+#parsed escaped
+:-manakai-contains
+  "abc\U00010000"
+
+#data
+:-manakai-contains(abc\110000 x)
+#supported
+:-manakai-contains
+#errors
+1;29;css:escape:not unicode;;;s
+#parsed escaped
+:-manakai-contains
+  "abc\uFFFDx"
+
+#data
+:-manakai-contains(abc\
+x)
+#supported
+:-manakai-contains
+#errors
+1;23;selectors:pseudo:argument not closed;;;m
+#parsed escaped
+
+#data
+:-manakai-contains("abc\
+def")
+#supported
+:-manakai-contains
+#errors
+#parsed
+:-manakai-contains
+  "abcdef"
+
+#data
+:-manakai-contains("abc
+def")
+#supported
+:-manakai-contains
+#errors
+1;20;no contains string;;;m
+#parsed
+
+#data
+:-manakai-contains("abc
+#supported
+:-manakai-contains
+#errors
+1;24;selectors:pseudo:argument not closed;;;m
+#parsed

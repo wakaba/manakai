@@ -48,7 +48,11 @@ sub serialize_simple_selector ($) {
     }
     $result .= "\n";
     if (exists $_->[2]) {
-      $result .= "  " . serialize_simple_selector $_->[2];
+      if (ref $_->[2] eq 'ARRAY') {
+        $result .= "  " . serialize_simple_selector $_->[2];
+      } else {
+        $result .= q<  "> . $_->[2] . qq<"\n>;
+      }
     }
   }
   return $result;

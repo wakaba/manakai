@@ -2,3 +2,19 @@
 | # a
 #errors
 1;1;selectors:id:empty;;;m
+
+#data
+:-manakai-contains(abc)
+#supported
+:-manakai-contains
+#parsed
+:-manakai-contains
+  "abc"
+
+#data
+:-manakai-contains("abc")
+#supported
+:-manakai-contains
+#parsed
+:-manakai-contains
+  "abc"

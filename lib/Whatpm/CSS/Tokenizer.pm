@@ -104,7 +104,12 @@ sub init ($) {
   my $self = shift;
   $self->{state} = BEFORE_TOKEN_STATE;
   $self->{c} = $self->{get_char}->($self);
-  #$self->{t} = {type => token-type, value => value, number => number};
+  #$self->{t} = {type => token-type,
+  #              value => value,
+  #              number => number,
+  #              line => ..., column => ...,
+  #              hyphen => bool,
+  #              eos => bool};
 } # init
 
 sub get_next_token ($) {
@@ -1121,6 +1126,7 @@ sub get_next_token ($) {
         redo A;
       } elsif ($self->{c} == $q) { # " | '
         if ($self->{t}->{type} == STRING_TOKEN) {
+          $self->normalize_surrogate ($self->{t}->{value});
           $self->{state} = BEFORE_TOKEN_STATE;
           $self->{c} = $self->{get_char}->($self);
           return $self->{t};
@@ -1142,6 +1148,7 @@ sub get_next_token ($) {
           URI_PREFIX_TOKEN, URI_PREFIX_INVALID_TOKEN,
           URI_PREFIX_INVALID_TOKEN, URI_PREFIX_INVALID_TOKEN,
         }->{$self->{t}->{type}};
+        $self->{t}->{eos} = 1 if $self->{c} == -1;
         $self->{state} = BEFORE_TOKEN_STATE;
         # reconsume
         return $self->{t};
