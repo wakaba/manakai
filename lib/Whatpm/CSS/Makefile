@@ -4,7 +4,7 @@ WGET = wget
 RM = rm
 RMALL = $(RM) -fr
 
-all: SelectorsParser.html Colors.html Parser.html
+all: SelectorsParser.html Colors.html Parser.html Tokenizer.html
 
 %.html: %.pod
 	$(POD2HTML) $< > $@

@@ -1,6 +1,8 @@
 package Whatpm::CSS::Tokenizer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.20 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+no warnings 'utf8';
+our $VERSION = '1.21';
 
 require Exporter;
 push our @ISA, 'Exporter';
