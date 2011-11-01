@@ -785,13 +785,24 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             $state = AFTER_B_STATE;
             $t = $tt->get_next_token;
             redo S;
-          } else {
-            $self->{onerror}->(type => 'an+b syntax error',
-                               level => $self->{level}->{must},
-                               uri => \$self->{href},
-                               token => $t);
-            return ($t, undef);
+          } elsif ($n =~ /\An-\z/) {
+            push @$sss, [PSEUDO_CLASS_SELECTOR, $name, 0+$t->{number}, 0];
+
+            $t = $tt->get_next_token;
+            $t = $tt->get_next_token while $t->{type} == S_TOKEN;
+            if ($t->{type} == NUMBER_TOKEN and
+                $t->{number} =~ /\A[0-9]+\z/) {
+              $sss->[-1]->[-1] -= $t->{number};
+              $state = AFTER_B_STATE;
+              $t = $tt->get_next_token;
+              redo S;
+            }
           }
+          $self->{onerror}->(type => 'an+b syntax error',
+                             level => $self->{level}->{must},
+                             uri => \$self->{href},
+                             token => $t);
+          return ($t, undef);
         } else {
           $self->{onerror}->(type => 'an+b syntax error',
                              level => $self->{level}->{must},
@@ -815,7 +826,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         }
       } elsif ($t->{type} == IDENT_TOKEN) {
         my $value = $t->{value};
-        $value =~ tr/A-Z/a-z/; ## TODO: ASCII case-insensitive?
+        $value =~ tr/A-Z/a-z/; ## ASCII case-insensitive
         if ($value eq 'odd') {
           push @$sss, [PSEUDO_CLASS_SELECTOR, $name, 2, 1];
 
@@ -851,8 +862,6 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
       } elsif ($t->{type} == MINUS_TOKEN or
                $t->{type} == PLUS_TOKEN) {
         my $sign = $t->{type} == MINUS_TOKEN ? -1 : +1;
-        ## ISSUE: Is :nth-child(- 1) allowed?
-        ## ISSUE: Is :nth-child(n-/**/6) or (-n-/**/6) allowed?
         $t = $tt->get_next_token;
         if ($t->{type} == DIMENSION_TOKEN || $t->{type} == IDENT_TOKEN) {
           my $num = $t->{type} == IDENT_TOKEN ? 1 : $t->{number};
@@ -889,7 +898,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             return ($t, undef);
           }
         } elsif ($t->{type} == NUMBER_TOKEN) {
-          if (int $t->{number} == $t->{number}) {
+          if ($t->{number} =~ /\A[0-9]+\z/) {
             push @$sss, [PSEUDO_CLASS_SELECTOR, $name,
                          0, $sign * $t->{number}];
 
@@ -922,8 +931,6 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         return ($t, undef);
       }
     } elsif ($state == AFTER_AN_STATE) {
-      ## ISSUE: :nth-child(1n +2) is allowed.
-      ## :nth-child(1n /**/ +2) and :nth-child(1n -2) are allowed?
       if ($t->{type} == PLUS_TOKEN) {
         $simple_selector->[3] = +1;
 
@@ -954,9 +961,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         return ($t, undef);
       }
     } elsif ($state == BEFORE_B_STATE) {
-      ## ISSUE: Is S allowed?
       if ($t->{type} == NUMBER_TOKEN) {
-        if (int $t->{number} == $t->{number}) {
+        if ($t->{number} =~ /\A[0-9]+\z/) {
           $simple_selector->[3] *= $t->{number};
           push @$sss, $simple_selector;
           
@@ -970,6 +976,10 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                              token => $t);
           return ($t, undef);
         }
+      } elsif ($t->{type} == S_TOKEN) {
+        ## Stay in the state.
+        $t = $tt->get_next_token;
+        redo S;
       } else {
         $self->{onerror}->(type => 'an+b syntax error',
                            level => $self->{level}->{must},

@@ -521,7 +521,34 @@
   "-1"
 
 #data
+:nth-child(0)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
 :nth-child(00000000)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(+0)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(-0)
 #supported
 :nth-child
 #parsed
@@ -554,6 +581,33 @@
 #parsed
 :nth-child
   "3"
+  "0"
+
+#data
+:nth-child(0n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(+0n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
+  "0"
+
+#data
+:nth-child(-0n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "0"
   "0"
 
 #data
@@ -994,6 +1048,335 @@
 :nth-child
   "12"
   "0"
+
+#data
+:nth-child(2n+)
+#supported
+:nth-child
+#errors
+1;15;an+b syntax error;;;m
+
+#data
+:nth-child(2n-)
+#supported
+:nth-child
+#errors
+1;15;an+b syntax error;;;m
+
+#data
+:nth-child(2n/**/+)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n/**/-)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n  +)
+#supported
+:nth-child
+#errors
+1;17;an+b syntax error;;;m
+
+#data
+:nth-child(2n  -)
+#supported
+:nth-child
+#errors
+1;17;an+b syntax error;;;m
+
+#data
+:nth-child(2n+1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(2n+120)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "120"
+
+#data
+:nth-child(2n+000001)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(2n-1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-1"
+
+#data
+:nth-child(2n-00001)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-1"
+
+#data
+:nth-child(2n-120)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-120"
+
+#data
+:nth-child(2n+0)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "0"
+
+#data
+:nth-child(2n-0)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "0"
+
+#data
+:nth-child(2n/**/+1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(2n/**/-1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-1"
+
+#data
+:nth-child(2n+/**/1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(2n-/**/1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-1"
+
+#data
+:nth-child(2n+/**/+1)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n-/**/+1)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n+/**/+1)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n+/**/-1)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n-/**/+1)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n-/**/-1)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n+1.0)
+#supported
+:nth-child
+#errors
+1;15;an+b syntax error;;;m
+
+#data
+:nth-child(2n-1.0)
+#supported
+:nth-child
+#errors
+1;16;an+b not closed;;;m
+
+#data
+:nth-child(2n/**/+1.0)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n/**/-1.0)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n+/**/1.0)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n-/**/1.0)
+#supported
+:nth-child
+#errors
+1;19;an+b syntax error;;;m
+
+#data
+:nth-child(2n/**/-/**/ /**/ 1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-1"
+
+#data
+:nth-child(2n-/**/ /**/ 1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-1"
+
+#data
+:nth-child(4n +  1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "4"
+  "1"
+
+#data
+:nth-child(4n - 1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "4"
+  "-1"
+
+#data
+:nth-child(4n /**/ + /**/ 1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "4"
+  "1"
+
+#data
+:nth-child(4n /**/ - /**/ 1)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "4"
+  "-1"
+
+#data
+:nth-child(4n /**/ + /**/ 1 /**/ )
+#supported
+:nth-child
+#parsed
+:nth-child
+  "4"
+  "1"
+
+#data
+:nth-child(4n /**/ + /**/ +1)
+#supported
+:nth-child
+#errors
+1;27;an+b syntax error;;;m
+
+#data
+:nth-child(4n /**/ + /**/ -1)
+#supported
+:nth-child
+#errors
+1;27;an+b syntax error;;;m
+
+#data
+:nth-child(\-n)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "-1"
+  "0"
+
+#data
+:nth-child(2n-\31)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "-1"
 
 #data
 :first-child
