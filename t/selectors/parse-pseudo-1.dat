@@ -1379,6 +1379,191 @@
   "-1"
 
 #data
+:nth-child(odd)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(\odd)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(ODD)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(/**/ /**/ odd/**/ /**/)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data escaped
+:nth-child(o\44\u000Dd)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "1"
+
+#data
+:nth-child(even)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "0"
+
+#data
+:nth-child(EvEn)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "0"
+
+#data
+:nth-child(/**/e\ven/**/ /**/ /**/)
+#supported
+:nth-child
+#parsed
+:nth-child
+  "2"
+  "0"
+
+#data
+:nth-child(event)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(add)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(even+2)
+#supported
+:nth-child
+#errors
+1;16;an+b not closed;;;m
+
+#data
+:nth-child(an+b)
+#supported
+:nth-child
+#errors
+1;12;an+b syntax error;;;m
+
+#data
+:nth-child(3
+#supported
+:nth-child
+#errors
+1;13;an+b not closed;;;m
+
+#data
+:nth-child(3n
+#supported
+:nth-child
+#errors
+1;14;an+b syntax error;;;m
+
+#data
+:nth-child(3+
+#supported
+:nth-child
+#errors
+1;13;an+b not closed;;;m
+
+#data
+:nth-child(3n+6
+#supported
+:nth-child
+#errors
+1;16;an+b not closed;;;m
+
+#data
+:nth-last-child
+#supported
+:nth-last-child
+#errors
+1;2;selectors:pseudo-class:ident:unknown;;nth-last-child;m
+
+#data
+:nth-last-child(5n+30)
+#supported
+:nth-last-child
+#parsed
+:nth-last-child
+  "5"
+  "30"
+
+#data
+:nth-last-child(/**/-5n)
+#supported
+:nth-last-child
+#parsed
+:nth-last-child
+  "-5"
+  "0"
+
+#data
+:nth-of-type
+#supported
+:nth-of-type
+#errors
+1;2;selectors:pseudo-class:ident:unknown;;nth-of-type;m
+
+#data
+:nth-of-type(5n+30)
+#supported
+:nth-of-type
+#parsed
+:nth-of-type
+  "5"
+  "30"
+
+#data
+:nth-last-of-type
+#supported
+:nth-last-of-type
+#errors
+1;2;selectors:pseudo-class:ident:unknown;;nth-last-of-type;m
+
+#data
+:nth-last-of-type(5n+30)
+#supported
+:nth-last-of-type
+#parsed
+:nth-last-of-type
+  "5"
+  "30"
+
+#data
 :first-child
 #ns
 http://hoge/
