@@ -147,3 +147,403 @@ h1, h2..foo, h3
 :first-child,abc
 #errors
 1;2;selectors:pseudo-class:ident:not supported;;first-child;w
+
+#data
+foo bar::before
+#supported
+::before
+#parsed
+<foo>
+***
+<bar>
+::before
+
+#data
+foo ::before
+#supported
+::before
+#parsed
+<foo>
+***
+::before
+
+#data
+foo>::before
+#supported
+::before
+#parsed
+<foo>
+>
+::before
+
+#data
+:first-child::before
+#supported
+:first-child
+::before
+#parsed
+:first-child
+::before
+
+#data
+::before::after
+#supported
+::before
+::after
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::before:first-child
+#supported
+::before
+:first-child
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::before.after
+#supported
+::before
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::before#after
+#supported
+::before
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::before[after]
+#supported
+::before
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::before/**/after
+#supported
+::before
+#errors
+1;13;no combinator;;;m
+
+#data
+::before/**/*
+#supported
+::before
+#errors
+1;13;no combinator;;;m
+
+#data
+::before after
+#supported
+::before
+#errors
+1;10;ss after pseudo-element;;;m
+
+#data
+::before *
+#supported
+::before
+#errors
+1;10;ss after pseudo-element;;;m
+
+#data
+::before .after
+#supported
+::before
+#errors
+1;10;ss after pseudo-element;;;m
+
+#data
+::before #after
+#supported
+::before
+#errors
+1;10;ss after pseudo-element;;;m
+
+#data
+::before :first-child
+#supported
+::before
+:first-child
+#errors
+1;10;ss after pseudo-element;;;m
+
+#data
+::before ::after
+#supported
+::before
+::after
+#errors
+1;10;ss after pseudo-element;;;m
+
+#data
+::before :lang(en)
+#supported
+::before
+:lang
+#errors
+1;10;ss after pseudo-element;;;m
+
+#data
+::before>after
+#supported
+::before
+#errors
+1;9;combinator after pseudo-element;;;m
+
+#data
+::before+after
+#supported
+::before
+#errors
+1;9;combinator after pseudo-element;;;m
+
+#data
+::before~after
+#supported
+::before
+#errors
+1;9;combinator after pseudo-element;;;m
+
+#data
+::before >after
+#supported
+::before
+#errors
+1;10;combinator after pseudo-element;;;m
+
+#data
+::before +after
+#supported
+::before
+#errors
+1;10;combinator after pseudo-element;;;m
+
+#data
+::before ~after
+#supported
+::before
+#errors
+1;10;combinator after pseudo-element;;;m
+
+#data
+:before after
+#supported
+::before
+#errors
+1;9;ss after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before *
+#supported
+::before
+#errors
+1;9;ss after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before .after
+#supported
+::before
+#errors
+1;9;ss after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before #after
+#supported
+::before
+#errors
+1;9;ss after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before :first-child
+#supported
+::before
+:first-child
+#errors
+1;9;ss after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before ::after
+#supported
+::before
+::after
+#errors
+1;9;ss after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before :lang(en)
+#supported
+::before
+:lang
+#errors
+1;9;ss after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before>after
+#supported
+::before
+#errors
+1;8;combinator after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before+after
+#supported
+::before
+#errors
+1;8;combinator after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before~after
+#supported
+::before
+#errors
+1;8;combinator after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before >after
+#supported
+::before
+#errors
+1;9;combinator after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before +after
+#supported
+::before
+#errors
+1;9;combinator after pseudo-element;;;m
+1;2;selectors:pseudo-element:one colon;;before;w
+
+#data
+:before ~after
+#supported
+::before
+#errors
+1;2;selectors:pseudo-element:one colon;;before;w
+1;9;combinator after pseudo-element;;;m
+
+#data
+.foo::before
+#supported
+::before
+#parsed
+.foo
+::before
+
+#data
+.foo:before
+#supported
+::before
+#parsed
+.foo
+::before
+#errors
+1;6;selectors:pseudo-element:one colon;;before;w
+
+#data
+.foo ::before
+#supported
+::before
+#parsed
+.foo
+***
+::before
+
+#data
+.foo :before
+#supported
+::before
+#parsed
+.foo
+***
+::before
+#errors
+1;7;selectors:pseudo-element:one colon;;before;w
+
+#data
+:link:visited:after
+#supported
+:link
+:visited
+::after
+#errors
+1;15;selectors:pseudo-element:one colon;;after;w
+#parsed
+:link
+:visited
+::after
+
+#data
+::before,::after
+#supported
+::before
+::after
+#parsed
+::before
+------
+::after
+
+#data
+::before  ,  ::after
+#supported
+::before
+::after
+#parsed
+::before
+------
+::after
+
+#data
+::before,foo::after
+#supported
+::before
+::after
+#parsed
+::before
+------
+<foo>
+::after
+
+#data
+::before:visited,::after
+#supported
+::before
+::after
+:visited
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::before,::after:visited
+#supported
+::before
+::after
+:visited
+#errors
+1;17;ss after pseudo-element;;;m
+
+#data
+::before/**/,/**/foo::after
+#supported
+::before
+::after
+#parsed
+::before
+------
+<foo>
+::after

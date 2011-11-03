@@ -236,7 +236,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
 
       if ($t->{type} == DOT_TOKEN) { ## class selector
         if ($has_pseudo_element) {
-          $self->{onerror}->(type => 'ss after pseudo element',
+          $self->{onerror}->(type => 'ss after pseudo-element',
                              level => $self->{level}->{must},
                              uri => \$self->{href},
                              token => $t);
@@ -247,7 +247,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } elsif ($t->{type} == HASH_TOKEN) { ## ID selector
         if ($has_pseudo_element) {
-          $self->{onerror}->(type => 'ss after pseudo element',
+          $self->{onerror}->(type => 'ss after pseudo-element',
                              level => $self->{level}->{must},
                              uri => \$self->{href},
                              token => $t);
@@ -266,7 +266,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         redo S;
       } elsif ($t->{type} == COLON_TOKEN) { ## pseudo-class or pseudo-element
         if ($has_pseudo_element) {
-          $self->{onerror}->(type => 'ss after pseudo element',
+          $self->{onerror}->(type => 'ss after pseudo-element',
                              level => $self->{level}->{must},
                              uri => \$self->{href},
                              token => $t);
@@ -404,6 +404,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                 PLUS_TOKEN, 1,
                 TILDE_TOKEN, 1,
                }->{$t->{type}}) {
+        if ($has_pseudo_element) {
+          $self->{onerror}->(type => 'combinator after pseudo-element',
+                             level => $self->{level}->{must},
+                             uri => \$self->{href},
+                             token => $t);
+          return ($t, undef);
+        }
+
         push @$selector, $t->{type};
 
         $state = BEFORE_TYPE_SELECTOR_STATE;
@@ -421,6 +429,14 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         redo S;
       } else {
+        if ($has_pseudo_element) {
+          $self->{onerror}->(type => 'ss after pseudo-element',
+                             level => $self->{level}->{must},
+                             uri => \$self->{href},
+                             token => $t);
+          return ($t, undef);
+        }
+
         push @$selector, S_TOKEN;
 
         $state = BEFORE_TYPE_SELECTOR_STATE;
@@ -465,6 +481,10 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                   before => 1, after => 1}->{$class} and
                  not $in_negation) {
           if ($self->{pseudo_element}->{$class}) {
+            $self->{onerror}->(type => 'selectors:pseudo-element:one colon',
+                               level => $self->{level}->{warning},
+                               uri => \$self->{href},
+                               token => $t, value => $class);
             push @$sss, [PSEUDO_ELEMENT_SELECTOR, $class];
             $has_pseudo_element = 1;
           } else {
