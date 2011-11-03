@@ -769,6 +769,36 @@ foo http://foo/
 1;4;no attr value;;;m
 
 #data
+[*]
+#errors
+1;3;no attr namespace separator;;;m
+
+#data
+[\*]
+#parsed
+[{}*]
+
+#data
+[|*]
+#errors
+1;3;no attr local name;;;m
+
+#data
+[|\*]
+#parsed
+[{}*]
+
+#data
+[*|*]
+#errors
+1;4;no attr local name;;;m
+
+#data
+[*|\*]
+#parsed
+[*]
+
+#data
 .foo
 #parsed
 .foo

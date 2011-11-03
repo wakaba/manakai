@@ -865,7 +865,6 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         $t = $tt->get_next_token;
         if ($t->{type} == DIMENSION_TOKEN || $t->{type} == IDENT_TOKEN) {
           my $num = $t->{type} == IDENT_TOKEN ? 1 : $t->{number};
-          ## NOTE: :nth-child(-/**/n)
           if ($num =~ /\A[0-9]+\z/) {
             my $n = $t->{value};
             $n =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
