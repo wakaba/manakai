@@ -201,7 +201,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                 RPAREN_TOKEN, 1, # :not(a ->> ) <<-
                }->{$t->{type}}) {
         $in_negation = 1 if $in_negation;
-        if (defined $default_namespace) {
+        if (defined $default_namespace and not $in_negation) {
           if (length $default_namespace) {
             push @$sss, [NAMESPACE_SELECTOR, $default_namespace];
           } else {
@@ -462,7 +462,8 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
             return ($t, undef);
           }
         } elsif ({'first-letter' => 1, 'first-line' => 1,
-                  before => 1, after => 1}->{$class}) {
+                  before => 1, after => 1}->{$class} and
+                 not $in_negation) {
           if ($self->{pseudo_element}->{$class}) {
             push @$sss, [PSEUDO_ELEMENT_SELECTOR, $class];
             $has_pseudo_element = 1;
@@ -709,7 +710,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
     } elsif ($state == AFTER_DOUBLE_COLON_STATE) {
       if ($t->{type} == IDENT_TOKEN) {
         my $pe = $t->{value};
-        $pe =~ tr/A-Z/a-z/; ## TODO: Is ASCII case-insensitive OK?
+        $pe =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
         if ($self->{pseudo_element}->{$pe} and 
             {'first-letter' => 1, 'first-line' => 1,
              after => 1, before => 1}->{$pe}) {

@@ -1743,6 +1743,351 @@ http://hoge/
   "abc"
 
 #data
+:not(a)
+#errors
+1;2;selectors:pseudo-class:function:not supported;;not;w
+
+#data
+:not(a)
+#supported
+:not
+#parsed
+:not
+  <a>
+
+#data
+:not(*)
+#supported
+:not
+#parsed
+:not
+  *
+
+#data
+:not(*|a)
+#supported
+:not
+#parsed
+:not
+  <a>
+
+#data
+:not(*|*)
+#supported
+:not
+#parsed
+:not
+  *
+
+#data
+:not(a)
+#ns
+http://foo/
+#supported
+:not
+#parsed
+{http://foo/}
+:not
+  {http://foo/}
+  <a>
+
+#data
+:not(*)
+#ns
+http://foo/
+#supported
+:not
+#parsed
+{http://foo/}
+:not
+  {http://foo/}
+
+#data
+:not(*|a)
+#ns
+http://foo/
+#supported
+:not
+#parsed
+{http://foo/}
+:not
+  <a>
+
+#data
+:not(*|*)
+#ns
+http://foo/
+#supported
+:not
+#parsed
+{http://foo/}
+:not
+  *
+
+#data
+:not(a|b)
+#ns
+a http://foo/bar
+#supported
+:not
+#parsed
+:not
+  {http://foo/bar}
+  <b>
+
+#data
+:not(a|*)
+#ns
+a http://foo/
+#supported
+:not
+#parsed
+:not
+  {http://foo/}
+
+#data
+*|*:not(.foo)
+#ns
+http://hoge/
+#supported
+:not
+#parsed
+:not
+  .foo
+
+#data
+*|*:not(#foo)
+#ns
+http://hoge/
+#supported
+:not
+#parsed
+:not
+  #foo
+
+#data
+*|*:not(:first-child)
+#ns
+http://hoge/
+#supported
+:not
+:first-child
+#parsed
+:not
+  :first-child
+
+#data
+*|*:not([a])
+#ns
+http://hoge/
+#supported
+:not
+#parsed
+:not
+  [{}a]
+
+#data
+:not(a|b)
+#supported
+:not
+#errors
+1;6;namespace prefix:not declared;;a;m
+
+#data
+:not(.foo)
+#supported
+:not
+#parsed
+:not
+  .foo
+
+#data
+:not(#foo)
+#supported
+:not
+#parsed
+:not
+  #foo
+
+#data
+:not([foo])
+#supported
+:not
+#parsed
+:not
+  [{}foo]
+
+#data
+:not([foo^="bar"])
+#supported
+:not
+#parsed
+:not
+  [{}foo]
+  ^=bar
+
+#data
+:not([foo)
+#supported
+:not
+#errors
+1;10;no attr match;;;m
+
+#data
+:not(:first-child)
+#supported
+:not
+#errors
+1;7;selectors:pseudo-class:ident:not supported;;first-child;w
+
+#data
+:not(:first-child)
+#supported
+:not
+:first-child
+#parsed
+:not
+  :first-child
+
+#data
+:not(:nth-child(3n+5))
+#supported
+:not
+:nth-child
+#parsed
+:not
+  :nth-child
+    "3"
+    "5"
+
+#data
+:not(:lang(en))
+#supported
+:not
+:lang
+#parsed
+:not
+  :lang
+    "en"
+
+#data
+:not(:not(a))
+#supported
+:not
+#errors
+1;7;selectors:pseudo-class:function:unknown;;not;m
+
+#data
+:not(:not)
+#supported
+:not
+#errors
+1;7;selectors:pseudo-class:ident:unknown;;not;m
+
+#data
+:not
+#supported
+:not
+#errors
+1;2;selectors:pseudo-class:ident:unknown;;not;m
+
+#data
+:not(:before)
+#supported
+:not
+::before
+#errors
+1;7;selectors:pseudo-class:ident:unknown;;before;m
+
+#data
+:not(::before)
+#supported
+:not
+::before
+#errors
+1;7;no pseudo-class name;;;m
+
+#data
+:not(a.b)
+#supported
+:not
+#errors
+1;7;not not closed;;;m
+
+#data
+:not(.a.b)
+#supported
+:not
+#errors
+1;8;not not closed;;;m
+
+#data
+:not(a):not(b)
+#supported
+:not
+#errors
+#parsed
+:not
+  <a>
+:not
+  <b>
+
+#data
+:not(/**/a/**/)
+#supported
+:not
+#parsed
+:not
+  <a>
+
+#data escaped
+:not(\u0009 abc \u000c)
+#supported
+:not
+#parsed
+:not
+  <abc>
+
+#data
+:NOT(abc)
+#supported
+:not
+#parsed
+:not
+  <abc>
+
+#data
+:n\ot(abc)
+#supported
+:not
+#parsed
+:not
+  <abc>
+
+#data
+:/**/not(abc)
+#supported
+:not
+#parsed
+:not
+  <abc>
+
+#data
+:n\4ft(abc)
+#supported
+:not
+#parsed
+:not
+  <abc>
+
+#data
+:not/**/(abc)
+#supported
+:not
+#errors
+1;2;selectors:pseudo-class:ident:unknown;;not;m
+
+#data
 ::active
 #supported
 :active

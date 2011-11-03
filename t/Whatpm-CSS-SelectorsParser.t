@@ -50,11 +50,16 @@ sub serialize_simple_selector ($) {
     if (exists $_->[2]) {
       for (@{$_}[2..$#{$_}]) {
         if (ref $_ eq 'ARRAY') {
-          $result .= "  " . serialize_simple_selector $_;
+          my $r = "  " . serialize_simple_selector $_;
+          $r =~ s/\n/\n  /g;
+          $r =~ s/\n  $/\n/;
+          $result .= $r;
         } else {
           $result .= q<  "> . $_ . qq<"\n>;
         }
       }
+    } elsif ($_->[1] eq 'not') {
+      $result .= qq<  *\n>;
     }
   }
   return $result;
