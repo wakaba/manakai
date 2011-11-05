@@ -1,114 +1,80 @@
-package test::Message::DOM::selectors_api;
+package test::Message::DOM::SelectorsAPI;
 use strict;
 use warnings;
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
+use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;
 use base qw(Test::Class);
 use Test::Differences;
+use Test::HTCT::Parser;
 
 require Message::DOM::DOMImplementation;
 my $dom = Message::DOM::DOMImplementation->new;
 
+my $data_d = file (__FILE__)->dir->subdir ('selectors');
+
 sub _query_selector : Tests {
-for my $file_name (qw(
-  selectors/query-1.dat
-)) {
-  print "# $file_name\n";
-  open my $file, '<', file (__FILE__)->dir->file ($file_name)
-      or die "$0: $file_name: $!";
+  my $documents = {};
 
-  my $all_test = {document => {}, test => []};
-  my $test;
-  my $mode = 'data';
-  my $label;
-  my $root;
-  while (<$file>) {
-    s/\x0D\x0A/\x0A/;
-    if (/^#data$/) {
-      undef $test;
-      $test->{data} = '';
-      push @{$all_test->{test}}, $test;
-      $mode = 'data';
-    } elsif (/^#result (\S+)$/) {
-      $label = $1;
-      $root = '/';
-      $test->{result}->{$label}->{$root} = [];
-      $mode = 'result';
-      $test->{data} =~ s/\x0D?\x0A\z//;       
-    } elsif (/^#result (\S+) (\S+)$/) {
-      $label = $1;
-      $root = $2;
-      $test->{result}->{$label}->{$root} = [];
-      $mode = 'result';
-      $test->{data} =~ s/\x0D?\x0A\z//;       
-    } elsif (/^#ns (\S+)$/) {
-      $test->{ns}->{''} = $1;
-    } elsif (/^#ns (\S+) (\S+)$/) {
-      $test->{ns}->{$1} = $2;
-    } elsif (/^#html (\S+)$/) {
-      undef $test;
-      $test->{format} = 'html';
-      $test->{data} = '';
-      $all_test->{document}->{$1} = $test;
-      $mode = 'data';
-    } elsif (defined $test->{data} and /^$/) {
-      undef $test;
-    } else {
-      if ($mode eq 'data' or $mode eq 'document') {
-        $test->{$mode} .= $_;
-      } elsif ($mode eq 'result') {
-        tr/\x0D\x0A//d;
-        push @{$test->{result}->{$label}->{$root}}, $_;
+  for_each_test $_, {
+    html => {is_prefixed => 1},
+    data => {is_prefixed => 1},
+    result => {is_list => 1, multiple => 1},
+    ns => {is_list => 1},
+    supported => {is_list => 1},
+  }, sub {
+    my $test = shift;
+
+    if ($test->{html}) {
+      my $doc_name = $test->{html}->[1]->[0];
+      if (exists $documents->{$doc_name}) {
+        warn "# Document |$doc_name| is already defined\n";
       }
-    }
-  }
-
-  for my $data (values %{$all_test->{document}}) {
-    if ($data->{format} eq 'html') {
+      
       my $doc = $dom->create_document;
       $doc->manakai_is_html (1);
-      $doc->inner_html ($data->{data});
-      $data->{document} = $doc;
-    } else {
-      die "Test data format $data->{format} is not supported";
+      $doc->inner_html ($test->{html}->[0]);
+      $documents->{$doc_name} = $doc;
+
+      return;
     }
-  }
-
-  for my $test (@{$all_test->{test}}) {
-    for my $label (keys %{$test->{result}}) {
-      my $doc = $all_test->{document}->{$label}->{document};
-      unless ($doc) {
-        die "Test document $label is not defined";
-      }
-      my $ns = sub {
-        my $prefix = shift;
-        if (defined $prefix) {
-          return $test->{ns}->{$prefix};
-        } else {
-          return $test->{ns}->{''};
-        }
-      };
-
-      for my $root (keys %{$test->{result}->{$label}}) {
-        my $root_node = get_node_by_path ($doc, $root);
-
-        ## query_selector_all
-        my $expected = join "\n", @{$test->{result}->{$label}->{$root}};
-        my $actual = join "\n", map {
-          get_node_path ($_)
-        } @{$root_node->query_selector_all ($test->{data}, $ns)};
-        eq_or_diff $actual, $expected, "$test->{data} $label $root all";
-
-        ## query_selector
-        $expected = $test->{result}->{$label}->{$root}->[0];
-        undef $actual;
-        my $node = $root_node->query_selector ($test->{data}, $ns);
-        $actual = get_node_path ($node) if defined $node;
-        eq_or_diff $actual, $expected, "$test->{data} $label $root one";
+    
+    my %ns;
+    for (@{$test->{ns}->[0] or []}) {
+      if (/^(\S+)\s+(\S+)$/) {
+        $ns{$1} = $2 eq '<null>' ? '' : $2;
+      } elsif (/^(\S+)$/) {
+        $ns{''} = $1 eq '<null>' ? '' : $1;
       }
     }
-  }
-}
+    my $lookup_ns = sub {
+      return $ns{$_[0] // ''};
+    }; # lookup_namespace_uri
+    
+    for my $result (@{$test->{result} or []}) {
+      my $label = $result->[1]->[0];
+      my $root = $result->[1]->[1] // '/';
+      
+      my $doc = $documents->{$label} or die "Test |$label| not found\n";
+      my $root_node = get_node_by_path ($doc, $root);
+      
+      ## query_selector_all
+      my $expected = join "\n", @{$result->[0]};
+      my $actual = join "\n", map {
+        get_node_path ($_)
+      } @{$root_node->query_selector_all ($test->{data}->[0], $lookup_ns)};
+      eq_or_diff $actual, $expected, "$test->{data}->[0] $label $root all";
+      
+      ## query_selector
+      $expected = $result->[0]->[0];
+      undef $actual;
+      my $node = $root_node->query_selector ($test->{data}->[0], $lookup_ns);
+      $actual = get_node_path ($node) if defined $node;
+      eq_or_diff $actual, $expected, "$test->{data}->[0] $label $root one";
+    } # $result
+  } for map { $data_d->file ($_)->stringify } qw(
+    query-1.dat
+  );
 } # _query_selector
 
 sub get_node_path ($) {
