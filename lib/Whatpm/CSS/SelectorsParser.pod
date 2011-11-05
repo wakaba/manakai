@@ -33,7 +33,7 @@ Otherwise, it returns C<undef>.
 =item $specificity = $parser->get_selector_specificity ($parsed_selector)
 
 Returns the specificity of a parsed selector data structure.  Note
-that the input has to be a I<selector>, not a C<group of selectors>.
+that the input has to be a I<selector>, not a I<group of selectors>.
 
 The return value is an array reference with four values: The C<style>
 attribute flag (always C<0>), I<a>, I<b>, and I<c>.
@@ -49,8 +49,8 @@ Following parameters can be specified on a parser object:
 =item $parser->{href} = URL
 
 The URL in which the input selectors string is found, if available.
-This value is used to set the C<href> parameter to the C<<
-$parser->{onerror} >> handler.
+This value is used to set the C<href> parameter to the 
+C<< $parser->{onerror} >> handler.
 
 =item $parser->{lookup_namespace_uri} = CODE
 
