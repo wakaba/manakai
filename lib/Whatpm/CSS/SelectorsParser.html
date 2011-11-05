@@ -1,37 +1,45 @@
+<?xml version="1.0" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Whatpm::CSS::SelectorsParser - A Selectors Parser</title>
 <link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
 </head>
 
 <body>
 
-<p><a name="__index__"></a></p>
+
 <!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
 
 <ul>
 
 	<li><a href="#name">NAME</a></li>
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#constants">CONSTANTS</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#parameters">PARAMETERS</a></li>
+	<li><a href="#data_structures">DATA STRUCTURES</a></li>
 	<ul>
 
-		<li><a href="#simple_selector_types">Simple Selector Types</a></li>
-		<li><a href="#combinator_types">Combinator Types</a></li>
-		<li><a href="#match_types">Match Types</a></li>
+		<li><a href="#a_group_of_selectors">A group of selectors</a></li>
+		<li><a href="#a_selector">A selector</a></li>
+		<li><a href="#a_sequence_of_simple_selectors">A sequence of simple selectors</a></li>
+		<li><a href="#a_simple_selector">A simple selector</a></li>
 	</ul>
 
-	<li><a href="#methods">METHODS</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#license">LICENSE</a></li>
 </ul>
+
+<hr name="index" />
+</div>
 <!-- INDEX END -->
 
-<hr />
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
@@ -40,165 +48,322 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>@@ TBD</p>
+<pre>
+  use Whatpm::CSS::SelectorsParser;
+  my $parser = Whatpm::CSS::SelectorsParser-&gt;new;
+  $parsed_selectors = $parser-&gt;parse_string ($selectors);</pre>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>@@ TBD</p>
-<p>
-</p>
-<hr />
-<h1><a name="constants">CONSTANTS</a></h1>
-<p>
-</p>
-<h2><a name="simple_selector_types">Simple Selector Types</a></h2>
-<p>The constants below represent the types of simple selectors (or parts
-of simple selectors).</p>
-<dl>
-<dt><strong><a name="item_namespace_selector">NAMESPACE_SELECTOR</a></strong><br />
-</dt>
-<dd>
-Namespace specification.  It represents the namespace part
-of a universal or type selector.
-</dd>
-<p></p>
-<dt><strong><a name="item_local_name_selector">LOCAL_NAME_SELECTOR</a></strong><br />
-</dt>
-<dd>
-Local name specification.  It represents the local name part
-of a type selector.
-</dd>
-<p></p>
-<dt><strong><a name="item_id_selector">ID_SELECTOR</a></strong><br />
-</dt>
-<dd>
-An ID selector.
-</dd>
-<p></p>
-<dt><strong><a name="item_class_selector">CLASS_SELECTOR</a></strong><br />
-</dt>
-<dd>
-A class selector.
-</dd>
-<p></p>
-<dt><strong><a name="item_pseudo_class_selector">PSEUDO_CLASS_SELECTOR</a></strong><br />
-</dt>
-<dd>
-A pseudo-class selector.
-</dd>
-<p></p>
-<dt><strong><a name="item_pseudo_element_selector">PSEUDO_ELEMENT_SELECTOR</a></strong><br />
-</dt>
-<dd>
-A pseudo-element specification.
-</dd>
-<p></p>
-<dt><strong><a name="item_attribute_selector">ATTRIBUTE_SELECTOR</a></strong><br />
-</dt>
-<dd>
-An attribute selector.
-</dd>
-<p></p></dl>
-<p>The tag <code>:selector</code> can be used to export all of these
-constants as:</p>
-<pre>
-  use Whatpm::CSS::SelectorsParser qw(:selector);</pre>
-<p>
-</p>
-<h2><a name="combinator_types">Combinator Types</a></h2>
-<p>The constants below represent the types of combinators.</p>
-<dl>
-<dt><strong><a name="item_descendant_combinator">DESCENDANT_COMBINATOR</a></strong><br />
-</dt>
-<dd>
-A descendant combinator.
-</dd>
-<p></p>
-<dt><strong><a name="item_child_combinator">CHILD_COMBINATOR</a></strong><br />
-</dt>
-<dd>
-A child combinator.
-</dd>
-<p></p>
-<dt><strong><a name="item_adjacent_sibling_combinator">ADJACENT_SIBLING_COMBINATOR</a></strong><br />
-</dt>
-<dd>
-An adjacent sibling combinator.
-</dd>
-<p></p>
-<dt><strong><a name="item_general_sibling_combinator">GENERAL_SIBLING_COMBINATOR</a></strong><br />
-</dt>
-<dd>
-A general sibling combinator.
-</dd>
-<p></p></dl>
-<p>The tag <code>:combinator</code> can be used to export all of these
-constants as:</p>
-<pre>
-  use Whatpm::CSS::SelectorsParser qw(:combinator);</pre>
-<p>
-</p>
-<h2><a name="match_types">Match Types</a></h2>
-<p>The constants below represent the types of matches used
-in attribute selectors.</p>
-<dl>
-<dt><strong><a name="item_exists_match">EXISTS_MATCH</a></strong><br />
-</dt>
-<dd>
-Match by the existence of an attribute.
-</dd>
-<p></p>
-<dt><strong><a name="item_equals_match">EQUALS_MATCH</a></strong><br />
-</dt>
-<dd>
-Exact match.
-</dd>
-<p></p>
-<dt><strong><a name="item_includes_match">INCLUDES_MATCH</a></strong><br />
-</dt>
-<dd>
-Includes match (typically used for class attributes).
-</dd>
-<p></p>
-<dt><strong><a name="item_dash_match">DASH_MATCH</a></strong><br />
-</dt>
-<dd>
-Dash match (typically used for language tag attributes).
-</dd>
-<p></p>
-<dt><strong><a name="item_prefix_match">PREFIX_MATCH</a></strong><br />
-</dt>
-<dd>
-Prefix match.
-</dd>
-<p></p>
-<dt><strong><a name="item_suffix_match">SUFFIX_MATCH</a></strong><br />
-</dt>
-<dd>
-Suffix match.
-</dd>
-<p></p>
-<dt><strong><a name="item_substring_match">SUBSTRING_MATCH</a></strong><br />
-</dt>
-<dd>
-Substring match.
-</dd>
-<p></p></dl>
-<p>The tag <code>:match</code> can be used to export all of these
-constants as:</p>
-<pre>
-  use Whatpm::CSS::SelectorsParser qw(:match);</pre>
+<p>The <code>Whatpm::CSS::SelectorsParser</code> is a parser for Selectors, the
+element pattern language used in CSS.  It parses a Selectors string
+into parsed data structure, if the input is valid, or reports a parse
+error, otherwise.  In addition, it provides a method to compute the
+specificity of a parsed selector.</p>
 <p>
 </p>
 <hr />
 <h1><a name="methods">METHODS</a></h1>
-<p>@@ TBD</p>
+<dl>
+<dt><strong><a name="new" class="item">$parser = Whatpm::CSS::SelectorsParser-&gt;new</a></strong></dt>
+
+<dd>
+<p>Creates a new instance of the Selectors parser.</p>
+</dd>
+<dt><strong><a name="parse_string" class="item">$parsed = $parser-&gt;parse_string ($selectors)</a></strong></dt>
+
+<dd>
+<p>Parses a character string.  If it is a valid group of selectors, the
+method returns the parsed group of selectors data structure.
+Otherwise, it returns <code>undef</code>.</p>
+</dd>
+<dt><strong><a name="get_selector_specificity" class="item">$specificity = $parser-&gt;get_selector_specificity ($parsed_selector)</a></strong></dt>
+
+<dd>
+<p>Returns the specificity of a parsed selector data structure.  Note
+that the input has to be a <em>selector</em>, not a <code>group of selectors</code>.</p>
+<p>The return value is an array reference with four values: The <code>style</code>
+attribute flag (always <code>0</code>), <em>a</em>, <em>b</em>, and <em>c</em>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="parameters">PARAMETERS</a></h1>
+<p>Following parameters can be specified on a parser object:</p>
+<dl>
+<dt><strong><a name="_parser___href_" class="item">$parser-&gt;{href} = URL</a></strong></dt>
+
+<dd>
+<p>The URL in which the input selectors string is found, if available.
+This value is used to set the <code>href</code> parameter to the <code>&lt;
+$parser-</code>{onerror} &gt;&gt; handler.</p>
+</dd>
+<dt><strong><a name="_parser___lookup_namespace_uri_" class="item">$parser-&gt;{lookup_namespace_uri} = CODE</a></strong></dt>
+
+<dd>
+<p>The <code>CODE</code> reference used to resolve namespce prefixes and to obtain
+the default namespace.</p>
+<p>The code would be invoked during the parsing with an argument.  The
+argument is <code>undef</code>, it must return the default namespace URL.
+Otherwise, it must return the namespace URL bound to the specified
+namespace prefix.</p>
+<p>If the namespace URL is explicitly given for the prefix (or the
+default namespace), the URL must be returned.  If the prefix (or the
+default namespace) is bound to the null namespace, the empty string
+must be returned.  (Note that this is incompatible with the
+<code>lookup_namespace_uri</code> method on the <code>Node</code> object.)  Otherwise,
+i.e. the namespace prefix (or the default namespace) is not bound to
+any namespace, <code>undef</code> must be returned.</p>
+</dd>
+<dt><strong><a name="_parser___onerror_" class="item">$parser-&gt;{onerror} = CODE</a></strong></dt>
+
+<dd>
+<p>The <code>CODE</code> reference to which any errors and warnings during the
+parsing is reported.  The code would receive the following name-value
+pairs:</p>
+<dl>
+<dt><strong><a name="type" class="item">type (string, always specified)</a></strong></dt>
+
+<dd>
+<p>A short string describing the kind of the error.  Descriptions of
+error types are available at
+&lt;http://suika.fam.cx/gate/2007/html/error-description#{type}&gt;, where
+<em>{type}</em> is an error type string.</p>
+<p>For the list of error types, see
+&lt;http://suika.fam.cx/gate/2007/html/error-description#langtag-errors&gt;.</p>
+</dd>
+<dt><strong><a name="level" class="item">level (string, always specified)</a></strong></dt>
+
+<dd>
+<p>A character representing the level or severity of the error, which is
+one of the following characters: <code>m</code> (violation to a MUST-level
+requirement), <code>s</code> (violation to a SHOULD-level requirement), <code>w</code> (a
+warning), and <code>i</code> (an informational notification).</p>
+</dd>
+<dt><strong><a name="token" class="item">token (always specified)</a></strong></dt>
+
+<dd>
+<p>A <a href="../../Whatpm/CSS/Tokenizer.html">the Whatpm::CSS::Tokenizer manpage</a> token where the error is detected.</p>
+</dd>
+<dt><strong><a name="uri" class="item">uri (a reference to string, possibly missing)</a></strong></dt>
+
+<dd>
+<p>The URL in which the input selectors string is found.  The value is
+always same as <a href="#_parser___href_"><code>$parser-&gt;{href}</code></a> in this parser.</p>
+</dd>
+<dt><strong><a name="value" class="item">value (string, possibly missing)</a></strong></dt>
+
+<dd>
+<p>A part of the input, in which an error is detected.</p>
+</dd>
+</dl>
+</dd>
+<dt><strong><a name="_parser___pseudo_class_" class="item">$parser-&gt;{pseudo_class} = {class_name =&gt; 1, class_name =&gt; 1, ...}</a></strong></dt>
+
+<dd>
+<p>The list of pseudo-classes supported by the implementation,
+represented as a hash reference, where the hash key is the lowercased
+pseudo-class name and the hash key is a boolean representing whther
+the pseudo-class is supported or not.  Any pseudo-class not supported
+by both the parser and the implementation (as declared by this
+parameter) are ignored and the entire group of selectors is considered
+<em>invalid</em> for the purpose of parsing.</p>
+</dd>
+<dt><strong><a name="_parser___pseudo_element_" class="item">$parser-&gt;{pseudo_element} = {element_name =&gt; 1, element_name =&gt; 1, ...}</a></strong></dt>
+
+<dd>
+<p>The list of pseudo-elements supported by the implementation,
+represented as a hash reference, where the hash key is the lowercased
+pseudo-element name and the hash key is a boolean representing whther
+the pseudo-lelement is supported or not.  Any pseudo-element not
+supported by both the parser and the implementation (as declared by
+this parameter) are ignored and the entire group of selectors is
+considered <em>invalid</em> for the purpose of parsing.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="data_structures">DATA STRUCTURES</a></h1>
+<p>
+</p>
+<h2><a name="a_group_of_selectors">A group of selectors</a></h2>
+<p>The <a href="#parse_string"><code>parse_string</code></a> method returns an array reference, which contains
+one or more selector data structures.  They corresponds to selectors
+in the original group of selectors string, in order.</p>
+<p>
+</p>
+<h2><a name="a_selector">A selector</a></h2>
+<p>A selector is represented as an array reference, which contains pairs
+of a combinator constant and a sequence of simple selector data
+structure.  They corresponds to sequences of simple selector and
+combinators appears in the original selector string, in order.  Note
+that the first (index 0) item is always the descendant combinator
+constant.</p>
+<p>The constants below represent the types of combinators.</p>
+<dl>
+<dt><strong><a name="descendant_combinator" class="item">DESCENDANT_COMBINATOR</a></strong></dt>
+
+<dd>
+<p>A descendant combinator.</p>
+</dd>
+<dt><strong><a name="child_combinator" class="item">CHILD_COMBINATOR</a></strong></dt>
+
+<dd>
+<p>A child combinator.</p>
+</dd>
+<dt><strong><a name="adjacent_sibling_combinator" class="item">ADJACENT_SIBLING_COMBINATOR</a></strong></dt>
+
+<dd>
+<p>An adjacent sibling combinator.</p>
+</dd>
+<dt><strong><a name="general_sibling_combinator" class="item">GENERAL_SIBLING_COMBINATOR</a></strong></dt>
+
+<dd>
+<p>A general sibling combinator.</p>
+</dd>
+</dl>
+<p>The exporter tag <code>:combinator</code> can be used to export all of these
+constants:</p>
+<pre>
+  use Whatpm::CSS::SelectorsParser qw(:combinator);</pre>
+<p>
+</p>
+<h2><a name="a_sequence_of_simple_selectors">A sequence of simple selectors</a></h2>
+<p>A sequence of simple selector is represented as an array reference,
+which contains simple selector data strucutures.  They corresponds to
+simple selectors in the original sequence of simple selectors string,
+in order.</p>
+<p>
+</p>
+<h2><a name="a_simple_selector">A simple selector</a></h2>
+<p>A simple selector is represented as an array reference whose first
+(index 0) item is the type of simple selector and the following items
+are arguments to the simple selector.</p>
+<p>The constants below represent the types of simple selectors (or parts
+of simple selectors).</p>
+<dl>
+<dt><strong><a name="namespace_selector" class="item">NAMESPACE_SELECTOR</a></strong></dt>
+
+<dd>
+<p>The namespace specification in a type of universal selector.  The
+first argument (item of index 1) is the namespace URL (or <code>undef</code> for
+the null namespace).</p>
+</dd>
+<dt><strong><a name="local_name_selector" class="item">LOCAL_NAME_SELECTOR</a></strong></dt>
+
+<dd>
+<p>The local name specification in a type selector.  The first argument
+(item of index 1) is the local name.</p>
+</dd>
+<dt><strong><a name="id_selector" class="item">ID_SELECTOR</a></strong></dt>
+
+<dd>
+<p>An ID selector.  The first argument (item of index 1) is the ID.</p>
+</dd>
+<dt><strong><a name="class_selector" class="item">CLASS_SELECTOR</a></strong></dt>
+
+<dd>
+<p>A class selector.  The first argument (item of index 1) is the class.</p>
+</dd>
+<dt><strong><a name="pseudo_class_selector" class="item">PSEUDO_CLASS_SELECTOR</a></strong></dt>
+
+<dd>
+<p>A pseudo-class selector.  The first argument (item of index 1) is the
+pseudo-class name in lowercase.  If the pseudo-class takes a string or
+identifier argument (e.g. <code>:lang()</code> or <code>:contains()</code>), the second
+argument (item of index 2) is the argument (with no case folding).
+Otherwise, if the pseudo-class takes a <code>an+b</code> argument
+(e.g. <code>:nth-child()</code>), the second argument (item of index 2)
+represents the <em>a</em> value and the third argument (item of index 3)
+represents the <em>b</em> value (Even an incomplete argument is normalized
+to this form).  If the pseudo-class takes a simple selector
+(e.g. <code>:not()</code>), any arguments (the zero or more items with index 2
+or more) are simple selector data structures.</p>
+<p>For example, the simple selector data structure for <code>:NOT(a|b)</code> would
+contain four items: constant <a href="#pseudo_class_selector"><code>PSEUDO_CLASS_SELECTOR</code></a>, string <code>not</code>,
+the namespace selector for the namespace <em>a</em>, the local name selector
+with local name <code>b</code>.</p>
+</dd>
+<dt><strong><a name="pseudo_element_selector" class="item">PSEUDO_ELEMENT_SELECTOR</a></strong></dt>
+
+<dd>
+<p>A pseudo-element specification.  The first argument (item of index 1)
+is the pseudo-element name in lowercase.</p>
+</dd>
+<dt><strong><a name="attribute_selector" class="item">ATTRIBUTE_SELECTOR</a></strong></dt>
+
+<dd>
+<p>An attribute selector.  The first argument (item of index 1) is the
+attribute name.  The second argument (item of index 2) is the type of
+matching.</p>
+<p>The constants below represent the types of matches used in attribute
+selectors.</p>
+<dl>
+<dt><strong><a name="exists_match" class="item">EXISTS_MATCH</a></strong></dt>
+
+<dd>
+<p>Match by the existence of an attribute.</p>
+</dd>
+<dt><strong><a name="equals_match" class="item">EQUALS_MATCH</a></strong></dt>
+
+<dd>
+<p>Exact match.  The third argument (item of index 3) is the expected
+value.</p>
+</dd>
+<dt><strong><a name="includes_match" class="item">INCLUDES_MATCH</a></strong></dt>
+
+<dd>
+<p>Includes match (typically used for class attributes).  The third
+argument (item of index 3) is the expected value.</p>
+</dd>
+<dt><strong><a name="dash_match" class="item">DASH_MATCH</a></strong></dt>
+
+<dd>
+<p>Dash match (typically used for language tag attributes).  The third
+argument (item of index 3) is the expected value.</p>
+</dd>
+<dt><strong><a name="prefix_match" class="item">PREFIX_MATCH</a></strong></dt>
+
+<dd>
+<p>Prefix match.  The third argument (item of index 3) is the expected
+value.</p>
+</dd>
+<dt><strong><a name="suffix_match" class="item">SUFFIX_MATCH</a></strong></dt>
+
+<dd>
+<p>Suffix match.  The third argument (item of index 3) is the expected
+value.</p>
+</dd>
+<dt><strong><a name="substring_match" class="item">SUBSTRING_MATCH</a></strong></dt>
+
+<dd>
+<p>Substring match.  The third argument (item of index 3) is the expected
+value.</p>
+</dd>
+</dl>
+<p>The exporter tag <code>:match</code> can be used to export all of these
+constants:</p>
+<pre>
+  use Whatpm::CSS::SelectorsParser qw(:match);</pre>
+</dd>
+</dl>
+<p>The exporter tag <code>:selector</code> can be used to export all of these
+constants:</p>
+<pre>
+  use Whatpm::CSS::SelectorsParser qw(:selector);</pre>
 <p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p>@@ TBD</p>
+<p>Selectors &lt;http://www.w3.org/TR/selectors/&gt;.</p>
+<p>The CSS syntax &lt;http://www.w3.org/TR/CSS21/syndata.html&gt;.</p>
+<p>The <code>style</code> attribute specificity
+&lt;http://www.w3.org/TR/CSS21/cascade.html#specificity&gt;.</p>
+<p>Supported standards - Selectors
+&lt;http://suika.fam.cx/gate/2007/html/standards#selectors&gt;.</p>
 <p>
 </p>
 <hr />
@@ -208,9 +373,9 @@ constants as:</p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.</p>
+<p>Copyright 2007-2011 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
 
 </body>
 
