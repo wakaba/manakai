@@ -547,3 +547,300 @@ foo>::before
 ------
 <foo>
 ::after
+
+#data
+ab cd
+#parsed
+<ab>
+***
+<cd>
+
+#data escaped
+ab\u0009\u000A\u000D\u000Cc
+#parsed
+<ab>
+***
+<c>
+
+#data
+ab * c
+#parsed
+<ab>
+***
+*
+***
+<c>
+
+#data
+ab/**/ /**/ /**/ /**/c
+#parsed
+<ab>
+***
+<c>
+
+#data
+/**/ /**/ /**/  ab.c.d.e/**/ /**/g /**//**/ /**/
+#parsed
+<ab>
+.c
+.d
+.e
+***
+<g>
+
+#data
+ab/**/c
+#errors
+1;7;no combinator;;;m
+
+#data
+ab cd , ef
+#parsed
+<ab>
+***
+<cd>
+------
+<ef>
+
+#data
+ab>cd
+#parsed
+<ab>
+>
+<cd>
+
+#data
+ab >cd
+#parsed
+<ab>
+>
+<cd>
+
+#data
+ab> cd
+#parsed
+<ab>
+>
+<cd>
+
+#data
+ab/**/ /**/ > /**/ /**/ cd
+#parsed
+<ab>
+>
+<cd>
+
+#data
+ab >
+#errors
+1;5;no sss;;;m
+
+#data
+ab > /**/
+#errors
+1;10;no sss;;;m
+
+#data
+> ab
+#errors
+1;1;no sss;;;m
+
+#data
+ab >,cd
+#errors
+1;5;no sss;;;m
+
+#data
+ab > ::before,de
+#supported
+::before
+#parsed
+<ab>
+>
+::before
+------
+<de>
+
+#data
+ab/**/>/**/cd
+#parsed
+<ab>
+>
+<cd>
+
+#data
+ab+cd
+#parsed
+<ab>
++
+<cd>
+
+#data
+ab +cd
+#parsed
+<ab>
++
+<cd>
+
+#data
+ab+ cd
+#parsed
+<ab>
++
+<cd>
+
+#data
+ab/**/ /**/ + /**/ /**/ cd
+#parsed
+<ab>
++
+<cd>
+
+#data
+ab +
+#errors
+1;5;no sss;;;m
+
+#data
+ab + /**/
+#errors
+1;10;no sss;;;m
+
+#data
++ ab
+#errors
+1;1;no sss;;;m
+
+#data
+ab +,cd
+#errors
+1;5;no sss;;;m
+
+#data
+ab + ::before,de
+#supported
+::before
+#parsed
+<ab>
++
+::before
+------
+<de>
+
+#data
+ab/**/+/**/cd
+#parsed
+<ab>
++
+<cd>
+
+#data
+ab~cd
+#parsed
+<ab>
+~
+<cd>
+
+#data
+ab ~cd
+#parsed
+<ab>
+~
+<cd>
+
+#data
+ab~ cd
+#parsed
+<ab>
+~
+<cd>
+
+#data
+ab/**/ /**/ ~ /**/ /**/ cd
+#parsed
+<ab>
+~
+<cd>
+
+#data
+ab ~
+#errors
+1;5;no sss;;;m
+
+#data
+ab ~ /**/
+#errors
+1;10;no sss;;;m
+
+#data
+~ ab
+#errors
+1;1;no sss;;;m
+
+#data
+ab ~,cd
+#errors
+1;5;no sss;;;m
+
+#data
+ab ~ ::before,de
+#supported
+::before
+#parsed
+<ab>
+~
+::before
+------
+<de>
+
+#data
+ab/**/~/**/cd
+#parsed
+<ab>
+~
+<cd>
+
+#data
+ab \> cd
+#parsed
+<ab>
+***
+<>>
+***
+<cd>
+
+#data
+ab \+ cd
+#parsed
+<ab>
+***
+<+>
+***
+<cd>
+
+#data
+ab \~ cd
+#parsed
+<ab>
+***
+<~>
+***
+<cd>
+
+#data
+ab + cd > ef g ~ h
+#parsed
+<ab>
++
+<cd>
+>
+<ef>
+***
+<g>
+~
+<h>
+
+#data
+abc +> cd
+#errors
+1;6;no sss;;;m
