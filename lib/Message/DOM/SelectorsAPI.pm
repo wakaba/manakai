@@ -1,6 +1,8 @@
 package Message::DOM::SelectorsAPI;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.11 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.12';
+
 require Message::DOM::DOMException;
 
 package Message::DOM::Document;
@@ -173,15 +175,20 @@ my $sss_match = sub ($$$$) {
               }
             }
           } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
-            if ($simple_selector->[1] eq '-manakai-current') {
+            my $class_name = $simple_selector->[1];
+            if ($class_name eq 'root') {
+              my $parent = $node->parent_node;
+              $sss_matched = 0
+                  unless $parent->node_type == 9; # DOCUMENT_NODE
+            } elsif ($class_name eq '-manakai-current') {
               $sss_matched = 0 if $current_node ne $node;
-            } elsif ($simple_selector->[1] eq '-manakai-contains') {
+            } elsif ($class_name eq '-manakai-contains') {
               $sss_matched = 0
                   if index ($node->text_content,
                             $simple_selector->[2]) == -1;
             } else {
               ## This statement should never be executed.
-              die "$simple_selector->[1]: Bad pseudo-class";
+              die "$class_name: Bad pseudo-class";
             }
           } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
             $sss_matched = 0;
@@ -250,11 +257,12 @@ my $get_elements_by_selectors = sub {
   ## NOTE: SHOULD ensure to remain stable when facing a hostile $_[2].
 
   $p->{pseudo_class}->{$_} = 1 for qw/
+    root
     -manakai-contains -manakai-current
   /;
 #    active checked disabled empty enabled first-child first-of-type
 #    focus hover indeterminate last-child last-of-type link only-child
-#    only-of-type root target visited
+#    only-of-type target visited
 #    lang nth-child nth-last-child nth-of-type nth-last-of-type not
 
   ## NOTE: MAY treat all links as :link rather than :visited
@@ -292,6 +300,7 @@ my $get_elements_by_selectors = sub {
   
   my @node_cond = map {$_->[1] = [@$selectors]; $_} @{$_[3]};
   while (@node_cond) {
+    $Message::DOM::SelectorsAPI::NodeCount++;
     my $node_cond = shift @node_cond;
     if ($node_cond->[0]->node_type == 1) { # ELEMENT_NODE
       my @new_cond;
@@ -503,8 +512,7 @@ sub query_selector_all ($$;$) {
 
 =head1 SEE ALSO
 
-Selectors Working Draft 15 December 2005
-<http://www.w3.org/TR/2005/WD-css3-selectors-20051215>
+Selectors <http://www.w3.org/TR/selectors/>.
 
 Selectors API Editor's Draft 29 August 2007
 <http://dev.w3.org/cvsweb/~checkout~/2006/webapi/selectors-api/Overview.html?rev=1.28&content-type=text/html;%20charset=utf-8>
@@ -514,12 +522,11 @@ manakai Selectors Extensions
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
 1;
-## $Date: 2007/12/31 13:46:25 $

@@ -320,6 +320,39 @@ p ~ q
 #result 6
 /2/2/4
 
+#html lists
+<!DOCTYPE HTML>
+<ul><li>ul1
+<li>ul2
+<li>ul3
+<ol><li>ul3ol1
+</ol>
+</ul><ol><li>ol1
+<li>ol2
+</ol><menu><li>menu1
+</menu>
+
+#data
+menu li,ul ol, menu
+#result lists
+/2/2/1/3/2
+/2/2/3
+/2/2/3/1
+#result lists /2/2/2
+#result lists /2/2/3
+/2/2/3/1
+#result lists /2/2/3/1
+
+#data
+menu li,ul ol, menu::first-line
+#result lists
+/2/2/1/3/2
+/2/2/3/1
+#result lists /2/2/2
+#result lists /2/2/3
+/2/2/3/1
+#result lists /2/2/3/1
+
 #data
 ::before
 #result 1
@@ -881,6 +914,17 @@ html http://www.w3.org/1999/xhtml
 <p>a<span>aa<!--xyz-->aaaaaaaaaaaaaaa</span>aaa<em>aaa</em>aa
 <p>ab<span><em>c</em>defghijklm</span>nopq<b>rstuvwx</b>y<img>z
 <p>
+
+#data
+:root
+#result 13
+/2
+#result 13 /2
+#result 13 /2/2
+
+#data
+span:root
+#result 13
 
 #data
 p:-manakai-contains("")
