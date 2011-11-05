@@ -152,10 +152,6 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
 
   my $default_namespace = $self->{lookup_namespace_uri}->('');
 
-  ## ISSUE: The Selectors spec only poorly defines how tokens are mapped
-  ## to each component of selectors.  In addition, it does not well define
-  ## where spaces and comments are able to be inserted.
-
   my $selectors = [];
   my $selector = [DESCENDANT_COMBINATOR];
   my $sss = [];
@@ -1071,20 +1067,17 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
       die "$0: Selectors Parser: $state: Unknown state";
     }
   } # S
-} # parse_string
+} # _parse_selectors_with_tokenizer
 
-## NOTE: Specificity in CSS 2.1 and Selectors 3 are incompatible.
-## What is implemented by this method is CSS 2.1's one.
-## (With Selectors 3 terminology and with Selectors 3 additions.)
 sub get_selector_specificity ($$) {
   my (undef, $selector) = @_;
 
-  my $r = [0, 0, 0, 0]; # a, b, c, d
+  my $r = [0, 0, 0, 0]; # s, a, b, c
 
-  ## a = 1 iff style="" attribute
-  ## b += 1 for ID attribute selectors
-  ## c += 1 for attribute, class, and pseudo-class selectors
-  ## d += 1 for type selectors and pseudo-elements
+  ## s  = 1 iff style="" attribute
+  ## a += 1 for ID attribute selectors
+  ## b += 1 for attribute, class, and pseudo-class selectors
+  ## c += 1 for type selectors and pseudo-elements
 
   for my $sss (@$selector) {
     next unless ref $sss; # combinator
@@ -1095,9 +1088,9 @@ sub get_selector_specificity ($$) {
           $ss->[0] == PSEUDO_ELEMENT_SELECTOR) {
         $r->[3]++;
       } elsif ($ss->[0] == ATTRIBUTE_SELECTOR or
-               $ss->[0] == PSEUDO_CLASS_SELECTOR) {
+               $ss->[0] == CLASS_SELECTOR) {
         $r->[2]++;
-      } elsif ($ss->[0] == CLASS_SELECTOR) {
+      } elsif ($ss->[0] == PSEUDO_CLASS_SELECTOR) {
         if ($ss->[1] eq 'not') {
           push @sss, @$ss[2..$#$ss];
         } else {

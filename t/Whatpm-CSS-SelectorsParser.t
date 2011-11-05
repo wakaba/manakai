@@ -170,6 +170,40 @@ sub _parse_string : Tests {
   );
 } # _parse_string
 
+sub _get_selector_specificity : Test(16) {
+  for (
+    ['*',                 [0, 0, 0, 0]],
+    ['LI',                [0, 0, 0, 1]],
+    ['UL LI',             [0, 0, 0, 2]],
+    ['UL OL+LI',          [0, 0, 0, 3]],
+    ['H1 + *[REL=up]',    [0, 0, 1, 1]],
+    ['UL OL LI.red',      [0, 0, 1, 3]],
+    ['LI.red.level',      [0, 0, 2, 1]],
+    ['#x34y',             [0, 1, 0, 0]],
+    ['#s12:not(FOO)',     [0, 1, 0, 1]],
+    [':first-child',      [0, 0, 1, 0]],
+    [':lang(en)::before', [0, 0, 1, 1]],
+    [':NOT(.foo):NOT(*)', [0, 0, 1, 0]],
+    ['ns1|*',             [0, 0, 0, 0]],
+    ['ns1|hoge',          [0, 0, 0, 1]],
+    ['[ns1|foo]',         [0, 0, 1, 0]],
+    ['[ns1~=hoge]',       [0, 0, 1, 0]],
+  ) {
+    my $parser = Whatpm::CSS::SelectorsParser->new;
+    $parser->{pseudo_class}->{not} = 1;
+    $parser->{pseudo_class}->{lang} = 1;
+    $parser->{pseudo_class}->{'first-child'} = 1;
+    $parser->{pseudo_element}->{before} = 1;
+    $parser->{lookup_namespace_uri} = sub {
+      my $prefix = shift;
+      return 'http://foo/' if $prefix;
+      return undef;
+    };
+    my $selectors = $parser->parse_string ($_->[0]);
+    eq_or_diff $parser->get_selector_specificity ($selectors->[0]), $_->[1];
+  }
+}
+
 __PACKAGE__->runtests;
 
 1;
