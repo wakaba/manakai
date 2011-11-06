@@ -183,11 +183,21 @@ my $sss_match = sub ($$$$) {
       if ({
         'nth-child' => 1, 'nth-last-child' => 1,
         'nth-of-type' => 1, 'nth-last-of-type' => 1,
+        'first-child' => 1, 'last-child' => 1,
+        'first-of-type' => 1, 'last-of-type' => 1,
       }->{$class_name}) {
-        my $aa = $simple_selector->[2];
-        my $ab = $simple_selector->[3];
+        my $aa = $class_name =~ /^first/ ? 0
+               : $class_name =~ /^last/ ? 0
+               : $simple_selector->[2];
+        my $ab = $class_name =~ /^first/ ? 1
+               : $class_name =~ /^last/ ? 1
+               : $simple_selector->[3];
         my $parent = $node->parent_node;
         if ($parent) {
+
+          ## O(n^2) (or O(nm) where /m/ is the average number of
+          ## children, more strictly speaking) as a whole, which seems
+          ## bad...
           my $i = 0;
           my @child = @{$parent->child_nodes};
           @child = reverse @child if $class_name =~ /last/;
@@ -295,11 +305,11 @@ my $get_elements_by_selectors = sub {
 
   $p->{pseudo_class}->{$_} = 1 for qw/
     root nth-child nth-last-child nth-of-type nth-last-of-type
+    first-child first-of-type last-child last-of-type
     -manakai-contains -manakai-current
   /;
-#    active checked disabled empty enabled first-child first-of-type
-#    focus hover indeterminate last-child last-of-type link only-child
-#    only-of-type target visited lang not
+#    active checked disabled empty enabled focus hover indeterminate
+#    link only-child only-of-type target visited lang not
 
   ## NOTE: MAY treat all links as :link rather than :visited
 
