@@ -180,13 +180,15 @@ my $sss_match = sub ($$$$) {
             }
     } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
       my $class_name = $simple_selector->[1];
-      if ($class_name eq 'nth-child') {
+      if ($class_name eq 'nth-child' or $class_name eq 'nth-last-child') {
         my $aa = $simple_selector->[2];
         my $ab = $simple_selector->[3];
         my $parent = $node->parent_node;
         if ($parent) {
           my $i = 0;
-          for (@{$parent->child_nodes}) {
+          my @child = @{$parent->child_nodes};
+          @child = reverse @child if $class_name eq 'nth-last-child';
+          for (@child) {
             $i++ if $_->node_type == 1; # ELEMENT_NODE
             last if $_ eq $node;
           }
@@ -285,7 +287,7 @@ my $get_elements_by_selectors = sub {
   ## NOTE: SHOULD ensure to remain stable when facing a hostile $_[2].
 
   $p->{pseudo_class}->{$_} = 1 for qw/
-    root nth-child
+    root nth-child nth-last-child
     -manakai-contains -manakai-current
   /;
 #    active checked disabled empty enabled first-child first-of-type

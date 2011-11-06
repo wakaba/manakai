@@ -1003,6 +1003,129 @@ p:nth-child(-n+2)
 /2/2/2
 
 #data
+p:nth-last-child(1)
+#result 13
+/2/2/3
+
+#data
+p:nth-last-child(2)
+#result 13
+/2/2/2
+
+#data
+p:nth-last-child(3)
+#result 13
+/2/2/1
+
+#data
+p:nth-last-child(4)
+#result 13
+
+#data
+p:nth-last-child(12)
+#result 13
+
+#data
+p:nth-last-child(0)
+#result 13
+
+#data
+p:nth-last-child(-1)
+#result 13
+
+#data
+p:nth-last-child(2n)
+#result 13
+/2/2/2
+
+#data
+p:nth-last-child(2n+1)
+#result 13
+/2/2/1
+/2/2/3
+
+#data
+p:nth-last-child(2n+2)
+#result 13
+/2/2/2
+
+#data
+p:nth-last-child(2n+3)
+#result 13
+/2/2/1
+
+#data
+p:nth-last-child(2n+4)
+#result 13
+
+#data
+p:nth-last-child(3n)
+#result 13
+/2/2/1
+
+#data
+p:nth-last-child(3n+2)
+#result 13
+/2/2/2
+
+#data
+p:nth-last-child(2n-1)
+#result 13
+/2/2/1
+/2/2/3
+
+#data
+p:nth-last-child(2n-2)
+#result 13
+/2/2/2
+
+#data
+p:nth-last-child(2n-3)
+#result 13
+/2/2/1
+/2/2/3
+
+#data
+p:nth-last-child(-n)
+#result 13
+
+#data
+p:nth-last-child(n)
+#result 13
+/2/2/1
+/2/2/2
+/2/2/3
+
+#data
+p:nth-last-child(-n+3)
+#result 13
+/2/2/1
+/2/2/2
+/2/2/3
+
+#data
+p:nth-last-child(-n-2)
+#result 13
+
+#data
+p:nth-last-child(-2n)
+#result 13
+
+#data
+p:nth-last-child(-2n+2)
+#result 13
+/2/2/2
+
+#data
+p:nth-last-child(-2n+1)
+#result 13
+/2/2/3
+
+#data
+p:nth-last-child(-12n)
+#result 13
+
+#data
 p:-manakai-contains("")
 #result 12
 /2/2/1
