@@ -223,6 +223,27 @@ my $sss_match = sub ($$$$) {
         } else {
           $sss_matched = 0;
         }
+      } elsif ($class_name eq 'only-child' or $class_name eq 'only-of-type') {
+        my $parent = $node->parent_node;
+        if ($parent) {
+          my $i = 0;
+          for (@{$parent->child_nodes}) {
+            if ($_->node_type == 1) { # ELEMENT_NODE
+              if ($class_name eq 'only-of-type') {
+                $i++ if $_->manakai_element_type_match
+                    ($node->namespace_uri, $node->manakai_local_name);
+              } else {
+                $i++;
+              }
+              if ($i == 2) {
+                $sss_matched = 0;
+                last;
+              }
+            }
+          }
+        } else {
+          $sss_matched = 0;
+        }
       } elsif ($class_name eq 'root') {
         my $parent = $node->parent_node;
         $sss_matched = 0
@@ -306,10 +327,11 @@ my $get_elements_by_selectors = sub {
   $p->{pseudo_class}->{$_} = 1 for qw/
     root nth-child nth-last-child nth-of-type nth-last-of-type
     first-child first-of-type last-child last-of-type
+    only-child only-of-type
     -manakai-contains -manakai-current
   /;
 #    active checked disabled empty enabled focus hover indeterminate
-#    link only-child only-of-type target visited lang not
+#    link target visited lang not
 
   ## NOTE: MAY treat all links as :link rather than :visited
 
