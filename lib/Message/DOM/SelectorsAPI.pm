@@ -180,16 +180,23 @@ my $sss_match = sub ($$$$) {
             }
     } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
       my $class_name = $simple_selector->[1];
-      if ($class_name eq 'nth-child' or $class_name eq 'nth-last-child') {
+      if ({
+        'nth-child' => 1, 'nth-last-child' => 1,
+        'nth-of-type' => 1, 'nth-last-of-type' => 1,
+      }->{$class_name}) {
         my $aa = $simple_selector->[2];
         my $ab = $simple_selector->[3];
         my $parent = $node->parent_node;
         if ($parent) {
           my $i = 0;
           my @child = @{$parent->child_nodes};
-          @child = reverse @child if $class_name eq 'nth-last-child';
+          @child = reverse @child if $class_name =~ /last/;
           for (@child) {
-            $i++ if $_->node_type == 1; # ELEMENT_NODE
+            next unless $_->node_type == 1; # ELEMENT_NODE
+            next if $class_name =~ /of-type/ and
+                not $_->manakai_element_type_match
+                        ($node->namespace_uri, $node->manakai_local_name);
+            $i++;
             last if $_ eq $node;
           }
 
@@ -287,13 +294,12 @@ my $get_elements_by_selectors = sub {
   ## NOTE: SHOULD ensure to remain stable when facing a hostile $_[2].
 
   $p->{pseudo_class}->{$_} = 1 for qw/
-    root nth-child nth-last-child
+    root nth-child nth-last-child nth-of-type nth-last-of-type
     -manakai-contains -manakai-current
   /;
 #    active checked disabled empty enabled first-child first-of-type
 #    focus hover indeterminate last-child last-of-type link only-child
-#    only-of-type target visited lang nth-last-child nth-of-type
-#    nth-last-of-type not
+#    only-of-type target visited lang not
 
   ## NOTE: MAY treat all links as :link rather than :visited
 
