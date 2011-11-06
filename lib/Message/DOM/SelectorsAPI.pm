@@ -5,6 +5,10 @@ our $VERSION = '1.12';
 
 require Message::DOM::DOMException;
 
+## NOTE: This implementation does no optimization at all.  Future
+## revisions are expected to do it, but the current focus is
+## implementing the features rather than tuning some of them.
+
 package Message::DOM::Document;
 
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
@@ -174,32 +178,56 @@ my $sss_match = sub ($$$$) {
                 }
               }
             }
-          } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
-            my $class_name = $simple_selector->[1];
-            if ($class_name eq 'root') {
-              my $parent = $node->parent_node;
-              $sss_matched = 0
-                  unless $parent->node_type == 9; # DOCUMENT_NODE
-            } elsif ($class_name eq '-manakai-current') {
-              $sss_matched = 0 if $current_node ne $node;
-            } elsif ($class_name eq '-manakai-contains') {
-              $sss_matched = 0
-                  if index ($node->text_content,
-                            $simple_selector->[2]) == -1;
-            } else {
-              ## This statement should never be executed.
-              die "$class_name: Bad pseudo-class";
-            }
-          } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
-            $sss_matched = 0;
-          } else {
-            ## NOTE: New simple selector type.
-            report Message::DOM::DOMException
-                -object => $self,
-                -type => 'SYNTAX_ERR',
-                -subtype => 'INVALID_SELECTORS_ERR';
+    } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
+      my $class_name = $simple_selector->[1];
+      if ($class_name eq 'nth-child') {
+        my $aa = $simple_selector->[2];
+        my $ab = $simple_selector->[3];
+        my $parent = $node->parent_node;
+        if ($parent) {
+          my $i = 0;
+          for (@{$parent->child_nodes}) {
+            $i++ if $_->node_type == 1; # ELEMENT_NODE
+            last if $_ eq $node;
           }
+
+          if ($aa == 0) {
+            $sss_matched = 0 if $i != $ab;
+          } else {
+            my $j = $i - $ab;
+            if ($aa > 0) {
+              $sss_matched = 0 if $j % $aa or $j / $aa < 0;
+            } else { # $aa < 0
+              $sss_matched = 0 if -$j % -$aa or -$j / -$aa < 0;
+            }
+          }
+        } else {
+          $sss_matched = 0;
         }
+      } elsif ($class_name eq 'root') {
+        my $parent = $node->parent_node;
+        $sss_matched = 0
+            unless $parent->node_type == 9; # DOCUMENT_NODE
+      } elsif ($class_name eq '-manakai-current') {
+        $sss_matched = 0 if $current_node ne $node;
+      } elsif ($class_name eq '-manakai-contains') {
+        $sss_matched = 0
+            if index ($node->text_content,
+                      $simple_selector->[2]) == -1;
+      } else {
+        ## This statement should never be executed.
+        die "$class_name: Bad pseudo-class";
+      }
+    } elsif ($simple_selector->[0] == PSEUDO_ELEMENT_SELECTOR) {
+      $sss_matched = 0;
+    } else {
+      ## NOTE: New simple selector type.
+      report Message::DOM::DOMException
+          -object => $self,
+          -type => 'SYNTAX_ERR',
+          -subtype => 'INVALID_SELECTORS_ERR';
+    }
+  }
   return $sss_matched;
 }; # $sss_match
 
@@ -257,13 +285,13 @@ my $get_elements_by_selectors = sub {
   ## NOTE: SHOULD ensure to remain stable when facing a hostile $_[2].
 
   $p->{pseudo_class}->{$_} = 1 for qw/
-    root
+    root nth-child
     -manakai-contains -manakai-current
   /;
 #    active checked disabled empty enabled first-child first-of-type
 #    focus hover indeterminate last-child last-of-type link only-child
-#    only-of-type target visited
-#    lang nth-child nth-last-child nth-of-type nth-last-of-type not
+#    only-of-type target visited lang nth-last-child nth-of-type
+#    nth-last-of-type not
 
   ## NOTE: MAY treat all links as :link rather than :visited
 
