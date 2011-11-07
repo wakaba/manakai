@@ -18,6 +18,7 @@ sub _query_selector : Tests {
 
   for_each_test $_, {
     html => {is_prefixed => 1},
+    xml => {is_prefixed => 1},
     data => {is_prefixed => 1},
     result => {is_list => 1, multiple => 1},
     ns => {is_list => 1},
@@ -34,6 +35,17 @@ sub _query_selector : Tests {
       my $doc = $dom->create_document;
       $doc->manakai_is_html (1);
       $doc->inner_html ($test->{html}->[0]);
+      $documents->{$doc_name} = $doc;
+
+      return;
+    } elsif ($test->{xml}) {
+      my $doc_name = $test->{xml}->[1]->[0];
+      if (exists $documents->{$doc_name}) {
+        warn "# Document |$doc_name| is already defined\n";
+      }
+      
+      my $doc = $dom->create_document;
+      $doc->inner_html ($test->{xml}->[0]);
       $documents->{$doc_name} = $doc;
 
       return;

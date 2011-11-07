@@ -244,6 +244,20 @@ my $sss_match = sub ($$$$) {
         } else {
           $sss_matched = 0;
         }
+      } elsif ($class_name eq 'empty') {
+        for (@{$node->child_nodes}) {
+          my $nt = $_->node_type;
+          if ($nt == 1) { # ELEMENT_NODE
+            $sss_matched = 0;
+            last;
+          } elsif ($nt == 3 or $nt == 4) { # TEXT_NODE, CDATA_SECTION_NODE
+            my $length = length $_->data;
+            if ($length) {
+              $sss_matched = 0;
+              last;
+            }
+          }
+        }
       } elsif ($class_name eq 'root') {
         my $parent = $node->parent_node;
         $sss_matched = 0
@@ -327,11 +341,11 @@ my $get_elements_by_selectors = sub {
   $p->{pseudo_class}->{$_} = 1 for qw/
     root nth-child nth-last-child nth-of-type nth-last-of-type
     first-child first-of-type last-child last-of-type
-    only-child only-of-type
+    only-child only-of-type empty
     -manakai-contains -manakai-current
   /;
-#    active checked disabled empty enabled focus hover indeterminate
-#    link target visited lang not
+#    active checked disabled enabled focus hover indeterminate link
+#    target visited lang not
 
   ## NOTE: MAY treat all links as :link rather than :visited
 

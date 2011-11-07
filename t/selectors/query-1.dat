@@ -1299,6 +1299,40 @@ div :only-of-type
 /2
 /2/2/1
 
+#html empty
+<!DOCTYPE HTML>
+<p></p
+><p> </p
+><p><!----></p
+><p>a</p
+><p><span></span></p>
+
+#data
+:empty
+#result empty
+/2/1
+/2/2/1
+/2/2/3
+/2/2/5/1
+
+#data
+p:empty
+#result empty
+/2/2/1
+/2/2/3
+
+#xml emptyxml
+<hoge><p/><p><![CDATA[]]></p><p></p><p><!----></p><p><q/></p></hoge>
+
+#data
+:empty
+#result emptyxml
+/1/1
+/1/2
+/1/3
+/1/4
+/1/5/1
+
 #data
 p:-manakai-contains("")
 #result 12
