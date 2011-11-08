@@ -1334,6 +1334,69 @@ p:empty
 /1/5/1
 
 #data
+:not(p)
+#result emptyxml
+/1
+/1/5/1
+
+#data
+:not(*)
+#result types
+
+#data
+:not(hoge|*)
+#ns
+hoge http://foo/
+#result emptyxml /1/5
+/1/5/1
+
+#data
+:not(dd) ~ dd
+#result types
+/2/2/1/7
+/2/2/1/8
+
+#data
+:not(dd) + dd
+#result types
+/2/2/1/7
+
+#data
+:not(:first-child) + dd
+#result types
+/2/2/1/7
+/2/2/1/8
+
+#data
+:not(:first-child) ~ dd
+#result types
+/2/2/1/7
+/2/2/1/8
+
+#data
+:not(:first-of-type) + dd
+#result types
+/2/2/1/7
+
+#data
+:not(:first-of-type) ~ dd
+#result types
+/2/2/1/7
+/2/2/1/8
+
+#data
+:not(:first-of-type):not(dd) + dd
+#result types
+/2/2/1/7
+
+#data
+:not(html|p) + p
+#ns
+html http://www.w3.org/1999/xhtml
+#result types
+/2/2/1/4
+
+#data
 p:-manakai-contains("")
 #result 12
 /2/2/1

@@ -13,12 +13,13 @@ package Message::DOM::Document;
 
 use Whatpm::CSS::SelectorsParser qw(:match :combinator :selector);
 
-my $sss_match = sub ($$$$) {
+my $sss_match;
+$sss_match = sub ($$$$) {
   my ($self, $sss, $node, $current_node, $is_html) = @_;
 
-        my $sss_matched = 1;
-        for my $simple_selector (@{$sss}) {
-          if ($simple_selector->[0] == LOCAL_NAME_SELECTOR) {
+  my $sss_matched = 1;
+  for my $simple_selector (@{$sss}) {
+    if ($simple_selector->[0] == LOCAL_NAME_SELECTOR) {
             if ($simple_selector->[1] eq
                 $node->manakai_local_name) {
               #
@@ -180,7 +181,12 @@ my $sss_match = sub ($$$$) {
             }
     } elsif ($simple_selector->[0] == PSEUDO_CLASS_SELECTOR) {
       my $class_name = $simple_selector->[1];
-      if ({
+      if ($class_name eq 'not') {
+        if ($sss_match->($self, [@$simple_selector[2..$#$simple_selector]],
+                         $node, $current_node, $is_html)) {
+          $sss_matched = 0;
+        }
+      } elsif ({
         'nth-child' => 1, 'nth-last-child' => 1,
         'nth-of-type' => 1, 'nth-last-of-type' => 1,
         'first-child' => 1, 'last-child' => 1,
@@ -342,10 +348,11 @@ my $get_elements_by_selectors = sub {
     root nth-child nth-last-child nth-of-type nth-last-of-type
     first-child first-of-type last-child last-of-type
     only-child only-of-type empty
+    not
     -manakai-contains -manakai-current
   /;
 #    active checked disabled enabled focus hover indeterminate link
-#    target visited lang not
+#    target visited lang
 
   ## NOTE: MAY treat all links as :link rather than :visited
 
