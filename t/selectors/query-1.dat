@@ -160,14 +160,10 @@ s http://www.w3.org/2000/svg
 #result 1
 
 #xml nullns
-<foo>
-  <bar/>
-</foo>
+<foo><bar/></foo>
 
 #xml nonnullns
-<foo xmlns="http://foo/bar">
-  <bar/>
-</foo>
+<foo xmlns="http://foo/bar"><bar/></foo>
 
 #data
 |foo
@@ -234,6 +230,81 @@ a http://foo/baz
 /1
 #result nonnullns
 /1
+
+#data
+*
+#result nullns
+/1
+/1/1
+#result nonnullns
+/1
+/1/1
+
+#data
+|*
+#result nullns
+/1
+/1/1
+#result nonnullns
+
+#data
+*|*
+#result nullns
+/1
+/1/1
+#result nonnullns
+/1
+/1/1
+
+#data
+*
+#ns
+http://foo/
+#result nullns
+#result nonnullns
+
+#data
+*
+#ns
+http://foo/bar
+#result nullns
+#result nonnullns
+/1
+/1/1
+
+#data
+*
+#ns
+<null>
+#result nullns
+/1
+/1/1
+#result nonnullns
+
+#data
+a|*
+#ns
+a http://foo/
+#result nullns
+#result nonnullns
+
+#data
+a|*
+#ns
+a http://foo/bar
+#result nullns
+#result nonnullns
+/1
+/1/1
+
+#data
+a|*
+#ns
+a <null>
+#result nullns
+/1
+/1/1
+#result nonnullns
 
 #data
 * *
@@ -978,6 +1049,67 @@ html http://www.w3.org/1999/xhtml
 [*|class~=ccc]
 #result 11
 /2/2/1
+
+#xml nullnsattr
+<abc foo=""><abc foo="" xmlns="http://hoge/"/></abc>
+
+#data
+[foo]
+#ns
+http://foo/bar
+#result nullnsattr
+
+#data
+[foo]
+#ns
+http://hoge/
+#result nullnsattr
+/1/1
+
+#data
+[foo]
+#ns
+<null>
+#result nullnsattr
+/1
+
+#data
+:not([foo])
+#ns
+http://foo/bar
+#result nullnsattr
+
+#data
+:not([foo])
+#ns
+http://hoge/
+#result nullnsattr
+
+#data
+:not([foo])
+#ns
+<null>
+#result nullnsattr
+
+#data
+:not([bar])
+#ns
+http://foo/bar
+#result nullnsattr
+
+#data
+:not([bar])
+#ns
+http://hoge/
+#result nullnsattr
+/1/1
+
+#data
+:not([bar])
+#ns
+<null>
+#result nullnsattr
+/1
 
 #html 12
 <!DOCTYPE HTML>
