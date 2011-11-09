@@ -318,8 +318,7 @@ my $get_elements_by_selectors = sub {
       if (defined $uri) {
         $uri = ''.$uri;
         if ($uri eq '') {
-          $ns_error = $_[0];
-          return undef;
+          return '';
         } else {
           return $uri;
         }
@@ -332,7 +331,7 @@ my $get_elements_by_selectors = sub {
       if (defined $uri) {
         $uri = ''.$uri;
         if ($uri eq '') {
-          return undef;
+          return '';
         } else {
           return $uri;
         }

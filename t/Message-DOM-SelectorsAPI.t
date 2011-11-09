@@ -59,6 +59,7 @@ sub _query_selector : Tests {
         $ns{''} = $1 eq '<null>' ? '' : $1;
       }
     }
+
     my $lookup_ns = sub {
       return $ns{$_[0] // ''};
     }; # lookup_namespace_uri

@@ -159,6 +159,82 @@ s|p
 s http://www.w3.org/2000/svg
 #result 1
 
+#xml nullns
+<foo>
+  <bar/>
+</foo>
+
+#xml nonnullns
+<foo xmlns="http://foo/bar">
+  <bar/>
+</foo>
+
+#data
+|foo
+#result nullns
+/1
+#result nonnullns
+
+#data
+foo
+#result nullns
+/1
+#result nonnullns
+/1
+
+#data
+foo
+#ns
+<null>
+#result nullns
+/1
+#result nonnullns
+
+#data
+foo
+#ns
+http://foo/bar
+#result nullns
+#result nonnullns
+/1
+
+#data
+foo
+#ns
+http://foo/baz
+#result nullns
+#result nonnullns
+
+#data
+a|foo
+#ns
+a <null>
+#result nullns
+/1
+#result nonnullns
+
+#data
+a|foo
+#ns
+a http://foo/bar
+#result nullns
+#result nonnullns
+/1
+
+#data
+a|foo
+#ns
+a http://foo/baz
+#result nullns
+#result nonnullns
+
+#data
+*|foo
+#result nullns
+/1
+#result nonnullns
+/1
+
 #data
 * *
 #result 1
