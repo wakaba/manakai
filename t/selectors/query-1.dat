@@ -1053,6 +1053,17 @@ html http://www.w3.org/1999/xhtml
 #xml nullnsattr
 <abc foo=""><abc foo="" xmlns="http://hoge/"/></abc>
 
+#xml nonnullnsattr
+<abc a:foo="" xmlns:a="http://a/"><abc foo="" xmlns="http://hoge/"/></abc>
+
+#data
+[foo]
+#result nullnsattr
+/1
+/1/1
+#result nonnullnsattr
+/1/1
+
 #data
 [foo]
 #ns
@@ -1071,6 +1082,75 @@ http://hoge/
 #ns
 <null>
 #result nullnsattr
+/1
+
+#data
+[|foo]
+#result nullnsattr
+/1
+/1/1
+#result nonnullnsattr
+/1/1
+
+#data
+[*|foo]
+#result nullnsattr
+/1
+/1/1
+#result nonnullnsattr
+/1
+/1/1
+
+#data
+[a|foo]
+#ns
+a http://a/
+#result nullnsattr
+#result nonnullnsattr
+/1
+
+#data
+[a|foo]
+#ns
+a http://b/
+#result nullnsattr
+#result nonnullnsattr
+
+#data
+[a|foo]
+#ns
+a <null>
+#result nullnsattr
+/1
+/1/1
+#result nonnullnsattr
+/1/1
+
+#data
+[|xmlns]
+#result nullnsattr
+#result nonnullnsattr
+
+#data
+[*|xmlns]
+#result nullnsattr
+/1/1
+#result nonnullnsattr
+/1/1
+
+#data
+[a|xmlns]
+#ns
+a http://www.w3.org/2000/xmlns/
+#result nullnsattr
+/1/1
+#result nonnullnsattr
+/1/1
+
+#data
+[*|a]
+#result nullnsattr
+#result nonnullnsattr
 /1
 
 #data
