@@ -54,7 +54,21 @@ $sss_match = sub ($$$$) {
                 $sss_matched = 0;
               }
             }
-          } elsif ($simple_selector->[0] == ATTRIBUTE_SELECTOR) {
+    } elsif ($simple_selector->[0] == CLASS_SELECTOR) {
+      M: {
+        my $class_name = $node->can('class_name') ? $node->class_name : '';
+        $class_name = '' unless defined $class_name;
+        for (grep length, split /[\x09\x0A\x0C\x0D\x20]/, $class_name, -1) {
+          if ($simple_selector->[1] eq $_) {
+            last M;
+          }
+        }
+        $sss_matched = 0;
+      } # M
+    } elsif ($simple_selector->[0] == ID_SELECTOR) {
+      my $el = $node->owner_document->get_element_by_id ($simple_selector->[1]);
+      $sss_matched = $el eq $node;
+    } elsif ($simple_selector->[0] == ATTRIBUTE_SELECTOR) {
             my @attr_node;
             ## Namespace URI
             if (not defined $simple_selector->[1]) {
@@ -342,7 +356,7 @@ my $get_elements_by_selectors = sub {
         return undef;
       }
     }
-  };
+  }; # lookup_namespace_uri
 
   ## NOTE: SHOULD ensure to remain stable when facing a hostile $_[2].
 
@@ -372,7 +386,7 @@ my $get_elements_by_selectors = sub {
           -type => 'NAMESPACE_ERR',
           -subtype => 'UNDECLARED_PREFIX_ERR',
           namespace_prefix => $ns_error;
-    } else {
+    } else { 
       report Message::DOM::DOMException
           -object => $_[0],
           -type => 'SYNTAX_ERR',

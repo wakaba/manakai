@@ -1338,6 +1338,111 @@ http://hoge/
 #result defaultattr
 /2/1
 
+#html htmlclass1
+<!DOCTYPE HTML>
+<p class=foo>
+<p class="foo bar">
+<p class="&#x09;&#xa;hoge &#xb;&#xc;&#xd;  xyz  ">
+<p class=BAR>
+<p class=ho.ge>
+
+#data
+.foo
+#result htmlclass1
+/2/2/1
+/2/2/2
+
+#data
+.foo.bar
+#result htmlclass1
+/2/2/2
+
+#data
+.bar.foo
+#result htmlclass1
+/2/2/2
+
+#data
+.bar
+#result htmlclass1
+/2/2/2
+
+#data
+.\b
+#result htmlclass1
+/2/2/3
+
+#data
+.xyz
+#result htmlclass1
+/2/2/3
+
+#data
+.BAR
+#result htmlclass1
+/2/2/4
+
+#data
+.ho\.ge
+#result htmlclass1
+/2/2/5
+
+#data
+.foo\ bar
+#result htmlclass1
+
+#html htmlid1
+<!DOCTYPE HTML>
+<p id=foo>
+<p id="foo bar">
+<p id=" foo ">
+<p id=foo>
+
+#data
+| #foo
+#result htmlid1
+/2/2/1
+
+#data
+| #foo\ bar
+#result htmlid1
+/2/2/2
+
+#data
+| #\ foo\20
+#result htmlid1
+/2/2/3
+
+#data
+| #bar
+#result htmlid1
+
+#xml xmlid1
+<!DOCTYPE hoge [
+  <!ATTLIST foo bar ID #IMPLIED>
+]>
+<hoge><foo bar="abc"/><foo id="xyz"/><foo xml:id="aaa"/><foo
+id="html1" xmlns="http://www.w3.org/1999/xhtml"/></hoge>
+
+#data
+| #abc
+#result xmlid1
+/2/1
+
+#data
+| #xyz
+#result xmlid1
+
+#data
+| #aaa
+#result xmlid1
+/2/3
+
+#data
+| #html1
+#result xmlid1
+/2/4
+
 #html 12
 <!DOCTYPE HTML>
 <p>aaaaaaaaaaaaaaaaaaaaaaaaaa
