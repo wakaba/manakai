@@ -1191,6 +1191,153 @@ http://hoge/
 #result nullnsattr
 /1
 
+#xml attr1
+<hoge><fuga foo="bar"/><fuga foo="BAR"/><fuga foo=" bar&#x9;"
+/><abc foo=""/><abc foo="hoge fuga xyz &#xc;&#xb;&#xa;&#xd;"
+/><fuga foo="bar-"/><fuga foo="bar-baz"
+/><hoge foo="-"/><fuga foo="-abc"/><fuga foo="barbaz"/></hoge>
+
+#data
+[foo=bar]
+#result attr1
+/1/1
+
+#data
+[foo="bar"]
+#result attr1
+/1/1
+
+#data
+[foo=BAR]
+#result attr1
+/1/2
+
+#data escaped
+[foo=" bar\u0009"]
+#result attr1
+/1/3
+
+#data
+[foo=""]
+#result attr1
+/1/4
+
+#data
+[foo~=""]
+#result attr1
+
+#data
+[foo~=hoge]
+#result attr1
+/1/5
+
+#data
+[foo~=fuga]
+#result attr1
+/1/5
+
+#data
+[foo~=xyz]
+#result attr1
+/1/5
+
+#data
+[foo~=bar]
+#result attr1
+/1/1
+/1/3
+
+#data
+[foo~=BAR]
+#result attr1
+/1/2
+
+#data
+[foo~="hoge fuga"]
+#result attr1
+
+#data
+[foo~=" "]
+#result attr1
+
+#data escaped
+[foo~=\000b]
+#result attr1
+/1/5
+
+#data
+[foo|=bar]
+#result attr1
+/1/1
+/1/6
+/1/7
+
+#data
+[foo|=""]
+#result attr1
+/1/4
+/1/8
+/1/9
+
+#data
+[foo^=bar]
+#result attr1
+/1/1
+/1/6
+/1/7
+/1/10
+
+#data
+[foo^=""]
+#result attr1
+
+#data
+[foo$="bar"]
+#result attr1
+/1/1
+
+#data
+[foo$="-"]
+#result attr1
+/1/6
+/1/8
+
+#data
+[foo$=""]
+#result attr1
+
+#data
+[foo*=bar]
+#result attr1
+/1/1
+/1/3
+/1/6
+/1/7
+/1/10
+
+#data
+[foo*="-"]
+#result attr1
+/1/6
+/1/7
+/1/8
+/1/9
+
+#data
+[foo*=""]
+#result attr1
+
+#xml defaultattr
+<!DOCTYPE hoge [
+  <!ATTLIST foo bar CDATA "xyz">
+]>
+<hoge><foo/></hoge>
+
+#data
+[bar=xyz]
+#result defaultattr
+/2/1
+
 #html 12
 <!DOCTYPE HTML>
 <p>aaaaaaaaaaaaaaaaaaaaaaaaaa
