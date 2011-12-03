@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2011-08-25',
+          '_file_date' => '2011-12-02',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -53469,7 +53469,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                         'ly' => {
                                   'Description' => [
-                                                     'Libyan Arab Jamahiriya'
+                                                     'Libya'
                                                    ],
                                   '_added' => '2005-10-16',
                                   '_canon' => '_uppercase'
