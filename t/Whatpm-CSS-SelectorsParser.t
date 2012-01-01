@@ -12,6 +12,10 @@ use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
 my $data_d = file (__FILE__)->dir;
 
+sub _lists : Test(1) {
+  eq_or_diff ref $Whatpm::CSS::SelectorsParser::IdentOnlyPseudoClasses, 'HASH';
+} # _lists
+
 sub serialize_simple_selector ($);
 sub serialize_simple_selector ($) {
   local $_ = $_[0];
@@ -210,7 +214,7 @@ __PACKAGE__->runtests;
 
 =head1 LICENSE
 
-Copyright 2011 Wakaba <w@suika.fam.cx>.
+Copyright 2011-2012 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

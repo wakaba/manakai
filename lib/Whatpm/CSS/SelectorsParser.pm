@@ -144,6 +144,28 @@ sub parse_string ($$) {
   return $selectors; # or undef
 } # parse_string
 
+our $IdentOnlyPseudoClasses = {
+  active => 1,
+  checked => 1,
+  '-manakai-current' => 1,
+  disabled => 1,
+  empty => 1,
+  enabled => 1,
+  'first-child' => 1,
+  'first-of-type' => 1,
+  focus => 1,
+  hover => 1,
+  indeterminate => 1,
+  'last-child' => 1,
+  'last-of-type' => 1,
+  link => 1,
+  'only-child' => 1,
+  'only-of-type' => 1,
+  root => 1,
+  target => 1,
+  visited => 1,
+}; # $IdentOnlyPseudoClasses
+
 sub _parse_selectors_with_tokenizer ($$$;$) {
   my $self = $_[0];
   my $tt = $_[1];
@@ -443,27 +465,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
       if ($t->{type} == IDENT_TOKEN) {
         my $class = $t->{value};
         $class =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-        if ({
-              active => 1,
-              checked => 1,
-              '-manakai-current' => 1,
-              disabled => 1,
-              empty => 1,
-              enabled => 1,
-              'first-child' => 1,
-              'first-of-type' => 1,
-              focus => 1,
-              hover => 1,
-              indeterminate => 1,
-              'last-child' => 1,
-              'last-of-type' => 1,
-              link => 1,
-              'only-child' => 1,
-              'only-of-type' => 1,
-              root => 1,
-              target => 1,
-              visited => 1,
-            }->{$class}) {
+        if ($IdentOnlyPseudoClasses->{$class}) {
           if ($self->{pseudo_class}->{$class}) {
             push @$sss, [PSEUDO_CLASS_SELECTOR, $class];
           } else {
@@ -1107,7 +1109,7 @@ sub get_selector_specificity ($$) {
 
 =head1 LICENSE
 
-Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
