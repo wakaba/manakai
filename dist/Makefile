@@ -6,7 +6,7 @@ all: dist
 dist: langtag css-tokenizer
 
 langtag:
-	cd .. && $(GENERATEPM) config/packages/langtag.pi dist/
+	cd .. && $(GENERATEPM) config/dist/whatpm-langtag.pi dist/
 
 css-tokenizer:
 	cd .. && $(GENERATEPM) config/dist/whatpm-css-tokenizer.pi dist/

@@ -1,11 +1,15 @@
+use Path::Class;
+my $root_d = file (__FILE__)->dir->parent->parent;
+
   {
       main_module_name => 'Whatpm::LangTag',
-      file_names => [qw(
+      file_names => [map { glob $root_d->file ($_)->stringify } qw(
           lib/Whatpm/LangTag.pm
           lib/Whatpm/LangTag.pod
           lib/Whatpm/_LangTagReg.pm
+          lib/Whatpm/_LangTagReg_Full.pm
           lib/Whatpm/mklangreg.pl
-          t/langtag-1.dat
+          t/langtag-*.dat
           t/LangTag.t
           t/testfiles.pl
       )],
