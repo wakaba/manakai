@@ -12,8 +12,10 @@ use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
 my $data_d = file (__FILE__)->dir;
 
-sub _lists : Test(1) {
+sub _lists : Test(2) {
   eq_or_diff ref $Whatpm::CSS::SelectorsParser::IdentOnlyPseudoClasses, 'HASH';
+  eq_or_diff ref $Whatpm::CSS::SelectorsParser::IdentOnlyPseudoElements,
+      'HASH';
 } # _lists
 
 sub serialize_simple_selector ($);

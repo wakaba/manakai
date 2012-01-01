@@ -168,6 +168,14 @@ our $IdentOnlyPseudoClasses = {
   visited => 1,
 }; # $IdentOnlyPseudoClasses
 
+our $IdentOnlyPseudoElements = {
+  'first-letter' => 1,
+  'first-line' => 1,
+  after => 1,
+  before => 1,
+  cue => 1,
+}; # $IdentOnlyPseudoElements
+
 sub _parse_selectors_with_tokenizer ($$$;$) {
   my $self = $_[0];
   my $tt = $_[1];
@@ -732,8 +740,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
         my $pe = $t->{value};
         $pe =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
         if ($self->{pseudo_element}->{$pe} and 
-            {'first-letter' => 1, 'first-line' => 1,
-             after => 1, before => 1}->{$pe}) {
+            $IdentOnlyPseudoElements->{$pe}) {
           push @$sss, [PSEUDO_ELEMENT_SELECTOR, $pe];
           $has_pseudo_element = 1;
 
