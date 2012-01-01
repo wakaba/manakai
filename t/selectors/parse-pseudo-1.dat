@@ -1743,6 +1743,34 @@ http://hoge/
   "abc"
 
 #data
+:past
+#supported
+:past
+#parsed
+:past
+
+#data
+:past(hoge)
+#supported
+:past
+#errors
+1;2;selectors:pseudo-class:function:unknown;;past;m
+
+#data
+:future
+#supported
+:future
+#parsed
+:future
+
+#data
+:future(hoge)
+#supported
+:future
+#errors
+1;2;selectors:pseudo-class:function:unknown;;future;m
+
+#data
 :not(a)
 #errors
 1;2;selectors:pseudo-class:function:not supported;;not;w
