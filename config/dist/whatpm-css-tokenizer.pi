@@ -1,0 +1,23 @@
+use Path::Class;
+my $root_d = file (__FILE__)->dir->parent->parent;
+
+  {
+      main_module_name => 'Whatpm::CSS::Tokenizer',
+      file_names => [map { glob $root_d->file ($_)->stringify } qw(
+          lib/Whatpm/CSS/Tokenizer.pm
+          lib/Whatpm/CSS/Tokenizer.pod
+          t/Whatpm-CSS-Tokenizer.t
+          t/css-token-*.test
+          config/dist/whatpm-css-tokenizer.pi
+      )],
+      req_modules => {
+          'Exporter' => 0,
+      },
+      t_req_modules => {
+          'Data::Dumper' => 0,
+          'JSON' => 0,
+          'Path::Class' => 0,
+          'Test::Differences' => 0,
+          'Test::More' => 0,
+      },
+  };
