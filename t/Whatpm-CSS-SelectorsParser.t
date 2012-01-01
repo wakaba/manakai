@@ -18,6 +18,8 @@ sub _lists : Test(2) {
       'HASH';
 } # _lists
 
+sub serialize_selector_object ($);
+
 sub serialize_simple_selector ($);
 sub serialize_simple_selector ($) {
   local $_ = $_[0];
@@ -54,12 +56,19 @@ sub serialize_simple_selector ($) {
     }
     $result .= "\n";
     if (exists $_->[2]) {
+      my $value = $_->[1];
       for (@{$_}[2..$#{$_}]) {
         if (ref $_ eq 'ARRAY') {
-          my $r = "  " . serialize_simple_selector $_;
-          $r =~ s/\n/\n  /g;
-          $r =~ s/\n  $/\n/;
-          $result .= $r;
+          if ($value eq 'cue') {
+            my $v = serialize_selector_object $_;
+            $v =~ s/\x0A/\x0A  /g;
+            $result .= "  " . $v . "\n";
+          } else {
+            my $r = "  " . serialize_simple_selector $_;
+            $r =~ s/\n/\n  /g;
+            $r =~ s/\n  $/\n/;
+            $result .= $r;
+          }
         } else {
           $result .= q<  "> . $_ . qq<"\n>;
         }

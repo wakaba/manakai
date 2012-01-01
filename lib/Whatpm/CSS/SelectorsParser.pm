@@ -226,7 +226,7 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
                 COLON_TOKEN, 1,
                 HASH_TOKEN, 1,
                 LBRACKET_TOKEN, 1,
-                RPAREN_TOKEN, 1, # :not(a ->> ) <<-
+                RPAREN_TOKEN, $in_negation, # :not(a ->> ) <<-
                }->{$t->{type}}) {
         $in_negation = 1 if $in_negation;
         if (defined $default_namespace and not $in_negation) {
@@ -748,10 +748,61 @@ sub _parse_selectors_with_tokenizer ($$$;$) {
           $t = $tt->get_next_token;
           redo S;
         } else {
-          $self->{onerror}->(type => 'selectors:pseudo-element:ident:unknown',
-                             level => $self->{level}->{must},
-                             uri => \$self->{href},
-                             token => $t, value => $pe);
+          if ($IdentOnlyPseudoElements->{$pe}) {
+            $self->{onerror}
+                ->(type => 'selectors:pseudo-element:ident:not supported',
+                   level => $self->{level}->{warning},
+                   uri => \$self->{href},
+                   token => $t, value => $pe);
+          } else {
+            $self->{onerror}
+                ->(type => 'selectors:pseudo-element:ident:unknown',
+                   level => $self->{level}->{must},
+                   uri => \$self->{href},
+                   token => $t, value => $pe);
+          }
+          return ($t, undef);
+        }
+      } elsif ($t->{type} == FUNCTION_TOKEN) {
+        my $pe = $t->{value};
+        $pe =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+        if ($self->{pseudo_element}->{$pe} and
+            $pe eq 'cue') {
+          my $sub_selectors;
+          ($t, $sub_selectors)
+              = $self->_parse_selectors_with_tokenizer ($tt, RPAREN_TOKEN);
+          if ($sub_selectors and @$sub_selectors) {
+            unless ($t->{type} == RPAREN_TOKEN) {
+              $self->{onerror}->(type => 'function not closed',
+                                 level => $self->{level}->{must},
+                                 uri => \$self->{href},
+                                 token => $t);
+              return ($t, undef);
+            }
+
+            push @$sss, [PSEUDO_ELEMENT_SELECTOR, $pe, $sub_selectors];
+            $has_pseudo_element = 1;
+            
+            $state = BEFORE_SIMPLE_SELECTOR_STATE;
+            $t = $tt->get_next_token;
+            redo S;
+          } else {
+            return ($t, undef);
+          }
+        } else {
+          if ($pe eq 'cue') {
+            $self->{onerror}
+                ->(type => 'selectors:pseudo-element:function:not supported',
+                   level => $self->{level}->{warning},
+                   uri => \$self->{href},
+                   token => $t, value => $pe);
+          } else {
+            $self->{onerror}
+                ->(type => 'selectors:pseudo-element:function:unknown',
+                   level => $self->{level}->{must},
+                   uri => \$self->{href},
+                   token => $t, value => $pe);
+          }
           return ($t, undef);
         }
       } else {

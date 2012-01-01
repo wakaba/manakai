@@ -2129,7 +2129,7 @@ http://hoge/
 :lang
 ::lang
 #errors
-1;3;no pseudo-element name;;;m
+1;3;selectors:pseudo-element:function:unknown;;lang;m
 
 #data
 :before
@@ -2171,7 +2171,7 @@ http://hoge/
 #data
 ::before
 #errors
-1;3;selectors:pseudo-element:ident:unknown;;before;m
+1;3;selectors:pseudo-element:ident:not supported;;before;w
 
 #data
 :/**/before
@@ -2208,7 +2208,7 @@ http://hoge/
 #supported
 ::before
 #errors
-1;3;no pseudo-element name;;;m
+1;3;selectors:pseudo-element:function:unknown;;before;m
 
 #data
 :after
@@ -2250,7 +2250,7 @@ http://hoge/
 #data
 ::after
 #errors
-1;3;selectors:pseudo-element:ident:unknown;;after;m
+1;3;selectors:pseudo-element:ident:not supported;;after;w
 
 #data
 :/**/after
@@ -2287,7 +2287,7 @@ http://hoge/
 #supported
 ::after
 #errors
-1;3;no pseudo-element name;;;m
+1;3;selectors:pseudo-element:function:unknown;;after;m
 
 #data
 :first-line
@@ -2329,7 +2329,7 @@ http://hoge/
 #data
 ::first-line
 #errors
-1;3;selectors:pseudo-element:ident:unknown;;first-line;m
+1;3;selectors:pseudo-element:ident:not supported;;first-line;w
 
 #data
 :/**/first-line
@@ -2366,7 +2366,7 @@ http://hoge/
 #supported
 ::first-line
 #errors
-1;3;no pseudo-element name;;;m
+1;3;selectors:pseudo-element:function:unknown;;first-line;m
 
 #data
 :first-letter
@@ -2408,7 +2408,7 @@ http://hoge/
 #data
 ::first-letter
 #errors
-1;3;selectors:pseudo-element:ident:unknown;;first-letter;m
+1;3;selectors:pseudo-element:ident:not supported;;first-letter;w
 
 #data
 :/**/first-letter
@@ -2445,7 +2445,7 @@ http://hoge/
 #supported
 ::first-letter
 #errors
-1;3;no pseudo-element name;;;m
+1;3;selectors:pseudo-element:function:unknown;;first-letter;m
 
 #data
 *:before
@@ -2533,7 +2533,7 @@ http://foo/
 #data
 ::cue
 #errors
-1;3;selectors:pseudo-element:ident:unknown;;cue;m
+1;3;selectors:pseudo-element:ident:not supported;;cue;w
 
 #data
 ::cue
@@ -2548,3 +2548,393 @@ http://foo/
 ::cue
 #parsed
 ::cue
+
+#data
+:cue()
+#errors
+1;2;selectors:pseudo-class:function:unknown;;cue;m
+
+#data
+::cue()
+#errors
+1;3;selectors:pseudo-element:function:not supported;;cue;w
+
+#data
+::cue(abc)
+#errors
+1;3;selectors:pseudo-element:function:not supported;;cue;w
+
+#data
+::cue(),hoge
+#errors
+1;3;selectors:pseudo-element:function:not supported;;cue;w
+
+#data
+hoge,
+::cue()
+#errors
+2;3;selectors:pseudo-element:function:not supported;;cue;w
+
+#data
+::cue()
+#supported
+::cue
+#errors
+1;7;no sss;;;m
+
+#data
+::cue(  )
+#supported
+::cue
+#errors
+1;9;no sss;;;m
+
+#data
+::cue/**/()
+#errors
+1;3;selectors:pseudo-element:ident:not supported;;cue;w
+
+#data
+::cue/**/()
+#supported
+::cue
+#errors
+1;10;no combinator;;;m
+
+#data
+::cue/**/(abc)
+#supported
+::cue
+#errors
+1;10;no combinator;;;m
+
+#data
+::CUE()
+#errors
+1;3;selectors:pseudo-element:function:not supported;;cue;w
+
+#data
+::CUE()
+#supported
+::cue
+#errors
+1;7;no sss;;;m
+
+#data
+::cue(*)
+#errors
+1;3;selectors:pseudo-element:function:not supported;;cue;w
+
+#data
+::cue(*)
+#supported
+::cue
+#parsed
+::cue
+  *
+
+#data
+::cue(*)
+#supported
+::cue
+#ns 
+http://foo/
+#parsed
+{http://foo/}
+::cue
+  {http://foo/}
+
+#data
+::cue(foo)
+#supported
+::cue
+#parsed
+::cue
+  <foo>
+
+#data
+::cue(bar)
+#supported
+::cue
+#ns 
+http://foo/
+#parsed
+{http://foo/}
+::cue
+  {http://foo/}
+  <bar>
+
+#data
+::cue(/**/bar/**/)
+#supported
+::cue
+#ns 
+http://foo/
+#parsed
+{http://foo/}
+::cue
+  {http://foo/}
+  <bar>
+
+#data escaped
+::cue( \u0009bar\u000A\u000C)
+#supported
+::cue
+#ns 
+http://foo/
+#parsed
+{http://foo/}
+::cue
+  {http://foo/}
+  <bar>
+
+#data
+::cue(a):first-child
+#supported
+::cue
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::cue(a):before
+#supported
+::cue
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::cue(a).abc
+#supported
+::cue
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::cue(a)::cue(a)
+#supported
+::cue
+#errors
+1;9;ss after pseudo-element;;;m
+
+#data
+::cue(abc
+#supported
+::cue
+#errors
+1;10;function not closed;;;m
+
+#data escaped
+::cue(abc  \u0020
+#supported
+::cue
+#errors
+1;13;function not closed;;;m
+
+#data
+::cue(abc xyz
+#supported
+::cue
+#errors
+1;14;function not closed;;;m
+
+#data
+::cue(abc(
+#supported
+::cue
+#errors
+1;7;no sss;;;m
+
+#data
+::cue(abc (
+#supported
+::cue
+#errors
+1;11;no sss;;;m
+
+#data
+::cue([not])
+#supported
+::cue
+#parsed
+::cue
+  [{}not]
+
+#data
+::cue([not ^= "xyz"])
+#supported
+::cue
+#parsed
+::cue
+  [{}not]
+  ^=xyz
+
+#data
+::cue(.foo)
+#supported
+::cue
+#parsed
+::cue
+  .foo
+
+#data
+::cue(.foo.bar)
+#supported
+::cue
+#parsed
+::cue
+  .foo
+  .bar
+
+#data
+::cue(.foo .bar)
+#supported
+::cue
+#parsed
+::cue
+  .foo
+  ***
+  .bar
+
+#data
+::cue(:first-child)
+#supported
+::cue
+:first-child
+#parsed
+::cue
+  :first-child
+
+#data
+::cue(:target)
+#supported
+::cue
+#errors
+1;8;selectors:pseudo-class:ident:not supported;;target;w
+
+#data
+::cue(::before),abc
+#supported
+::cue
+#errors
+1;9;selectors:pseudo-element:ident:not supported;;before;w
+
+#data
+::cue(::before),abc
+#supported
+::cue
+::before
+#parsed
+::cue
+  ::before
+------
+<abc>
+
+#data
+::cue(hoge|fuga)
+#supported
+::cue
+#ns
+hoge http://foo/
+#parsed
+::cue
+  {http://foo/}
+  <fuga>
+
+#data
+::cue(foo > bar)
+#supported
+::cue
+#parsed
+::cue
+  <foo>
+  >
+  <bar>
+
+#data
+::cue(foo > bar >)
+#supported
+::cue
+#errors
+1;18;no sss;;;m
+
+#data
+::cue(foo,bar)
+#supported
+::cue
+#parsed
+::cue
+  <foo>
+  ------
+  <bar>
+
+#data
+::cue(foo > bar,)
+#supported
+::cue
+#errors
+1;17;no sss;;;m
+
+#data
+::cue(::cue(hoge,fuga))
+#supported
+::cue
+#parsed
+::cue
+  ::cue
+    <hoge>
+    ------
+    <fuga>
+
+#data
+::cue(::cue(::cue(::cue())))
+#supported
+::cue
+#errors
+1;25;no sss;;;m
+
+#data
+::cue(::cue(::cue(::cue(*))))
+#supported
+::cue
+#parsed
+::cue
+  ::cue
+    ::cue
+      ::cue
+        *
+
+#data
+::cue(:lang(ja))
+#supported
+:lang
+::cue
+#parsed
+::cue
+  :lang
+    "ja"
+
+#data
+::cue(:not(foo))
+#supported
+:not
+::cue
+#parsed
+::cue
+  :not
+    <foo>
+
+#data
+:not(::cue)
+#supported
+:not
+::cue
+#errors
+1;7;no pseudo-class name;;;m
+
+#data
+:not(::cue(foo))
+#supported
+:not
+::cue
+#errors
+1;7;no pseudo-class name;;;m
