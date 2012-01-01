@@ -1,7 +1,7 @@
 package Whatpm::CSS::SelectorsSerializer;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.8 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-
+use warnings;
+our $VERSION = '1.9';
 use Whatpm::CSS::SelectorsParser qw(:selector :combinator :match);
 
 sub serialize_test ($$;$) {
@@ -234,7 +234,13 @@ sub serialize_selector_text ($$$) {
               $v .= ':' . $ident->($vv->[1]);
             }
           } elsif ($_->[0] == PSEUDO_ELEMENT_SELECTOR) {
-            $v .= ':' . $ident->($_->[1]);
+            if ({
+              after => 1, before => 1, 'first-letter' => 1, 'first-line' => 1,
+            }->{$_->[1]}) {
+              $v .= ':' . $ident->($_->[1]);
+            } else {
+              $v .= '::' . $ident->($_->[1]);
+            }
           }
           ## NOTE: else ... impl error
 
@@ -256,12 +262,11 @@ sub serialize_selector_text ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
 1;
-# $Date: 2008/01/14 05:57:35 $
