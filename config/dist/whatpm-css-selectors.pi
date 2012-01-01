@@ -1,0 +1,22 @@
+use Path::Class;
+my $root_d = file (__FILE__)->dir->parent->parent;
+
+  {
+      main_module_name => 'Whatpm::CSS::SelectorsParser',
+      file_names => [map { glob $root_d->file ($_)->stringify } qw(
+          lib/Whatpm/CSS/Selectors*.p*
+          t/Whatpm-CSS-Selectors*.t
+          t/selectors/*
+          config/dist/whatpm-css-selectors.pi
+      )],
+      req_modules => {
+          'Exporter' => 0,
+          'Whatpm::CSS::Tokenizer' => 0,
+      },
+      t_req_modules => {
+          'Path::Class' => 0,
+          'Test::Differences' => 0,
+          'Test::HTCT::Parser' => 0,
+          'Test::More' => 0,
+      },
+  };
