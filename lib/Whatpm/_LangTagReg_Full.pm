@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2011-12-02',
+          '_file_date' => '2012-01-04',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -54739,6 +54739,15 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Hiragana'
                                                      ],
                                     '_added' => '2005-10-16',
+                                    '_canon' => '_titlecase'
+                                  },
+                        'hluw' => {
+                                    'Description' => [
+                                                       'Anatolian Hieroglyphs',
+                                                       'Luwian Hieroglyphs',
+                                                       'Hittite Hieroglyphs'
+                                                     ],
+                                    '_added' => '2011-12-28',
                                     '_canon' => '_titlecase'
                                   },
                         'hmng' => {
