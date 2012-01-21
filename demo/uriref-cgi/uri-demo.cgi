@@ -1,11 +1,13 @@
 #!/usr/bin/perl
 use strict;
-use lib qw[/home/wakaba/work/manakai/lib
-           /home/wakaba/public_html/-temp/wiki/lib];
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->parent->subdir ('lib')->stringify;
+use lib glob file (__FILE__)->dir->parent->parent->subdir ('modules', '*', 'lib')->stringify;
 use CGI::Carp qw/fatalsToBrowser/;
 
-use SuikaWiki::Input::HTTP; ## TODO: Use some better CGI module
-my $http = SuikaWiki::Input::HTTP->new;
+use Message::CGI::HTTP;
+my $http = Message::CGI::HTTP->new;
 
 print STDOUT "Status: 404 Not Found\nContent-Type: text/plain; charset=us-ascii\n\n404" and exit
   unless $http->meta_variable ('PATH_INFO') eq '/';
@@ -71,5 +73,5 @@ for (
   print STDOUT $_->[0] . ': ' . (defined $value ? '"' . $value . '"' : '(undef)') . "\n";
 }
 
+## Author: Wakaba <w@suika.fam.cx>.
 ## License: Public Domain.
-# $Date: 2007/05/22 11:28:56 $
