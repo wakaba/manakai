@@ -1,8 +1,9 @@
 #!/usr/bin/perl
 use strict;
-
-use lib qw[/home/httpd/html/www/markup/html/whatpm
-           /home/wakaba/work/manakai2/lib];
+use warnings;
+use Path::Class;
+use lib file (__FILE__)->dir->parent->parent->subdir ('lib')->stringify;
+use lib glob file (__FILE__)->dir->parent->parent->subdir ('modules', '*', 'lib')->stringify;
 use CGI::Carp qw[fatalsToBrowser];
 
 use Message::CGI::HTTP;
@@ -343,11 +344,9 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
-
-## $Date: 2008/09/15 14:35:31 $
