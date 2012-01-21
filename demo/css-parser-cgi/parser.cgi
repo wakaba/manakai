@@ -17,6 +17,7 @@ my $mode = $http->get_meta_variable ('PATH_INFO');
 if ($mode eq '/csstext') {
   require Encode;
   require Whatpm::CSS::Parser;
+  require Whatpm::CSS::SelectorsParser;
 
   my $s = $http->get_parameter ('s');
   if (length $s > 1000_000) {
@@ -192,15 +193,12 @@ if ($mode eq '/csstext') {
   $p->{prop_value}->{'outline-color'}->{invert} = 1;
   $p->{prop_value}->{'outline-color'}->{'-manakai-invert-or-currentcolor'} = 1;
   $p->{pseudo_class}->{$_} = 1 for qw/
-    active checked disabled empty enabled first-child first-of-type
-    focus hover indeterminate last-child last-of-type link only-child
-    only-of-type root target visited
     lang nth-child nth-last-child nth-of-type nth-last-of-type not
-    -manakai-contains -manakai-current
-  /;
+    -manakai-contains
+  /, keys %$Whatpm::CSS::SelectorsParser::IdentOnlyPseudoClasses;
   $p->{pseudo_element}->{$_} = 1 for qw/
-    after before first-letter first-line
-  /;
+    
+  /, keys %$Whatpm::CSS::SelectorsParser::IdentOnlyPseudoElements;
 
   my $css_options = {
     prop => $p->{prop},
@@ -341,7 +339,7 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
