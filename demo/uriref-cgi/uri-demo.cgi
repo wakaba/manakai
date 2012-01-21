@@ -10,7 +10,7 @@ use Message::CGI::HTTP;
 my $http = Message::CGI::HTTP->new;
 
 print STDOUT "Status: 404 Not Found\nContent-Type: text/plain; charset=us-ascii\n\n404" and exit
-  unless $http->meta_variable ('PATH_INFO') eq '/';
+  unless $http->get_meta_variable ('PATH_INFO') eq '/';
 
 use Message::URI::URIReference;
 use Encode;
