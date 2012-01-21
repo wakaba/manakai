@@ -310,15 +310,12 @@ if ($mode eq '/csstext') {
   };
 
   $p->{pseudo_class}->{$_} = 1 for qw/
-    active checked disabled empty enabled first-child first-of-type
-    focus hover indeterminate last-child last-of-type link only-child
-    only-of-type root target visited
     lang nth-child nth-last-child nth-of-type nth-last-of-type not
-    -manakai-contains -manakai-current
-  /;
+    -manakai-contains
+  /, keys %$Whatpm::CSS::SelectorsParser::IdentOnlyPseudoClasses;
   $p->{pseudo_element}->{$_} = 1 for qw/
-    after before first-letter first-line
-  /;
+    
+  /, keys %$Whatpm::CSS::SelectorsParser::IdentOnlyPseudoElements;
 
   my $selectors = $p->parse_string ($s);
   
