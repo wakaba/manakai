@@ -17,9 +17,9 @@ use Encode;
 use encoding 'utf8', STDOUT => 'utf8';
 
 my $uri = Message::DOM::DOMImplementation->create_uri_reference
-  (decode 'utf8', scalar $http->parameter ('uri'));
+  (decode 'utf8', scalar $http->get_parameter ('uri'));
 my $baseuri = Message::DOM::DOMImplementation->create_uri_reference
-  (decode 'utf8', scalar $http->parameter ('baseuri'));
+  (decode 'utf8', scalar $http->get_parameter ('baseuri'));
 
 print STDOUT "Content-Type: text/plain; charset=utf-8\n\n";
 
