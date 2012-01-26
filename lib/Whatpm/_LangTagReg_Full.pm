@@ -57479,9 +57479,19 @@ $Whatpm::LangTag::RegistryFull = {
                                                         'Armenian lower case numerals'
                                                       ]
                                    },
+                      'bali' => {
+                                  'Description' => [
+                                                     'Balinese digits'
+                                                   ]
+                                },
                       'beng' => {
                                   'Description' => [
                                                      'Bengali digits'
+                                                   ]
+                                },
+                      'cham' => {
+                                  'Description' => [
+                                                     'Cham digits'
                                                    ]
                                 },
                       'deva' => {
@@ -57559,6 +57569,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Hebrew numerals'
                                                    ]
                                 },
+                      'java' => {
+                                  'Description' => [
+                                                     'Javanese digits'
+                                                   ]
+                                },
                       'jpan' => {
                                   'Description' => [
                                                      'Japanese numerals'
@@ -57569,6 +57584,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                         'Japanese financial numerals'
                                                       ]
                                    },
+                      'kali' => {
+                                  'Description' => [
+                                                     'Kayah Li digits'
+                                                   ]
+                                },
                       'khmr' => {
                                   'Description' => [
                                                      'Khmer digits'
@@ -57579,6 +57599,16 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Kannada digits'
                                                    ]
                                 },
+                      'lanahora' => {
+                                      'Description' => [
+                                                         'Tai Tham Hora digits'
+                                                       ]
+                                    },
+                      'lanatham' => {
+                                      'Description' => [
+                                                         'Tai Tham Tham digits'
+                                                       ]
+                                    },
                       'laoo' => {
                                   'Description' => [
                                                      'Lao digits'
@@ -57587,6 +57617,16 @@ $Whatpm::LangTag::RegistryFull = {
                       'latn' => {
                                   'Description' => [
                                                      'Latin digits'
+                                                   ]
+                                },
+                      'lepc' => {
+                                  'Description' => [
+                                                     'Lepcha digits'
+                                                   ]
+                                },
+                      'limb' => {
+                                  'Description' => [
+                                                     'Limbu digits'
                                                    ]
                                 },
                       'mlym' => {
@@ -57599,16 +57639,36 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Mongolian digits'
                                                    ]
                                 },
+                      'mtei' => {
+                                  'Description' => [
+                                                     'Meetei Mayek digits'
+                                                   ]
+                                },
                       'mymr' => {
                                   'Description' => [
                                                      'Myanmar digits'
                                                    ]
                                 },
+                      'mymrshan' => {
+                                      'Description' => [
+                                                         'Myanmar Shan digits'
+                                                       ]
+                                    },
                       'native' => {
                                     'Description' => [
                                                        'Native digits'
                                                      ]
                                   },
+                      'nkoo' => {
+                                  'Description' => [
+                                                     'N\'Ko digits'
+                                                   ]
+                                },
+                      'olck' => {
+                                  'Description' => [
+                                                     'Ol Chiki digits'
+                                                   ]
+                                },
                       'orya' => {
                                   'Description' => [
                                                      'Oriya digits'
@@ -57624,6 +57684,21 @@ $Whatpm::LangTag::RegistryFull = {
                                                          'Roman lowercase numerals'
                                                        ]
                                     },
+                      'saur' => {
+                                  'Description' => [
+                                                     'Saurashtra digits'
+                                                   ]
+                                },
+                      'sund' => {
+                                  'Description' => [
+                                                     'Sundanese digits'
+                                                   ]
+                                },
+                      'talu' => {
+                                  'Description' => [
+                                                     'New Tai Lue digits'
+                                                   ]
+                                },
                       'taml' => {
                                   'Description' => [
                                                      'Tamil numerals'
@@ -57653,7 +57728,12 @@ $Whatpm::LangTag::RegistryFull = {
                                       'Description' => [
                                                          'Traditional numerals'
                                                        ]
-                                    }
+                                    },
+                      'vaii' => {
+                                  'Description' => [
+                                                     'Vai digits'
+                                                   ]
+                                }
                     },
           'u_tz' => {
                       'adalv' => {
@@ -57954,6 +58034,11 @@ $Whatpm::LangTag::RegistryFull = {
                       'bolpb' => {
                                    'Description' => [
                                                       'La Paz, Bolivia'
+                                                    ]
+                                 },
+                      'bqkra' => {
+                                   'Description' => [
+                                                      'Bonaire, Sint Estatius and Saba'
                                                     ]
                                  },
                       'braux' => {
@@ -59369,6 +59454,11 @@ $Whatpm::LangTag::RegistryFull = {
                       'svsal' => {
                                    'Description' => [
                                                       'El Salvador'
+                                                    ]
+                                 },
+                      'sxphi' => {
+                                   'Description' => [
+                                                      'Sint Maarten'
                                                     ]
                                  },
                       'sydam' => {
