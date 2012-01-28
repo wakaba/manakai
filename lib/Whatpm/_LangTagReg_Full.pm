@@ -56924,6 +56924,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'Surinamese Guilder'
                                                   ]
                                },
+                      'ssp' => {
+                                 'Description' => [
+                                                    'South Sudanese Pound'
+                                                  ]
+                               },
                       'std' => {
                                  'Description' => [
                                                     'São Tomé and Príncipe Dobra'
@@ -57184,9 +57189,19 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'RINET Funds'
                                                   ]
                                },
+                      'xsu' => {
+                                 'Description' => [
+                                                    'Sucre'
+                                                  ]
+                               },
                       'xts' => {
                                  'Description' => [
                                                     'Testing Currency Code'
+                                                  ]
+                               },
+                      'xua' => {
+                                 'Description' => [
+                                                    'ADB Unit of Account'
                                                   ]
                                },
                       'xxx' => {
@@ -57471,12 +57486,12 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                       'armn' => {
                                   'Description' => [
-                                                     'Armenian upper case numerals'
+                                                     'Armenian upper case numerals — non-decimal'
                                                    ]
                                 },
                       'armnlow' => {
                                      'Description' => [
-                                                        'Armenian lower case numerals'
+                                                        'Armenian lower case numerals — non-decimal'
                                                       ]
                                    },
                       'bali' => {
@@ -57487,6 +57502,16 @@ $Whatpm::LangTag::RegistryFull = {
                       'beng' => {
                                   'Description' => [
                                                      'Bengali digits'
+                                                   ]
+                                },
+                      'brah' => {
+                                  'Description' => [
+                                                     'Brahmi digits'
+                                                   ]
+                                },
+                      'cakm' => {
+                                  'Description' => [
+                                                     'Chakma digits'
                                                    ]
                                 },
                       'cham' => {
@@ -57501,12 +57526,12 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'ethi' => {
                                   'Description' => [
-                                                     'Ethiopic numerals'
+                                                     'Ethiopic numerals — non-decimal'
                                                    ]
                                 },
                       'finance' => {
                                      'Description' => [
-                                                        'Financial numerals'
+                                                        'Financial numerals — may be non-decimal'
                                                       ]
                                    },
                       'fullwide' => {
@@ -57516,17 +57541,17 @@ $Whatpm::LangTag::RegistryFull = {
                                     },
                       'geor' => {
                                   'Description' => [
-                                                     'Georgian numerals'
+                                                     'Georgian numerals — non-decimal'
                                                    ]
                                 },
                       'grek' => {
                                   'Description' => [
-                                                     'Greek upper case numerals'
+                                                     'Greek upper case numerals — non-decimal'
                                                    ]
                                 },
                       'greklow' => {
                                      'Description' => [
-                                                        'Greek lower case numerals'
+                                                        'Greek lower case numerals — non-decimal'
                                                       ]
                                    },
                       'gujr' => {
@@ -57546,27 +57571,27 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                       'hans' => {
                                   'Description' => [
-                                                     'Simplified Chinese numerals'
+                                                     'Simplified Chinese numerals — non-decimal'
                                                    ]
                                 },
                       'hansfin' => {
                                      'Description' => [
-                                                        'Simplified Chinese financial numerals'
+                                                        'Simplified Chinese financial numerals — non-decimal'
                                                       ]
                                    },
                       'hant' => {
                                   'Description' => [
-                                                     'Traditional Chinese numerals'
+                                                     'Traditional Chinese numerals — non-decimal'
                                                    ]
                                 },
                       'hantfin' => {
                                      'Description' => [
-                                                        'Traditional Chinese financial numerals'
+                                                        'Traditional Chinese financial numerals — non-decimal'
                                                       ]
                                    },
                       'hebr' => {
                                   'Description' => [
-                                                     'Hebrew numerals'
+                                                     'Hebrew numerals — non-decimal'
                                                    ]
                                 },
                       'java' => {
@@ -57576,12 +57601,12 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'jpan' => {
                                   'Description' => [
-                                                     'Japanese numerals'
+                                                     'Japanese numerals — non-decimal'
                                                    ]
                                 },
                       'jpanfin' => {
                                      'Description' => [
-                                                        'Japanese financial numerals'
+                                                        'Japanese financial numerals — non-decimal'
                                                       ]
                                    },
                       'kali' => {
@@ -57599,14 +57624,14 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Kannada digits'
                                                    ]
                                 },
-                      'lanahora' => {
-                                      'Description' => [
-                                                         'Tai Tham Hora digits'
-                                                       ]
-                                    },
+                      'lana' => {
+                                  'Description' => [
+                                                     'Tai Tham Hora (secular) digits'
+                                                   ]
+                                },
                       'lanatham' => {
                                       'Description' => [
-                                                         'Tai Tham Tham digits'
+                                                         'Tai Tham Tham (ecclesiastical) digits'
                                                        ]
                                     },
                       'laoo' => {
@@ -57656,7 +57681,7 @@ $Whatpm::LangTag::RegistryFull = {
                                     },
                       'native' => {
                                     'Description' => [
-                                                       'Native digits'
+                                                       'Native digits — may be non-decimal'
                                                      ]
                                   },
                       'nkoo' => {
@@ -57674,14 +57699,19 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Oriya digits'
                                                    ]
                                 },
+                      'osma' => {
+                                  'Description' => [
+                                                     'Osmanya digits'
+                                                   ]
+                                },
                       'roman' => {
                                    'Description' => [
-                                                      'Roman upper case numerals'
+                                                      'Roman upper case numerals — non-decimal'
                                                     ]
                                  },
                       'romanlow' => {
                                       'Description' => [
-                                                         'Roman lowercase numerals'
+                                                         'Roman lowercase numerals — non-decimal'
                                                        ]
                                     },
                       'saur' => {
@@ -57689,9 +57719,24 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Saurashtra digits'
                                                    ]
                                 },
+                      'shrd' => {
+                                  'Description' => [
+                                                     'Sharada digits'
+                                                   ]
+                                },
+                      'sora' => {
+                                  'Description' => [
+                                                     'Sora_Sompeng digits'
+                                                   ]
+                                },
                       'sund' => {
                                   'Description' => [
                                                      'Sundanese digits'
+                                                   ]
+                                },
+                      'takr' => {
+                                  'Description' => [
+                                                     'Takri digits'
                                                    ]
                                 },
                       'talu' => {
@@ -57701,7 +57746,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'taml' => {
                                   'Description' => [
-                                                     'Tamil numerals'
+                                                     'Tamil numerals — non-decimal'
                                                    ]
                                 },
                       'tamldec' => {
@@ -57726,7 +57771,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'traditio' => {
                                       'Description' => [
-                                                         'Traditional numerals'
+                                                         'Traditional numerals — may be non-decimal'
                                                        ]
                                     },
                       'vaii' => {
