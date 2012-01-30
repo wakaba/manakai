@@ -12305,6 +12305,7 @@ $Whatpm::LangTag::Registry = {
                        'kh' => {},
                        'kk' => {},
                        'kn' => {},
+                       'kr' => {},
                        'ks' => {},
                        'nu' => {},
                        'tz' => {},
@@ -12327,6 +12328,9 @@ $Whatpm::LangTag::Registry = {
           'u_kn' => {
                       'false' => {},
                       'true' => {}
+                    },
+          'u_kr' => {
+                      'reorder_code' => {}
                     },
           'u_ks' => {
                       'identic' => {},

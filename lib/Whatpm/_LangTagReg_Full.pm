@@ -57367,6 +57367,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'Collation parameter key for numeric handling'
                                                   ]
                                },
+                       'kr' => {
+                                 'Description' => [
+                                                    'Collation reorder codes'
+                                                  ]
+                               },
                        'ks' => {
                                  'Description' => [
                                                     'Collation parameter key for collation strength'
@@ -57445,6 +57450,13 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'A sequence of decimal digits is sorted at primary level with its numeric value'
                                                    ]
                                 }
+                    },
+          'u_kr' => {
+                      'reorder_code' => {
+                                          'Description' => [
+                                                             'One or more collation reorder codes: LDML 5.14.12)'
+                                                           ]
+                                        }
                     },
           'u_ks' => {
                       'identic' => {
@@ -57681,7 +57693,7 @@ $Whatpm::LangTag::RegistryFull = {
                                     },
                       'native' => {
                                     'Description' => [
-                                                       'Native digits — may be non-decimal'
+                                                       'Native digits'
                                                      ]
                                   },
                       'nkoo' => {
