@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2012-01-04',
+          '_file_date' => '2012-02-16',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -60211,6 +60211,15 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ],
                                       '_added' => '2006-09-18'
                                     },
+                         'emodeng' => {
+                                        'Description' => [
+                                                           'Early Modern English (1500-1700)'
+                                                         ],
+                                        'Prefix' => [
+                                                      'en'
+                                                    ],
+                                        '_added' => '2012-02-05'
+                                      },
                          'fonipa' => {
                                        'Description' => [
                                                           'International Phonetic Alphabet'
@@ -60389,6 +60398,21 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ],
                                       '_added' => '2007-07-05'
                                     },
+                         'nulik' => {
+                                      'Description' => [
+                                                         'VolapŸk nulik',
+                                                         'VolapŸk perevidšl',
+                                                         'VolapŸk nulŠdik',
+                                                         'de Jong\'s VolapŸk',
+                                                         'New VolapŸk',
+                                                         'Revised VolapŸk',
+                                                         'Modern VolapŸk'
+                                                       ],
+                                      'Prefix' => [
+                                                    'vo'
+                                                  ],
+                                      '_added' => '2012-01-28'
+                                    },
                          'osojs' => {
                                       'Comments' => [
                                                       'The dialect of Oseacco/Osojane is one of the four major local  dialects of Resian'
@@ -60457,6 +60481,18 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'rm'
                                                   ],
                                       '_added' => '2010-06-29'
+                                    },
+                         'rigik' => {
+                                      'Description' => [
+                                                         'VolapŸk rigik',
+                                                         'Schleyer\'s VolapŸk',
+                                                         'Original VolapŸk',
+                                                         'Classic VolapŸk'
+                                                       ],
+                                      'Prefix' => [
+                                                    'vo'
+                                                  ],
+                                      '_added' => '2012-01-28'
                                     },
                          'rozaj' => {
                                       'Description' => [

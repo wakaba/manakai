@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2012-01-04',
+          '_file_date' => '2012-02-16',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
@@ -12947,6 +12947,11 @@ $Whatpm::LangTag::Registry = {
                                                     'en'
                                                   ]
                                     },
+                         'emodeng' => {
+                                        'Prefix' => [
+                                                      'en'
+                                                    ]
+                                      },
                          'fonipa' => {},
                          'fonupa' => {},
                          'fonxsamp' => {},
@@ -13023,6 +13028,11 @@ $Whatpm::LangTag::Registry = {
                                                     'sl-rozaj'
                                                   ]
                                     },
+                         'nulik' => {
+                                      'Prefix' => [
+                                                    'vo'
+                                                  ]
+                                    },
                          'osojs' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
@@ -13053,6 +13063,11 @@ $Whatpm::LangTag::Registry = {
                          'puter' => {
                                       'Prefix' => [
                                                     'rm'
+                                                  ]
+                                    },
+                         'rigik' => {
+                                      'Prefix' => [
+                                                    'vo'
                                                   ]
                                     },
                          'rozaj' => {
