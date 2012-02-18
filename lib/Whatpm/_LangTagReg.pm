@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2012-02-16',
+          '_file_date' => '2012-02-17',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
