@@ -500,7 +500,7 @@ sub parse_byte_stream ($$$$;$$) {
       ($char_stream, $e_status) = $charset->get_decode_handle
           ($buffer, allow_error_reporting => 1,
            allow_fallback => 1, byte_buffer => \$byte_buffer);
-      if ($char_stream) {
+      if ($char_stream) { # supported
         $buffer->{buffer} = $byte_buffer;
         !!!parse-error (type => 'sniffing:chardet',
                         text => $charset_name,
