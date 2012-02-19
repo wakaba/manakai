@@ -187,7 +187,7 @@ sub import ($;%) {
       require Jcode;
       Message::MIME::Charset::make_charset ('*default' =>
         encoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{output}, $CODE{internal}); $s },
-        decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, $CODE{input}); $s },
+        decoder	=> sub { my $s = $_[1]; Jcode::convert (\$s, $CODE{internal}, $CODE{input} || Jcode::getcode ($s)); $s },
         mime_text	=> 1,
       );
       Message::MIME::Charset::make_charset ('iso-2022-jp' =>

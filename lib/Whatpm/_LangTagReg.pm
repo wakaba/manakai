@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2011-12-02',
+          '_file_date' => '2012-02-17',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
@@ -11556,6 +11556,9 @@ $Whatpm::LangTag::Registry = {
                         'hira' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'hluw' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'hmng' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -12207,6 +12210,7 @@ $Whatpm::LangTag::Registry = {
                       'sos' => {},
                       'srd' => {},
                       'srg' => {},
+                      'ssp' => {},
                       'std' => {},
                       'sur' => {},
                       'svc' => {},
@@ -12259,7 +12263,9 @@ $Whatpm::LangTag::Registry = {
                       'xpf' => {},
                       'xpt' => {},
                       'xre' => {},
+                      'xsu' => {},
                       'xts' => {},
+                      'xua' => {},
                       'xxx' => {},
                       'ydd' => {},
                       'yer' => {},
@@ -12299,6 +12305,7 @@ $Whatpm::LangTag::Registry = {
                        'kh' => {},
                        'kk' => {},
                        'kn' => {},
+                       'kr' => {},
                        'ks' => {},
                        'nu' => {},
                        'tz' => {},
@@ -12322,6 +12329,9 @@ $Whatpm::LangTag::Registry = {
                       'false' => {},
                       'true' => {}
                     },
+          'u_kr' => {
+                      'reorder_code' => {}
+                    },
           'u_ks' => {
                       'identic' => {},
                       'level1' => {},
@@ -12334,7 +12344,11 @@ $Whatpm::LangTag::Registry = {
                       'arabext' => {},
                       'armn' => {},
                       'armnlow' => {},
+                      'bali' => {},
                       'beng' => {},
+                      'brah' => {},
+                      'cakm' => {},
+                      'cham' => {},
                       'deva' => {},
                       'ethi' => {},
                       'finance' => {},
@@ -12350,25 +12364,43 @@ $Whatpm::LangTag::Registry = {
                       'hant' => {},
                       'hantfin' => {},
                       'hebr' => {},
+                      'java' => {},
                       'jpan' => {},
                       'jpanfin' => {},
+                      'kali' => {},
                       'khmr' => {},
                       'knda' => {},
+                      'lana' => {},
+                      'lanatham' => {},
                       'laoo' => {},
                       'latn' => {},
+                      'lepc' => {},
+                      'limb' => {},
                       'mlym' => {},
                       'mong' => {},
+                      'mtei' => {},
                       'mymr' => {},
+                      'mymrshan' => {},
                       'native' => {},
+                      'nkoo' => {},
+                      'olck' => {},
                       'orya' => {},
+                      'osma' => {},
                       'roman' => {},
                       'romanlow' => {},
+                      'saur' => {},
+                      'shrd' => {},
+                      'sora' => {},
+                      'sund' => {},
+                      'takr' => {},
+                      'talu' => {},
                       'taml' => {},
                       'tamldec' => {},
                       'telu' => {},
                       'thai' => {},
                       'tibt' => {},
-                      'traditio' => {}
+                      'traditio' => {},
+                      'vaii' => {}
                     },
           'u_tz' => {
                       'adalv' => {},
@@ -12431,6 +12463,7 @@ $Whatpm::LangTag::Registry = {
                       'bmbda' => {},
                       'bnbwn' => {},
                       'bolpb' => {},
+                      'bqkra' => {},
                       'braux' => {},
                       'brbel' => {},
                       'brbvb' => {},
@@ -12714,6 +12747,7 @@ $Whatpm::LangTag::Registry = {
                       'ssjub' => {},
                       'sttms' => {},
                       'svsal' => {},
+                      'sxphi' => {},
                       'sydam' => {},
                       'szqmn' => {},
                       'tcgdt' => {},
@@ -12913,6 +12947,11 @@ $Whatpm::LangTag::Registry = {
                                                     'en'
                                                   ]
                                     },
+                         'emodeng' => {
+                                        'Prefix' => [
+                                                      'en'
+                                                    ]
+                                      },
                          'fonipa' => {},
                          'fonupa' => {},
                          'fonxsamp' => {},
@@ -12989,6 +13028,11 @@ $Whatpm::LangTag::Registry = {
                                                     'sl-rozaj'
                                                   ]
                                     },
+                         'nulik' => {
+                                      'Prefix' => [
+                                                    'vo'
+                                                  ]
+                                    },
                          'osojs' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
@@ -13019,6 +13063,11 @@ $Whatpm::LangTag::Registry = {
                          'puter' => {
                                       'Prefix' => [
                                                     'rm'
+                                                  ]
+                                    },
+                         'rigik' => {
+                                      'Prefix' => [
+                                                    'vo'
                                                   ]
                                     },
                          'rozaj' => {

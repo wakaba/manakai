@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2011-12-02',
+          '_file_date' => '2012-02-17',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -582,7 +582,7 @@ $Whatpm::LangTag::RegistryFull = {
                          'csc' => {
                                     'Description' => [
                                                        'Catalan Sign Language',
-                                                       'Lengua de señas catalana',
+                                                       'Lengua de se√±as catalana',
                                                        'Llengua de Signes Catalana'
                                                      ],
                                     'Prefix' => [
@@ -817,7 +817,7 @@ $Whatpm::LangTag::RegistryFull = {
                          'fss' => {
                                     'Description' => [
                                                        'Finland-Swedish Sign Language',
-                                                       'finlandssvenskt teckenspråk',
+                                                       'finlandssvenskt teckenspr√•k',
                                                        'suomenruotsalainen viittomakieli'
                                                      ],
                                     'Prefix' => [
@@ -1314,7 +1314,7 @@ $Whatpm::LangTag::RegistryFull = {
                          'lsp' => {
                                     'Description' => [
                                                        'Panamanian Sign Language',
-                                                       'Lengua de Señas Panameñas'
+                                                       'Lengua de Se√±as Paname√±as'
                                                      ],
                                     'Prefix' => [
                                                   'sgn'
@@ -1803,7 +1803,7 @@ $Whatpm::LangTag::RegistryFull = {
                          'pys' => {
                                     'Description' => [
                                                        'Paraguayan Sign Language',
-                                                       'Lengua de Señas del Paraguay'
+                                                       'Lengua de Se√±as del Paraguay'
                                                      ],
                                     'Prefix' => [
                                                   'sgn'
@@ -2041,7 +2041,7 @@ $Whatpm::LangTag::RegistryFull = {
                          'tsm' => {
                                     'Description' => [
                                                        'Turkish Sign Language',
-                                                       'Türk İşaret Dili'
+                                                       'T√ºrk ƒ∞≈üaret Dili'
                                                      ],
                                     'Prefix' => [
                                                   'sgn'
@@ -2121,7 +2121,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                          'uks' => {
                                     'Description' => [
-                                                       'Urubú-Kaapor Sign Language',
+                                                       'Urub√∫-Kaapor Sign Language',
                                                        'Kaapor Sign Language'
                                                      ],
                                     'Prefix' => [
@@ -2622,7 +2622,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aae' => {
                                      'Description' => [
-                                                        'Arbëreshë Albanian'
+                                                        'Arb√´resh√´ Albanian'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'sq'
@@ -2671,7 +2671,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aan' => {
                                      'Description' => [
-                                                        'Anambé'
+                                                        'Anamb√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -2684,7 +2684,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aap' => {
                                      'Description' => [
-                                                        'Pará Arára'
+                                                        'Par√° Ar√°ra'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -2696,7 +2696,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aas' => {
                                      'Description' => [
-                                                        'Aasáx'
+                                                        'Aas√°x'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -2749,7 +2749,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'aba' => {
                                      'Description' => [
-                                                        'Abé'
+                                                        'Ab√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -2907,7 +2907,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'acb' => {
                                      'Description' => [
-                                                        'Áncá'
+                                                        '√Ånc√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -2987,7 +2987,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'acs' => {
                                      'Description' => [
-                                                        'Acroá'
+                                                        'Acro√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -3585,7 +3585,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ahn' => {
                                      'Description' => [
-                                                        'Àhàn'
+                                                        '√Äh√†n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -3772,7 +3772,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aji' => {
                                      'Description' => [
-                                                        'Ajië'
+                                                        'Aji√´'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4098,7 +4098,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'alw' => {
                                      'Description' => [
-                                                        'Alaba-K’abeena',
+                                                        'Alaba-K‚Äôabeena',
                                                         'Wanbasana'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -4130,7 +4130,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'ama' => {
                                      'Description' => [
-                                                        'Amanayé'
+                                                        'Amanay√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4304,7 +4304,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ane' => {
                                      'Description' => [
-                                                        'Xârâcùù'
+                                                        'X√¢r√¢c√π√π'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4496,7 +4496,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aok' => {
                                      'Description' => [
-                                                        'Arhö'
+                                                        'Arh√∂'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4508,7 +4508,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aom' => {
                                      'Description' => [
-                                                        'Ömie'
+                                                        '√ñmie'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4603,7 +4603,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'api' => {
                                      'Description' => [
-                                                        'Apiaká'
+                                                        'Apiak√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4633,7 +4633,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'apn' => {
                                      'Description' => [
-                                                        'Apinayé'
+                                                        'Apinay√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4675,7 +4675,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'apu' => {
                                      'Description' => [
-                                                        'Apurinã'
+                                                        'Apurin√£'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4699,7 +4699,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'apy' => {
                                      'Description' => [
-                                                        'Apalaí'
+                                                        'Apala√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4765,7 +4765,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aqr' => {
                                      'Description' => [
-                                                        'Arhâ'
+                                                        'Arh√¢'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4831,7 +4831,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ark' => {
                                      'Description' => [
-                                                        'Arikapú'
+                                                        'Arikap√∫'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4891,8 +4891,8 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aru' => {
                                      'Description' => [
-                                                        'Aruá (Amazonas State)',
-                                                        'Arawá'
+                                                        'Aru√° (Amazonas State)',
+                                                        'Araw√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4910,7 +4910,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'arx' => {
                                      'Description' => [
-                                                        'Aruá (Rodonia State)'
+                                                        'Aru√° (Rodonia State)'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5009,7 +5009,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'asn' => {
                                      'Description' => [
-                                                        'Xingú Asuriní'
+                                                        'Xing√∫ Asurin√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5135,7 +5135,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ati' => {
                                      'Description' => [
-                                                        'Attié'
+                                                        'Atti√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5382,7 +5382,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'aux' => {
                                      'Description' => [
-                                                        'Aurá'
+                                                        'Aur√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5468,7 +5468,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'avv' => {
                                      'Description' => [
-                                                        'Avá-Canoeiro'
+                                                        'Av√°-Canoeiro'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5501,7 +5501,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'awe' => {
                                      'Description' => [
-                                                        'Awetí'
+                                                        'Awet√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5555,7 +5555,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'awt' => {
                                      'Description' => [
-                                                        'Araweté'
+                                                        'Arawet√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5597,7 +5597,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'axg' => {
                                      'Description' => [
-                                                        'Mato Grosso Arára'
+                                                        'Mato Grosso Ar√°ra'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5845,7 +5845,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bab' => {
                                      'Description' => [
-                                                        'Bainouk-Gunyuño'
+                                                        'Bainouk-Gunyu√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -5866,7 +5866,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bae' => {
                                      'Description' => [
-                                                        'Baré'
+                                                        'Bar√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -6043,7 +6043,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bbj' => {
                                      'Description' => [
-                                                        'Ghomálá\''
+                                                        'Ghom√°l√°\''
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -6073,8 +6073,8 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bbo' => {
                                      'Description' => [
-                                                        'Northern Bobo Madaré',
-                                                        'Konabéré'
+                                                        'Northern Bobo Madar√©',
+                                                        'Konab√©r√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -6196,7 +6196,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bci' => {
                                      'Description' => [
-                                                        'Baoulé'
+                                                        'Baoul√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -6311,7 +6311,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bdc' => {
                                      'Description' => [
-                                                        'Emberá-Baudó'
+                                                        'Ember√°-Baud√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -6569,7 +6569,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bet' => {
                                      'Description' => [
-                                                        'Guiberoua Béte'
+                                                        'Guiberoua B√©te'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -6581,7 +6581,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bev' => {
                                      'Description' => [
-                                                        'Daloa Bété'
+                                                        'Daloa B√©t√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -6678,7 +6678,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bfl' => {
                                      'Description' => [
-                                                        'Banda-Ndélé'
+                                                        'Banda-Nd√©l√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -7375,7 +7375,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bjw' => {
                                      'Description' => [
-                                                        'Bakwé'
+                                                        'Bakw√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -7494,7 +7494,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bkq' => {
                                      'Description' => [
-                                                        'Bakairí'
+                                                        'Bakair√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -8075,7 +8075,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'boi' => {
                                      'Description' => [
-                                                        'Barbareño'
+                                                        'Barbare√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -8111,7 +8111,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'boo' => {
                                      'Description' => [
-                                                        'Tiemacèwè Bozo'
+                                                        'Tiemac√®w√® Bozo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -8129,7 +8129,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bor' => {
                                      'Description' => [
-                                                        'Borôro'
+                                                        'Bor√¥ro'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -8171,7 +8171,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'boz' => {
                                      'Description' => [
-                                                        'Tiéyaxo Bozo'
+                                                        'Ti√©yaxo Bozo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -8369,7 +8369,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bqk' => {
                                      'Description' => [
-                                                        'Banda-Mbrès'
+                                                        'Banda-Mbr√®s'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -8750,7 +8750,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bsv' => {
                                      'Description' => [
-                                                        'Baga Sobané'
+                                                        'Baga Soban√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -8814,7 +8814,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'btg' => {
                                      'Description' => [
-                                                        'Gagnoa Bété'
+                                                        'Gagnoa B√©t√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9286,7 +9286,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bwj' => {
                                      'Description' => [
-                                                        'Láá Láá Bwamu'
+                                                        'L√°√° L√°√° Bwamu'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9329,7 +9329,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bwq' => {
                                      'Description' => [
-                                                        'Southern Bobo Madaré'
+                                                        'Southern Bobo Madar√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9821,7 +9821,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bzx' => {
                                      'Description' => [
-                                                        'Kɛlɛngaxo Bozo'
+                                                        'K…õl…õngaxo Bozo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9847,7 +9847,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'caa' => {
                                      'Description' => [
-                                                        'Chortí'
+                                                        'Chort√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9884,7 +9884,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cag' => {
                                      'Description' => [
-                                                        'Nivaclé'
+                                                        'Nivacl√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9905,7 +9905,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'caj' => {
                                      'Description' => [
-                                                        'Chané'
+                                                        'Chan√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9924,7 +9924,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cam' => {
                                      'Description' => [
-                                                        'Cemuhî'
+                                                        'Cemuh√Æ'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9936,7 +9936,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cao' => {
                                      'Description' => [
-                                                        'Chácobo'
+                                                        'Ch√°cobo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9960,7 +9960,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cas' => {
                                      'Description' => [
-                                                        'Tsimané'
+                                                        'Tsiman√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -9975,7 +9975,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cav' => {
                                      'Description' => [
-                                                        'Cavineña'
+                                                        'Cavine√±a'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10014,7 +10014,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cbb' => {
                                      'Description' => [
-                                                        'Cabiyarí'
+                                                        'Cabiyar√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10366,7 +10366,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cet' => {
                                      'Description' => [
-                                                        'Centúúm'
+                                                        'Cent√∫√∫m'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10463,7 +10463,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'chj' => {
                                      'Description' => [
-                                                        'Ojitlán Chinantec'
+                                                        'Ojitl√°n Chinantec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10521,7 +10521,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cht' => {
                                      'Description' => [
-                                                        'Cholón'
+                                                        'Chol√≥n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10545,7 +10545,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'chz' => {
                                      'Description' => [
-                                                        'Ozumacín Chinantec'
+                                                        'Ozumac√≠n Chinantec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10672,13 +10672,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cjo' => {
                                      'Description' => [
-                                                        'Ashéninka Pajonal'
+                                                        'Ash√©ninka Pajonal'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'cjp' => {
                                      'Description' => [
-                                                        'Cabécar'
+                                                        'Cab√©car'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10790,7 +10790,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ckz' => {
                                      'Description' => [
-                                                        'Cakchiquel-Quiché Mixed Language'
+                                                        'Cakchiquel-Quich√© Mixed Language'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10902,7 +10902,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cmi' => {
                                      'Description' => [
-                                                        'Emberá-Chamí'
+                                                        'Ember√°-Cham√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10971,7 +10971,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cnc' => {
                                      'Description' => [
-                                                        'Côông'
+                                                        'C√¥√¥ng'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -10989,7 +10989,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cni' => {
                                      'Description' => [
-                                                        'Asháninka'
+                                                        'Ash√°ninka'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11123,7 +11123,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'con' => {
                                      'Description' => [
-                                                        'Cofán'
+                                                        'Cof√°n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11195,13 +11195,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cpb' => {
                                      'Description' => [
-                                                        'Ucayali-Yurúa Ashéninka'
+                                                        'Ucayali-Yur√∫a Ash√©ninka'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'cpc' => {
                                      'Description' => [
-                                                        'Ajyíninka Apurucayali'
+                                                        'Ajy√≠ninka Apurucayali'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11258,7 +11258,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cpu' => {
                                      'Description' => [
-                                                        'Pichis Ashéninka'
+                                                        'Pichis Ash√©ninka'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11271,7 +11271,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cpy' => {
                                      'Description' => [
-                                                        'South Ucayali Ashéninka'
+                                                        'South Ucayali Ash√©ninka'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11343,7 +11343,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cri' => {
                                      'Description' => [
-                                                        'Sãotomense'
+                                                        'S√£otomense'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11446,7 +11446,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'crz' => {
                                      'Description' => [
-                                                        'Cruzeño'
+                                                        'Cruze√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11472,7 +11472,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'csc' => {
                                      'Description' => [
                                                         'Catalan Sign Language',
-                                                        'Lengua de señas catalana',
+                                                        'Lengua de se√±as catalana',
                                                         'Llengua de Signes Catalana'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -11646,7 +11646,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cto' => {
                                      'Description' => [
-                                                        'Emberá-Catío'
+                                                        'Ember√°-Cat√≠o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11761,7 +11761,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'cup' => {
                                      'Description' => [
-                                                        'Cupeño'
+                                                        'Cupe√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -11938,7 +11938,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'daa' => {
                                      'Description' => [
-                                                        'Dangaléat'
+                                                        'Dangal√©at'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -12987,7 +12987,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'dnn' => {
                                      'Description' => [
-                                                        'Dzùùngoo'
+                                                        'Dz√π√πngoo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -13017,7 +13017,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'dny' => {
                                      'Description' => [
-                                                        'Dení'
+                                                        'Den√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -13110,7 +13110,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'dos' => {
                                      'Description' => [
-                                                        'Dogosé'
+                                                        'Dogos√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -13701,7 +13701,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ebr' => {
                                      'Description' => [
-                                                        'Ebrié'
+                                                        'Ebri√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -14008,7 +14008,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'emp' => {
                                      'Description' => [
-                                                        'Northern Emberá'
+                                                        'Northern Ember√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -14144,7 +14144,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'eot' => {
                                      'Description' => [
-                                                        'Beti (Côte d\'Ivoire)'
+                                                        'Beti (C√¥te d\'Ivoire)'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -14854,7 +14854,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'frp' => {
                                      'Description' => [
                                                         'Arpitan',
-                                                        'Francoprovençal'
+                                                        'Francoproven√ßal'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -14899,7 +14899,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'fss' => {
                                      'Description' => [
                                                         'Finland-Swedish Sign Language',
-                                                        'finlandssvenskt teckenspråk',
+                                                        'finlandssvenskt teckenspr√•k',
                                                         'suomenruotsalainen viittomakieli'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -14966,7 +14966,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'fun' => {
                                      'Description' => [
-                                                        'Fulniô'
+                                                        'Fulni√¥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -15016,7 +15016,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'fwa' => {
                                      'Description' => [
-                                                        'Fwâi'
+                                                        'Fw√¢i'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -15721,7 +15721,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gha' => {
                                      'Description' => [
-                                                        'Ghadamès'
+                                                        'Ghadam√®s'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16030,7 +16030,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gmd' => {
                                      'Description' => [
-                                                        'Mághdì'
+                                                        'M√°ghd√¨'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16225,7 +16225,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gnw' => {
                                      'Description' => [
-                                                        'Western Bolivian Guaraní'
+                                                        'Western Bolivian Guaran√≠'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'gn'
@@ -16256,7 +16256,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'god' => {
                                      'Description' => [
-                                                        'Godié'
+                                                        'Godi√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16621,7 +16621,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gta' => {
                                      'Description' => [
-                                                        'Guató'
+                                                        'Guat√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16646,7 +16646,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gub' => {
                                      'Description' => [
-                                                        'Guajajára'
+                                                        'Guajaj√°ra'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16658,7 +16658,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gud' => {
                                      'Description' => [
-                                                        'Yocoboué Dida'
+                                                        'Yocobou√© Dida'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16676,7 +16676,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gug' => {
                                      'Description' => [
-                                                        'Paraguayan Guaraní'
+                                                        'Paraguayan Guaran√≠'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'gn'
@@ -16689,7 +16689,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gui' => {
                                      'Description' => [
-                                                        'Eastern Bolivian Guaraní'
+                                                        'Eastern Bolivian Guaran√≠'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'gn'
@@ -16714,7 +16714,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gun' => {
                                      'Description' => [
-                                                        'Mbyá Guaraní'
+                                                        'Mby√° Guaran√≠'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'gn'
@@ -16733,7 +16733,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'guq' => {
                                      'Description' => [
-                                                        'Aché'
+                                                        'Ach√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16751,13 +16751,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gut' => {
                                      'Description' => [
-                                                        'Maléku Jaíka'
+                                                        'Mal√©ku Ja√≠ka'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'guu' => {
                                      'Description' => [
-                                                        'Yanomamö'
+                                                        'Yanomam√∂'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16775,7 +16775,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gux' => {
                                      'Description' => [
-                                                        'Gourmanchéma'
+                                                        'Gourmanch√©ma'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16819,7 +16819,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gvj' => {
                                      'Description' => [
-                                                        'Guajá'
+                                                        'Guaj√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16843,13 +16843,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gvo' => {
                                      'Description' => [
-                                                        'Gavião Do Jiparaná'
+                                                        'Gavi√£o Do Jiparan√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'gvp' => {
                                      'Description' => [
-                                                        'Pará Gavião'
+                                                        'Par√° Gavi√£o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -16915,7 +16915,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gwi' => {
                                      'Description' => [
-                                                        'Gwichʼin'
+                                                        'Gwich ºin'
                                                       ],
                                      '_added' => '2005-10-16'
                                    },
@@ -16963,7 +16963,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gxx' => {
                                      'Description' => [
-                                                        'Wè Southern'
+                                                        'W√® Southern'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17018,7 +17018,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'gym' => {
                                      'Description' => [
-                                                        'Ngäbere'
+                                                        'Ng√§bere'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17155,7 +17155,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hao' => {
                                      'Description' => [
-                                                        'Hakö'
+                                                        'Hak√∂'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17291,7 +17291,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hed' => {
                                      'Description' => [
-                                                        'Herdé'
+                                                        'Herd√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17434,7 +17434,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hir' => {
                                      'Description' => [
-                                                        'Himarimã'
+                                                        'Himarim√£'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17452,7 +17452,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hix' => {
                                      'Description' => [
-                                                        'Hixkaryána'
+                                                        'Hixkary√°na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17674,7 +17674,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hmv' => {
                                      'Description' => [
-                                                        'Hmong Dô'
+                                                        'Hmong D√¥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17814,7 +17814,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hoh' => {
                                      'Description' => [
-                                                        'Hobyót'
+                                                        'Hoby√≥t'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17879,7 +17879,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'hot' => {
                                      'Description' => [
                                                         'Hote',
-                                                        'Malê'
+                                                        'Mal√™'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -17966,7 +17966,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hrt' => {
                                      'Description' => [
-                                                        'Hértevin'
+                                                        'H√©rtevin'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -18195,13 +18195,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hux' => {
                                      'Description' => [
-                                                        'Nüpode Huitoto'
+                                                        'N√ºpode Huitoto'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'huy' => {
                                      'Description' => [
-                                                        'Hulaulá'
+                                                        'Hulaul√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -18237,13 +18237,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hvv' => {
                                      'Description' => [
-                                                        'Santa María Del Mar Huave'
+                                                        'Santa Mar√≠a Del Mar Huave'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'hwa' => {
                                      'Description' => [
-                                                        'Wané'
+                                                        'Wan√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -18473,7 +18473,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'idt' => {
                                      'Description' => [
-                                                        'Idaté'
+                                                        'Idat√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -18505,7 +18505,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ife' => {
                                      'Description' => [
-                                                        'Ifè'
+                                                        'If√®'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -18947,7 +18947,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'inp' => {
                                      'Description' => [
-                                                        'Iñapari'
+                                                        'I√±apari'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -18965,7 +18965,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'inz' => {
                                      'Description' => [
-                                                        'Ineseño'
+                                                        'Inese√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -19046,7 +19046,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'irn' => {
                                      'Description' => [
-                                                        'Irántxe'
+                                                        'Ir√°ntxe'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -19276,7 +19276,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'itz' => {
                                      'Description' => [
-                                                        'Itzá'
+                                                        'Itz√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -19397,7 +19397,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'jaa' => {
                                      'Description' => [
-                                                        'Jamamadí'
+                                                        'Jamamad√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -19551,7 +19551,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'jbt' => {
                                      'Description' => [
-                                                        'Jabutí'
+                                                        'Jabut√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -19931,7 +19931,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'jor' => {
                                      'Description' => [
-                                                        'Jorá'
+                                                        'Jor√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20003,7 +20003,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'jru' => {
                                      'Description' => [
-                                                        'Japrería'
+                                                        'Japrer√≠a'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20015,7 +20015,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'jua' => {
                                      'Description' => [
-                                                        'Júma'
+                                                        'J√∫ma'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20039,7 +20039,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'juh' => {
                                      'Description' => [
-                                                        'Hõne'
+                                                        'H√µne'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20075,13 +20075,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'jup' => {
                                      'Description' => [
-                                                        'Hupdë'
+                                                        'Hupd√´'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'jur' => {
                                      'Description' => [
-                                                        'Jurúna'
+                                                        'Jur√∫na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20105,7 +20105,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'juw' => {
                                      'Description' => [
-                                                        'Wãpha'
+                                                        'W√£pha'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20278,7 +20278,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kav' => {
                                      'Description' => [
-                                                        'Katukína'
+                                                        'Katuk√≠na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20296,7 +20296,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kay' => {
                                      'Description' => [
-                                                        'Kamayurá'
+                                                        'Kamayur√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20308,13 +20308,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kbb' => {
                                      'Description' => [
-                                                        'Kaxuiâna'
+                                                        'Kaxui√¢na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'kbc' => {
                                      'Description' => [
-                                                        'Kadiwéu'
+                                                        'Kadiw√©u'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20344,7 +20344,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kbh' => {
                                      'Description' => [
-                                                        'Camsá'
+                                                        'Cams√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20392,7 +20392,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kbp' => {
                                      'Description' => [
-                                                        'Kabiyè'
+                                                        'Kabiy√®'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20477,7 +20477,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kcd' => {
                                      'Description' => [
-                                                        'Ngkâlmpw Kanum'
+                                                        'Ngk√¢lmpw Kanum'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20769,7 +20769,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'keb' => {
                                      'Description' => [
-                                                        'Kélé'
+                                                        'K√©l√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -20823,7 +20823,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kek' => {
                                      'Description' => [
-                                                        'Kekchí'
+                                                        'Kekch√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21003,7 +21003,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kfo' => {
                                      'Description' => [
-                                                        'Koro (Côte d\'Ivoire)'
+                                                        'Koro (C√¥te d\'Ivoire)'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21069,7 +21069,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kfz' => {
                                      'Description' => [
-                                                        'Koromfé'
+                                                        'Koromf√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21144,7 +21144,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kgk' => {
                                      'Description' => [
-                                                        'Kaiwá'
+                                                        'Kaiw√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21156,7 +21156,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kgm' => {
                                      'Description' => [
-                                                        'Karipúna'
+                                                        'Karip√∫na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21243,7 +21243,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'khb' => {
                                      'Description' => [
-                                                        'Lü'
+                                                        'L√º'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21255,7 +21255,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'khd' => {
                                      'Description' => [
-                                                        'Bädi Kanum'
+                                                        'B√§di Kanum'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21621,7 +21621,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kjm' => {
                                      'Description' => [
-                                                        'Kháng'
+                                                        'Kh√°ng'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -21742,7 +21742,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kkh' => {
                                      'Description' => [
-                                                        'Khün'
+                                                        'Kh√ºn'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22066,7 +22066,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kmg' => {
                                      'Description' => [
-                                                        'Kâte'
+                                                        'K√¢te'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22157,7 +22157,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kmv' => {
                                      'Description' => [
-                                                        'Karipúna Creole French'
+                                                        'Karip√∫na Creole French'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22262,7 +22262,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'knm' => {
                                      'Description' => [
-                                                        'Kanamarí'
+                                                        'Kanamar√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22305,7 +22305,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'knt' => {
                                      'Description' => [
-                                                        'Panoan Katukína'
+                                                        'Panoan Katuk√≠na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22342,7 +22342,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'knz' => {
                                      'Description' => [
-                                                        'Kalamsé'
+                                                        'Kalams√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22550,7 +22550,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kpj' => {
                                      'Description' => [
-                                                        'Karajá'
+                                                        'Karaj√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22574,7 +22574,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kpn' => {
                                      'Description' => [
-                                                        'Kepkiriwát'
+                                                        'Kepkiriw√°t'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22743,7 +22743,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kqp' => {
                                      'Description' => [
-                                                        'Kimré'
+                                                        'Kimr√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -22842,7 +22842,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kre' => {
                                      'Description' => [
-                                                        'Panará'
+                                                        'Panar√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23014,7 +23014,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ksh' => {
                                      'Description' => [
-                                                        'Kölsch'
+                                                        'K√∂lsch'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23087,7 +23087,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kst' => {
                                      'Description' => [
-                                                        'Winyé'
+                                                        'Winy√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23207,7 +23207,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ktn' => {
                                      'Description' => [
-                                                        'Karitiâna'
+                                                        'Kariti√¢na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23267,13 +23267,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ktx' => {
                                      'Description' => [
-                                                        'Kaxararí'
+                                                        'Kaxarar√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'kty' => {
                                      'Description' => [
-                                                        'Kango (Bas-Uélé District)'
+                                                        'Kango (Bas-U√©l√© District)'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23336,7 +23336,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kui' => {
                                      'Description' => [
-                                                        'Kuikúro-Kalapálo'
+                                                        'Kuik√∫ro-Kalap√°lo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23612,7 +23612,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'kwa' => {
                                      'Description' => [
-                                                        'Dâw'
+                                                        'D√¢w'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23738,7 +23738,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kwv' => {
                                      'Description' => [
-                                                        'Sara Kaba Náà'
+                                                        'Sara Kaba N√°√†'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23849,7 +23849,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kxo' => {
                                      'Description' => [
-                                                        'Kanoé'
+                                                        'Kano√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -23861,7 +23861,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kxq' => {
                                      'Description' => [
-                                                        'Smärky Kanum'
+                                                        'Sm√§rky Kanum'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -24030,7 +24030,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kyr' => {
                                      'Description' => [
-                                                        'Kuruáya'
+                                                        'Kuru√°ya'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -24078,7 +24078,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kyz' => {
                                      'Description' => [
-                                                        'Kayabí'
+                                                        'Kayab√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -24216,7 +24216,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'kzw' => {
                                      'Description' => [
-                                                        'Karirí-Xocó'
+                                                        'Karir√≠-Xoc√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -24653,7 +24653,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ldn' => {
                                      'Description' => [
-                                                        'Láadan'
+                                                        'L√°adan'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -24701,7 +24701,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'lee' => {
                                      'Description' => [
-                                                        'Lyélé'
+                                                        'Ly√©l√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -24978,7 +24978,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'lhs' => {
                                      'Description' => [
-                                                        'Mlahsö'
+                                                        'Mlahs√∂'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -25187,7 +25187,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'lkd' => {
                                      'Description' => [
-                                                        'Lakondê'
+                                                        'Lakond√™'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -25238,7 +25238,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'lkr' => {
                                      'Description' => [
-                                                        'Päri'
+                                                        'P√§ri'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -25402,7 +25402,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'lme' => {
                                      'Description' => [
-                                                        'Pévé'
+                                                        'P√©v√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -25663,7 +25663,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'loi' => {
                                      'Description' => [
-                                                        'Loma (Côte d\'Ivoire)'
+                                                        'Loma (C√¥te d\'Ivoire)'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -25717,7 +25717,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'lor' => {
                                      'Description' => [
-                                                        'Téén'
+                                                        'T√©√©n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -25946,7 +25946,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'lsp' => {
                                      'Description' => [
                                                         'Panamanian Sign Language',
-                                                        'Lengua de Señas Panameñas'
+                                                        'Lengua de Se√±as Paname√±as'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26002,7 +26002,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ltn' => {
                                      'Description' => [
-                                                        'Latundê'
+                                                        'Latund√™'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26307,7 +26307,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'maa' => {
                                      'Description' => [
-                                                        'San Jerónimo Tecóatl Mazatec'
+                                                        'San Jer√≥nimo Tec√≥atl Mazatec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26350,7 +26350,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'maj' => {
                                      'Description' => [
-                                                        'Jalapa De Díaz Mazatec'
+                                                        'Jalapa De D√≠az Mazatec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26386,7 +26386,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'maq' => {
                                      'Description' => [
-                                                        'Chiquihuitlán Mazatec'
+                                                        'Chiquihuitl√°n Mazatec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26410,7 +26410,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mav' => {
                                      'Description' => [
-                                                        'Sateré-Mawé'
+                                                        'Sater√©-Maw√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26483,7 +26483,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mbj' => {
                                      'Description' => [
-                                                        'Nadëb'
+                                                        'Nad√´b'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26495,7 +26495,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mbl' => {
                                      'Description' => [
-                                                        'Maxakalí'
+                                                        'Maxakal√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26507,7 +26507,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mbn' => {
                                      'Description' => [
-                                                        'Macaguán'
+                                                        'Macagu√°n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26531,7 +26531,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mbr' => {
                                      'Description' => [
-                                                        'Nukak Makú'
+                                                        'Nukak Mak√∫'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26615,7 +26615,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mcf' => {
                                      'Description' => [
-                                                        'Matsés'
+                                                        'Mats√©s'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26669,7 +26669,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mco' => {
                                      'Description' => [
-                                                        'Coatlán Mixe'
+                                                        'Coatl√°n Mixe'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26861,7 +26861,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mdv' => {
                                      'Description' => [
-                                                        'Santa Lucía Monteverde Mixtec'
+                                                        'Santa Luc√≠a Monteverde Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -26885,7 +26885,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mdz' => {
                                      'Description' => [
-                                                        'Suruí Do Pará'
+                                                        'Suru√≠ Do Par√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -27453,7 +27453,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mhn' => {
                                      'Description' => [
-                                                        'Mócheno'
+                                                        'M√≥cheno'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -27540,7 +27540,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mib' => {
                                      'Description' => [
-                                                        'Atatláhuca Mixtec'
+                                                        'Atatl√°huca Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -27583,7 +27583,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mii' => {
                                      'Description' => [
-                                                        'Chigmecatitlán Mixtec'
+                                                        'Chigmecatitl√°n Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -27601,7 +27601,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mil' => {
                                      'Description' => [
-                                                        'Peñoles Mixtec'
+                                                        'Pe√±oles Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -27632,7 +27632,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'miq' => {
                                      'Description' => [
-                                                        'Mískito'
+                                                        'M√≠skito'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28156,7 +28156,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mmc' => {
                                      'Description' => [
-                                                        'Michoacán Mazahua'
+                                                        'Michoac√°n Mazahua'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28186,7 +28186,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mmh' => {
                                      'Description' => [
-                                                        'Mehináku'
+                                                        'Mehin√°ku'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28322,7 +28322,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mnd' => {
                                      'Description' => [
-                                                        'Mondé'
+                                                        'Mond√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28481,7 +28481,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'moc' => {
                                      'Description' => [
-                                                        'Mocoví'
+                                                        'Mocov√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28551,7 +28551,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mop' => {
                                      'Description' => [
-                                                        'Mopán Maya'
+                                                        'Mop√°n Maya'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28575,7 +28575,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mot' => {
                                      'Description' => [
-                                                        'Barí'
+                                                        'Bar√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28684,7 +28684,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mpm' => {
                                      'Description' => [
-                                                        'Yosondúa Mixtec'
+                                                        'Yosond√∫a Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28708,7 +28708,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mpq' => {
                                      'Description' => [
-                                                        'Matís'
+                                                        'Mat√≠s'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -28732,7 +28732,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mpu' => {
                                      'Description' => [
-                                                        'Makuráp'
+                                                        'Makur√°p'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29165,7 +29165,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'msn' => {
                                      'Description' => [
-                                                        'Vurës'
+                                                        'Vur√´s'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29177,7 +29177,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'msp' => {
                                      'Description' => [
-                                                        'Maritsauá'
+                                                        'Maritsau√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29342,7 +29342,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mtp' => {
                                      'Description' => [
-                                                        'Wichí Lhamtés Nocten'
+                                                        'Wich√≠ Lhamt√©s Nocten'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29391,7 +29391,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mtx' => {
                                      'Description' => [
-                                                        'Tidaá Mixtec'
+                                                        'Tida√° Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29439,7 +29439,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'muh' => {
                                      'Description' => [
-                                                        'Mündü'
+                                                        'M√ºnd√º'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29588,7 +29588,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mvg' => {
                                      'Description' => [
-                                                        'Yucuañe Mixtec'
+                                                        'Yucua√±e Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29800,7 +29800,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mwq' => {
                                      'Description' => [
-                                                        'Mün Chin'
+                                                        'M√ºn Chin'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29870,7 +29870,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mxb' => {
                                      'Description' => [
-                                                        'Tezoatlán Mixtec'
+                                                        'Tezoatl√°n Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -29991,7 +29991,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mxv' => {
                                      'Description' => [
-                                                        'Metlatónoc Mixtec'
+                                                        'Metlat√≥noc Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30010,7 +30010,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mxy' => {
                                      'Description' => [
-                                                        'Southeastern Nochixtlán Mixtec'
+                                                        'Southeastern Nochixtl√°n Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30116,7 +30116,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'myp' => {
                                      'Description' => [
-                                                        'Pirahã'
+                                                        'Pirah√£'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30149,7 +30149,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'myu' => {
                                      'Description' => [
-                                                        'Mundurukú'
+                                                        'Munduruk√∫'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30185,7 +30185,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mza' => {
                                      'Description' => [
-                                                        'Santa María Zacatepec Mixtec'
+                                                        'Santa Mar√≠a Zacatepec Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30221,13 +30221,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mzh' => {
                                      'Description' => [
-                                                        'Wichí Lhamtés Güisnay'
+                                                        'Wich√≠ Lhamt√©s G√ºisnay'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'mzi' => {
                                      'Description' => [
-                                                        'Ixcatlán Mazatec'
+                                                        'Ixcatl√°n Mazatec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30245,7 +30245,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mzl' => {
                                      'Description' => [
-                                                        'Mazatlán Mixe'
+                                                        'Mazatl√°n Mixe'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30281,7 +30281,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'mzr' => {
                                      'Description' => [
-                                                        'Marúbo'
+                                                        'Mar√∫bo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30348,7 +30348,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nab' => {
                                      'Description' => [
-                                                        'Southern Nambikuára'
+                                                        'Southern Nambiku√°ra'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30493,7 +30493,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nb' => {
                                     'Description' => [
-                                                       'Norwegian Bokmål'
+                                                       'Norwegian Bokm√•l'
                                                      ],
                                     '_added' => '2005-10-16',
                                     '_macro' => 'no',
@@ -30715,7 +30715,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ncl' => {
                                      'Description' => [
-                                                        'Michoacán Nahuatl'
+                                                        'Michoac√°n Nahuatl'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30947,7 +30947,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'neb' => {
                                      'Description' => [
-                                                        'Toura (Côte d\'Ivoire)'
+                                                        'Toura (C√¥te d\'Ivoire)'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -30965,7 +30965,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nee' => {
                                      'Description' => [
-                                                        'Nêlêmwa-Nixumwak'
+                                                        'N√™l√™mwa-Nixumwak'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -31019,7 +31019,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'neo' => {
                                      'Description' => [
-                                                        'Ná-Meo'
+                                                        'N√°-Meo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -31093,7 +31093,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'nfl' => {
                                      'Description' => [
                                                         'Ayiwo',
-                                                        'Äiwoo'
+                                                        '√Ñiwoo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -31296,8 +31296,8 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nhd' => {
                                      'Description' => [
-                                                        'Chiripá',
-                                                        'Ava Guaraní'
+                                                        'Chirip√°',
+                                                        'Ava Guaran√≠'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'gn'
@@ -31328,7 +31328,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nhi' => {
                                      'Description' => [
-                                                        'Zacatlán-Ahuacatlán-Tepetzintla Nahuatl'
+                                                        'Zacatl√°n-Ahuacatl√°n-Tepetzintla Nahuatl'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -31412,7 +31412,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nhz' => {
                                      'Description' => [
-                                                        'Santa María La Alta Nahuatl'
+                                                        'Santa Mar√≠a La Alta Nahuatl'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -31912,7 +31912,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nlz' => {
                                      'Description' => [
-                                                        'Nalögo'
+                                                        'Nal√∂go'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -31925,7 +31925,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'nmb' => {
                                      'Description' => [
                                                         'Big Nambas',
-                                                        'V\'ënen Taut'
+                                                        'V\'√´nen Taut'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -31997,7 +31997,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nmn' => {
                                      'Description' => [
-                                                        '!Xóõ'
+                                                        '!X√≥√µ'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -32303,7 +32303,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nom' => {
                                      'Description' => [
-                                                        'Nocamán'
+                                                        'Nocam√°n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -32458,7 +32458,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'nqo' => {
                                      'Description' => [
                                                         'N\'Ko',
-                                                        'N’Ko'
+                                                        'N‚ÄôKo'
                                                       ],
                                      '_added' => '2006-06-05',
                                      '_suppress' => 'nkoo'
@@ -32757,7 +32757,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ntu' => {
                                      'Description' => [
-                                                        'Natügu'
+                                                        'Nat√ºgu'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -32869,7 +32869,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'nuo' => {
                                      'Description' => [
-                                                        'Nguôn'
+                                                        'Ngu√¥n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -33323,7 +33323,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'obi' => {
                                      'Description' => [
-                                                        'Obispeño'
+                                                        'Obispe√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -33931,7 +33931,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'oon' => {
                                      'Description' => [
-                                                        'Önge'
+                                                        '√ñnge'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -33979,7 +33979,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'opy' => {
                                      'Description' => [
-                                                        'Ofayé'
+                                                        'Ofay√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34005,7 +34005,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ore' => {
                                      'Description' => [
-                                                        'Orejón'
+                                                        'Orej√≥n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34203,7 +34203,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'otq' => {
                                      'Description' => [
-                                                        'Querétaro Otomi'
+                                                        'Quer√©taro Otomi'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34215,7 +34215,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ots' => {
                                      'Description' => [
-                                                        'Estado de México Otomi'
+                                                        'Estado de M√©xico Otomi'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34353,7 +34353,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pab' => {
                                      'Description' => [
-                                                        'Parecís'
+                                                        'Parec√≠s'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34365,7 +34365,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pad' => {
                                      'Description' => [
-                                                        'Paumarí'
+                                                        'Paumar√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34377,7 +34377,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'paf' => {
                                      'Description' => [
-                                                        'Paranawát'
+                                                        'Paranaw√°t'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34401,7 +34401,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pak' => {
                                      'Description' => [
-                                                        'Parakanã'
+                                                        'Parakan√£'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34463,7 +34463,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pav' => {
                                      'Description' => [
-                                                        'Pakaásnovos'
+                                                        'Paka√°snovos'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34475,7 +34475,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pax' => {
                                      'Description' => [
-                                                        'Pankararé'
+                                                        'Pankarar√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34487,13 +34487,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'paz' => {
                                      'Description' => [
-                                                        'Pankararú'
+                                                        'Pankarar√∫'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'pbb' => {
                                      'Description' => [
-                                                        'Páez'
+                                                        'P√°ez'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34523,7 +34523,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pbh' => {
                                      'Description' => [
-                                                        'E\'ñapa Woromaipu'
+                                                        'E\'√±apa Woromaipu'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34603,7 +34603,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pca' => {
                                      'Description' => [
-                                                        'Santa Inés Ahuatempan Popoloca'
+                                                        'Santa In√©s Ahuatempan Popoloca'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34846,7 +34846,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pev' => {
                                      'Description' => [
-                                                        'Pémono'
+                                                        'P√©mono'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -34870,7 +34870,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pfa' => {
                                      'Description' => [
-                                                        'Pááfang'
+                                                        'P√°√°fang'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35201,7 +35201,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pka' => {
                                      'Description' => [
-                                                        'Ardhamāgadhī Prākrit'
+                                                        'ArdhamƒÅgadhƒ´ PrƒÅkrit'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35238,7 +35238,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pko' => {
                                      'Description' => [
-                                                        'Pökoot'
+                                                        'P√∂koot'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'kln'
@@ -35321,7 +35321,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'plg' => {
                                      'Description' => [
-                                                        'Pilagá'
+                                                        'Pilag√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35394,7 +35394,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'plu' => {
                                      'Description' => [
-                                                        'Palikúr'
+                                                        'Palik√∫r'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35454,7 +35454,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pmh' => {
                                      'Description' => [
-                                                        'Māhārāṣṭri Prākrit'
+                                                        'MƒÅhƒÅrƒÅ·π£·π≠ri PrƒÅkrit'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35711,7 +35711,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pog' => {
                                      'Description' => [
-                                                        'Potiguára'
+                                                        'Potigu√°ra'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35729,7 +35729,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pok' => {
                                      'Description' => [
-                                                        'Pokangá'
+                                                        'Pokang√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35877,7 +35877,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pps' => {
                                      'Description' => [
-                                                        'San Luís Temalacayuca Popoloca'
+                                                        'San Lu√≠s Temalacayuca Popoloca'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -35976,7 +35976,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pri' => {
                                      'Description' => [
-                                                        'Paicî'
+                                                        'Paic√Æ'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -36006,7 +36006,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pro' => {
                                      'Description' => [
-                                                        'Old Provençal (to 1500)',
+                                                        'Old Proven√ßal (to 1500)',
                                                         'Old Occitan (to 1500)'
                                                       ],
                                      '_added' => '2005-10-16'
@@ -36019,7 +36019,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'prq' => {
                                      'Description' => [
-                                                        'Ashéninka Perené'
+                                                        'Ash√©ninka Peren√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -36184,7 +36184,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'psu' => {
                                      'Description' => [
-                                                        'Sauraseni Prākrit'
+                                                        'Sauraseni PrƒÅkrit'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -36215,7 +36215,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pth' => {
                                      'Description' => [
-                                                        'Pataxó Hã-Ha-Hãe'
+                                                        'Patax√≥ H√£-Ha-H√£e'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -36233,7 +36233,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pto' => {
                                      'Description' => [
-                                                        'Zo\'é'
+                                                        'Zo\'√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -36365,7 +36365,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pur' => {
                                      'Description' => [
-                                                        'Puruborá'
+                                                        'Purubor√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -36395,7 +36395,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'puy' => {
                                      'Description' => [
-                                                        'Purisimeño'
+                                                        'Purisime√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -36473,14 +36473,14 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'pyn' => {
                                      'Description' => [
-                                                        'Poyanáwa'
+                                                        'Poyan√°wa'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'pys' => {
                                      'Description' => [
                                                         'Paraguayan Sign Language',
-                                                        'Lengua de Señas del Paraguay'
+                                                        'Lengua de Se√±as del Paraguay'
                                                       ],
                                      '_added' => '2010-03-11'
                                    },
@@ -37054,7 +37054,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qub' => {
                                      'Description' => [
-                                                        'Huallaga Huánuco Quechua'
+                                                        'Huallaga Hu√°nuco Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37062,13 +37062,13 @@ $Whatpm::LangTag::RegistryFull = {
                           'quc' => {
                                      'Description' => [
                                                         'K\'iche\'',
-                                                        'Quiché'
+                                                        'Quich√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'qud' => {
                                      'Description' => [
-                                                        'Calderón Highland Quichua'
+                                                        'Calder√≥n Highland Quichua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37203,14 +37203,14 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qve' => {
                                      'Description' => [
-                                                        'Eastern Apurímac Quechua'
+                                                        'Eastern Apur√≠mac Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
                                    },
                           'qvh' => {
                                      'Description' => [
-                                                        'Huamalíes-Dos de Mayo Huánuco Quechua'
+                                                        'Huamal√≠es-Dos de Mayo Hu√°nuco Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37245,7 +37245,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qvn' => {
                                      'Description' => [
-                                                        'North Junín Quechua'
+                                                        'North Jun√≠n Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37266,7 +37266,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qvs' => {
                                      'Description' => [
-                                                        'San Martín Quechua'
+                                                        'San Mart√≠n Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37342,7 +37342,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qxa' => {
                                      'Description' => [
-                                                        'Chiquián Ancash Quechua'
+                                                        'Chiqui√°n Ancash Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37356,7 +37356,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qxh' => {
                                      'Description' => [
-                                                        'Panao Huánuco Quechua'
+                                                        'Panao Hu√°nuco Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37397,7 +37397,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qxr' => {
                                      'Description' => [
-                                                        'Cañar Highland Quichua'
+                                                        'Ca√±ar Highland Quichua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37417,7 +37417,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'qxu' => {
                                      'Description' => [
-                                                        'Arequipa-La Unión Quechua'
+                                                        'Arequipa-La Uni√≥n Quechua'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'qu'
@@ -37619,7 +37619,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'rcf' => {
                                      'Description' => [
-                                                        'Réunion Creole French'
+                                                        'R√©union Creole French'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -37733,7 +37733,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'rgr' => {
                                      'Description' => [
-                                                        'Resígaro'
+                                                        'Res√≠garo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -37974,7 +37974,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'rmq' => {
                                      'Description' => [
-                                                        'Caló'
+                                                        'Cal√≥'
                                                       ],
                                      '_added' => '2010-03-11'
                                    },
@@ -37983,7 +37983,7 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'see emx, rmq'
                                                    ],
                                      'Description' => [
-                                                        'Caló'
+                                                        'Cal√≥'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_deprecated' => 1
@@ -38433,7 +38433,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'sae' => {
                                      'Description' => [
-                                                        'Sabanê'
+                                                        'Saban√™'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -38493,7 +38493,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'sap' => {
                                      'Description' => [
-                                                        'Sanapaná'
+                                                        'Sanapan√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -38643,7 +38643,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'sbo' => {
                                      'Description' => [
-                                                        'Sabüm'
+                                                        'Sab√ºm'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -39058,7 +39058,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'sen' => {
                                      'Description' => [
-                                                        'Nanerigé Sénoufo'
+                                                        'Nanerig√© S√©noufo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -39070,13 +39070,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'sep' => {
                                      'Description' => [
-                                                        'Sìcìté Sénoufo'
+                                                        'S√¨c√¨t√© S√©noufo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'seq' => {
                                      'Description' => [
-                                                        'Senara Sénoufo'
+                                                        'Senara S√©noufo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -39758,7 +39758,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'skf' => {
                                      'Description' => [
-                                                        'Sakirabiá'
+                                                        'Sakirabi√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -39896,7 +39896,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'slc' => {
                                      'Description' => [
-                                                        'Sáliba'
+                                                        'S√°liba'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -39938,7 +39938,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'slj' => {
                                      'Description' => [
-                                                        'Salumá'
+                                                        'Salum√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -40476,7 +40476,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'spc' => {
                                      'Description' => [
-                                                        'Sapé'
+                                                        'Sap√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -40745,7 +40745,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'srq' => {
                                      'Description' => [
-                                                        'Sirionó'
+                                                        'Sirion√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -40769,7 +40769,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'sru' => {
                                      'Description' => [
-                                                        'Suruí'
+                                                        'Suru√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -40925,7 +40925,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'sss' => {
                                      'Description' => [
-                                                        'Sô'
+                                                        'S√¥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -41222,7 +41222,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'suy' => {
                                      'Description' => [
-                                                        'Suyá'
+                                                        'Suy√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -41423,7 +41423,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'swx' => {
                                      'Description' => [
-                                                        'Suruahá'
+                                                        'Suruah√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -41706,7 +41706,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'taf' => {
                                      'Description' => [
-                                                        'Tapirapé'
+                                                        'Tapirap√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -41818,7 +41818,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tba' => {
                                      'Description' => [
-                                                        'Aikanã'
+                                                        'Aikan√£'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -42027,7 +42027,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tci' => {
                                      'Description' => [
-                                                        'Wára'
+                                                        'W√°ra'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -42093,7 +42093,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tcw' => {
                                      'Description' => [
-                                                        'Tecpatlán Totonac'
+                                                        'Tecpatl√°n Totonac'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -42129,13 +42129,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tdc' => {
                                      'Description' => [
-                                                        'Emberá-Tadó'
+                                                        'Ember√°-Tad√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'tdd' => {
                                      'Description' => [
-                                                        'Tai Nüa'
+                                                        'Tai N√ºa'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -42794,7 +42794,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tiq' => {
                                      'Description' => [
-                                                        'Tiéfo'
+                                                        'Ti√©fo'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -42902,7 +42902,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'tka' => {
                                      'Description' => [
-                                                        'Truká'
+                                                        'Truk√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -42926,7 +42926,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tkf' => {
                                      'Description' => [
-                                                        'Tukumanféd'
+                                                        'Tukumanf√©d'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43111,7 +43111,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tlp' => {
                                      'Description' => [
-                                                        'Filomena Mata-Coahuitlán Totonac'
+                                                        'Filomena Mata-Coahuitl√°n Totonac'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43196,7 +43196,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tme' => {
                                      'Description' => [
-                                                        'Tremembé'
+                                                        'Trememb√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43208,7 +43208,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tmg' => {
                                      'Description' => [
-                                                        'Ternateño'
+                                                        'Ternate√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43266,7 +43266,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tmp' => {
                                      'Description' => [
-                                                        'Tai Mène'
+                                                        'Tai M√®ne'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43346,7 +43346,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tnc' => {
                                      'Description' => [
-                                                        'Tanimuca-Retuarã'
+                                                        'Tanimuca-Retuar√£'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43559,7 +43559,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'too' => {
                                      'Description' => [
-                                                        'Xicotepec De Juárez Totonac'
+                                                        'Xicotepec De Ju√°rez Totonac'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43631,8 +43631,8 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tpc' => {
                                      'Description' => [
-                                                        'Azoyú Me\'phaa',
-                                                        'Azoyú Tlapanec'
+                                                        'Azoy√∫ Me\'phaa',
+                                                        'Azoy√∫ Tlapanec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43663,7 +43663,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tpj' => {
                                      'Description' => [
-                                                        'Tapieté'
+                                                        'Tapiet√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43688,7 +43688,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tpn' => {
                                      'Description' => [
-                                                        'Tupinambá'
+                                                        'Tupinamb√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43712,7 +43712,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tpr' => {
                                      'Description' => [
-                                                        'Tuparí'
+                                                        'Tupar√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43736,7 +43736,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tpw' => {
                                      'Description' => [
-                                                        'Tupí'
+                                                        'Tup√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43761,7 +43761,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tqb' => {
                                      'Description' => [
-                                                        'Tembé'
+                                                        'Temb√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43870,7 +43870,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'trg' => {
                                      'Description' => [
-                                                        'Lishán Didán'
+                                                        'Lish√°n Did√°n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43882,7 +43882,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tri' => {
                                      'Description' => [
-                                                        'Trió'
+                                                        'Tri√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43933,7 +43933,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'trq' => {
                                      'Description' => [
-                                                        'San Martín Itunyoso Triqui'
+                                                        'San Mart√≠n Itunyoso Triqui'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -43987,7 +43987,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'trz' => {
                                      'Description' => [
-                                                        'Torá'
+                                                        'Tor√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44066,14 +44066,14 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tsl' => {
                                      'Description' => [
-                                                        'Ts\'ün-Lao'
+                                                        'Ts\'√ºn-Lao'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'tsm' => {
                                      'Description' => [
                                                         'Turkish Sign Language',
-                                                        'Türk İşaret Dili'
+                                                        'T√ºrk ƒ∞≈üaret Dili'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44308,7 +44308,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tub' => {
                                      'Description' => [
-                                                        'Tübatulabal'
+                                                        'T√ºbatulabal'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44320,7 +44320,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tud' => {
                                      'Description' => [
-                                                        'Tuxá'
+                                                        'Tux√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44437,7 +44437,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tux' => {
                                      'Description' => [
-                                                        'Tuxináwa'
+                                                        'Tuxin√°wa'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44578,7 +44578,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'twh' => {
                                      'Description' => [
-                                                        'Tai Dón'
+                                                        'Tai D√≥n'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44626,7 +44626,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'twt' => {
                                      'Description' => [
-                                                        'Turiwára'
+                                                        'Turiw√°ra'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44740,7 +44740,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'txu' => {
                                      'Description' => [
-                                                        'Kayapó'
+                                                        'Kayap√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44819,13 +44819,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tys' => {
                                      'Description' => [
-                                                        'Tày Sa Pa'
+                                                        'T√†y Sa Pa'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'tyt' => {
                                      'Description' => [
-                                                        'Tày Tac'
+                                                        'T√†y Tac'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44849,7 +44849,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'tyz' => {
                                      'Description' => [
-                                                        'Tày'
+                                                        'T√†y'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -44897,7 +44897,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'uam' => {
                                      'Description' => [
-                                                        'Uamué'
+                                                        'Uamu√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -45128,7 +45128,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'uks' => {
                                      'Description' => [
-                                                        'Urubú-Kaapor Sign Language',
+                                                        'Urub√∫-Kaapor Sign Language',
                                                         'Kaapor Sign Language'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -45262,7 +45262,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'umo' => {
                                      'Description' => [
-                                                        'Umotína'
+                                                        'Umot√≠na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -45320,7 +45320,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'unk' => {
                                      'Description' => [
-                                                        'Enawené-Nawé'
+                                                        'Enawen√©-Naw√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -45388,7 +45388,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'urb' => {
                                      'Description' => [
-                                                        'Urubú-Kaapor',
+                                                        'Urub√∫-Kaapor',
                                                         'Kaapor'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -45478,7 +45478,7 @@ $Whatpm::LangTag::RegistryFull = {
                           'urr' => {
                                      'Description' => [
                                                         'Lehalurup',
-                                                        'Löyöp'
+                                                        'L√∂y√∂p'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -45815,7 +45815,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'veo' => {
                                      'Description' => [
-                                                        'Ventureño'
+                                                        'Venture√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46011,7 +46011,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'vmf' => {
                                      'Description' => [
-                                                        'Mainfränkisch'
+                                                        'Mainfr√§nkisch'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46113,7 +46113,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'vmz' => {
                                      'Description' => [
-                                                        'Mazatlán Mazatec'
+                                                        'Mazatl√°n Mazatec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46139,7 +46139,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'vo' => {
                                     'Description' => [
-                                                       'Volapük'
+                                                       'Volap√ºk'
                                                      ],
                                     '_added' => '2005-10-16'
                                   },
@@ -46163,7 +46163,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'vro' => {
                                      'Description' => [
-                                                        'Võro'
+                                                        'V√µro'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'et'
@@ -46268,7 +46268,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'waf' => {
                                      'Description' => [
-                                                        'Wakoná'
+                                                        'Wakon√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46362,7 +46362,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wau' => {
                                      'Description' => [
-                                                        'Waurá'
+                                                        'Waur√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46495,7 +46495,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wca' => {
                                      'Description' => [
-                                                        'Yanomámi'
+                                                        'Yanom√°mi'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46537,7 +46537,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wec' => {
                                      'Description' => [
-                                                        'Wè Western'
+                                                        'W√® Western'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46767,7 +46767,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wir' => {
                                      'Description' => [
-                                                        'Wiraféd'
+                                                        'Wiraf√©d'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46924,7 +46924,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wlv' => {
                                      'Description' => [
-                                                        'Wichí Lhamtés Vejoz'
+                                                        'Wich√≠ Lhamt√©s Vejoz'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -46966,7 +46966,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wmd' => {
                                      'Description' => [
-                                                        'Mamaindé'
+                                                        'Mamaind√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47110,7 +47110,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wob' => {
                                      'Description' => [
-                                                        'Wè Northern'
+                                                        'W√® Northern'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47515,7 +47515,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'wyr' => {
                                      'Description' => [
-                                                        'Wayoró'
+                                                        'Wayor√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47563,7 +47563,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xai' => {
                                      'Description' => [
-                                                        'Kaimbé'
+                                                        'Kaimb√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47630,7 +47630,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xav' => {
                                      'Description' => [
-                                                        'Xavánte'
+                                                        'Xav√°nte'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47696,13 +47696,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xbw' => {
                                      'Description' => [
-                                                        'Kambiwá'
+                                                        'Kambiw√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'xbx' => {
                                      'Description' => [
-                                                        'Kabixí'
+                                                        'Kabix√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47853,7 +47853,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xer' => {
                                      'Description' => [
-                                                        'Xerénte'
+                                                        'Xer√©nte'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47865,7 +47865,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xet' => {
                                      'Description' => [
-                                                        'Xetá'
+                                                        'Xet√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -47889,7 +47889,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xgf' => {
                                      'Description' => [
-                                                        'Gabrielino-Fernandeño'
+                                                        'Gabrielino-Fernande√±o'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48002,13 +48002,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xip' => {
                                      'Description' => [
-                                                        'Xipináwa'
+                                                        'Xipin√°wa'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'xir' => {
                                      'Description' => [
-                                                        'Xiriâna'
+                                                        'Xiri√¢na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48122,7 +48122,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xkr' => {
                                      'Description' => [
-                                                        'Xakriabá'
+                                                        'Xakriab√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48514,7 +48514,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xoo' => {
                                      'Description' => [
-                                                        'Xukurú'
+                                                        'Xukur√∫'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48575,7 +48575,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xpn' => {
                                      'Description' => [
-                                                        'Kapinawá'
+                                                        'Kapinaw√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48635,7 +48635,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xra' => {
                                      'Description' => [
-                                                        'Krahô'
+                                                        'Krah√¥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48701,7 +48701,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xsb' => {
                                      'Description' => [
-                                                        'Tinà Sambal'
+                                                        'Tin√† Sambal'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48792,7 +48792,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xsu' => {
                                      'Description' => [
-                                                        'Sanumá'
+                                                        'Sanum√°'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48864,7 +48864,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xtm' => {
                                      'Description' => [
-                                                        'Magdalena Peñasco Mixtec'
+                                                        'Magdalena Pe√±asco Mixtec'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -48918,7 +48918,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xtw' => {
                                      'Description' => [
-                                                        'Tawandê'
+                                                        'Tawand√™'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -49080,7 +49080,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xxr' => {
                                      'Description' => [
-                                                        'Koropó'
+                                                        'Korop√≥'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -49140,7 +49140,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'yae' => {
                                      'Description' => [
-                                                        'Pumé'
+                                                        'Pum√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -49152,7 +49152,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'yag' => {
                                      'Description' => [
-                                                        'Yámana'
+                                                        'Y√°mana'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -49248,7 +49248,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'yaw' => {
                                      'Description' => [
-                                                        'Yawalapití'
+                                                        'Yawalapit√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -49332,7 +49332,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ybn' => {
                                      'Description' => [
-                                                        'Yabaâna'
+                                                        'Yaba√¢na'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -49795,7 +49795,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'yly' => {
                                      'Description' => [
-                                                        'Nyâlayu'
+                                                        'Ny√¢layu'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -50129,13 +50129,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'yre' => {
                                      'Description' => [
-                                                        'Yaouré'
+                                                        'Yaour√©'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'yri' => {
                                      'Description' => [
-                                                        'Yarí'
+                                                        'Yar√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -50294,7 +50294,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'yui' => {
                                      'Description' => [
-                                                        'Yurutí'
+                                                        'Yurut√≠'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -50478,21 +50478,21 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                           'zaa' => {
                                      'Description' => [
-                                                        'Sierra de Juárez Zapotec'
+                                                        'Sierra de Ju√°rez Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'zab' => {
                                      'Description' => [
-                                                        'San Juan Guelavía Zapotec'
+                                                        'San Juan Guelav√≠a Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'zac' => {
                                      'Description' => [
-                                                        'Ocotlán Zapotec'
+                                                        'Ocotl√°n Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -50557,7 +50557,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zam' => {
                                      'Description' => [
-                                                        'Miahuatlán Zapotec'
+                                                        'Miahuatl√°n Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -50580,14 +50580,14 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zaq' => {
                                      'Description' => [
-                                                        'Aloápam Zapotec'
+                                                        'Alo√°pam Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'zar' => {
                                      'Description' => [
-                                                        'Rincón Zapotec'
+                                                        'Rinc√≥n Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -50899,7 +50899,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zkp' => {
                                      'Description' => [
-                                                        'São Paulo Kaingáng'
+                                                        'S√£o Paulo Kaing√°ng'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -51186,7 +51186,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zoc' => {
                                      'Description' => [
-                                                        'Copainalá Zoque'
+                                                        'Copainal√° Zoque'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -51204,7 +51204,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zoo' => {
                                      'Description' => [
-                                                        'Asunción Mixtepec Zapotec'
+                                                        'Asunci√≥n Mixtepec Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51217,13 +51217,13 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zor' => {
                                      'Description' => [
-                                                        'Rayón Zoque'
+                                                        'Ray√≥n Zoque'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
                           'zos' => {
                                      'Description' => [
-                                                        'Francisco León Zoque'
+                                                        'Francisco Le√≥n Zoque'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -51250,7 +51250,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zpd' => {
                                      'Description' => [
-                                                        'Southeastern Ixtlán Zapotec'
+                                                        'Southeastern Ixtl√°n Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51285,7 +51285,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zpi' => {
                                      'Description' => [
-                                                        'Santa María Quiegolani Zapotec'
+                                                        'Santa Mar√≠a Quiegolani Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51306,7 +51306,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zpl' => {
                                      'Description' => [
-                                                        'Lachixío Zapotec'
+                                                        'Lachix√≠o Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51320,14 +51320,14 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zpn' => {
                                      'Description' => [
-                                                        'Santa Inés Yatzechi Zapotec'
+                                                        'Santa In√©s Yatzechi Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'zpo' => {
                                      'Description' => [
-                                                        'Amatlán Zapotec'
+                                                        'Amatl√°n Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51355,21 +51355,21 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zps' => {
                                      'Description' => [
-                                                        'Coatlán Zapotec'
+                                                        'Coatl√°n Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'zpt' => {
                                      'Description' => [
-                                                        'San Vicente Coatlán Zapotec'
+                                                        'San Vicente Coatl√°n Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'zpu' => {
                                      'Description' => [
-                                                        'Yalálag Zapotec'
+                                                        'Yal√°lag Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51436,7 +51436,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'zro' => {
                                      'Description' => [
-                                                        'Záparo'
+                                                        'Z√°paro'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -51499,21 +51499,21 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ztg' => {
                                      'Description' => [
-                                                        'Xanaguía Zapotec'
+                                                        'Xanagu√≠a Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'ztl' => {
                                      'Description' => [
-                                                        'Lapaguía-Guivini Zapotec'
+                                                        'Lapagu√≠a-Guivini Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
                                    },
                           'ztm' => {
                                      'Description' => [
-                                                        'San Agustín Mixtepec Zapotec'
+                                                        'San Agust√≠n Mixtepec Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51534,7 +51534,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ztq' => {
                                      'Description' => [
-                                                        'Quioquitani-Quierí Zapotec'
+                                                        'Quioquitani-Quier√≠ Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -51555,7 +51555,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ztu' => {
                                      'Description' => [
-                                                        'Güilá Zapotec'
+                                                        'G√ºil√° Zapotec'
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'zap'
@@ -52546,7 +52546,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                         'ax' => {
                                   'Description' => [
-                                                     'Åland Islands'
+                                                     '√Öland Islands'
                                                    ],
                                   '_added' => '2005-10-16',
                                   '_canon' => '_uppercase'
@@ -52623,7 +52623,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                         'bl' => {
                                   'Description' => [
-                                                     'Saint Barthélemy'
+                                                     'Saint Barth√©lemy'
                                                    ],
                                   '_added' => '2007-11-02',
                                   '_canon' => '_uppercase'
@@ -52758,7 +52758,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                         'ci' => {
                                   'Description' => [
-                                                     'Côte d\'Ivoire'
+                                                     'C√¥te d\'Ivoire'
                                                    ],
                                   '_added' => '2005-10-16',
                                   '_canon' => '_uppercase'
@@ -52839,7 +52839,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                         'cw' => {
                                   'Description' => [
-                                                     'Curaçao'
+                                                     'Cura√ßao'
                                                    ],
                                   '_added' => '2011-01-07',
                                   '_canon' => '_uppercase'
@@ -53861,7 +53861,7 @@ $Whatpm::LangTag::RegistryFull = {
                         'qz' => {},
                         're' => {
                                   'Description' => [
-                                                     'Réunion'
+                                                     'R√©union'
                                                    ],
                                   '_added' => '2005-10-16',
                                   '_canon' => '_uppercase'
@@ -54624,7 +54624,7 @@ $Whatpm::LangTag::RegistryFull = {
                         'ethi' => {
                                     'Description' => [
                                                        'Ethiopic',
-                                                       'Geʻez',
+                                                       'Ge ªez',
                                                        'Ge\'ez'
                                                      ],
                                     '_added' => '2005-10-16',
@@ -54689,7 +54689,7 @@ $Whatpm::LangTag::RegistryFull = {
                         'hang' => {
                                     'Description' => [
                                                        'Hangul',
-                                                       'Hangŭl',
+                                                       'Hang≈≠l',
                                                        'Hangeul'
                                                      ],
                                     '_added' => '2005-10-16',
@@ -54708,7 +54708,7 @@ $Whatpm::LangTag::RegistryFull = {
                         'hano' => {
                                     'Description' => [
                                                        'Hanunoo',
-                                                       'Hanunóo'
+                                                       'Hanun√≥o'
                                                      ],
                                     '_added' => '2005-10-16',
                                     '_canon' => '_titlecase'
@@ -54739,6 +54739,15 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Hiragana'
                                                      ],
                                     '_added' => '2005-10-16',
+                                    '_canon' => '_titlecase'
+                                  },
+                        'hluw' => {
+                                    'Description' => [
+                                                       'Anatolian Hieroglyphs',
+                                                       'Luwian Hieroglyphs',
+                                                       'Hittite Hieroglyphs'
+                                                     ],
+                                    '_added' => '2011-12-28',
                                     '_canon' => '_titlecase'
                                   },
                         'hmng' => {
@@ -54900,7 +54909,7 @@ $Whatpm::LangTag::RegistryFull = {
                         'lepc' => {
                                     'Description' => [
                                                        'Lepcha',
-                                                       'Róng'
+                                                       'R√≥ng'
                                                      ],
                                     '_added' => '2005-10-16',
                                     '_canon' => '_titlecase'
@@ -55065,7 +55074,7 @@ $Whatpm::LangTag::RegistryFull = {
                         'nkgb' => {
                                     'Description' => [
                                                        'Nakhi Geba',
-                                                       '\'Na-\'Khi ²Ggŏ-¹baw',
+                                                       '\'Na-\'Khi ¬≤Gg≈è-¬πbaw',
                                                        'Naxi Geba'
                                                      ],
                                     '_added' => '2009-03-13',
@@ -55073,7 +55082,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                         'nkoo' => {
                                     'Description' => [
-                                                       'N’Ko',
+                                                       'N‚ÄôKo',
                                                        'N\'Ko'
                                                      ],
                                     '_added' => '2005-10-16',
@@ -55081,7 +55090,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                         'nshu' => {
                                     'Description' => [
-                                                       'Nüshu'
+                                                       'N√ºshu'
                                                      ],
                                     '_added' => '2011-01-07',
                                     '_canon' => '_titlecase'
@@ -55314,7 +55323,7 @@ $Whatpm::LangTag::RegistryFull = {
                         'shrd' => {
                                     'Description' => [
                                                        'Sharada',
-                                                       'Śāradā'
+                                                       '≈öƒÅradƒÅ'
                                                      ],
                                     '_added' => '2011-01-07',
                                     '_canon' => '_titlecase'
@@ -55393,8 +55402,8 @@ $Whatpm::LangTag::RegistryFull = {
                         'takr' => {
                                     'Description' => [
                                                        'Takri',
-                                                       'Ṭākrī',
-                                                       'Ṭāṅkrī'
+                                                       '·π¨ƒÅkrƒ´',
+                                                       '·π¨ƒÅ·πÖkrƒ´'
                                                      ],
                                     '_added' => '2011-01-07',
                                     '_canon' => '_titlecase'
@@ -56915,6 +56924,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'Surinamese Guilder'
                                                   ]
                                },
+                      'ssp' => {
+                                 'Description' => [
+                                                    'South Sudanese Pound'
+                                                  ]
+                               },
                       'std' => {
                                  'Description' => [
                                                     'São Tomé and Príncipe Dobra'
@@ -57175,9 +57189,19 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'RINET Funds'
                                                   ]
                                },
+                      'xsu' => {
+                                 'Description' => [
+                                                    'Sucre'
+                                                  ]
+                               },
                       'xts' => {
                                  'Description' => [
                                                     'Testing Currency Code'
+                                                  ]
+                               },
+                      'xua' => {
+                                 'Description' => [
+                                                    'ADB Unit of Account'
                                                   ]
                                },
                       'xxx' => {
@@ -57343,6 +57367,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'Collation parameter key for numeric handling'
                                                   ]
                                },
+                       'kr' => {
+                                 'Description' => [
+                                                    'Collation reorder codes'
+                                                  ]
+                               },
                        'ks' => {
                                  'Description' => [
                                                     'Collation parameter key for collation strength'
@@ -57422,6 +57451,13 @@ $Whatpm::LangTag::RegistryFull = {
                                                    ]
                                 }
                     },
+          'u_kr' => {
+                      'reorder_code' => {
+                                          'Description' => [
+                                                             'One or more collation reorder codes: LDML 5.14.12)'
+                                                           ]
+                                        }
+                    },
           'u_ks' => {
                       'identic' => {
                                      'Description' => [
@@ -57462,17 +57498,37 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                       'armn' => {
                                   'Description' => [
-                                                     'Armenian upper case numerals'
+                                                     'Armenian upper case numerals — non-decimal'
                                                    ]
                                 },
                       'armnlow' => {
                                      'Description' => [
-                                                        'Armenian lower case numerals'
+                                                        'Armenian lower case numerals — non-decimal'
                                                       ]
                                    },
+                      'bali' => {
+                                  'Description' => [
+                                                     'Balinese digits'
+                                                   ]
+                                },
                       'beng' => {
                                   'Description' => [
                                                      'Bengali digits'
+                                                   ]
+                                },
+                      'brah' => {
+                                  'Description' => [
+                                                     'Brahmi digits'
+                                                   ]
+                                },
+                      'cakm' => {
+                                  'Description' => [
+                                                     'Chakma digits'
+                                                   ]
+                                },
+                      'cham' => {
+                                  'Description' => [
+                                                     'Cham digits'
                                                    ]
                                 },
                       'deva' => {
@@ -57482,12 +57538,12 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'ethi' => {
                                   'Description' => [
-                                                     'Ethiopic numerals'
+                                                     'Ethiopic numerals — non-decimal'
                                                    ]
                                 },
                       'finance' => {
                                      'Description' => [
-                                                        'Financial numerals'
+                                                        'Financial numerals — may be non-decimal'
                                                       ]
                                    },
                       'fullwide' => {
@@ -57497,17 +57553,17 @@ $Whatpm::LangTag::RegistryFull = {
                                     },
                       'geor' => {
                                   'Description' => [
-                                                     'Georgian numerals'
+                                                     'Georgian numerals — non-decimal'
                                                    ]
                                 },
                       'grek' => {
                                   'Description' => [
-                                                     'Greek upper case numerals'
+                                                     'Greek upper case numerals — non-decimal'
                                                    ]
                                 },
                       'greklow' => {
                                      'Description' => [
-                                                        'Greek lower case numerals'
+                                                        'Greek lower case numerals — non-decimal'
                                                       ]
                                    },
                       'gujr' => {
@@ -57527,39 +57583,49 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                       'hans' => {
                                   'Description' => [
-                                                     'Simplified Chinese numerals'
+                                                     'Simplified Chinese numerals — non-decimal'
                                                    ]
                                 },
                       'hansfin' => {
                                      'Description' => [
-                                                        'Simplified Chinese financial numerals'
+                                                        'Simplified Chinese financial numerals — non-decimal'
                                                       ]
                                    },
                       'hant' => {
                                   'Description' => [
-                                                     'Traditional Chinese numerals'
+                                                     'Traditional Chinese numerals — non-decimal'
                                                    ]
                                 },
                       'hantfin' => {
                                      'Description' => [
-                                                        'Traditional Chinese financial numerals'
+                                                        'Traditional Chinese financial numerals — non-decimal'
                                                       ]
                                    },
                       'hebr' => {
                                   'Description' => [
-                                                     'Hebrew numerals'
+                                                     'Hebrew numerals — non-decimal'
+                                                   ]
+                                },
+                      'java' => {
+                                  'Description' => [
+                                                     'Javanese digits'
                                                    ]
                                 },
                       'jpan' => {
                                   'Description' => [
-                                                     'Japanese numerals'
+                                                     'Japanese numerals — non-decimal'
                                                    ]
                                 },
                       'jpanfin' => {
                                      'Description' => [
-                                                        'Japanese financial numerals'
+                                                        'Japanese financial numerals — non-decimal'
                                                       ]
                                    },
+                      'kali' => {
+                                  'Description' => [
+                                                     'Kayah Li digits'
+                                                   ]
+                                },
                       'khmr' => {
                                   'Description' => [
                                                      'Khmer digits'
@@ -57570,6 +57636,16 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Kannada digits'
                                                    ]
                                 },
+                      'lana' => {
+                                  'Description' => [
+                                                     'Tai Tham Hora (secular) digits'
+                                                   ]
+                                },
+                      'lanatham' => {
+                                      'Description' => [
+                                                         'Tai Tham Tham (ecclesiastical) digits'
+                                                       ]
+                                    },
                       'laoo' => {
                                   'Description' => [
                                                      'Lao digits'
@@ -57578,6 +57654,16 @@ $Whatpm::LangTag::RegistryFull = {
                       'latn' => {
                                   'Description' => [
                                                      'Latin digits'
+                                                   ]
+                                },
+                      'lepc' => {
+                                  'Description' => [
+                                                     'Lepcha digits'
+                                                   ]
+                                },
+                      'limb' => {
+                                  'Description' => [
+                                                     'Limbu digits'
                                                    ]
                                 },
                       'mlym' => {
@@ -57590,34 +57676,89 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Mongolian digits'
                                                    ]
                                 },
+                      'mtei' => {
+                                  'Description' => [
+                                                     'Meetei Mayek digits'
+                                                   ]
+                                },
                       'mymr' => {
                                   'Description' => [
                                                      'Myanmar digits'
                                                    ]
                                 },
+                      'mymrshan' => {
+                                      'Description' => [
+                                                         'Myanmar Shan digits'
+                                                       ]
+                                    },
                       'native' => {
                                     'Description' => [
                                                        'Native digits'
                                                      ]
                                   },
+                      'nkoo' => {
+                                  'Description' => [
+                                                     'N\'Ko digits'
+                                                   ]
+                                },
+                      'olck' => {
+                                  'Description' => [
+                                                     'Ol Chiki digits'
+                                                   ]
+                                },
                       'orya' => {
                                   'Description' => [
                                                      'Oriya digits'
                                                    ]
                                 },
+                      'osma' => {
+                                  'Description' => [
+                                                     'Osmanya digits'
+                                                   ]
+                                },
                       'roman' => {
                                    'Description' => [
-                                                      'Roman upper case numerals'
+                                                      'Roman upper case numerals — non-decimal'
                                                     ]
                                  },
                       'romanlow' => {
                                       'Description' => [
-                                                         'Roman lowercase numerals'
+                                                         'Roman lowercase numerals — non-decimal'
                                                        ]
                                     },
+                      'saur' => {
+                                  'Description' => [
+                                                     'Saurashtra digits'
+                                                   ]
+                                },
+                      'shrd' => {
+                                  'Description' => [
+                                                     'Sharada digits'
+                                                   ]
+                                },
+                      'sora' => {
+                                  'Description' => [
+                                                     'Sora_Sompeng digits'
+                                                   ]
+                                },
+                      'sund' => {
+                                  'Description' => [
+                                                     'Sundanese digits'
+                                                   ]
+                                },
+                      'takr' => {
+                                  'Description' => [
+                                                     'Takri digits'
+                                                   ]
+                                },
+                      'talu' => {
+                                  'Description' => [
+                                                     'New Tai Lue digits'
+                                                   ]
+                                },
                       'taml' => {
                                   'Description' => [
-                                                     'Tamil numerals'
+                                                     'Tamil numerals — non-decimal'
                                                    ]
                                 },
                       'tamldec' => {
@@ -57642,9 +57783,14 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'traditio' => {
                                       'Description' => [
-                                                         'Traditional numerals'
+                                                         'Traditional numerals — may be non-decimal'
                                                        ]
-                                    }
+                                    },
+                      'vaii' => {
+                                  'Description' => [
+                                                     'Vai digits'
+                                                   ]
+                                }
                     },
           'u_tz' => {
                       'adalv' => {
@@ -57945,6 +58091,11 @@ $Whatpm::LangTag::RegistryFull = {
                       'bolpb' => {
                                    'Description' => [
                                                       'La Paz, Bolivia'
+                                                    ]
+                                 },
+                      'bqkra' => {
+                                   'Description' => [
+                                                      'Bonaire, Sint Estatius and Saba'
                                                     ]
                                  },
                       'braux' => {
@@ -59362,6 +59513,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'El Salvador'
                                                     ]
                                  },
+                      'sxphi' => {
+                                   'Description' => [
+                                                      'Sint Maarten'
+                                                    ]
+                                 },
                       'sydam' => {
                                    'Description' => [
                                                       'Damascus, Syria'
@@ -59891,7 +60047,7 @@ $Whatpm::LangTag::RegistryFull = {
                                        },
                          '1694acad' => {
                                          'Comments' => [
-                                                         '17th century French, as catalogued in the "Dictionnaire de  l\'académie françoise", 4eme ed. 1694; frequently includes  elements of Middle French, as this is a transitional period'
+                                                         '17th century French, as catalogued in the "Dictionnaire de  l\'acad√©mie fran√ßoise", 4eme ed. 1694; frequently includes  elements of Middle French, as this is a transitional period'
                                                        ],
                                          'Description' => [
                                                             'Early Modern French'
@@ -59992,7 +60148,7 @@ $Whatpm::LangTag::RegistryFull = {
                                       },
                          'baku1926' => {
                                          'Comments' => [
-                                                         'Denotes alphabet used in Turkic republics/regions of the  former USSR in late 1920s, and throughout 1930s, which aspired to  represent equivalent phonemes in a unified fashion. Also known as: New  Turkic Alphabet; Birlәşdirilmiş Jeni Tyrk  Әlifbasь (Birlesdirilmis Jeni Tyrk Elifbasi);  Jaŋalif (Janalif).'
+                                                         'Denotes alphabet used in Turkic republics/regions of the  former USSR in late 1920s, and throughout 1930s, which aspired to  represent equivalent phonemes in a unified fashion. Also known as: New  Turkic Alphabet; Birl”ô≈üdirilmi≈ü Jeni Tyrk  ”òlifbas—å (Birlesdirilmis Jeni Tyrk Elifbasi);  Ja≈ãalif (Janalif).'
                                                        ],
                                          'Description' => [
                                                             'Unified Turkic Latin Alphabet (Historical)'
@@ -60055,6 +60211,15 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ],
                                       '_added' => '2006-09-18'
                                     },
+                         'emodeng' => {
+                                        'Description' => [
+                                                           'Early Modern English (1500-1700)'
+                                                         ],
+                                        'Prefix' => [
+                                                      'en'
+                                                    ],
+                                        '_added' => '2012-02-05'
+                                      },
                          'fonipa' => {
                                        'Description' => [
                                                           'International Phonetic Alphabet'
@@ -60104,7 +60269,7 @@ $Whatpm::LangTag::RegistryFull = {
                                                          'Norwegian following Ivar Aasen\'s orthographical principles,  including modern usage.'
                                                        ],
                                          'Description' => [
-                                                            'Norwegian in Høgnorsk (High Norwegian) orthography'
+                                                            'Norwegian in H√∏gnorsk (High Norwegian) orthography'
                                                           ],
                                          'Prefix' => [
                                                        'nn'
@@ -60122,7 +60287,7 @@ $Whatpm::LangTag::RegistryFull = {
                                       },
                          'jauer' => {
                                       'Comments' => [
-                                                      'The spoken dialect of the Val Müstair, which has no written  standard.'
+                                                      'The spoken dialect of the Val M√ºstair, which has no written  standard.'
                                                     ],
                                       'Description' => [
                                                          'Jauer dialect of Romansh'
@@ -60233,6 +60398,21 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ],
                                       '_added' => '2007-07-05'
                                     },
+                         'nulik' => {
+                                      'Description' => [
+                                                         'Volapük nulik',
+                                                         'Volapük perevidöl',
+                                                         'Volapük nulädik',
+                                                         'de Jong\'s Volapük',
+                                                         'New Volapük',
+                                                         'Revised Volapük',
+                                                         'Modern Volapük'
+                                                       ],
+                                      'Prefix' => [
+                                                    'vo'
+                                                  ],
+                                      '_added' => '2012-01-28'
+                                    },
                          'osojs' => {
                                       'Comments' => [
                                                       'The dialect of Oseacco/Osojane is one of the four major local  dialects of Resian'
@@ -60301,6 +60481,18 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'rm'
                                                   ],
                                       '_added' => '2010-06-29'
+                                    },
+                         'rigik' => {
+                                      'Description' => [
+                                                         'Volapük rigik',
+                                                         'Schleyer\'s Volapük',
+                                                         'Original Volapük',
+                                                         'Classic Volapük'
+                                                       ],
+                                      'Prefix' => [
+                                                    'vo'
+                                                  ],
+                                      '_added' => '2012-01-28'
                                     },
                          'rozaj' => {
                                       'Description' => [
