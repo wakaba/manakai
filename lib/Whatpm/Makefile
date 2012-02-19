@@ -59,7 +59,7 @@ update-remove-old: update-_NamedEntityList.pm \
   update-$(LANGUAGE_SUBTAG_REGISTRY_PM)
 
 update-http:
-	cd http && make update
+	cd HTTP && make update
 
 HTML.pm: HTML.pm.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
@@ -133,10 +133,14 @@ update-langtag-data:
 
 dataautoupdate: \
   update-$(LANGUAGE_SUBTAG_REGISTRY_PM) \
-  $(LANGUAGE_SUBTAG_REGISTRY_PM) $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM)
+  $(LANGUAGE_SUBTAG_REGISTRY_PM) $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM) \
+  dataautoupdate-http
 	git add \
 	    $(LANGUAGE_SUBTAG_REGISTRY_PM) \
 	    $(LANGUAGE_SUBTAG_REGISTRY_FULL_PM)
+
+dataautoupdate-http:
+	cd HTTP && make dataautoupdate
 
 clean: Charset-clean CSS-clean HTML-clean XML-clean
 	$(RMALL) *~ *.bak *.tmp
