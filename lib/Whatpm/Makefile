@@ -48,7 +48,7 @@ XML-all:
 ContentChecker-all:
 	cd ContentChecker && make all
 
-update: update-remove-old _update
+update: update-remove-old _update update-http
 
 _update:_NamedEntityList.pm _LinkTypeList.pm \
   $(LANGUAGE_SUBTAG_REGISTRY_PM) \
@@ -57,6 +57,9 @@ _update:_NamedEntityList.pm _LinkTypeList.pm \
 update-remove-old: update-_NamedEntityList.pm \
   update-_LinkTypeList.pm \
   update-$(LANGUAGE_SUBTAG_REGISTRY_PM)
+
+update-http:
+	cd http && make update
 
 HTML.pm: HTML.pm.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
