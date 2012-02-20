@@ -1,4 +1,4 @@
-$Whatpm::HTTP::_Methods::VERSION = 20120219;
+$Whatpm::HTTP::_Methods::VERSION = 20120220;
 $Whatpm::HTTP::Methods = {
           'ACL' => {},
           'BASELINE-CONTROL' => {},
@@ -59,7 +59,10 @@ $Whatpm::HTTP::Methods = {
           'RPC_IN_DATA' => {},
           'RPC_OUT_DATA' => {},
           'SEARCH' => {},
+          'SHOWMETHOD' => {},
+          'SPACEJUMP' => {},
           'SUBSCRIBE' => {},
+          'TEXTSEARCH' => {},
           'TRACE' => {
                        'case_insensitive' => 1,
                        'idempotent' => 1,
