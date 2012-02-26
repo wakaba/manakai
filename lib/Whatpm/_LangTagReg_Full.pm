@@ -55608,7 +55608,7 @@ $Whatpm::LangTag::RegistryFull = {
           't_key' => {
                        'm0' => {
                                  'Description' => [
-                                                    'Transliteration extension mechanism'
+                                                    'Transform extension mechanism'
                                                   ]
                                }
                      },
