@@ -23,6 +23,9 @@ for (@$rows) {
   $List->{$method_name} = {};
 }
 
+## <http://dvcs.w3.org/hg/cors/raw-file/tip/Overview.html#simple-method>.
+$List->{$_}->{simple} = 1 for qw(GET HEAD POST);
+
 ## <http://dvcs.w3.org/hg/xhr/raw-file/tip/Overview.html#dom-xmlhttprequest-open>.
 $List->{$_}->{case_insensitive} = 1
     for qw(CONNECT DELETE GET HEAD OPTIONS POST PUT TRACE TRACK);

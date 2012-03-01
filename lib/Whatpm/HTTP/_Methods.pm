@@ -1,4 +1,4 @@
-$Whatpm::HTTP::_Methods::VERSION = 20120224;
+$Whatpm::HTTP::_Methods::VERSION = 20120301;
 $Whatpm::HTTP::Methods = {
           'ACL' => {},
           'BASELINE-CONTROL' => {},
@@ -22,12 +22,14 @@ $Whatpm::HTTP::Methods = {
           'GET' => {
                      'case_insensitive' => 1,
                      'idempotent' => 1,
-                     'safe' => 1
+                     'safe' => 1,
+                     'simple' => 1
                    },
           'HEAD' => {
                       'case_insensitive' => 1,
                       'idempotent' => 1,
-                      'safe' => 1
+                      'safe' => 1,
+                      'simple' => 1
                     },
           'LABEL' => {},
           'LOCK' => {},
@@ -47,7 +49,8 @@ $Whatpm::HTTP::Methods = {
           'PEP-PUT' => {},
           'POLL' => {},
           'POST' => {
-                      'case_insensitive' => 1
+                      'case_insensitive' => 1,
+                      'simple' => 1
                     },
           'PROPFIND' => {},
           'PROPPATCH' => {},
