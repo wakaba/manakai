@@ -12485,6 +12485,7 @@ $Whatpm::LangTag::Registry = {
                       'bwgbe' => {},
                       'bymsq' => {},
                       'bzbze' => {},
+                      'cacfq' => {},
                       'caedm' => {},
                       'caffs' => {},
                       'caglb' => {},

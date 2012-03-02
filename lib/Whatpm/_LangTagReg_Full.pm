@@ -58203,6 +58203,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'Belize'
                                                     ]
                                  },
+                      'cacfq' => {
+                                   'Description' => [
+                                                      'Creston, Canada'
+                                                    ]
+                                 },
                       'caedm' => {
                                    'Description' => [
                                                       'Edmonton, Canada'
