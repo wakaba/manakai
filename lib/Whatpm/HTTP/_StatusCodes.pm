@@ -1,4 +1,4 @@
-$Whatpm::HTTP::_StatusCodes::VERSION = 20120307;
+$Whatpm::HTTP::_StatusCodes::VERSION = 20120419;
 $Whatpm::HTTP::StatusCodes = {
           '0' => {
                    'text' => ''
@@ -97,7 +97,8 @@ $Whatpm::HTTP::StatusCodes = {
                      'text' => 'Temporary Redirect'
                    },
           '308' => {
-                     'text' => 'Resume Incomplete'
+                     'registered' => 1,
+                     'text' => 'Permanent Redirect'
                    },
           '400' => {
                      'registered' => 1,
