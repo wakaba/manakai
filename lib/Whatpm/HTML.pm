@@ -29,9 +29,6 @@ require IO::Handle;
 sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
 sub MML_NS () { q<http://www.w3.org/1998/Math/MathML> }
 sub SVG_NS () { q<http://www.w3.org/2000/svg> }
-sub XLINK_NS () { q<http://www.w3.org/1999/xlink> }
-sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
-sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 ## Element categories
 
@@ -308,85 +305,11 @@ my $el_category_f = {
   ## is set to MathML elements, and SVG_EL is set to SVG elements.
 };
 
-my $svg_attr_name = {
-  attributename => 'attributeName',
-  attributetype => 'attributeType',
-  basefrequency => 'baseFrequency',
-  baseprofile => 'baseProfile',
-  calcmode => 'calcMode',
-  clippathunits => 'clipPathUnits',
-  contentscripttype => 'contentScriptType',
-  contentstyletype => 'contentStyleType',
-  diffuseconstant => 'diffuseConstant',
-  edgemode => 'edgeMode',
-  externalresourcesrequired => 'externalResourcesRequired',
-  filterres => 'filterRes',
-  filterunits => 'filterUnits',
-  glyphref => 'glyphRef',
-  gradienttransform => 'gradientTransform',
-  gradientunits => 'gradientUnits',
-  kernelmatrix => 'kernelMatrix',
-  kernelunitlength => 'kernelUnitLength',
-  keypoints => 'keyPoints',
-  keysplines => 'keySplines',
-  keytimes => 'keyTimes',
-  lengthadjust => 'lengthAdjust',
-  limitingconeangle => 'limitingConeAngle',
-  markerheight => 'markerHeight',
-  markerunits => 'markerUnits',
-  markerwidth => 'markerWidth',
-  maskcontentunits => 'maskContentUnits',
-  maskunits => 'maskUnits',
-  numoctaves => 'numOctaves',
-  pathlength => 'pathLength',
-  patterncontentunits => 'patternContentUnits',
-  patterntransform => 'patternTransform',
-  patternunits => 'patternUnits',
-  pointsatx => 'pointsAtX',
-  pointsaty => 'pointsAtY',
-  pointsatz => 'pointsAtZ',
-  preservealpha => 'preserveAlpha',
-  preserveaspectratio => 'preserveAspectRatio',
-  primitiveunits => 'primitiveUnits',
-  refx => 'refX',
-  refy => 'refY',
-  repeatcount => 'repeatCount',
-  repeatdur => 'repeatDur',
-  requiredextensions => 'requiredExtensions',
-  requiredfeatures => 'requiredFeatures',
-  specularconstant => 'specularConstant',
-  specularexponent => 'specularExponent',
-  spreadmethod => 'spreadMethod',
-  startoffset => 'startOffset',
-  stddeviation => 'stdDeviation',
-  stitchtiles => 'stitchTiles',
-  surfacescale => 'surfaceScale',
-  systemlanguage => 'systemLanguage',
-  tablevalues => 'tableValues',
-  targetx => 'targetX',
-  targety => 'targetY',
-  textlength => 'textLength',
-  viewbox => 'viewBox',
-  viewtarget => 'viewTarget',
-  xchannelselector => 'xChannelSelector',
-  ychannelselector => 'yChannelSelector',
-  zoomandpan => 'zoomAndPan',
-};
+require Whatpm::HTML::ParserData;
 
-my $foreign_attr_xname = {
-  'xlink:actuate' => [XLINK_NS, ['xlink', 'actuate']],
-  'xlink:arcrole' => [XLINK_NS, ['xlink', 'arcrole']],
-  'xlink:href' => [XLINK_NS, ['xlink', 'href']],
-  'xlink:role' => [XLINK_NS, ['xlink', 'role']],
-  'xlink:show' => [XLINK_NS, ['xlink', 'show']],
-  'xlink:title' => [XLINK_NS, ['xlink', 'title']],
-  'xlink:type' => [XLINK_NS, ['xlink', 'type']],
-  'xml:base' => [XML_NS, ['xml', 'base']],
-  'xml:lang' => [XML_NS, ['xml', 'lang']],
-  'xml:space' => [XML_NS, ['xml', 'space']],
-  'xmlns' => [XMLNS_NS, [undef, 'xmlns']],
-  'xmlns:xlink' => [XMLNS_NS, ['xmlns', 'xlink']],
-};
+my $svg_attr_name = $Whatpm::HTML::ParserData::SVGAttrNameFixup;
+my $mml_attr_name = $Whatpm::HTML::ParserData::MathMLAttrNameFixup;
+my $foreign_attr_xname = $Whatpm::HTML::ParserData::ForeignAttrNamespaceFixup;
 
 ## TODO: Invoke the reset algorithm when a resettable element is
 ## created (cf. HTML5 revision 2259).
@@ -500,7 +423,7 @@ sub parse_byte_stream ($$$$;$$) {
       ($char_stream, $e_status) = $charset->get_decode_handle
           ($buffer, allow_error_reporting => 1,
            allow_fallback => 1, byte_buffer => \$byte_buffer);
-      if ($char_stream) {
+      if ($char_stream) { # supported
         $buffer->{buffer} = $byte_buffer;
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'sniffing:chardet',
                         text => $charset_name,
@@ -2092,45 +2015,8 @@ sub _tree_construction_main ($) {
           my $nsuri = $self->{open_elements}->[-1]->[0]->namespace_uri;
           my $tag_name = $token->{tag_name};
           if ($nsuri eq SVG_NS) {
-            $tag_name = {
-               altglyph => 'altGlyph',
-               altglyphdef => 'altGlyphDef',
-               altglyphitem => 'altGlyphItem',
-               animatecolor => 'animateColor',
-               animatemotion => 'animateMotion',
-               animatetransform => 'animateTransform',
-               clippath => 'clipPath',
-               feblend => 'feBlend',
-               fecolormatrix => 'feColorMatrix',
-               fecomponenttransfer => 'feComponentTransfer',
-               fecomposite => 'feComposite',
-               feconvolvematrix => 'feConvolveMatrix',
-               fediffuselighting => 'feDiffuseLighting',
-               fedisplacementmap => 'feDisplacementMap',
-               fedistantlight => 'feDistantLight',
-               feflood => 'feFlood',
-               fefunca => 'feFuncA',
-               fefuncb => 'feFuncB',
-               fefuncg => 'feFuncG',
-               fefuncr => 'feFuncR',
-               fegaussianblur => 'feGaussianBlur',
-               feimage => 'feImage',
-               femerge => 'feMerge',
-               femergenode => 'feMergeNode',
-               femorphology => 'feMorphology',
-               feoffset => 'feOffset',
-               fepointlight => 'fePointLight',
-               fespecularlighting => 'feSpecularLighting',
-               fespotlight => 'feSpotLight',
-               fetile => 'feTile',
-               feturbulence => 'feTurbulence',
-               foreignobject => 'foreignObject',
-               glyphref => 'glyphRef',
-               lineargradient => 'linearGradient',
-               radialgradient => 'radialGradient',
-               #solidcolor => 'solidColor', ## NOTE: Commented in spec (SVG1.2)
-               textpath => 'textPath',  
-            }->{$tag_name} || $tag_name;
+            $tag_name = $Whatpm::HTML::ParserData::SVGElementNameFixup
+                ->{$tag_name} || $tag_name;
           }
 
           ## "adjust SVG attributes" (SVG only) - done in insert-element-f
@@ -2153,8 +2039,7 @@ sub _tree_construction_main ($) {
                      ($nsuri) eq SVG_NS ?
                          ($svg_attr_name->{$attr_name} || $attr_name) :
                      ($nsuri) eq MML_NS ?
-                         ($attr_name eq 'definitionurl' ?
-                             'definitionURL' : $attr_name) :
+                         ($mml_attr_name->{$attr_name} || $attr_name) :
                          $attr_name]]
           }
         );
@@ -6383,8 +6268,7 @@ sub _tree_construction_main ($) {
                      ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS) eq SVG_NS ?
                          ($svg_attr_name->{$attr_name} || $attr_name) :
                      ($token->{tag_name} eq 'math' ? MML_NS : SVG_NS) eq MML_NS ?
-                         ($attr_name eq 'definitionurl' ?
-                             'definitionURL' : $attr_name) :
+                         ($mml_attr_name->{$attr_name} || $attr_name) :
                          $attr_name]]
           }
         );

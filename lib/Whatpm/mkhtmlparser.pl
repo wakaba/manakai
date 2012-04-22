@@ -98,8 +98,7 @@ while (<>) {
                      ($nsuri) eq SVG_NS ?
                          (\$svg_attr_name->{\$attr_name} || \$attr_name) :
                      ($nsuri) eq MML_NS ?
-                         (\$attr_name eq 'definitionurl' ?
-                             'definitionURL' : \$attr_name) :
+                         (\$mml_attr_name->{\$attr_name} || \$attr_name) :
                          \$attr_name]]
           }
         ];
