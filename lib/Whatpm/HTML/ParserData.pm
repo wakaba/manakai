@@ -140,6 +140,9 @@ our $SVGElementNameFixup = {
   textpath => 'textPath',  
 }; # $SVGElementNameFixup
 
+require Whatpm::_NamedEntityList;
+our $NamedCharRefs = $Whatpm::HTML::EntityChar;
+
 =head1 NAME
 
 Whatpm::HTML::ParserData - Data for HTML parser
@@ -162,6 +165,8 @@ Following data from the HTML specification are included:
 =item $ForeignAttrNamespaceFixup
 
 =item $SVGElementNameFixup
+
+=item $NamedCharRefs
 
 =back
 

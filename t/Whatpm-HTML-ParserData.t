@@ -27,6 +27,12 @@ sub _svg_el : Test(1) {
       'foreignObject';
 } # _svg_el
 
+sub _charrefes : Test(3) {
+  is $Whatpm::HTML::ParserData::NamedCharRefs->{'amp;'}, '&';
+  is $Whatpm::HTML::ParserData::NamedCharRefs->{'AMP'}, '&';
+  is $Whatpm::HTML::ParserData::NamedCharRefs->{'acE;'}, "\x{223E}\x{333}";
+} # _charrefs
+
 __PACKAGE__->runtests;
 
 1;
