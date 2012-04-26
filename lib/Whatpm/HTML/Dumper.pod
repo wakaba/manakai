@@ -1,0 +1,121 @@
+=head1 NAME
+
+Whatpm::HTML::Dumper - Dump DOM tree by the parser test format
+
+=head1 SYNOPSIS
+
+  use Whatpm::HTML::Dumper qw(dumptree);
+  
+  warn dumptree $doc;
+
+=head1 DESCRIPTION
+
+The C<Whatpm::HTML::Dumper> exports a function, C<dumptree>, which
+serializes the given document into the format used in HTML parser
+tests.
+
+=head1 FUNCTION
+
+The module exports a function:
+
+=over 4
+
+=item $dumped = dumptree $doc
+
+Dump the DOM tree.  The argument must be a DOM document object
+(i.e. an instance of L<Message::DOM::Document> class).  The function
+returns the dump for the document and its subtree.
+
+=back
+
+=head1 DUMP FORMAT
+
+The function serializes the DOM tree into the format used in HTML
+parser tests, as described in
+<http://wiki.whatwg.org/wiki/Parser_tests#Tree_Construction_Tests>,
+with following exceptions:
+
+=over 4
+
+=item Only the "#document" part of the tree construction test is returned.
+
+=item No "| " prefix is prepended to lines.
+
+=item XML-only node types are also supported.
+
+Element type definition, entity, and notation nodes attached to a
+document type node is serialized as if they were children of the
+document type node.  They are inserted before any children of the
+document type node, sorted by node types in the aforementioned order,
+then by code point order of their node names.
+
+Element type definition nodes are represented as C<< <!ELEMENT >>,
+followed by a C<U+0020> C<SPACE> character, followed by the node name,
+followed by a C<U+0020> C<SPACE> character, followed by the
+C<contentModelText> of the node, followed by C<< > >>.
+
+Entity nodes are represented as C<< <!ENTITY >>, followed by a
+C<U+0020> C<SPACE> character, followed by the node name, followed by a
+C<U+0020> C<SPACE> character, followed by list of C<textContent>,
+C<publicId>, and C<systemId> of the node (the empty string is used
+when the value is C<undef>), where each item is enclosed by C<">
+characters, separated by a C<U+0020> C<SPACE> character, followed by a
+C<U+0020> C<SPACE> character, followed by the C<notationName> of the
+node, if it is not C<undef>, followed by C<< > >>.
+
+Notation nodes are represented as C<< <!NOTATION >>, followed by a
+C<U+0020> C<SPACE> character, followed by the node name, followed by a
+C<U+0020> C<SPACE> character, followecd by list of C<publicId> and
+C<systemId> of the node (the empty string is used when the value is
+C<undef>), where each item is enclosed by C<"> characters, separated
+by a C<U+0020> C<SPACE> character, followed by C<< > >>.
+
+Attribute definition nodes attached to an element type definition node
+is serialized as if they were children of the element type node,
+sorted by code point order of their node names.
+
+Attribute type definition nodes are represented as the node name,
+followed by a C<U+0020> C<SPACE> character, followed by the keyword
+represented by C<declaredType> of the node (or C<ENUMERATION> if it
+represents the enumerated type), followed by a C<U+0020> C<SPACE>
+character, followed by C<(>, followed by the list of C<allowedTokens>
+of the node separated by C<|>, followed by C<)>, followed by a
+C<U+0020> C<SPACE> character, followed by the keyword represented by
+C<defaultType> or the node (or C<EXPLICIT> if it reprensets the
+explicit default value), followed by a C<U+0020> C<SPACE> character,
+followed by C<">, followed by the C<textContent> of the node, followed
+by C<">.
+
+=item Namespace designators are extended.
+
+For the SuikaWiki/0.9 namespace
+(C<urn:x-suika-fam-cx:markup:suikawiki:0:9:>), the namespace
+designator is C<sw>.  For the SuikaWiki/0.10 namespace
+(C<urn:x-suika-fam-cx:markup:suikawiki:0:10:>), the namespace
+designator is C<sw10>.  For the Temma namespace
+(C<http://suika.fam.cx/www/markup/temma>), the namespace designator is
+C<temma>.
+
+When no namespace designator is explicitly defined for a namespace,
+the namespace designator for the namespace is C<{> followed by the
+namespace URL followed by C<}>.  If an element has no namespace, the
+namespace designator for the element is C<{}>.
+
+=back
+
+=head1 SEE ALSO
+
+Parser tests - WHATWG Wiki <http://wiki.whatwg.org/wiki/Parser_tests>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

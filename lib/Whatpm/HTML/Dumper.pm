@@ -1,9 +1,8 @@
 package Whatpm::HTML::Dumper;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
-
-require Exporter;
-push our @ISA, 'Exporter';
+use warnings;
+our $VERSION = '1.7';
+use Exporter::Lite;
 
 our @EXPORT = qw(dumptree);
 
@@ -21,6 +20,7 @@ sub dumptree ($) {
 
     q<urn:x-suika-fam-cx:markup:suikawiki:0:9:> => 'sw',
     q<urn:x-suika-fam-cx:markup:suikawiki:0:10:> => 'sw10',
+    q<http://suika.fam.cx/www/markup/temma> => 'temma',
   };
 
   my @node = map { [$_, ''] } @{$node->child_nodes};
@@ -52,7 +52,7 @@ sub dumptree ($) {
                       $ns . $_->manakai_local_name;
                     }, $_->value] }
                     @{$child->[0]->attributes}) {
-        $r .= $child->[1] . '  ' . $attr->[0] . '="'; ## ISSUE: case?
+        $r .= $child->[1] . '  ' . $attr->[0] . '="';
         $r .= $attr->[1] . '"' . "\x0A";
       }
       
@@ -66,7 +66,8 @@ sub dumptree ($) {
       $r .= $child->[1] . '<!DOCTYPE ' . $child->[0]->name;
       my $pubid = $child->[0]->public_id;
       my $sysid = $child->[0]->system_id;
-      if (length $pubid or length $sysid) {
+      if ((defined $pubid and length $pubid) or
+          (defined $sysid and length $sysid)) {
         $r .= ' "' . $pubid . '"';
         $r .= ' "' . $sysid . '"';
       }
@@ -134,8 +135,13 @@ sub dumptree ($) {
   return $r;
 } # dumptree
 
-## NOTE: Based on <http://wiki.whatwg.org/wiki/Parser_tests>.
-## TDOO: Document
-
 1;
-## $Date: 2008/11/07 08:45:28 $
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

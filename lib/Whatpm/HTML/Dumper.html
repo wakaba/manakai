@@ -1,0 +1,157 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::HTML::Dumper - Dump DOM tree by the parser test format</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#function">FUNCTION</a></li>
+	<li><a href="#dump_format">DUMP FORMAT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::HTML::Dumper - Dump DOM tree by the parser test format</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Whatpm::HTML::Dumper qw(dumptree);
+  
+  warn dumptree $doc;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::HTML::Dumper</code> exports a function, <code>dumptree</code>, which
+serializes the given document into the format used in HTML parser
+tests.</p>
+<p>
+</p>
+<hr />
+<h1><a name="function">FUNCTION</a></h1>
+<p>The module exports a function:</p>
+<dl>
+<dt><strong><a name="_dumped" class="item">$dumped = dumptree $doc</a></strong></dt>
+
+<dd>
+<p>Dump the DOM tree.  The argument must be a DOM document object
+(i.e. an instance of <a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a> class).  The function
+returns the dump for the document and its subtree.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="dump_format">DUMP FORMAT</a></h1>
+<p>The function serializes the DOM tree into the format used in HTML
+parser tests, as described in
+&lt;http://wiki.whatwg.org/wiki/Parser_tests#Tree_Construction_Tests&gt;,
+with following exceptions:</p>
+<dl>
+<dt><strong><a name="only_the_document_part_of_the_tree_construction_test_is_returned" class="item">Only the &quot;#document&quot; part of the tree construction test is returned.</a></strong></dt>
+
+<dt><strong><a name="no_prefix_is_prepended_to_lines" class="item">No &quot;| &quot; prefix is prepended to lines.</a></strong></dt>
+
+<dt><strong><a name="xml_only_node_types_are_also_supported" class="item">XML-only node types are also supported.</a></strong></dt>
+
+<dd>
+<p>Element type definition, entity, and notation nodes attached to a
+document type node is serialized as if they were children of the
+document type node.  They are inserted before any children of the
+document type node, sorted by node types in the aforementioned order,
+then by code point order of their node names.</p>
+<p>Element type definition nodes are represented as <code>&lt;!ELEMENT</code>,
+followed by a <code>U+0020</code> <code>SPACE</code> character, followed by the node name,
+followed by a <code>U+0020</code> <code>SPACE</code> character, followed by the
+<code>contentModelText</code> of the node, followed by <code>&gt;</code>.</p>
+<p>Entity nodes are represented as <code>&lt;!ENTITY</code>, followed by a
+<code>U+0020</code> <code>SPACE</code> character, followed by the node name, followed by a
+<code>U+0020</code> <code>SPACE</code> character, followed by list of <code>textContent</code>,
+<code>publicId</code>, and <code>systemId</code> of the node (the empty string is used
+when the value is <code>undef</code>), where each item is enclosed by <code>&quot;</code>
+characters, separated by a <code>U+0020</code> <code>SPACE</code> character, followed by a
+<code>U+0020</code> <code>SPACE</code> character, followed by the <code>notationName</code> of the
+node, if it is not <code>undef</code>, followed by <code>&gt;</code>.</p>
+<p>Notation nodes are represented as <code>&lt;!NOTATION</code>, followed by a
+<code>U+0020</code> <code>SPACE</code> character, followed by the node name, followed by a
+<code>U+0020</code> <code>SPACE</code> character, followecd by list of <code>publicId</code> and
+<code>systemId</code> of the node (the empty string is used when the value is
+<code>undef</code>), where each item is enclosed by <code>&quot;</code> characters, separated
+by a <code>U+0020</code> <code>SPACE</code> character, followed by <code>&gt;</code>.</p>
+<p>Attribute definition nodes attached to an element type definition node
+is serialized as if they were children of the element type node,
+sorted by code point order of their node names.</p>
+<p>Attribute type definition nodes are represented as the node name,
+followed by a <code>U+0020</code> <code>SPACE</code> character, followed by the keyword
+represented by <code>declaredType</code> of the node (or <code>ENUMERATION</code> if it
+represents the enumerated type), followed by a <code>U+0020</code> <code>SPACE</code>
+character, followed by <code>(</code>, followed by the list of <code>allowedTokens</code>
+of the node separated by <code>|</code>, followed by <code>)</code>, followed by a
+<code>U+0020</code> <code>SPACE</code> character, followed by the keyword represented by
+<code>defaultType</code> or the node (or <code>EXPLICIT</code> if it reprensets the
+explicit default value), followed by a <code>U+0020</code> <code>SPACE</code> character,
+followed by <code>&quot;</code>, followed by the <code>textContent</code> of the node, followed
+by <code>&quot;</code>.</p>
+</dd>
+<dt><strong><a name="namespace_designators_are_extended" class="item">Namespace designators are extended.</a></strong></dt>
+
+<dd>
+<p>For the SuikaWiki/0.9 namespace
+(<code>urn:x-suika-fam-cx:markup:suikawiki:0:9:</code>), the namespace
+designator is <code>sw</code>.  For the SuikaWiki/0.10 namespace
+(<code>urn:x-suika-fam-cx:markup:suikawiki:0:10:</code>), the namespace
+designator is <code>sw10</code>.  For the Temma namespace
+(<code>http://suika.fam.cx/www/markup/temma</code>), the namespace designator is
+<code>temma</code>.</p>
+<p>When no namespace designator is explicitly defined for a namespace,
+the namespace designator for the namespace is <code>{</code> followed by the
+namespace URL followed by <code>}</code>.  If an element has no namespace, the
+namespace designator for the element is <code>{}</code>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Parser tests - WHATWG Wiki &lt;http://wiki.whatwg.org/wiki/Parser_tests&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007-2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>
