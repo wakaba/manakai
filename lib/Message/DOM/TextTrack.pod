@@ -1,0 +1,89 @@
+=head1 NAME
+
+Message::DOM::TextTrack - DOM |TextTrack| object
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::TextTrack> class implements the DOM C<TextTrack>
+interface.
+
+=head1 METHODS
+
+The C<Message::DOM::TextTrack> object has following methods:
+
+=over 4
+
+=item $string = $track->kind
+
+The kind of the track.  [HTML]
+
+=item $string = $track->label
+
+The label of the track.  [HTML]
+
+=item $string = $track->language
+
+The language tag of the track.  [HTML]
+
+=item $mode = $track->mode
+
+The mode of the track.  [HTML]
+
+=item $bool = $track->manakai_is_invalid
+
+Return true if the text track represents a WebVTT file which cannot be
+successfully processed by the WebVTT parser.  [MANAKAI]
+
+=item $string = $track->manakai_signature_trailer
+
+Return the text fragment following the WebVTT signature, if any, or
+C<undef>.  [MANAKAI]
+
+=item $string = $track->manakai_headers
+
+Return the "header" portion of the WebVTT document, if any, or the
+empty string.  [MANAKAI]
+
+=item $list = $track->cues
+
+XXX Not implemented yet.
+
+=item $list = $track->active_cues
+
+XXX Not implemented yet.
+
+=item $list = $track->manakai_all_cues
+
+Return the live list of the cues contained in the track.  [MANAKAI]
+
+=item $track->add_cue ($cue)
+
+Add the cue to the track.  [HTML]
+
+=item $track->remove_cue ($cue)
+
+Remove the cue from the track.  [HTML]
+
+=back
+
+=head1 SEE ALSO
+
+HTML Standard
+<http://www.whatwg.org/specs/web-apps/current-work/#texttrack>.
+
+WebVTT Standard <http://dev.w3.org/html5/webvtt/>.
+
+L<Message::DOM::TextTrackCue>, L<Message::DOM::TextTrackCueList>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

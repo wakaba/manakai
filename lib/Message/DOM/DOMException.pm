@@ -107,7 +107,9 @@ sub ___error_def () {+{
     -code => 10,
     -description => q(Attribute is already in use),
   },
-  # INVALID_STATE_ERR == 11
+  INVALID_STATE_ERR => {
+    -code => 11,
+  },
   SYNTAX_ERR => {
     -code => 12,
     -subtype => {

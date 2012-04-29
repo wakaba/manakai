@@ -1,0 +1,135 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Message::DOM::TextTrack - DOM |TextTrack| object</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Message::DOM::TextTrack - DOM |TextTrack| object</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Message::DOM::TextTrack</code> class implements the DOM <code>TextTrack</code>
+interface.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>The <code>Message::DOM::TextTrack</code> object has following methods:</p>
+<dl>
+<dt><strong><a name="kind" class="item">$string = $track-&gt;kind</a></strong></dt>
+
+<dd>
+<p>The kind of the track.  [HTML]</p>
+</dd>
+<dt><strong><a name="label" class="item">$string = $track-&gt;label</a></strong></dt>
+
+<dd>
+<p>The label of the track.  [HTML]</p>
+</dd>
+<dt><strong><a name="language" class="item">$string = $track-&gt;language</a></strong></dt>
+
+<dd>
+<p>The language tag of the track.  [HTML]</p>
+</dd>
+<dt><strong><a name="mode" class="item">$mode = $track-&gt;mode</a></strong></dt>
+
+<dd>
+<p>The mode of the track.  [HTML]</p>
+</dd>
+<dt><strong><a name="manakai_is_invalid" class="item">$bool = $track-&gt;manakai_is_invalid</a></strong></dt>
+
+<dd>
+<p>Return true if the text track represents a WebVTT file which cannot be
+successfully processed by the WebVTT parser.  [MANAKAI]</p>
+</dd>
+<dt><strong><a name="manakai_signature_trailer" class="item">$string = $track-&gt;manakai_signature_trailer</a></strong></dt>
+
+<dd>
+<p>Return the text fragment following the WebVTT signature, if any, or
+<code>undef</code>.  [MANAKAI]</p>
+</dd>
+<dt><strong><a name="manakai_headers" class="item">$string = $track-&gt;manakai_headers</a></strong></dt>
+
+<dd>
+<p>Return the &quot;header&quot; portion of the WebVTT document, if any, or the
+empty string.  [MANAKAI]</p>
+</dd>
+<dt><strong><a name="cues" class="item">$list = $track-&gt;cues</a></strong></dt>
+
+<dd>
+<p>XXX Not implemented yet.</p>
+</dd>
+<dt><strong><a name="active_cues" class="item">$list = $track-&gt;active_cues</a></strong></dt>
+
+<dd>
+<p>XXX Not implemented yet.</p>
+</dd>
+<dt><strong><a name="manakai_all_cues" class="item">$list = $track-&gt;manakai_all_cues</a></strong></dt>
+
+<dd>
+<p>Return the live list of the cues contained in the track.  [MANAKAI]</p>
+</dd>
+<dt><strong><a name="add_cue" class="item">$track-&gt;add_cue ($cue)</a></strong></dt>
+
+<dd>
+<p>Add the cue to the track.  [HTML]</p>
+</dd>
+<dt><strong><a name="remove_cue" class="item">$track-&gt;remove_cue ($cue)</a></strong></dt>
+
+<dd>
+<p>Remove the cue from the track.  [HTML]</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>HTML Standard
+&lt;http://www.whatwg.org/specs/web-apps/current-work/#texttrack&gt;.</p>
+<p>WebVTT Standard &lt;http://dev.w3.org/html5/webvtt/&gt;.</p>
+<p><a href="../../Message/DOM/TextTrackCue.html">the Message::DOM::TextTrackCue manpage</a>, <a href="../../Message/DOM/TextTrackCueList.html">the Message::DOM::TextTrackCueList manpage</a>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

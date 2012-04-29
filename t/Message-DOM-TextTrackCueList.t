@@ -85,6 +85,13 @@ sub _get_cue_by_id_not_found : Test(2) {
 
 __PACKAGE__->runtests;
 
+our $DetectLeak = 1;
+
+sub Message::DOM::TextTrackCue::DESTROY
+    { die ref ($_[0]) . ": Leak detected" if $DetectLeak }
+sub Message::DOM::TextTrackCueList::DESTROY
+    { die ref ($_[0]) . ": Leak detected" if $DetectLeak }
+
 1;
 
 =head1 LICENSE
