@@ -1,0 +1,106 @@
+=head1 NAME
+
+Message::DOM::TextTrackCue - DOM |TextTrackCue| object
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::TextTrackCue> class implements the DOM
+C<TextTrackCue> interface.
+
+=head1 METHODS
+
+The C<Message::DOM::TextTrackCue> object has following methods:
+
+=over 4
+
+=item $track = $cue->track
+
+Return the associated C<TextTrack> object, if any, or C<undef>.
+[HTML]
+
+=item $id = $cue->id
+
+=item $cue->id ($new_id)
+
+Get or set the identifier of the cue. [HTML]
+
+=item $seconds = $cue->start_time
+
+=item $cue->start_time ($new_seconds)
+
+Get or set the start time of the cue.  [HTML]
+
+=item $seconds = $cue->end_time
+
+=item $cue->end_time ($seconds)
+
+Get or set the end time of the cue.  [HTML]
+
+=item $bool = $cue->pause_on_exit
+
+=item $cue->pause_on_exit ($new_bool)
+
+Get or set the pause-on-exit flag of the cue.  [HTML]
+
+=item $value = $cue->vertical
+
+=item $cue->vertical ($new_value)
+
+Get or set the writing direction of the cue.  [HTML]
+
+=item $bool = $cue->snap_to_lines
+
+=item $cue->snap_to_lines ($new_bool)
+
+Get or set the snap-to-lines flag of the cue.  [HTML]
+
+=item $int = $cue->line
+
+=item $cue->line ($new_int)
+
+Get the computed line position, or set the line position, of the cue.
+[HTML]
+
+=item $int = $cue->size
+
+=item $cue->size ($new_int)
+
+Get or set the text position of the cue.  [HTML]
+
+=item $value = $cue->align
+
+=item $cue->align ($new_value)
+
+Get or set the alignment of the cue.  [HTML]
+
+=item $text = $cue->text
+
+=item $cue->text ($new_text)
+
+Get or set the text of the cue, in raw unparsed format.  [HTML]
+
+=item $cue->get_cue_as_html
+
+XXX Not implemented yet.
+
+=back
+
+=head1 SEE ALSO
+
+HTML Standard
+<http://www.whatwg.org/specs/web-apps/current-work/#texttrackcue>.
+
+L<Message::DOM::TextTrackCueList>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

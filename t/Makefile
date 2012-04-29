@@ -71,7 +71,8 @@ test:
 	  URI-URIReference.t \
           MIME-Type.t IMT-InternetMediaType.t \
 	  CGI-*.t \
-	  Whatpm-*.t
+	  Whatpm-*.t \
+	  Message-*.t
 
 #	$(PERL_TEST_) *$(PT_SUFFIX)
 

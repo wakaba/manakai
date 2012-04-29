@@ -1,0 +1,53 @@
+=head1 NAME
+
+Message::DOM::TextTrackCueList - DOM |TextTrackCueList| object
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::TextTrackCueList> class implements the DOM
+C<TextTrackCueList> interface.
+
+=head1 METHODS
+
+The C<Message::DOM::TextTrackCueList> object has following methods:
+
+=over 4
+
+=item $length = $list->length
+
+Get the number of items in the list.
+
+=item $cue = $list->get_cue_by_id ($cue)
+
+Get the cue whose identifier is equal to the specified string, if any,
+or C<undef>.
+
+=back
+
+In addition, the items in the list, i.e. the cues contained in the
+list, can be accessed as if the list were an array reference:
+
+  $cue = $list->[0];
+  $cue = $list->[1];
+  ...
+  $cue = $list->[$list->lenght - 1];
+
+=head1 SEE ALSO
+
+HTML Standard
+<http://www.whatwg.org/specs/web-apps/current-work/#texttrackcuelist>.
+
+L<Message::DOM::TextTrackCueList>, L<Message::DOM::TextTrack>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
