@@ -216,8 +216,8 @@ sub feed_line ($$$) {
                                level => 'm',
                                line => $self->{l}, column => 1);
           }
-          if ($all =~ /\x0C/) {
-            my $col = 1 + index $all, "\x0C";
+          if (($all . $line) =~ /\x0C/) {
+            my $col = 1 + index $all . $line, "\x0C";
             $self->{onerror}->(type => 'webvtt:ff',
                                level => 'm',
                                line => $self->{l}, column => $col);
