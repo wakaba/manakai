@@ -71,6 +71,10 @@ sub manakai_all_cues ($) {
   return $_[0]->{all_cues};
 } # manakai_all_cues
 
+sub manakai_invalid_cues ($) {
+  return $_[0]->{invalid_cues} ||= [];
+} # manakai_invalid_cues
+
 sub add_cue ($$) {
   if ($_[1]->track or grep { $_ eq $_[1] } @{$_[0]->{all_cues}}) {
     # XXX error reporting
