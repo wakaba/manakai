@@ -51,8 +51,6 @@ sub parse_char_string ($;$) {
   } else {
     $self->feed_line ('', undef);
   }
-  
-  $self->feed_eof;
 
   return $self->{parsed};
 } # parse_char_string
@@ -242,7 +240,7 @@ sub feed_line ($$$) {
           $self->parse_settings ($line => $self->{new_cue});
           
           if (defined $eol) {
-            $self->{state} = 'cue text';
+            $self->{state} = 'cue text 1';
           } else {
             $self->{onerror}->(type => 'webvtt:no text',
                                level => 'm',
@@ -267,8 +265,38 @@ sub feed_line ($$$) {
       #      = $self->{new_cue}->{id} . "\x0A" . $_[1];
       #}
       $self->{state} = 'bad cue';
+    } elsif ($self->{state} eq 'cue text 1') {
+      if ($line eq '') {
+        push @{$self->{parsed}->{all_cues}},
+            Message::DOM::TextTrackCue->____new_from_hashref
+                ($self->{new_cue});
+        $self->{state} = 'cue text 1 blank';
+      } else {
+        $self->{state} = 'cue text';
+        redo STATE;
+      }
+    } elsif ($self->{state} eq 'cue text 1 blank') {
+      if ($line eq '') {
+        $self->{state} = 'before cue';
+        redo STATE;
+      } else {
+        $self->{onerror}->(type => 'webvtt:no cue separator',
+                           level => 'm',
+                           line => $self->{l},
+                           column => 1);
+        $self->{state} = 'before cue';
+        redo STATE;
+      }
     } elsif ($self->{state} eq 'cue text') {
-      if (not $line eq '' and not $line =~ /-->/) {
+      if ($line =~ /-->/) {
+        $self->{onerror}->(type => 'webvtt:no cue separator',
+                           level => 'm',
+                           line => $self->{l},
+                           column => 1);
+      } elsif ($line eq '') {
+        $self->{new_cue}->{text_line} ||= $self->{l};
+      } else {
+        $self->{new_cue}->{text_line} ||= $self->{l};
         $self->{new_cue}->{text} .= "\x0A"
             if length $self->{new_cue}->{text};
         $self->{new_cue}->{text} .= $line;
@@ -300,31 +328,6 @@ sub feed_line ($$$) {
     }
   }
 } # feed_line
-
-sub feed_eof ($) {
-  my $self = shift;
-return;
-
-  if ($self->{state} eq 'end') {
-    #
-  } elsif ($self->{state} eq 'cue text') {
-    $self->feed_line ('', undef);
-  } elsif ($self->{state} eq 'signature') {
-    #
-  } elsif ($self->{state} eq 'header') {
-    #
-  } elsif ($self->{state} eq 'bad cue') {
-    #
-  } elsif ($self->{state} eq 'before cue') {
-    # never
-  } elsif ($self->{state} eq 'before timings') {
-    # never
-  } elsif ($self->{state} eq 'timings') {
-    # never
-  } else {
-    die "Unknown state: |$self->{state}|";
-  }
-} # feed_eof
 
 sub parse_settings ($$$) {
   my $self = $_[0];
