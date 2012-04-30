@@ -216,8 +216,8 @@ sub feed_line ($$$) {
                                level => 'm',
                                line => $self->{l}, column => 1);
           }
-          if (($all . $line) =~ /\x0C/) {
-            my $col = 1 + index $all . $line, "\x0C";
+          if ($all =~ /\x0C/) {
+            my $col = 1 + index $all, "\x0C";
             $self->{onerror}->(type => 'webvtt:ff',
                                level => 'm',
                                line => $self->{l}, column => $col);
@@ -332,6 +332,13 @@ sub feed_line ($$$) {
 sub parse_settings ($$$) {
   my $self = $_[0];
   my $cue = $_[2];
+
+  if ($_[1] =~ /\x0C/) {
+    my $col = $self->{c} + 1 + index $_[1], "\x0C";
+    $self->{onerror}->(type => 'webvtt:ff',
+                       level => 'm',
+                       line => $self->{l}, column => $col);
+  }
 
   my @setting = split /([\x09\x0A\x0C\x0D\x20]+)/, $_[1], -1;
   if (@setting >= 2 and $setting[0] eq '') {
