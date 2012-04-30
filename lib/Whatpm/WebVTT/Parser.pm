@@ -64,9 +64,9 @@ sub feed_line ($$$) {
   STATE: {
     if ($self->{state} eq 'signature') {
       if ($line =~ /\A\x{FEFF}?WEBVTT(?:[\x20\x09]([^\x0D\x0A]*))?\z/) {
-        $self->{parsed}->{signature_trailer} = $1;
-        $self->{parsed}->{signature_trailer} =~ tr/\x00/\x{FFFD}/
-            if defined $self->{parsed}->{signature_trailer};
+        #$self->{parsed}->{signature_trailer} = $1;
+        #$self->{parsed}->{signature_trailer} =~ tr/\x00/\x{FFFD}/
+        #    if defined $self->{parsed}->{signature_trailer};
         $self->{state} = 'header';
       } else {
         $self->{parsed}->{invalid} = 1;
@@ -121,7 +121,7 @@ sub feed_line ($$$) {
                                level => 'm',
                                line => $self->{l},
                                column => 1 + length $line);
-            push @{$self->{parsed}->{invalid_cues} ||= []}, $line;
+            #push @{$self->{parsed}->{invalid_cues} ||= []}, $line;
             $self->{state} = 'end';
           }
         }
@@ -133,11 +133,11 @@ sub feed_line ($$$) {
                            level => 'm',
                            line => $self->{l},
                            column => 1 + length $line);
-        push @{$self->{parsed}->{invalid_cues} ||= []},
-            join "\x0A",
-                @{$self->{new_cue}->{invalid_ids} ||= []},
-                $self->{new_cue}->{id},
-                length $line ? $line : ();
+        #push @{$self->{parsed}->{invalid_cues} ||= []},
+        #    join "\x0A",
+        #        @{$self->{new_cue}->{invalid_ids} ||= []},
+        #        $self->{new_cue}->{id},
+        #        length $line ? $line : ();
         $self->{state} = defined $eol ? 'before cue' : 'end';
       } else {
         if ($line =~ /-->/) {
@@ -147,8 +147,8 @@ sub feed_line ($$$) {
           $self->{onerror}->(type => 'webvtt:id:duplicate',
                              level => 'm',
                              line => $self->{l} - 1, column => 1);
-          push @{$self->{new_cue}->{invalid_ids} ||= []},
-              $self->{new_cue}->{id};
+          #push @{$self->{new_cue}->{invalid_ids} ||= []},
+          #    $self->{new_cue}->{id};
           $self->{new_cue}->{id} = $line;
         }
       }
@@ -261,11 +261,11 @@ sub feed_line ($$$) {
         }
       }
 
-      push @{$self->{parsed}->{invalid_cues} ||= []}, $_[1];
-      if ($self->{new_cue} and length $self->{new_cue}->{id}) {
-        $self->{parsed}->{invalid_cues}->[-1]
-            = $self->{new_cue}->{id} . "\x0A" . $_[1];
-      }
+      #push @{$self->{parsed}->{invalid_cues} ||= []}, $_[1];
+      #if ($self->{new_cue} and length $self->{new_cue}->{id}) {
+      #  $self->{parsed}->{invalid_cues}->[-1]
+      #      = $self->{new_cue}->{id} . "\x0A" . $_[1];
+      #}
       $self->{state} = 'bad cue';
     } elsif ($self->{state} eq 'cue text') {
       if (not $line eq '' and not $line =~ /-->/) {
@@ -284,14 +284,14 @@ sub feed_line ($$$) {
       }
     } elsif ($self->{state} eq 'bad cue') {
       if (not defined $eol) {
-        $self->{parsed}->{invalid_cues}->[-1] .= "\x0A" . $line
-            if length $line;
+        #$self->{parsed}->{invalid_cues}->[-1] .= "\x0A" . $line
+        #    if length $line;
         $self->{state} = 'end';
       } elsif ($line =~ /-->/ or $line eq '') {
         $self->{state} = 'before cue';
         redo STATE;
       } else {
-        $self->{parsed}->{invalid_cues}->[-1] .= "\x0A" . $line;
+        #$self->{parsed}->{invalid_cues}->[-1] .= "\x0A" . $line;
       }
     } elsif ($self->{state} eq 'end') {
       #

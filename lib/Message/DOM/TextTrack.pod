@@ -34,16 +34,6 @@ The mode of the track.  [HTML]
 Return true if the text track represents a WebVTT file which cannot be
 successfully processed by the WebVTT parser.  [MANAKAI]
 
-=item $string = $track->manakai_signature_trailer
-
-Return the text fragment following the WebVTT signature, if any, or
-C<undef>.  [MANAKAI]
-
-=item $string = $track->manakai_headers
-
-Return the "header" portion of the WebVTT document, if any, or the
-empty string.  [MANAKAI]
-
 =item $list = $track->cues
 
 XXX Not implemented yet.

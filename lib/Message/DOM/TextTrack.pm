@@ -18,14 +18,6 @@ sub manakai_is_invalid ($) {
   return $_[0]->{invalid};
 } # manakai_is_invalid
 
-sub manakai_signature_trailer ($) {
-  return $_[0]->{signature_trailer};
-} # manakai_signature_trailer
-
-sub manakai_headers ($) {
-  return join "\x0A", @{$_[0]->{headers} or []};
-} # manakai_headers
-
 sub kind ($) {
   return $_[0]->{kind};
 } # kind
@@ -70,10 +62,6 @@ sub active_cues ($) {
 sub manakai_all_cues ($) {
   return $_[0]->{all_cues};
 } # manakai_all_cues
-
-sub manakai_invalid_cues ($) {
-  return $_[0]->{invalid_cues} ||= [];
-} # manakai_invalid_cues
 
 sub add_cue ($$) {
   if ($_[1]->track or grep { $_ eq $_[1] } @{$_[0]->{all_cues}}) {

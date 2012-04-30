@@ -24,10 +24,6 @@ sub id ($;$) {
   return $_[0]->{id}; # default = empty string
 } # id
 
-sub manakai_invalid_ids ($) {
-  return $_[0]->{invalid_ids} ||= [];
-} # manakai_invalid_ids
-
 sub start_time ($;$) {
   if (@_ > 1) {
     $_[0]->{start_time} = 0+$_[1];

@@ -20,13 +20,13 @@ sub dump_text_track ($) {
     $result .= "invalid\x0A";
   }
 
-  if (defined (my $trailer = $track->manakai_signature_trailer)) {
-    $result .= qq{sigline "$trailer"\x0A};
-  }
+  #if (defined (my $trailer = $track->manakai_signature_trailer)) {
+  #  $result .= qq{sigline "$trailer"\x0A};
+  #}
 
-  if (length (my $headers = $track->manakai_headers)) {
-    $result .= qq{headers "$headers"\x0A};
-  }
+  #if (length (my $headers = $track->manakai_headers)) {
+  #  $result .= qq{headers "$headers"\x0A};
+  #}
 
   for my $cue (@{$track->manakai_all_cues}) {
     my $start_time = $cue->start_time;
@@ -43,9 +43,9 @@ sub dump_text_track ($) {
         int ($end_time * 1000 % 1000);
     $result .= "<$start_time> <$end_time>\x0A";
 
-    for (@{$cue->manakai_invalid_ids}) {
-      $result .= "  invalid #" . $_ . "\x0A";
-    }
+    #for (@{$cue->manakai_invalid_ids}) {
+    #  $result .= "  invalid #" . $_ . "\x0A";
+    #}
     if (length $cue->id) {
       $result .= "  #" . $cue->id . "\x0A";
     }
@@ -78,9 +78,9 @@ sub dump_text_track ($) {
     $result .= qq<  "$text"\x0A>;
   }
 
-  for (@{$track->manakai_invalid_cues}) {
-    $result .= qq<invalid "$_"\x0A>;
-  }
+  #for (@{$track->manakai_invalid_cues}) {
+  #  $result .= qq<invalid "$_"\x0A>;
+  #}
   
   return $result;
 } # dump_text_track
