@@ -16,6 +16,9 @@ sub length ($) {
 
 # $list->[$index]
 
+# XXX DOM Perl Binding spec disallow modification of the array if the
+# underlying list is read-only.
+
 sub get_cue_by_id ($$) {
   my $name = $_[1] . '';
   return undef if not CORE::length $name;

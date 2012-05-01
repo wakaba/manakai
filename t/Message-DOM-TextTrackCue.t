@@ -25,6 +25,18 @@ sub _track_associated : Test(3) {
   is $cue->track, $cue->track;
 } # _track_associated
 
+sub _line_column_none : Test(2) {
+  my $cue = new_cue;
+  is $cue->manakai_line, -1;
+  is $cue->manakai_column, -1;
+} # _line_column_none
+
+sub _line_column_specified : Test(2) {
+  my $cue = new_cue line => 12, column => 31;
+  is $cue->manakai_line, 12;
+  is $cue->manakai_column, 31;
+} # _line_column_specified
+
 sub _id_none : Test(1) {
   my $cue = new_cue id => '';
   is $cue->id, '';

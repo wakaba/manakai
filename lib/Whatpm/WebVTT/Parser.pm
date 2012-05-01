@@ -1208,3 +1208,12 @@ sub construct_dom_from_tokens ($$$) {
 } # construct_dom_from_tokens
 
 1;
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

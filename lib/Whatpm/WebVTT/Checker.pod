@@ -1,0 +1,65 @@
+=head1 NAME
+
+Whatpm::WebVTT::Checker - A WebVTT conformance checker
+
+=head1 SYNOPSIS
+
+  use Whatpm::WebVTT::Checker;
+  
+  $checker = Whatpm::WebVTT::Checker->new;
+  $checker->onerror ($error_handler);
+  $checker->check_track ($track);
+
+=head1 DESCRIPTION
+
+The C<Whatpm::WebVTT::Checker> module, in conjunction with
+L<Whatpm::WebVTT::Parser>, forms a conformance checker for WebVTT.
+
+=head1 METHODS
+
+Following methods can be used to check the conformance of WebVTT
+documents:
+
+=over 4
+
+=item $parser = Whatpm::WebVTT::Checker->new
+
+Return a new instance of the WebVTT checker.
+
+=item $parser->onerror ($new_code)
+
+=item $code = $checker->onerror
+
+Get or set the error handler.  See L<Whatpm::Errors> for more
+information.
+
+=item $checker->check_track ($track)
+
+Check a C<TextTrack> (L<Message::DOM::TextTrack>) object representing
+a WebVTT file.  Any conformance error is reported via the error
+handler specified to the C<onerror> attribute.
+
+=back
+
+In addition, following methodis provided as lower-level APIs of the
+parser: C<check_text_document_fragment>.
+
+=head1 SEE ALSO
+
+WebVTT Standard <http://dev.w3.org/html5/webvtt/>.
+
+HTML Standard, Text Track API
+<http://www.whatwg.org/specs/web-apps/current-work/#text-track-api>.
+
+L<Message::DOM::TextTrack>.
+
+L<Whatpm::WebVTT::Parser>.
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

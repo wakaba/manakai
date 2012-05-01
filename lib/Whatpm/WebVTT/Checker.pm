@@ -67,8 +67,9 @@ sub check_track ($$) {
                          column => $cue->manakai_column);
     }
     
-    if ($cue->text =~ /\x0A\x0A|\x0D\x0D|\x0D\x0A[\x0D\x0A]|\x0A\x0D/) {
-      $self->{onerror}->(type => 'double newline not allowed',
+    if ($cue->text =~ /\x0A\x0A|\x0D\x0D|\x0D\x0A[\x0D\x0A]|\x0A\x0D/ or
+        $cue->text =~ /\A[\x0A\x0D]|[\x0D\x0A]\z/) {
+      $self->{onerror}->(type => 'webvtt:text:syntax',
                          level => 'm',
                          line => $cue->manakai_line,
                          column => $cue->manakai_column);
@@ -85,12 +86,32 @@ sub check_text_document_fragment ($$) {
   my @node = ($df);
   while (@node) {
     my $node = shift @node;
-    if ($node->node_type == $node->ELEMENT_NODE and
-        $node->manakai_local_name eq 'span') {
-      if ($node->has_attribute ('title')) {
-        ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-span-start-tag-annotation-text>.
-        unless ($node->title =~ /[^\x09\x0A\x0C\x0D\x20]/) {
-          $self->{onerror}->(type => 'webvtt:empty annotation',
+    if ($node->node_type == $node->ELEMENT_NODE) {
+      if ($node->manakai_local_name eq 'span') {
+        if ($node->has_attribute ('title')) {
+          ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-span-start-tag-annotation-text>.
+          unless ($node->title =~ /[^\x09\x0A\x0C\x0D\x20]/) {
+            $self->{onerror}->(type => 'webvtt:empty annotation',
+                               level => 'm',
+                               line => $node->get_user_data
+                                   ('manakai_source_line'),
+                               column => $node->get_user_data
+                                   ('manakai_source_column'));
+          }
+        }
+      } elsif ($node->manakai_local_name eq 'ruby') {
+        my $rt_found;
+        for (@{$node->child_nodes}) {
+          if ($_->node_type == $_->ELEMENT_NODE and
+              $_->manakai_local_name eq 'rt') {
+            $rt_found = 1;
+          } else {
+            undef $rt_found;
+          }
+        }
+        unless ($rt_found) {
+          $self->{onerror}->(type => 'element missing',
+                             text => 'rt',
                              level => 'm',
                              line => $node->get_user_data
                                  ('manakai_source_line'),
@@ -104,3 +125,12 @@ sub check_text_document_fragment ($$) {
 } # check_text_document_fragment
 
 1;
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

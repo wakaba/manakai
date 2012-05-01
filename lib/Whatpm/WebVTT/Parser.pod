@@ -1,0 +1,97 @@
+=head1 NAME
+
+Whatpm::WebVTT::Parser - A WebVTT parser
+
+=head1 SYNOPSIS
+
+  use Whatpm::WebVTT::Parser;
+  
+  $parser = Whatpm::WebVTT::Parser->new;
+  
+  ## Parse a WebVTT file
+  $track = $parser->parse_char_string ($string);
+  
+  ## Parse a WebVTT cue text
+  $root = $parser->text_to_dom ($text => $document);
+
+=head1 DESCRIPTION
+
+The C<Whatpm::WebVTT::Parser> module provides a WebVTT parser.
+
+=head1 METHODS
+
+Following methods can be used to parse WebVTT files and their
+contents:
+
+=over 4
+
+=item $parser = Whatpm::WebVTT::Parser->new
+
+Return a new instance of the WebVTT parser.
+
+=item $parser->onerror ($new_code)
+
+=item $code = $parser->onerror
+
+Get or set the error handler.  See L<Whatpm::Errors> for more
+information.
+
+=item $track = $parser->parse_char_string ($string)
+
+Parse a WebVTT file specified as a character string (i.e. a possibly
+utf8-flagged string, interpreted as sequence of characters, not
+bytes).
+
+The method return a C<TextTrack> (L<Message::DOM::TextTrack>) object
+representing the WebVTT document.  Any parse error is reported to the
+error handler specified to the C<onerror> attribute.  Therefore, this
+method will never throw and always return a track object.
+
+=item $df = $parser->text_to_dom ($text, $doc)
+
+Parse a WebVTT cue text and construct a DOM from the parsed tree.
+
+The first argument must be a WebVTT cue text to be parsed.  It must be
+a character string.
+
+The second argument must be a DOM C<Document>
+(L<Message::DOM::Document>) object.  The nodes in the constructed DOM
+tree will belong to this document.
+
+The method return a DOM C<DocumentFragment>
+(L<Message::DOM::DocumentFragment>) object constructed from the input.
+For more information on how WebVTT objects are mapped to DOM nodes,
+see the WebVTT Standard
+<http://dev.w3.org/html5/webvtt/#webvtt-cue-text-dom-construction-rules>.
+
+=back
+
+In addition, following methods are provided as lower-level APIs of the
+parser: C<init>, C<feed_line>, C<parse_settings>, C<tokenize_text>,
+C<parse_annotation>, and C<construct_dom_from_tokens>.  They might be
+useful for complicated things.
+
+This parser assumes all cues as using WebVTT cue text for the purpose
+of conformance checking.  This does not conflict with WebVTT files
+using chapter title text.  However, WebVTT files using metadata text
+might be unintentionally reported as non-conforming.
+
+=head1 SEE ALSO
+
+WebVTT Standard <http://dev.w3.org/html5/webvtt/>.
+
+HTML Standard, Text Track API
+<http://www.whatwg.org/specs/web-apps/current-work/#text-track-api>.
+
+L<Message::DOM::TextTrack>.
+
+L<Whatpm::WebVTT::Checker>.
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

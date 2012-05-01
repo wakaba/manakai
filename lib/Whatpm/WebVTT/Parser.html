@@ -1,0 +1,129 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Whatpm::WebVTT::Parser - A WebVTT parser</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Whatpm::WebVTT::Parser - A WebVTT parser</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Whatpm::WebVTT::Parser;
+  
+  $parser = Whatpm::WebVTT::Parser-&gt;new;
+  
+  ## Parse a WebVTT file
+  $track = $parser-&gt;parse_char_string ($string);
+  
+  ## Parse a WebVTT cue text
+  $root = $parser-&gt;text_to_dom ($text =&gt; $document);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Whatpm::WebVTT::Parser</code> module provides a WebVTT parser.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>Following methods can be used to parse WebVTT files and their
+contents:</p>
+<dl>
+<dt><strong><a name="new" class="item">$parser = Whatpm::WebVTT::Parser-&gt;new</a></strong></dt>
+
+<dd>
+<p>Return a new instance of the WebVTT parser.</p>
+</dd>
+<dt><strong><a name="onerror" class="item">$parser-&gt;onerror ($new_code)</a></strong></dt>
+
+<dt><strong>$code = $parser-&gt;onerror</strong></dt>
+
+<dd>
+<p>Get or set the error handler.  See <a href="../Whatpm/Errors.html">the Whatpm::Errors manpage</a> for more
+information.</p>
+</dd>
+<dt><strong><a name="parse_char_string" class="item">$track = $parser-&gt;parse_char_string ($string)</a></strong></dt>
+
+<dd>
+<p>Parse a WebVTT file specified as a character string (i.e. a possibly
+utf8-flagged string, interpreted as sequence of characters, not
+bytes).</p>
+<p>The method return a <code>TextTrack</code> (<a href="../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>) object
+representing the WebVTT document.  Any parse error is reported to the
+error handler specified to the <a href="#onerror"><code>onerror</code></a> attribute.  Therefore, this
+method will never throw and always return a track object.</p>
+</dd>
+<dt><strong><a name="text_to_dom" class="item">$df = $parser-&gt;text_to_dom ($text, $doc)</a></strong></dt>
+
+<dd>
+<p>Parse a WebVTT cue text and construct a DOM from the parsed tree.</p>
+<p>The first argument must be a WebVTT cue text to be parsed.  It must be
+a character string.</p>
+<p>The second argument must be a DOM <code>Document</code>
+(<a href="../Message/DOM/Document.html">the Message::DOM::Document manpage</a>) object.  The nodes in the constructed DOM
+tree will belong to this document.</p>
+<p>The method return a DOM <code>DocumentFragment</code>
+(<a href="../Message/DOM/DocumentFragment.html">the Message::DOM::DocumentFragment manpage</a>) object constructed from the input.
+For more information on how WebVTT objects are mapped to DOM nodes,
+see the WebVTT Standard
+&lt;http://dev.w3.org/html5/webvtt/#webvtt-cue-text-dom-construction-rules&gt;.</p>
+</dd>
+</dl>
+<p>In addition, following methods are provided as lower-level APIs of the
+parser: <code>init</code>, <code>feed_line</code>, <code>parse_settings</code>, <code>tokenize_text</code>,
+<code>parse_annotation</code>, and <code>construct_dom_from_tokens</code>.  They might be
+useful for complicated things.</p>
+<p>This parser assumes all cues as using WebVTT cue text for the purpose
+of conformance checking.  This does not conflict with WebVTT files
+using chapter title text.  However, WebVTT files using metadata text
+might be unintentionally reported as non-conforming.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>WebVTT Standard &lt;http://dev.w3.org/html5/webvtt/&gt;.</p>
+<p>HTML Standard, Text Track API
+&lt;http://www.whatwg.org/specs/web-apps/current-work/#text-track-api&gt;.</p>
+<p><a href="../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>.</p>
+<p><a href="../Whatpm/WebVTT/Checker.html">the Whatpm::WebVTT::Checker manpage</a>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

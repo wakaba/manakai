@@ -18,6 +18,16 @@ The C<Message::DOM::TextTrackCue> object has following methods:
 Return the associated C<TextTrack> object, if any, or C<undef>.
 [HTML]
 
+=item $line = $cue->manakai_line
+
+Get the line number in the WebVTT source file, if available, or C<-1>.
+[MANAKAI]
+
+=item $column = $cue->manakai_column
+
+Get the column number in the WebVTT source file, if available, or
+C<-1>.  [MANAKAI]
+
 =item $id = $cue->id
 
 =item $cue->id ($new_id)
@@ -89,6 +99,9 @@ XXX Not implemented yet.
 
 HTML Standard
 <http://www.whatwg.org/specs/web-apps/current-work/#texttrackcue>.
+
+manakai DOM Extensions
+<http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions#anchor-56>.
 
 WebVTT Standard <http://dev.w3.org/html5/webvtt/>.
 

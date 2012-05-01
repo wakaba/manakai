@@ -6,7 +6,8 @@ use Scalar::Util qw(weaken);
 use Message::DOM::DOMException;
 
 ## Spec:
-## <http://www.whatwg.org/specs/web-apps/current-work/#texttrack>.
+## <http://www.whatwg.org/specs/web-apps/current-work/#texttrack>,
+## <http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions#anchor-59>.
 
 # XXX EventTarget
 
