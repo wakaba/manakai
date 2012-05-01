@@ -73,6 +73,116 @@ sub _text_to_dom_inputs : Tests {
   );
 } # _text_to_dom_inputs
 
+sub _track_to_char_string_id_1 : Test(1) {
+  my $track = Whatpm::WebVTT::Parser->new->parse_char_string
+      ("WEBVTT\n\n00:12:22.000 --> 12:21:44.000\naaa");
+  $track->manakai_all_cues->[0]->id ("abc --> def");
+  
+  my $serialized = Whatpm::WebVTT::Serializer->track_to_char_string
+      ($track);
+  eq_or_diff $serialized,
+      qq{WEBVTT\n\nabc --&gt; def\n00:12:22.000 --> 12:21:44.000\naaa\n};
+} # track_to_char_string_id_1
+
+sub _track_to_char_string_id_2 : Test(1) {
+  my $track = Whatpm::WebVTT::Parser->new->parse_char_string
+      ("WEBVTT\n\n00:12:22.000 --> 12:21:44.000\naaa");
+  $track->manakai_all_cues->[0]->id ("abc\n");
+  
+  my $serialized = Whatpm::WebVTT::Serializer->track_to_char_string
+      ($track);
+  eq_or_diff $serialized,
+      qq{WEBVTT\n\nabc \n00:12:22.000 --> 12:21:44.000\naaa\n};
+} # track_to_char_string_id_2
+
+sub _track_to_char_string_id_3 : Test(1) {
+  my $track = Whatpm::WebVTT::Parser->new->parse_char_string
+      ("WEBVTT\n\n00:12:22.000 --> 12:21:44.000\naaa");
+  $track->manakai_all_cues->[0]->id ("abc\n\n\nxxx");
+  
+  my $serialized = Whatpm::WebVTT::Serializer->track_to_char_string
+      ($track);
+  eq_or_diff $serialized,
+      qq{WEBVTT\n\nabc xxx\n00:12:22.000 --> 12:21:44.000\naaa\n};
+} # track_to_char_string_id_3
+
+sub _track_to_char_string_text_1 : Test(1) {
+  my $track = Whatpm::WebVTT::Parser->new->parse_char_string
+      ("WEBVTT\n\n00:12:22.000 --> 12:21:44.000\naaa");
+  $track->manakai_all_cues->[0]->text ("abc --> xxx");
+  
+  my $serialized = Whatpm::WebVTT::Serializer->track_to_char_string
+      ($track);
+  eq_or_diff $serialized,
+      qq{WEBVTT\n\n00:12:22.000 --> 12:21:44.000\nabc --&gt; xxx\n};
+} # track_to_char_string_text_1
+
+sub _track_to_char_string_text_2 : Test(1) {
+  my $track = Whatpm::WebVTT::Parser->new->parse_char_string
+      ("WEBVTT\n\n00:12:22.000 --> 12:21:44.000\naaa");
+  $track->manakai_all_cues->[0]->text ("abc \n\n xxx");
+  
+  my $serialized = Whatpm::WebVTT::Serializer->track_to_char_string
+      ($track);
+  eq_or_diff $serialized,
+      qq{WEBVTT\n\n00:12:22.000 --> 12:21:44.000\nabc \n xxx\n};
+} # track_to_char_string_text_2
+
+sub _track_to_char_string_text_3 : Test(1) {
+  my $track = Whatpm::WebVTT::Parser->new->parse_char_string
+      ("WEBVTT\n\n00:12:22.000 --> 12:21:44.000\naaa");
+  $track->manakai_all_cues->[0]->text ("abc \x0D");
+  
+  my $serialized = Whatpm::WebVTT::Serializer->track_to_char_string
+      ($track);
+  eq_or_diff $serialized,
+      qq{WEBVTT\n\n00:12:22.000 --> 12:21:44.000\nabc \n};
+} # track_to_char_string_text_3
+
+sub _track_to_char_string_text_4 : Test(1) {
+  my $track = Whatpm::WebVTT::Parser->new->parse_char_string
+      ("WEBVTT\n\n00:12:22.000 --> 12:21:44.000\naaa");
+  $track->manakai_all_cues->[0]->text ("\x0Aabc ");
+  
+  my $serialized = Whatpm::WebVTT::Serializer->track_to_char_string
+      ($track);
+  eq_or_diff $serialized,
+      qq{WEBVTT\n\n00:12:22.000 --> 12:21:44.000\nabc \n};
+} # track_to_char_string_text_4
+
+sub _dom_to_text_title_1 : Test(1) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  $doc->manakai_is_html (1);
+  my $el = $doc->create_element ('div');
+  $el->inner_html (q{<span title="ab&#xa;bd&#xc;">foo</span>});
+  
+  my $text = Whatpm::WebVTT::Serializer->dom_to_text ($el);
+  eq_or_diff $text, qq{<v ab\x0Abd\x0C>foo</v>};
+} # _dom_to_text_title_1
+
+sub _dom_to_text_title_2 : Test(1) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  $doc->manakai_is_html (1);
+  my $el = $doc->create_element ('div');
+  $el->inner_html (q{<span title="ab<&>b">foo</span>});
+  
+  my $text = Whatpm::WebVTT::Serializer->dom_to_text ($el);
+  eq_or_diff $text, qq{<v ab&lt;&amp;&gt;b>foo</v>};
+} # _dom_to_text_title_2
+
+sub _dom_to_text_class_1 : Test(1) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  $doc->manakai_is_html (1);
+  my $el = $doc->create_element ('div');
+  $el->inner_html (q{<span class="&#xc; ab<&>b aa x.y dd">foo</span>});
+  
+  my $text = Whatpm::WebVTT::Serializer->dom_to_text ($el);
+  eq_or_diff $text, qq{<c.aa.dd>foo</c>};
+} # _dom_to_text_class_1
+
 __PACKAGE__->runtests;
 
 our $DetectLeak = 1;

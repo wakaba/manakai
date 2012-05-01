@@ -40,23 +40,25 @@ sub check_track ($$) {
   my $last_start_time = 0;
   my $id_found = {};
   for my $cue (@{$track->manakai_all_cues}) {
-    my $time = $cue->start_time;
-    if ($time < $last_start_time) {
+    my $start_time = $cue->start_time;
+    if ($start_time < $last_start_time) {
       ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-timings>.
       $self->{onerror}->(type => 'webvtt:start time order',
                          level => 'm',
                          line => $cue->manakai_line,
                          column => $cue->manakai_column);
     } else {
-      $last_start_time = $time;
+      $last_start_time = $start_time;
     }
 
-    if ($cue->end_time < $time) {
+    my $end_time = $cue->end_time;
+    if ($end_time < $start_time) {
       ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-timings>.
       $self->{onerror}->(type => 'webvtt:end time < start time',
                          level => 'm',
                          line => $cue->manakai_line,
                          column => $cue->manakai_column);
+      $end_time = $start_time;
     }
 
     my $id = $cue->id;
@@ -86,16 +88,21 @@ sub check_track ($$) {
                          column => $cue->manakai_column);
     }
 
-    my $df = $parser->text_to_dom ($cue->text => $doc);
-    $self->check_text_document_fragment ($df);
+    my $df = $parser->text_to_dom
+        ($cue->text => $doc, line => $cue->{text_line}, column => 1);
+    $self->check_text_document_fragment
+        ($df, start_time => $start_time, end_time => $end_time);
   }
 } # check_track
 
-sub check_text_document_fragment ($$) {
-  my ($self, $df) = @_;
+sub check_text_document_fragment ($$;%) {
+  my ($self, $df, %args) = @_;
 
   ## This method only supports output of
   ## Whatpm::WebVTT::Parser->text_to_dom.
+
+  my $min_time = $args{start_time} || 0;
+  my $max_time = $args{end_time};
 
   my @node = ($df);
   while (@node) {
@@ -149,11 +156,36 @@ sub check_text_document_fragment ($$) {
         }
       }
     } elsif ($node->node_type == $node->PROCESSING_INSTRUCTION_NODE) {
-      ## <?timestamp?> target data syntax:
-      ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-timestamp> (parse
-      ## error).
+      if ($node->target eq 'timestamp') {
+        if ($node->data =~ /\A([0-9]{2,}):([0-9]{2}):([0-9]{2}\.[0-9]{3})\z/) {
+          ## <?timestamp?> target data syntax:
+          ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-timestamp>
+          ## (parse error).
+          my $time = $1 * 60 * 60 + $2 * 60 + $3;
 
-      # XXX range
+          ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-timestamp>.
+          if ($time < $min_time) {
+            $self->{onerror}->(type => 'webvtt:timestamp < min time',
+                               level => 'm',
+                               line => $node->get_user_data
+                                   ('manakai_source_line'),
+                               column => $node->get_user_data
+                                   ('manakai_source_column'));
+          } else {
+            $min_time = $time;
+            
+            if (defined $max_time and
+                $max_time < $time) {
+              $self->{onerror}->(type => 'webvtt:end time < timestamp',
+                                 level => 'm',
+                                 line => $node->get_user_data
+                                     ('manakai_source_line'),
+                                 column => $node->get_user_data
+                                       ('manakai_source_column'));
+            }
+          }
+        }
+      }
     }
 
     push @node, @{$node->child_nodes};

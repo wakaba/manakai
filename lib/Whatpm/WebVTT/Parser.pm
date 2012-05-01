@@ -505,10 +505,10 @@ sub parse_settings ($$$) {
 
 sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
 
-sub text_to_dom ($$$) {
+sub text_to_dom ($$$;%) {
   my $self = $_[0];
   
-  my $tokens = $self->tokenize_text ($_[1]);
+  my $tokens = $self->tokenize_text ($_[1], @_[3..$#_]);
   return $self->construct_dom_from_tokens ($tokens => $_[2]);
 } # text_to_dom
 
