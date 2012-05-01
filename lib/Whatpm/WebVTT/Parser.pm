@@ -4,20 +4,28 @@ use warnings;
 no warnings 'utf8';
 our $VERSION = '1.0';
 
+my $DefaultErrorHandler = sub {
+  my %args = @_;
+  warn sprintf "%s: %s at Line %d Column %d\n",
+      $args{level},
+      $args{type}
+          . (defined $args{text} ? $args{text} : '')
+          . (defined $args{value} ? $args{value} : ''),
+      $args{line}, $args{column};
+}; # $DefaultErrorHandler
+
 sub new ($) {
-  my $self = bless {
-    onerror => sub {
-      my %args = @_;
-      warn sprintf "%s: %s at Line %d Column %d\n",
-          $args{level},
-          $args{type}
-              . (defined $args{text} ? $args{text} : '')
-              . (defined $args{value} ? $args{value} : ''),
-          $args{line}, $args{column};
-    }, # onerror
+  return bless {
+    onerror => $DefaultErrorHandler,
   }, $_[0];
-  return $self;
 } # new
+
+sub onerror ($;$) {
+  if (@_ > 1) {
+    $_[0]->{onerror} = $_[1] || $DefaultErrorHandler;
+  } 
+  return $_[0]->{onerror};
+} # onerror
 
 sub init ($) {
   my $self = shift;
@@ -106,12 +114,15 @@ sub feed_line ($$$) {
           size => 100,
           align => 'middle',
           text => '',
+          line => $self->{l},
+          column => 1,
         };
         if ($line =~ /-->/) {
           $self->{state} = 'timings';
           redo STATE;
         } else {
           if (defined $eol) {
+            $line =~ tr/\x00/\x{FFFD}/;
             $self->{new_cue}->{id} = $line;
             $self->{state} = 'before timings';
           } else {
@@ -147,6 +158,7 @@ sub feed_line ($$$) {
                              line => $self->{l} - 1, column => 1);
           #push @{$self->{new_cue}->{invalid_ids} ||= []},
           #    $self->{new_cue}->{id};
+          $line =~ tr/\x00/\x{FFFD}/;
           $self->{new_cue}->{id} = $line;
         }
       }
@@ -1042,7 +1054,7 @@ sub construct_dom_from_tokens ($$$) {
         $current->set_user_data
             (manakai_source_column => $token->{column});
       } elsif ($token->{tag_name} eq 'rt') {
-        if ($current->node_type == 1 and 
+        if ($current->node_type == $current->ELEMENT_NODE and 
             $current->manakai_local_name eq 'ruby') {
           $current = $current->append_child
               ($doc->create_element_ns
@@ -1071,13 +1083,14 @@ sub construct_dom_from_tokens ($$$) {
             ($doc->create_element_ns (HTML_NS, [undef, 'span']));
         my @class = grep { length } @{$token->{classes}};
         $current->class_name (join ' ', @class) if @class;
-        unless (defined $token->{annotation}) {
-          $self->{onerror}->(type => 'webvtt:no annotation',
-                             text => 'v',
-                             level => 'm',
-                             line => $token->{line},
-                             column => $token->{column});
-        }
+        ## Also reported by Checker
+        #unless (defined $token->{annotation}) {
+        #  $self->{onerror}->(type => 'webvtt:no annotation',
+        #                     text => 'v',
+        #                     level => 'm',
+        #                     line => $token->{line},
+        #                     column => $token->{column});
+        #}
         $current->title
             (defined $token->{annotation} ? $token->{annotation} : '');
         $current->set_user_data
@@ -1162,7 +1175,7 @@ sub construct_dom_from_tokens ($$$) {
                            column => $token->{column});
       }
     } elsif ($token->{type} eq 'eof') {
-      if ($current->node_type == 1) {
+      if ($current->node_type == $current->ELEMENT_NODE) {
         my $ln = $current->manakai_local_name;
         if ($ln eq 'span' and $current->has_attribute ('title')) { # <v>
           #

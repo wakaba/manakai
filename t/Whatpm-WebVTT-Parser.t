@@ -9,6 +9,7 @@ use base qw(Test::Class);
 use Test::MoreMore;
 use Test::HTCT::Parser;
 use Whatpm::WebVTT::Parser;
+use Whatpm::WebVTT::Checker;
 use Whatpm::HTML::Dumper qw/dumptree/;
 use Message::DOM::DOMImplementation;
 
@@ -89,6 +90,7 @@ sub dump_text_track ($) {
 
 sub _parse_char_string_inputs : Tests {
   my $parser = Whatpm::WebVTT::Parser->new;
+  my $validator = Whatpm::WebVTT::Checker->new;
 
   for_each_test ($test_d->file ($_)->stringify, {
     data => {is_prefixed => 1},
@@ -104,8 +106,11 @@ sub _parse_char_string_inputs : Tests {
           $args{line}, $args{column}, $args{level},
           $args{type}, $args{text}, $args{value};
     };
+    local $validator->{onerror} = $parser->{onerror};
     
     my $track = $parser->parse_char_string ($test->{data}->[0]);
+    $validator->check_track ($track);
+
     my $actual = dump_text_track $track;
     my $expected = $test->{parsed}->[0];
     $expected .= "\x0A" if length $expected;
@@ -124,6 +129,7 @@ sub _text_to_dom_inputs : Tests {
   my $parser = Whatpm::WebVTT::Parser->new;
   my $dom = Message::DOM::DOMImplementation->new;
   my $doc = $dom->create_document;
+  my $validator = Whatpm::WebVTT::Checker->new;
 
   for_each_test ($test_d->file ($_)->stringify, {
     data => {is_prefixed => 1},
@@ -139,10 +145,13 @@ sub _text_to_dom_inputs : Tests {
           $args{line}, $args{column}, $args{level},
           $args{type}, $args{text}, $args{value};
     };
+    local $validator->{onerror} = $parser->{onerror};
 
     my $df = $parser->text_to_dom ($test->{data}->[0] => $doc);
     isa_ok $df, 'Message::DOM::DocumentFragment';
     is $df->owner_document, $doc;
+
+    $validator->check_text_document_fragment ($df);
 
     my $actual = dumptree $df;
     my $expected = $test->{document}->[0];

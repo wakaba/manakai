@@ -17,6 +17,14 @@ sub track ($) {
   return $_[0]->{track}; # or undef
 } # track
 
+sub manakai_line ($) {
+  return defined $_[0]->{line} ? $_[0]->{line} : -1;
+} # manakai_line
+
+sub manakai_column ($) {
+  return defined $_[0]->{column} ? $_[0]->{column} : -1;
+} # manakai_column
+
 sub id ($;$) {
   if (@_ > 1) {
     $_[0]->{id} = $_[1] . '';
