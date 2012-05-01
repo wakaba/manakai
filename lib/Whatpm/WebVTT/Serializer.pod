@@ -1,0 +1,69 @@
+=head1 NAME
+
+Whatpm::WebVTT::Serializer - A WebVTT serializer
+
+=head1 SYNOPSIS
+
+  use Whatpm::WebVTT::Serializer;
+  
+  $string = Whatpm::WebVTT::Serializer
+      ->track_to_char_string ($track);
+  
+  $text = Whatpm::WebVTT::Serializer->dom_to_text
+      ($document_fragment)
+
+=head1 DESCRIPTION
+
+The C<Whatpm::WebVTT::Serializer> module provides methods to convert
+in-memory representation of WebVTT into strings in the WebVTT format.
+
+=head1 METHODS
+
+=over 4
+
+=item $string = Whatpm::WebVTT::Serializer->track_to_char_string ($track)
+
+Serialize the specified track object (DOM C<TextTrack>,
+L<Message::DOM::TextTrack> into WebVTT format.  The serializer does
+its best effort to output a valid WebVTT file, while keeping original
+semantics as far as possible.  Please note that some C<TextTrack>
+object cannot serialize as is.  For example, the C<TextTrack> object
+containing a cue with ID C<< --> >> cannot represent in WebVTT, such
+that the serializer replace it by C<--&gt;>.
+
+The output of this method is a character string, i.e. a possibly
+utf8-flagged string of characters, not bytes.
+
+=item $text = Whatpm::WebVTT::Serializer->dom_to_text ($node)
+
+Serialize the specified DOM node into WebVTT cue text format.  The
+specified node is expected to have structure that could be generated
+by the WebVTT's DOM construction rule (or L<Whatpm::WebVTT::Parser>'s
+C<text_to_dom> method), otherwise no meaningful result would be
+returned.
+
+The output of this method is a character string.  It is expected to be
+used to set the new value of the C<< $cue->text >> attribute.
+
+=back
+
+=head1 SEE ALSO
+
+WebVTT Standard <http://dev.w3.org/html5/webvtt/>.
+
+L<Whatpm::WebVTT::Parser>.
+
+L<Message::DOM::TextTrack>.
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

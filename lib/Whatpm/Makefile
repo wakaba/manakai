@@ -30,7 +30,7 @@ all: \
   CacheManifest.html WebIDL.html mklinktypelist.html \
   SWML/Parser.html LangTag.html \
   Errors.html \
-  WebVTT/Parser.html WebVTT/Checker.html
+  WebVTT/Parser.html WebVTT/Checker.html WebVTT/Serializer.html
 
 Atom-all:
 	cd Atom && make all
@@ -80,7 +80,7 @@ LangTag.html Errors.html \
 	$(POD2HTML) $< > $@
 
 SWML/Parser.html \
-WebVTT/Parser.html WebVTT/Checker.html \
+WebVTT/Parser.html WebVTT/Checker.html WebVTT/Serializer.html \
 :: %.html: %.pod
 	$(POD2HTML_SUB) $< > $@
 

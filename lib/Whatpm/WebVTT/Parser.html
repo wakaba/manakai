@@ -69,8 +69,18 @@ contents:</p>
 <dt><strong>$code = $parser-&gt;onerror</strong></dt>
 
 <dd>
-<p>Get or set the error handler.  See <a href="../Whatpm/Errors.html">the Whatpm::Errors manpage</a> for more
+<p>Get or set the error handler.  See <a href="../../Whatpm/Errors.html">the Whatpm::Errors manpage</a> for more
 information.</p>
+</dd>
+<dt><strong><a name="parse_byte_string" class="item">$track = $parser-&gt;parse_byte_string ($string)</a></strong></dt>
+
+<dd>
+<p>Parse a WebVTT file specified as a byte string (i.e. a sequence of
+bytes, not characters).</p>
+<p>The method return a <code>TextTrack</code> (<a href="../../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>) object
+representing the WebVTT document.  Any parse error is reported to the
+error handler specified to the <a href="#onerror"><code>onerror</code></a> attribute.  Therefore, this
+method will never throw and always return a track object.</p>
 </dd>
 <dt><strong><a name="parse_char_string" class="item">$track = $parser-&gt;parse_char_string ($string)</a></strong></dt>
 
@@ -78,7 +88,7 @@ information.</p>
 <p>Parse a WebVTT file specified as a character string (i.e. a possibly
 utf8-flagged string, interpreted as sequence of characters, not
 bytes).</p>
-<p>The method return a <code>TextTrack</code> (<a href="../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>) object
+<p>The method return a <code>TextTrack</code> (<a href="../../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>) object
 representing the WebVTT document.  Any parse error is reported to the
 error handler specified to the <a href="#onerror"><code>onerror</code></a> attribute.  Therefore, this
 method will never throw and always return a track object.</p>
@@ -90,10 +100,10 @@ method will never throw and always return a track object.</p>
 <p>The first argument must be a WebVTT cue text to be parsed.  It must be
 a character string.</p>
 <p>The second argument must be a DOM <code>Document</code>
-(<a href="../Message/DOM/Document.html">the Message::DOM::Document manpage</a>) object.  The nodes in the constructed DOM
+(<a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a>) object.  The nodes in the constructed DOM
 tree will belong to this document.</p>
 <p>The method return a DOM <code>DocumentFragment</code>
-(<a href="../Message/DOM/DocumentFragment.html">the Message::DOM::DocumentFragment manpage</a>) object constructed from the input.
+(<a href="../../Message/DOM/DocumentFragment.html">the Message::DOM::DocumentFragment manpage</a>) object constructed from the input.
 For more information on how WebVTT objects are mapped to DOM nodes,
 see the WebVTT Standard
 &lt;http://dev.w3.org/html5/webvtt/#webvtt-cue-text-dom-construction-rules&gt;.</p>
@@ -114,8 +124,8 @@ might be unintentionally reported as non-conforming.</p>
 <p>WebVTT Standard &lt;http://dev.w3.org/html5/webvtt/&gt;.</p>
 <p>HTML Standard, Text Track API
 &lt;http://www.whatwg.org/specs/web-apps/current-work/#text-track-api&gt;.</p>
-<p><a href="../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>.</p>
-<p><a href="../Whatpm/WebVTT/Checker.html">the Whatpm::WebVTT::Checker manpage</a>.</p>
+<p><a href="../../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>.</p>
+<p><a href="../../Whatpm/WebVTT/Checker.html">the Whatpm::WebVTT::Checker manpage</a>.</p>
 <p>
 </p>
 <hr />

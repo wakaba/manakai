@@ -6,11 +6,11 @@ our $VERSION = '1.0';
 
 my $DefaultErrorHandler = sub {
   my %args = @_;
-  warn sprintf "%s: %s at Line %d Column %d\n",
+  warn sprintf "[%s] %s at Line %d Column %d\n",
       $args{level},
       $args{type}
-          . (defined $args{text} ? $args{text} : '')
-          . (defined $args{value} ? $args{value} : ''),
+          . (defined $args{text} ? ' ' . $args{text} : '')
+          . (defined $args{value} ? ' ' . $args{value} : ''),
       $args{line}, $args{column};
 }; # $DefaultErrorHandler
 
@@ -94,10 +94,24 @@ sub check_track ($$) {
 sub check_text_document_fragment ($$) {
   my ($self, $df) = @_;
 
+  ## This method only supports output of
+  ## Whatpm::WebVTT::Parser->text_to_dom.
+
   my @node = ($df);
   while (@node) {
     my $node = shift @node;
     if ($node->node_type == $node->ELEMENT_NODE) {
+      my $class = $node->get_attribute ('class');
+      if (defined $class and $class =~ /[<>&.]/) {
+        ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-span-start-tag>.
+        $self->{onerror}->(type => 'webvtt:class:syntax',
+                           level => 'm',
+                           line => $node->get_user_data
+                               ('manakai_source_line'),
+                           column => $node->get_user_data
+                               ('manakai_source_column'));
+      }
+
       if ($node->manakai_local_name eq 'span') {
         if ($node->has_attribute ('title')) {
           ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-span-start-tag-annotation-text>.
@@ -109,6 +123,10 @@ sub check_text_document_fragment ($$) {
                                column => $node->get_user_data
                                    ('manakai_source_column'));
           }
+
+          ## |title| cannot contain U+000A, U+000D
+          ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-span-start-tag-annotation-text>
+          ## (parse error).
         }
       } elsif ($node->manakai_local_name eq 'ruby') {
         my $rt_found;
@@ -130,7 +148,14 @@ sub check_text_document_fragment ($$) {
                                  ('manakai_source_column'));
         }
       }
+    } elsif ($node->node_type == $node->PROCESSING_INSTRUCTION_NODE) {
+      ## <?timestamp?> target data syntax:
+      ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-timestamp> (parse
+      ## error).
+
+      # XXX range
     }
+
     push @node, @{$node->child_nodes};
   }
 } # check_text_document_fragment

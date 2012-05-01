@@ -7,11 +7,11 @@ use Encode qw(decode);
 
 my $DefaultErrorHandler = sub {
   my %args = @_;
-  warn sprintf "%s: %s at Line %d Column %d\n",
+  warn sprintf "[%s] %s at Line %d Column %d\n",
       $args{level},
       $args{type}
-          . (defined $args{text} ? $args{text} : '')
-          . (defined $args{value} ? $args{value} : ''),
+          . (defined $args{text} ? ' ' . $args{text} : '')
+          . (defined $args{value} ? ' ' . $args{value} : ''),
       $args{line}, $args{column};
 }; # $DefaultErrorHandler
 
