@@ -3,6 +3,7 @@ use strict;
 use warnings;
 no warnings 'utf8';
 our $VERSION = '1.0';
+use Encode qw(decode);
 
 my $DefaultErrorHandler = sub {
   my %args = @_;
@@ -46,7 +47,28 @@ sub init ($) {
        });
 } # init
 
-sub parse_char_string ($;$) {
+sub parse_byte_string ($$) {
+  my $self = $_[0];
+  $self->init;
+  
+  my @line = split /(\x0D\x0A?|\x0A)/, $_[1], -1;
+  if (@line) {
+    # XXX Web UTF-8
+
+    $line[0] =~ s/^\xEF\xBB\xBF//; # U+FEFF BOM
+
+    while (@line) {
+      my ($line, $eol) = (shift @line, shift @line);
+      $self->feed_line ((decode 'utf-8', $line), $eol);
+    }
+  } else {
+    $self->feed_line ('', undef);
+  }
+
+  return $self->{parsed};
+} # parse_byte_string
+
+sub parse_char_string ($$) {
   my $self = $_[0];
   $self->init;
   
@@ -69,7 +91,10 @@ sub feed_line ($$$) {
 
   STATE: {
     if ($self->{state} eq 'signature') {
-      if ($line =~ /\A\x{FEFF}?WEBVTT(?:[\x20\x09]([^\x0D\x0A]*))?\z/) {
+      ## NOTE: BOM (U+FEFF) must be dropped when bytes-chars
+      ## convertion is done.
+
+      if ($line =~ /\AWEBVTT(?:[\x20\x09]([^\x0D\x0A]*))?\z/) {
         #$self->{parsed}->{signature_trailer} = $1;
         #$self->{parsed}->{signature_trailer} =~ tr/\x00/\x{FFFD}/
         #    if defined $self->{parsed}->{signature_trailer};

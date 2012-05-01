@@ -12,6 +12,7 @@ use Whatpm::WebVTT::Parser;
 use Whatpm::WebVTT::Checker;
 use Whatpm::HTML::Dumper qw/dumptree/;
 use Message::DOM::DOMImplementation;
+use Encode;
 
 my $test_d = file (__FILE__)->dir->subdir ('data')->subdir ('webvtt');
 
@@ -87,6 +88,33 @@ sub dump_text_track ($) {
   
   return $result;
 } # dump_text_track
+
+sub _parse_byte_string : Test(3) {
+  my $parser = Whatpm::WebVTT::Parser->new;
+  my $track = $parser->parse_byte_string
+      (encode 'utf-8', "WEBVTT\n\n01:21.000 --> 12:21.000\nabc\x{4E00}");
+  ng $track->manakai_is_invalid;
+  is $track->manakai_all_cues->length, 1;
+  is $track->manakai_all_cues->[0]->text, "abc\x{4e00}";
+} # _parse_byte_string
+
+sub _parse_byte_string_bom : Test(3) {
+  my $parser = Whatpm::WebVTT::Parser->new;
+  my $track = $parser->parse_byte_string
+      (encode 'utf-8',
+           "\x{FEFF}WEBVTT\n\n01:21.000 --> 12:21.000\nabc\x{4E00}");
+  ng $track->manakai_is_invalid;
+  is $track->manakai_all_cues->length, 1;
+  is $track->manakai_all_cues->[0]->text, "abc\x{4e00}";
+} # _parse_byte_string_bom
+
+sub _parse_byte_string_double_bom : Test(2) {
+  my $parser = Whatpm::WebVTT::Parser->new;
+  my $track = $parser->parse_byte_string
+      (encode 'utf-8', "\x{FEFF}\x{FEFF}WEBVTT\n\n01:21.000 --> 12:21.000\nabc\x{4E00}");
+  ok $track->manakai_is_invalid;
+  is $track->manakai_all_cues->length, 0;
+} # _parse_byte_string_double_bom
 
 sub _parse_char_string_inputs : Tests {
   my $parser = Whatpm::WebVTT::Parser->new;

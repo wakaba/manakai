@@ -36,6 +36,16 @@ Return a new instance of the WebVTT parser.
 Get or set the error handler.  See L<Whatpm::Errors> for more
 information.
 
+=item $track = $parser->parse_byte_string ($string)
+
+Parse a WebVTT file specified as a byte string (i.e. a sequence of
+bytes, not characters).
+
+The method return a C<TextTrack> (L<Message::DOM::TextTrack>) object
+representing the WebVTT document.  Any parse error is reported to the
+error handler specified to the C<onerror> attribute.  Therefore, this
+method will never throw and always return a track object.
+
 =item $track = $parser->parse_char_string ($string)
 
 Parse a WebVTT file specified as a character string (i.e. a possibly
