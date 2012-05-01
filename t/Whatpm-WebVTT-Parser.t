@@ -9,6 +9,8 @@ use base qw(Test::Class);
 use Test::MoreMore;
 use Test::HTCT::Parser;
 use Whatpm::WebVTT::Parser;
+use Whatpm::HTML::Dumper qw/dumptree/;
+use Message::DOM::DOMImplementation;
 
 my $test_d = file (__FILE__)->dir->subdir ('data')->subdir ('webvtt');
 
@@ -117,6 +119,45 @@ sub _parse_char_string_inputs : Tests {
     parse-settings-1.dat
   );
 } # _parse_char_string_inputs
+
+sub _text_to_dom_inputs : Tests {
+  my $parser = Whatpm::WebVTT::Parser->new;
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+
+  for_each_test ($test_d->file ($_)->stringify, {
+    data => {is_prefixed => 1},
+    errors => {is_list => 1},
+    document => {is_prefixed => 1},
+  }, sub {
+    my $test = shift;
+
+    my @error;
+    local $parser->{onerror} = sub {
+      my %args = @_;
+      push @error, join ';', map { defined $_ ? $_ : '' } 
+          $args{line}, $args{column}, $args{level},
+          $args{type}, $args{text}, $args{value};
+    };
+
+    my $df = $parser->text_to_dom ($test->{data}->[0] => $doc);
+    isa_ok $df, 'Message::DOM::DocumentFragment';
+    is $df->owner_document, $doc;
+
+    my $actual = dumptree $df;
+    my $expected = $test->{document}->[0];
+    $expected .= "\x0A" if length $expected;
+
+    eq_or_diff $actual, $expected;
+    eq_or_diff [sort { $a cmp $b } split /\n/, join "\n", @error],
+               [sort { $a cmp $b } split /\n/, join "\n", @{$test->{errors}->[0]}];
+  }) for qw(
+    cue-text-1.dat
+    cue-text-2.dat
+    cue-text-3.dat
+    cue-text-4.dat
+  );
+} # _text_to_dom_inputs
 
 __PACKAGE__->runtests;
 
