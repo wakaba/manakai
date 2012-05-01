@@ -120,6 +120,7 @@ sub _parse_char_string_inputs : Tests {
                [sort { $a cmp $b } @{$test->{errors}->[0]}];
   }) for qw(
     parse-1.dat
+    parse-2.dat
     parse-timings-1.dat
     parse-settings-1.dat
   );

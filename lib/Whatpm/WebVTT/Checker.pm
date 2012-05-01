@@ -38,6 +38,7 @@ sub check_track ($$) {
   my $doc = $dom->create_document;
   
   my $last_start_time = 0;
+  my $id_found = {};
   for my $cue (@{$track->manakai_all_cues}) {
     my $time = $cue->start_time;
     if ($time < $last_start_time) {
@@ -59,6 +60,16 @@ sub check_track ($$) {
     }
 
     my $id = $cue->id;
+    if (length $id) {
+      if ($id_found->{$id}) {
+        $self->{onerror}->(type => 'webvtt:id:duplicate',
+                           level => 'w',
+                           value => $id,
+                           line => $cue->manakai_line,
+                           column => $cue->manakai_column);
+      }
+      $id_found->{$id} = 1;
+    }
     if ($id =~ /-->/ or $id =~ /[\x0D\x0A]/) {
       ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-identifier>.
       $self->{onerror}->(type => 'webvtt:id:syntax',
