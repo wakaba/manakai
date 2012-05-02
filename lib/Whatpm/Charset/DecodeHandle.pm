@@ -599,7 +599,7 @@ sub manakai_read_until ($$$;$) {
   my $self = $_[0];
 
   my $pattern = $_[2];
-  $pattern =~ s/^[^\[]+\[//s;
+  $pattern =~ s/^[^\[]+\[\^//s;
   $pattern =~ s/\][^\]]+$//s;
   $pattern =~ s/\\x([0-9A-Fa-f]{2})/pack 'C', hex $1/ge;
   my $stopper = {map { $_ => 1 } split //, $pattern};
