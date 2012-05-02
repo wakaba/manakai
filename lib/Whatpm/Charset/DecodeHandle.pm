@@ -567,15 +567,15 @@ package Whatpm::Charset::DecodeHandle::CharString;
 ## but supports |ungetc| and other extensions.
 
 sub new ($$) {
-  my $self = bless {pos => 0}, shift;
-  $self->{string} = shift; # must be a scalar ref
+  my $self = bless {pos => 0}, $_[0];
+  $self->{chars} = [split //, ${$_[1]}];
   return $self;
 } # new
 
 sub getc ($) {
   my $self = shift;
-  if ($self->{pos} < length ${$self->{string}}) {
-    return substr ${$self->{string}}, $self->{pos}++, 1;
+  if ($self->{pos} < @{$self->{chars}}) {
+    return $self->{chars}->[$self->{pos}++];
   } else {
     return undef;
   }
@@ -588,7 +588,7 @@ sub read ($$$$) {
   my $offset = $_[3];
   ## NOTE: We don't support standard Perl semantics if $offset is
   ## greater than the length of $scalar.
-  substr ($_[1], $offset) = substr (${$self->{string}}, $self->{pos}, $length);
+  substr ($_[1], $offset) = join '', @{$self->{chars}}[$self->{pos}..($self->{pos} + $length - 1)];
   my $count = (length $_[1]) - $offset;
   $self->{pos} += $count;
   return $count;
@@ -597,14 +597,32 @@ sub read ($$$$) {
 sub manakai_read_until ($$$;$) {
   #my ($self, $scalar, $pattern, $offset) = @_;
   my $self = $_[0];
-  pos (${$self->{string}}) = $self->{pos};
-  if (${$self->{string}} =~ /\G(?>$_[2])+/) {
-    substr ($_[1], $_[3]) = substr (${$self->{string}}, $-[0], $+[0] - $-[0]);
-    $self->{pos} += $+[0] - $-[0];
-    return $+[0] - $-[0];
-  } else {
-    return 0;
+
+  my $pattern = $_[2];
+  $pattern =~ s/^[^\[]+\[//s;
+  $pattern =~ s/\][^\]]+$//s;
+  $pattern =~ s/\\x([0-9A-Fa-f]{2})/pack 'C', hex $1/ge;
+  my $stopper = {map { $_ => 1 } split //, $pattern};
+
+  my $start = $self->{pos};
+  {
+    my $char = $self->{chars}->[$self->{pos}];
+    last if not length $char;
+    if ($stopper->{$char}) {
+      last;
+    } else {
+      $self->{pos}++;
+    }
+    redo;
   }
+  if ($start != $self->{pos}) {
+    if ($_[3] eq length $_[1]) {
+      $_[1] .= join '', @{$self->{chars}}[$start..($self->{pos}-1)];
+    } else {
+      substr ($_[1], $_[3]) = join '', @{$self->{chars}}[$start..($self->{pos}-1)];
+    }
+  }
+  return $self->{pos} - $start;
 } # manakai_read_until
 
 sub ungetc ($$) {
