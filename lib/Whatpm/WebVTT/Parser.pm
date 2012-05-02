@@ -178,7 +178,7 @@ sub feed_line ($$$) {
           $self->{state} = 'timings';
           redo STATE;
         } else {
-          $self->{onerror}->(type => 'webvtt:id:duplicate',
+          $self->{onerror}->(type => 'webvtt:id:multiple',
                              level => 'm',
                              line => $self->{l} - 1, column => 1);
           #push @{$self->{new_cue}->{invalid_ids} ||= []},
@@ -290,7 +290,7 @@ sub feed_line ($$$) {
           }
           last STATE;
         } else {
-          $self->{onerror}->(type => 'webvtt:bad timings',
+          $self->{onerror}->(type => 'webvtt:bad timestamp',
                              level => 'm',
                              line => $self->{l}, column => 1);
         }
@@ -495,6 +495,7 @@ sub parse_settings ($$$) {
     
     $self->{onerror}->(type => 'webvtt:setting:invalid value',
                        level => 'm',
+                       text => $name,
                        value => $value,
                        line => $self->{l},
                        column => $self->{c} + 2 + length $name);
@@ -583,6 +584,7 @@ sub tokenize_text ($$;%) {
         }->{$buffer} || do {
           $self->{onerror}->(type => 'entity not declared',
                              level => 'm',
+                             value => (substr $buffer, 1),
                              line => $line,
                              column => $column - length $buffer);
           $buffer . ';';
@@ -1052,6 +1054,7 @@ sub construct_dom_from_tokens ($$$) {
         if (defined $token->{annotation}) {
           $self->{onerror}->(type => 'webvtt:annotation not allowed',
                              level => 'm',
+                             text => $token->{tag_name},
                              line => $token->{line},
                              column => $token->{column});
         }
@@ -1071,6 +1074,7 @@ sub construct_dom_from_tokens ($$$) {
         if (defined $token->{annotation}) {
           $self->{onerror}->(type => 'webvtt:annotation not allowed',
                              level => 'm',
+                             text => $token->{tag_name},
                              line => $token->{line},
                              column => $token->{column});
         }
@@ -1089,8 +1093,9 @@ sub construct_dom_from_tokens ($$$) {
           if (defined $token->{annotation}) {
             $self->{onerror}->(type => 'webvtt:annotation not allowed',
                                level => 'm',
+                               text => $token->{tag_name},
                                line => $token->{line},
-                             column => $token->{column});
+                               column => $token->{column});
           }
           $current->set_user_data
               (manakai_source_line => $token->{line});

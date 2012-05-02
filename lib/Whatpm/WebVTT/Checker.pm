@@ -164,7 +164,7 @@ sub check_text_document_fragment ($$;%) {
           my $time = $1 * 60 * 60 + $2 * 60 + $3;
 
           ## <http://dev.w3.org/html5/webvtt/#webvtt-cue-timestamp>.
-          if ($time < $min_time) {
+          if ($time <= $min_time) {
             $self->{onerror}->(type => 'webvtt:timestamp < min time',
                                level => 'm',
                                line => $node->get_user_data
@@ -175,7 +175,7 @@ sub check_text_document_fragment ($$;%) {
             $min_time = $time;
             
             if (defined $max_time and
-                $max_time < $time) {
+                $max_time <= $time) {
               $self->{onerror}->(type => 'webvtt:end time < timestamp',
                                  level => 'm',
                                  line => $node->get_user_data
