@@ -68,8 +68,8 @@ sub dumptree ($) {
       my $sysid = $child->[0]->system_id;
       if ((defined $pubid and length $pubid) or
           (defined $sysid and length $sysid)) {
-        $r .= ' "' . $pubid . '"';
-        $r .= ' "' . $sysid . '"';
+        $r .= ' "' . (defined $pubid ? $pubid : '') . '"';
+        $r .= ' "' . (defined $sysid ? $sysid : '') . '"';
       }
       $r .= ">\x0A";
       unshift @node,

@@ -88,7 +88,7 @@ sub parse_char_stream ($$$;$$) {
     #my ($scalar, $specials_range, $offset) = @_;
     return 0 if defined $self->{next_nc};
 
-    my $pattern = qr/[^$_[1]\x00\x0A\x0D\x{D800}-\x{DFFF}]/;
+    my $pattern = qr/[^$_[1]\x00\x0A\x0D]/;
     my $offset = $_[2] || 0;
 
     if ($self->{char_buffer_pos} < length $self->{char_buffer}) {

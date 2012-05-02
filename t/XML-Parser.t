@@ -1,6 +1,7 @@
 package test::Whatpm::XML::Parser;
 use strict;
 use warnings;
+no warnings 'utf8';
 use Path::Class;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->parent->subdir ('modules', 'testdataparser', 'lib')->stringify;

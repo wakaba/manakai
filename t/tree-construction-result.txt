@@ -1,19 +1,13 @@
-Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 17.
-Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 35.
-Name "Whatpm::HTML::Debug::cp" used only once: possible typo at t/HTML-tree.t line 34.
+Subroutine Data::Dumper::qquote redefined at t/HTML-tree.t line 20.
+Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/HTML-tree.t line 38.
+Name "Whatpm::HTML::Debug::cp" used only once: possible typo at t/HTML-tree.t line 37.
 # t/tokenizer-test-chars.dat
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 1 - Parse error: qq'Ì†ÄÌ†ÅÌø∞Ìøø'; 1:4:no DOCTYPE;no DOCTYPE
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 2 - SHOULD-level error: qq'Ì†ÄÌ†ÅÌø∞Ìøø'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 3 - Document tree: qq'Ì†ÄÌ†ÅÌø∞Ìøø'
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 4 - Parse error: qq'<p>aaaÌ†ÄÌ†ÅÌø∞Ìøø'; 1:4:no DOCTYPE;no DOCTYPE
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 5 - SHOULD-level error: qq'<p>aaaÌ†ÄÌ†ÅÌø∞Ìøø'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 6 - Document tree: qq'<p>aaaÌ†ÄÌ†ÅÌø∞Ìøø'
+ok 1 - Parse error: qq'\x{D800}\x{D801}\x{DFF0}\x{DFFF}'; 1:4:no DOCTYPE;no DOCTYPE
+ok 2 - SHOULD-level error: qq'\x{D800}\x{D801}\x{DFF0}\x{DFFF}'; ;
+ok 3 - Document tree: qq'\x{D800}\x{D801}\x{DFF0}\x{DFFF}'
+ok 4 - Parse error: qq'<p>aaa\x{D800}\x{D801}\x{DFF0}\x{DFFF}'; 1:4:no DOCTYPE;no DOCTYPE
+ok 5 - SHOULD-level error: qq'<p>aaa\x{D800}\x{D801}\x{DFF0}\x{DFFF}'; ;
+ok 6 - Document tree: qq'<p>aaa\x{D800}\x{D801}\x{DFF0}\x{DFFF}'
 ok 7 - Parse error: qq'<p>...&NotNestedGreaterGreater;?'; 1:4:no DOCTYPE;no DOCTYPE
 ok 8 - SHOULD-level error: qq'<p>...&NotNestedGreaterGreater;?'; ;
 ok 9 - Document tree: qq'<p>...&NotNestedGreaterGreater;?'
@@ -336,30 +330,18 @@ ok 324 - Document tree: qq'\x{9F}'
 ok 325 - Parse error: qq'\x{9F}'; 1:1:control char:U+009F;control character
 ok 326 - SHOULD-level error: qq'\x{9F}'; ;
 ok 327 - Document tree: qq'\x{9F}'
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 328 - Parse error: qq'Ì†Ä'; 1:1:no DOCTYPE;no DOCTYPE
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 329 - SHOULD-level error: qq'Ì†Ä'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 330 - Document tree: qq'Ì†Ä'
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 331 - Parse error: qq'Ì†Ä'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 332 - SHOULD-level error: qq'Ì†Ä'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 333 - Document tree: qq'Ì†Ä'
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 334 - Parse error: qq'Ìøø'; 1:1:no DOCTYPE;no DOCTYPE
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 335 - SHOULD-level error: qq'Ìøø'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 336 - Document tree: qq'Ìøø'
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 337 - Parse error: qq'Ìøø'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 338 - SHOULD-level error: qq'Ìøø'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 339 - Document tree: qq'Ìøø'
+ok 328 - Parse error: qq'\x{D800}'; 1:1:no DOCTYPE;no DOCTYPE
+ok 329 - SHOULD-level error: qq'\x{D800}'; ;
+ok 330 - Document tree: qq'\x{D800}'
+ok 331 - Parse error: qq'\x{D800}'; ;
+ok 332 - SHOULD-level error: qq'\x{D800}'; ;
+ok 333 - Document tree: qq'\x{D800}'
+ok 334 - Parse error: qq'\x{DFFF}'; 1:1:no DOCTYPE;no DOCTYPE
+ok 335 - SHOULD-level error: qq'\x{DFFF}'; ;
+ok 336 - Document tree: qq'\x{DFFF}'
+ok 337 - Parse error: qq'\x{DFFF}'; ;
+ok 338 - SHOULD-level error: qq'\x{DFFF}'; ;
+ok 339 - Document tree: qq'\x{DFFF}'
 ok 340 - Parse error: qq'\x{FDD0}'; 1:1:nonchar:U+FDD0, 1:1:no DOCTYPE;no DOCTYPE, control character
 ok 341 - SHOULD-level error: qq'\x{FDD0}'; ;
 ok 342 - Document tree: qq'\x{FDD0}'
@@ -378,18 +360,12 @@ ok 354 - Document tree: qq'\x{FFFE}'
 ok 355 - Parse error: qq'\x{FFFE}'; 1:1:nonchar:U+FFFE;control character
 ok 356 - SHOULD-level error: qq'\x{FFFE}'; ;
 ok 357 - Document tree: qq'\x{FFFE}'
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 358 - Parse error: qq'Ôøø'; 1:1:nonchar:U+FFFF, 1:1:no DOCTYPE;no DOCTYPE, control character
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 359 - SHOULD-level error: qq'Ôøø'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 360 - Document tree: qq'Ôøø'
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 361 - Parse error: qq'Ôøø'; 1:1:nonchar:U+FFFF;control character
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 362 - SHOULD-level error: qq'Ôøø'; ;
-Malformed UTF-8 character (fatal) at t/HTML-tree.t line 27.
-ok 363 - Document tree: qq'Ôøø'
+ok 358 - Parse error: qq'\x{FFFF}'; 1:1:nonchar:U+FFFF, 1:1:no DOCTYPE;no DOCTYPE, control character
+ok 359 - SHOULD-level error: qq'\x{FFFF}'; ;
+ok 360 - Document tree: qq'\x{FFFF}'
+ok 361 - Parse error: qq'\x{FFFF}'; 1:1:nonchar:U+FFFF;control character
+ok 362 - SHOULD-level error: qq'\x{FFFF}'; ;
+ok 363 - Document tree: qq'\x{FFFF}'
 ok 364 - Parse error: qq'\x{10FFFF}'; 1:1:nonchar:U+10FFFF, 1:1:no DOCTYPE;no DOCTYPE, control character
 ok 365 - SHOULD-level error: qq'\x{10FFFF}'; ;
 ok 366 - Document tree: qq'\x{10FFFF}'
@@ -1110,14 +1086,14 @@ not ok 918 - Document tree: qq''
 # *  2|  <head>  *   |          |
 # *  3|  <body>  *   |          |
 # +---+----------+---+----------+
-Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 27.
-Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 30.
+Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 30.
+Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 33.
 ok 919 - Parse error: qq''; 1:0:no DOCTYPE;Line: 1 Col: 0 Unexpected End of file. Expected DOCTYPE.
-Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 27.
-Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 30.
+Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 30.
+Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 33.
 ok 920 - SHOULD-level error: qq''; ;
-Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 27.
-Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 30.
+Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 30.
+Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 33.
 ok 921 - Document tree: qq''
 ok 922 - Parse error: qq'<DIV>'; 1:5:no DOCTYPE, 1:5:in body:\#eof;Line: 1 Col: 5 Unexpected start tag (div). Expected DOCTYPE., Line: 1 Col: 5 Expected closing tag. Unexpected end of file.
 ok 923 - SHOULD-level error: qq'<DIV>'; ;
@@ -1195,18 +1171,18 @@ not ok 969 - Document tree: qq'<a href="blah">aba<table><a href="foo">br<tr><td>
 # +---+-------------------+---+----------+
 Use of uninitialized value in concatenation (.) or string at HTML-tree.t test () skip line 67.
 No #errors section () at HTML-tree.t test () skip line 67.
-Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 27.
-Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 30.
+Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 30.
+Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 33.
 not ok 970 - Parse error: qq''; 1:0:no DOCTYPE;
 #   Failed test 'Parse error: qq''; 1:0:no DOCTYPE;'
 #   at HTML-tree.t test () ok line 3.
 #          got: '1'
 #     expected: '0'
-Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 27.
-Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 30.
+Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 30.
+Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 33.
 ok 971 - SHOULD-level error: qq''; ;
-Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 27.
-Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 30.
+Use of uninitialized value $s in substitution (s///) at t/HTML-tree.t line 30.
+Use of uninitialized value $s in concatenation (.) or string at t/HTML-tree.t line 33.
 not ok 972 - Document tree: qq''
 #   Failed test 'Document tree: qq'''
 #   at HTML-tree.t test () ok line 9.
@@ -2043,8 +2019,8 @@ not ok 1389 - Document tree: qq'<noscript><!--</noscript>--></noscript>'
 # |  5|  <body>                    |  <body>                    |
 # +---+----------------------------+----------------------------+
 # t/tree-construction/tests6.dat
-utf8 "\x93" does not map to Unicode at t/testfiles.pl line 16.
-utf8 "\x94" does not map to Unicode at t/testfiles.pl line 16.
+utf8 "\x93" does not map to Unicode at modules/testdataparser/lib/Test/HTCT/Parser.pm line 21.
+utf8 "\x94" does not map to Unicode at modules/testdataparser/lib/Test/HTCT/Parser.pm line 21.
 ok 1390 - Parse error: qq'<!doctype html></head> <head>'; 1:29:after head:head;Line: 1 Col: 29 Unexpected start tag head. Ignored.
 ok 1391 - SHOULD-level error: qq'<!doctype html></head> <head>'; ;
 ok 1392 - Document tree: qq'<!doctype html></head> <head>'

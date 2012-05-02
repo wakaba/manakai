@@ -1,6 +1,6 @@
-Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 16.
-Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 34.
-Name "Whatpm::HTML::Debug::cp" used only once: possible typo at t/XML-Parser.t line 33.
+Subroutine Data::Dumper::qquote redefined at t/XML-Parser.t line 19.
+Name "Whatpm::HTML::Debug::cp_pass" used only once: possible typo at t/XML-Parser.t line 37.
+Name "Whatpm::HTML::Debug::cp" used only once: possible typo at t/XML-Parser.t line 36.
 # t/xml/elements-1.dat
 ok 1 - Parse error: qq'<a/>'
 ok 2 - Document tree: qq'<a/>'
@@ -191,10 +191,8 @@ ok 184 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST a\x{0A}b NMTOKENS \#IMPLI
 ok 185 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST a\x{0A}xmlns NMTOKEN " x  y \x{09}"\x{0A}>\x{0A}]>\x{0A}<z><a/></z>'
 ok 186 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST a\x{0A}xmlns NMTOKEN " x  y \x{09}"\x{0A}>\x{0A}]>\x{0A}<z><a/></z>'
 # t/xml/texts-1.dat
-Malformed UTF-8 character (fatal) at t/XML-Parser.t line 26.
-ok 187 - Parse error: qq'í €í í¿°í¿¿'
-Malformed UTF-8 character (fatal) at t/XML-Parser.t line 26.
-ok 188 - Document tree: qq'í €í í¿°í¿¿'
+ok 187 - Parse error: qq'\x{D800}\x{D801}\x{DFF0}\x{DFFF}'
+ok 188 - Document tree: qq'\x{D800}\x{D801}\x{DFF0}\x{DFFF}'
 ok 189 - Parse error: qq']]>'
 ok 190 - Document tree: qq']]>'
 ok 191 - Parse error: qq']]]>'

@@ -1311,11 +1311,14 @@ sub _get_next_token ($) {
     
 
     my $c = $nc > 0x007F ? KEY_ELSE_CHAR : $c_to_key->[$nc];
-    my $action = $Action->[$state]->[$c] || $Action->[$state]->[KEY_ELSE_CHAR];
+    my $action;
     if ($self->{is_xml}) {
       $action = $XMLAction->[$state]->[$c]
           || $Action->[$state]->[$c]
           || $XMLAction->[$state]->[KEY_ELSE_CHAR]
+          || $Action->[$state]->[KEY_ELSE_CHAR];
+    } else {
+      $action = $Action->[$state]->[$c]
           || $Action->[$state]->[KEY_ELSE_CHAR];
     }
 
