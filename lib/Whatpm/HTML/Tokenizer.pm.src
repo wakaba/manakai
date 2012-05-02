@@ -288,6 +288,10 @@ sub EOF_CHAR () { -1 }
 ## A pseudo-character code that can never appear in the input stream.
 sub NEVER_CHAR () { -2 }
 
+## Pause tokenization (and parsing) because of the end of the
+## currently available characters (that could be different from EOF).
+sub ABORT_CHAR () { -3 }
+
 ## ------ The tokenizer ------
 
 ## Implementations MUST act as if state machine in the spec
@@ -1296,6 +1300,13 @@ sub _get_next_token ($) {
 
   A: {
     my $nc = $self->{nc};
+
+    if ($nc == ABORT_CHAR) {
+      $self->{set_nc}->($self);
+      $nc = $self->{nc};
+      return {type => ABORT_TOKEN} if $nc == ABORT_CHAR;
+    }
+
     my $state = $self->{state};
 
     !!!tdebug { printf STDERR "U+%04X\t%d\n", $nc, $state };
