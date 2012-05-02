@@ -41,7 +41,7 @@ Charset-all:
 CSS-all:
 	cd CSS && make all
 
-HTML-all:
+HTML-all: HTML.pm
 	cd HTML && make all
 
 XML-all:
