@@ -54,6 +54,12 @@ Add the cue to the track.  [HTML]
 
 Remove the cue from the track.  [HTML]
 
+=item $track2 = $track->manakai_clone_track
+
+Create a copy of the text track object.  Attributes whose values are
+not cue lists are copied to the clone.  All cues in the
+C<manakai_all_cues> list are also cloned to the new track.  [MANAKAI]
+
 =back
 
 =head1 SEE ALSO

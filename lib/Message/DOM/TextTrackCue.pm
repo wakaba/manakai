@@ -173,6 +173,13 @@ sub get_cue_as_html ($) {
 
 } # get_cue_as_html
 
+sub manakai_clone_cue ($) {
+  my $self = shift;
+  my $clone = (ref $self)->____new_from_hashref ({%{$self}});
+  delete $clone->{track};
+  return $clone;
+} # manakai_clone_cue
+
 1;
 
 =head1 LICENSE

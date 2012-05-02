@@ -93,6 +93,20 @@ sub remove_cue ($$) {
   delete $_[1]->{track};
 } # remove_cue
 
+sub manakai_clone_track ($) {
+  my $self = shift;
+  require Message::DOM::TextTrackCueList;
+
+  my $clone = (ref $self)->____new_from_hashref ({%{$self}});
+  $clone->{all_cues} = Message::DOM::TextTrackCueList
+      ->____new_from_arrayref ([]);
+  for (@{$self->{all_cues}}) {
+    $clone->add_cue ($_->manakai_clone_cue);
+  }
+
+  return $clone;
+} # manakai_clone_track
+
 1;
 
 =head1 LICENSE

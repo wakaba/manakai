@@ -33,26 +33,6 @@ sub _manakai_is_invalid_yes : Test(1) {
   ok $track->manakai_is_invalid;
 } # _manakai_is_invalid_yes
 
-sub _manakai_signature_trailer : Test(1) {
-  my $track = new_track;
-  is $track->manakai_signature_trailer, undef;
-} # _manakai_signature_trailer
-
-sub _manakai_signature_trailer_found : Test(1) {
-  my $track = new_track signature_trailer => qq{aa \x{4000} b};
-  is $track->manakai_signature_trailer, qq{aa \x{4000} b};
-} # _manakai_signature_trailer_found
-
-sub _manakai_headers : Test(1) {
-  my $track = new_track;
-  is $track->manakai_headers, q{};
-} # _manakai_headers
-
-sub _manakai_headers_found : Test(1) {
-  my $track = new_track headers => [qw/abc def/, ''];
-  is $track->manakai_headers, qq{abc\x0Adef\x0A};
-} # _manakai_headers_found
-
 sub _kind : Test(1) {
   my $track = new_track kind => 'captions';
   is $track->kind, 'captions';
@@ -199,6 +179,36 @@ sub _remove_cue_another_list : Test(4) {
   is $track2->manakai_all_cues->length, 1;
   is $track->manakai_all_cues->length, 0;
 } # _remove_cue_another_list
+
+sub _manakai_clone_track : Test(16) {
+  my $cue1 = new_cue id => 'abc';
+  my $cue2 = new_cue id => 'xyz';
+  my $list = new_cue_list;
+  my $track = new_track all_cues => $list, label => 'abc',
+      mode => 'disabled', language => 'en', kind => 'subtitles';
+  $track->add_cue ($cue1);
+  $track->add_cue ($cue2);
+
+  my $track2 = $track->manakai_clone_track;
+  isnt $track2, $track;
+  is ref $track2, ref $track;
+  is $track2->kind, $track->kind;
+  is $track2->label, $track->label;
+  is $track2->mode, $track->mode;
+  is $track2->language, $track->language;
+  isnt $track2->manakai_all_cues, $track->manakai_all_cues;
+  is $track2->cues, undef;
+  is $track2->active_cues, undef;
+  is $track2->manakai_is_invalid, $track->manakai_is_invalid;
+  isa_ok $track2->manakai_all_cues, 'Message::DOM::TextTrackCueList';
+  isnt $track2->manakai_all_cues->[0], $track->manakai_all_cues->[0];
+  isnt $track2->manakai_all_cues->[1], $track->manakai_all_cues->[1];
+  is $track2->manakai_all_cues->length, 2;
+  is $track2->manakai_all_cues->[0]->id,
+      $track->manakai_all_cues->[0]->id;
+  is $track2->manakai_all_cues->[1]->id,
+      $track->manakai_all_cues->[1]->id;
+} # _manakai_clone_track
 
 __PACKAGE__->runtests;
 

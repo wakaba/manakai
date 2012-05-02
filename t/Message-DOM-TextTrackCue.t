@@ -307,6 +307,29 @@ sub _text : Test(5) {
 
 # XXX get_cue_as_html
 
+sub _manakai_clone_cue : Test(12) {
+  my $cue = new_cue
+      text => 'abc<v hoge>fuga abc',
+      track => 'ab dce ',
+      start_time => 4242,
+      end_time => 4143,
+      size => 21,
+      align => 'end';
+  my $cue2 = $cue->manakai_clone_cue;
+  isnt $cue2, $cue;
+  is ref $cue2, ref $cue;
+  is $cue2->text, $cue->text;
+  is $cue2->size, $cue->size;
+  is $cue2->align, $cue->align;
+  is $cue2->snap_to_lines, $cue->snap_to_lines;
+  is $cue2->vertical, $cue->vertical;
+  is $cue2->line, $cue->line;
+  is $cue2->pause_on_exit, $cue->pause_on_exit;
+  is $cue2->start_time, $cue->start_time;
+  is $cue2->end_time, $cue->end_time;
+  is $cue2->track, undef;
+} # _manakai_clone_cue
+
 __PACKAGE__->runtests;
 
 1;
