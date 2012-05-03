@@ -2,10 +2,10 @@ package test::Whatpm::HTML::Parser;
 use strict;
 use warnings;
 use Path::Class;
-use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
-use lib file (__FILE__)->dir->stringify;
+use lib file (__FILE__)->dir->subdir ('lib')->stringify;
+use Test::Manakai::Default;
 use base qw(Test::Class);
-use Test::More;
+use Test::MoreMore;
 use Whatpm::HTML;
 use Message::DOM::DOMImplementation;
 use Message::DOM::Document;
@@ -233,15 +233,134 @@ sub _html_parser_change_the_encoding_byte_string_with_charset : Test(2) {
   }
 } # _html_parser_change_the_encoding_byte_string_with_charset
 
+sub _parse_char_string : Test(4) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $input = qq{<!DOCTYPE html><html lang=en><title>\x{0500}\x{200}</title>\x{500}};
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_char_string ($input => $doc);
+  is $doc->child_nodes->length, 2;
+  eq_or_diff $doc->inner_html, qq{<!DOCTYPE html><html lang="en"><head><title>\x{0500}\x{0200}</title></head><body>\x{0500}</body></html>};
+  is $doc->input_encoding, undef; # XXX Should be UTF-8 for consistency with DOM4?
+  is $doc->manakai_is_html, 1;
+} # _parse_char_string
+
+sub _parse_char_string_onerror : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $input = qq{<html lang=en>};
+  my $parser = Whatpm::HTML->new;
+  my @error;
+  $parser->parse_char_string ($input => $doc, sub {
+    push @error, {@_};
+  });
+  ok $error[0]->{token};
+  delete $error[0]->{token};
+  eq_or_diff \@error, [{
+    type => 'no DOCTYPE',
+    level => 'm',
+    line => 1,
+    column => 14,
+  }];
+} # _parse_char_string_onerror
+
+sub _parse_char_string_old_children : Test(3) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  $doc->inner_html (q{<foo><bar/></foo><!---->});
+  is $doc->child_nodes->length, 2;
+
+  my $input = qq{<html lang=en>};
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_char_string ($input => $doc);
+
+  is $doc->child_nodes->length, 1;
+  eq_or_diff $doc->inner_html, q{<html lang="en"><head></head><body></body></html>};
+} # _parse_char_string_old_children
+
+sub _parse_char_string_encoding_decl : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $input = qq{<html lang=en><meta charset=euc-jp>};
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_char_string ($input => $doc);
+  eq_or_diff $doc->inner_html, q{<html lang="en"><head><meta charset="euc-jp"></head><body></body></html>};
+  is $doc->input_encoding, undef;
+} # _parse_char_string_encoding_decl
+
+sub _parse_byte_string_latin1 : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $input = qq{<html lang=en>\xCF\xEF\xEE\x21\x21};
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_byte_string ('iso-8859-1', $input => $doc);
+
+  eq_or_diff $doc->inner_html, qq{<html lang="en"><head></head><body>\xCF\xEF\xEE\x21\x21</body></html>};
+  is $doc->input_encoding, 'windows-1252';
+} # _parse_byte_string_latin1
+
+sub _parse_byte_string_utf8 : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $input = qq{<html lang=en>\xCF\xAF\xEE\x21\x21};
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_byte_string ('utf-8', $input => $doc);
+
+  eq_or_diff $doc->inner_html, qq{<html lang="en"><head></head><body>\x{03ef}\x{fffd}\x21\x21</body></html>};
+  is $doc->input_encoding, 'utf-8';
+} # _parse_byte_string_utf8
+
+sub _parse_char_stream : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $s = qq{<html><p>\x{4000}\x{3000}a<p>bc};
+
+  require Whatpm::Charset::DecodeHandle;
+  my $input = Whatpm::Charset::DecodeHandle::CharString->new (\$s);
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_char_stream ($input => $doc);
+
+  eq_or_diff $doc->inner_html, qq{<html><head></head><body><p>\x{4000}\x{3000}a</p><p>bc</p></body></html>};
+  is $doc->input_encoding, undef;
+} # _parse_char_stream
+
+sub _parse_byte_stream_utf8 : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $s = qq{<html><p>\xE5\x9A\x81\xC2\xAFa<p>bc};
+
+  require Whatpm::Charset::DecodeHandle;
+  my $input = Whatpm::Charset::DecodeHandle::CharString->new (\$s);
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_byte_stream ('utf-8', $input => $doc);
+
+  eq_or_diff $doc->inner_html, qq{<html><head></head><body><p>\x{5681}\xafa</p><p>bc</p></body></html>};
+  is $doc->input_encoding, 'utf-8';
+} # _parse_byte_stream_utf8
+
+sub _parse_byte_stream_latin1 : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $s = qq{<html><p>\xE5\x9A\x81\xC2\xAFa<p>bc};
+
+  require Whatpm::Charset::DecodeHandle;
+  my $input = Whatpm::Charset::DecodeHandle::CharString->new (\$s);
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_byte_stream ('latin1', $input => $doc);
+
+  eq_or_diff $doc->inner_html, qq{<html><head></head><body><p>\xe5\x{0161}\x{fffd}\xc2\xafa</p><p>bc</p></body></html>};
+  is $doc->input_encoding, 'windows-1252';
+} # _parse_byte_stream_latin1
+
 __PACKAGE__->runtests;
 
 1;
 
 =head1 LICENSE
 
-Copyright 2009-2010 Wakaba <w@suika.fam.cx>
+Copyright 2009-2012 Wakaba <w@suika.fam.cx>.
 
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

@@ -314,449 +314,268 @@ my $foreign_attr_xname = $Whatpm::HTML::ParserData::ForeignAttrNamespaceFixup;
 ## TODO: Invoke the reset algorithm when a resettable element is
 ## created (cf. HTML5 revision 2259).
 
-sub parse_byte_string ($$$$;$) {
-  my $self = shift;
-  my $charset_name = shift;
-  open my $input, '<', ref $_[0] ? $_[0] : \($_[0]);
-  return $self->parse_byte_stream ($charset_name, $input, @_[1..$#_]);
+require Whatpm::HTML::InputStream;
+push our @ISA, qw(Whatpm::HTML::InputStream);
+use Encode;
+
+our $DefaultErrorHandler = sub {
+  my (%opt) = @_;
+  my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
+  my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
+  warn "Parse error ($opt{type}) at line $line column $column\n";
+}; # $DefaultErrorHandler
+
+sub parse_byte_string ($$$$;$$) {
+  #my ($self, $charset_name, $string, $doc, $onerror, $get_wrapper) = @_;
+  my $self = ref $_[0] ? $_[0] : $_[0]->new;
+  my $doc = $self->{document} = $_[3];
+
+  my $embedded_encoding_name;
+  PARSER: {
+    @{$self->{document}->child_nodes} = ();
+    
+    my $inputref = \($_[2]);
+    $self->_encoding_sniffing
+        (transport_encoding_name => $_[1],
+         embedded_encoding_name => $embedded_encoding_name,
+         read_head => sub {
+           return $inputref;
+         });
+    $self->{document}->input_encoding ($self->{input_encoding});
+
+    $self->{line_prev} = $self->{line} = 1;
+    $self->{column_prev} = -1;
+    $self->{column} = 0;
+
+    $self->{chars} = [split //, decode $self->{input_encoding}, $$inputref];
+    $self->{chars_pos} = 0;
+    $self->{chars_pull_next} = sub { 0 };
+    delete $self->{chars_was_cr};
+
+    $self->{restart_parser} = sub {
+      $embedded_encoding_name = $_[0];
+      die bless {}, 'Whatpm::HTML::InputStream::RestartParser';
+    };
+
+    my $onerror = $_[4] || $DefaultErrorHandler;
+    $self->{parse_error} = sub {
+      $onerror->(line => $self->{line}, column => $self->{column}, @_);
+    };
+
+    $self->_initialize_tokenizer;
+    $self->_initialize_tree_constructor;
+    my $error;
+    {
+      local $@;
+      eval { $self->_construct_tree; 1 } or $error = $@;
+    }
+    if ($error) {
+      if (ref $error eq 'Whatpm::HTML::InputStream::RestartParser') {
+        redo PARSER;
+      }
+      die $error;
+    }
+    $self->_terminate_tree_constructor;
+    $self->_clear_refs;
+  } # PARSER
+
+  return $doc;
 } # parse_byte_string
 
+## DEPRECATED
 sub parse_byte_stream ($$$$;$$) {
-  # my ($self, $charset_name, $byte_stream, $doc, $onerror, $get_wrapper) = @_;
-  my $self = ref $_[0] ? shift : shift->new;
-  my $charset_name = shift;
-  my $byte_stream = $_[0];
+  #my ($self, $charset_name, $stream, $doc, $onerror, $get_wrapper) = @_;
+  my $self = ref $_[0] ? $_[0] : $_[0]->new;
+  my $doc = $self->{document} = $_[3];
 
-  my $onerror = $_[2] || sub {
-    my (%opt) = @_;
-    warn "Parse error ($opt{type})\n";
-  };
-  $self->{parse_error} = $onerror; # updated later by parse_char_string
-
-  my $get_wrapper = $_[3] || sub ($) {
-    return $_[0]; # $_[0] = byte stream handle, returned = arg to char handle
-  };
-
-  ## HTML5 encoding sniffing algorithm
-  require Message::Charset::Info;
-  my $charset;
-  my $buffer;
-  my ($char_stream, $e_status);
-
-  SNIFFING: {
-    ## NOTE: By setting |allow_fallback| option true when the
-    ## |get_decode_handle| method is invoked, we ignore what the HTML5
-    ## spec requires, i.e. unsupported encoding should be ignored.
-      ## TODO: We should not do this unless the parser is invoked
-      ## in the conformance checking mode, in which this behavior
-      ## would be useful.
-
-    ## Step 1
-    if (defined $charset_name) {
-      $charset = Message::Charset::Info->get_by_html_name ($charset_name);
-          ## TODO: Is this ok?  Transfer protocol's parameter should be
-          ## interpreted in its semantics?
-
-      ($char_stream, $e_status) = $charset->get_decode_handle
-          ($byte_stream, allow_error_reporting => 1,
-           allow_fallback => 1);
-      if ($char_stream) {
-        $self->{confident} = 1;
-        last SNIFFING;
-      } else {
-        !!!parse-error (type => 'charset:not supported',
-                        layer => 'encode',
-                        line => 1, column => 1,
-                        value => $charset_name,
-                        level => $self->{level}->{uncertain});
-      }
-    }
-
-    ## Step 2
-    my $byte_buffer = '';
-    for (1..1024) {
-      my $char = $byte_stream->getc;
-      last unless defined $char;
-      $byte_buffer .= $char;
-    } ## TODO: timeout
-
-    ## Step 3
-    if ($byte_buffer =~ /^\xFE\xFF/) {
-      $charset = Message::Charset::Info->get_by_html_name ('utf-16be');
-      ($char_stream, $e_status) = $charset->get_decode_handle
-          ($byte_stream, allow_error_reporting => 1,
-           allow_fallback => 1, byte_buffer => \$byte_buffer);
-      $self->{confident} = 1;
-      last SNIFFING;
-    } elsif ($byte_buffer =~ /^\xFF\xFE/) {
-      $charset = Message::Charset::Info->get_by_html_name ('utf-16le');
-      ($char_stream, $e_status) = $charset->get_decode_handle
-          ($byte_stream, allow_error_reporting => 1,
-           allow_fallback => 1, byte_buffer => \$byte_buffer);
-      $self->{confident} = 1;
-      last SNIFFING;
-    } elsif ($byte_buffer =~ /^\xEF\xBB\xBF/) {
-      $charset = Message::Charset::Info->get_by_html_name ('utf-8');
-      ($char_stream, $e_status) = $charset->get_decode_handle
-          ($byte_stream, allow_error_reporting => 1,
-           allow_fallback => 1, byte_buffer => \$byte_buffer);
-      $self->{confident} = 1;
-      last SNIFFING;
-    }
-
-    ## Step 4
-    ## TODO: <meta charset>
-
-    ## Step 5
-    ## TODO: from history
-
-    ## Step 6
-    require Whatpm::Charset::UniversalCharDet;
-    $charset_name = Whatpm::Charset::UniversalCharDet->detect_byte_string
-        ($byte_buffer);
-    if (defined $charset_name) {
-      $charset = Message::Charset::Info->get_by_html_name ($charset_name);
-
-      require Whatpm::Charset::DecodeHandle;
-      $buffer = Whatpm::Charset::DecodeHandle::ByteBuffer->new
-          ($byte_stream);
-      ($char_stream, $e_status) = $charset->get_decode_handle
-          ($buffer, allow_error_reporting => 1,
-           allow_fallback => 1, byte_buffer => \$byte_buffer);
-      if ($char_stream) { # supported
-        $buffer->{buffer} = $byte_buffer;
-        !!!parse-error (type => 'sniffing:chardet',
-                        text => $charset_name,
-                        level => $self->{level}->{info},
-                        layer => 'encode',
-                        line => 1, column => 1);
-        $self->{confident} = 0;
-        last SNIFFING;
-      }
-    }
-
-    ## Step 7: default
-    ## TODO: Make this configurable.
-    $charset = Message::Charset::Info->get_by_html_name ('windows-1252');
-        ## NOTE: We choose |windows-1252| here, since |utf-8| should be 
-        ## detectable in the step 6.
-    require Whatpm::Charset::DecodeHandle;
-    $buffer = Whatpm::Charset::DecodeHandle::ByteBuffer->new
-        ($byte_stream);
-    ($char_stream, $e_status)
-        = $charset->get_decode_handle ($buffer,
-                                       allow_error_reporting => 1,
-                                       allow_fallback => 1,
-                                       byte_buffer => \$byte_buffer);
-    $buffer->{buffer} = $byte_buffer;
-    !!!parse-error (type => 'sniffing:default',
-                    text => 'windows-1252',
-                    level => $self->{level}->{info},
-                    line => 1, column => 1,
-                    layer => 'encode');
-    $self->{confident} = 0;
-  } # SNIFFING
-
-  if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
-    $self->{input_encoding} = $charset->get_iana_name; ## TODO: Should we set actual charset decoder's encoding name?
-    !!!parse-error (type => 'chardecode:fallback',
-                    #text => $self->{input_encoding},
-                    level => $self->{level}->{uncertain},
-                    line => 1, column => 1,
-                    layer => 'encode');
-  } elsif (not ($e_status &
-                Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL ())) {
-    $self->{input_encoding} = $charset->get_iana_name;
-    !!!parse-error (type => 'chardecode:no error',
-                    text => $self->{input_encoding},
-                    level => $self->{level}->{uncertain},
-                    line => 1, column => 1,
-                    layer => 'encode');
-  } else {
-    $self->{input_encoding} = $charset->get_iana_name;
-  }
-
-  $self->{change_encoding} = sub {
-    my $self = shift;
-    $charset_name = shift;
-    my $token = shift;
-    my $orig_char_stream = $char_stream;
-
-    $charset = Message::Charset::Info->get_by_html_name ($charset_name);
-    ($char_stream, $e_status) = $charset->get_decode_handle
-        ($byte_stream, allow_error_reporting => 1, allow_fallback => 1,
-         byte_buffer => \ $buffer->{buffer});
+  my $embedded_encoding_name;
+  PARSER: {
+    @{$self->{document}->child_nodes} = ();
     
-    if ($char_stream) { # if supported
-      if ($charset->{category} & Message::Charset::Info::CHARSET_CATEGORY_ASCII_COMPAT () or
-          $charset->{category} & Message::Charset::Info::CHARSET_CATEGORY_UTF16 ()) {
-        #
-      } else {
-        return;
+    my $handle = $_[2];
+    $self->{chars} = [];
+    $self->{chars_pos} = 0;
+    my $bytes = '';
+    {
+      my $i = 0;
+      while ($handle->read ($bytes, 1, length $bytes)) {
+        last if $i++ == 1024;
       }
-      
-      ## "Change the encoding" algorithm:
-      
-      ## Step 1
-      if (defined $self->{input_encoding} and
-          $self->{input_encoding} eq $charset_name) {
-        !!!parse-error (type => 'charset label:matching',
-                        text => $charset_name,
-                        level => $self->{level}->{info});
-        $self->{confident} = 1;
-        return;
-      }
-
-      ## Step 2 (HTML5 revision 3205)
-      if (defined $self->{input_encoding} and
-          Message::Charset::Info->get_by_html_name ($self->{input_encoding})
-          ->{category} & Message::Charset::Info::CHARSET_CATEGORY_UTF16 ()) {
-        $self->{confident} = 1;
-        return;
-      }
-
-      ## Step 3
-      if ($charset->{category} &
-          Message::Charset::Info::CHARSET_CATEGORY_UTF16 ()) {
-        $charset = Message::Charset::Info->get_by_html_name ('utf-8');
-        ($char_stream, $e_status) = $charset->get_decode_handle
-            ($byte_stream,
-             allow_error_reporting => 1,
-             byte_buffer => \ $buffer->{buffer});
-      }
-      $charset_name = $charset->get_iana_name;
-
-      !!!parse-error (type => 'charset label detected',
-                      text => $self->{input_encoding},
-                      value => $charset_name,
-                      level => $self->{level}->{warn},
-                      token => $token);
-      
-      ## Step 4
-      # if (can) {
-        ## change the encoding on the fly.
-        #$self->{confident} = 1;
-        #return;
-      # }
-      
-      ## Step 5
-      throw Whatpm::HTML::RestartParser ();
-    } else {
-      $char_stream = $orig_char_stream;
     }
-  }; # $self->{change_encoding}
+    $self->{chars_pull_next} = sub {
+      if ($self->{confident}) {
+        $self->{chars} = [];
+        $self->{chars_pos} = 0;
+      }
+      my $i = 0;
+      while ($handle->read ($bytes, 1, length $bytes)) {
+        last if $i++ == 1024;
+      }
+      my @added = split //,
+          decode $self->{input_encoding}, $bytes, Encode::FB_QUIET;
+      if (6 < length $bytes or (length $bytes and $i <= 1024)) { # shit!
+        push @added, "\x{FFFD}";
+        substr ($bytes, 0, 1) = '';
+      }
+      push @{$self->{chars}}, @added;
+      return @added > 0;
+    };
+    delete $self->{chars_was_cr};
 
-  my $char_onerror = sub {
-    my (undef, $type, %opt) = @_;
-    !!!parse-error (layer => 'encode',
-                    line => $self->{line}, column => $self->{column} + 1,
-                    %opt, type => $type);
-    if ($opt{octets}) {
-      ${$opt{octets}} = "\x{FFFD}"; # relacement character
+    $self->_encoding_sniffing
+        (transport_encoding_name => $_[1],
+         embedded_encoding_name => $embedded_encoding_name,
+         read_head => sub {
+           return \$bytes;
+         });
+    $self->{document}->input_encoding ($self->{input_encoding});
+
+    $self->{line_prev} = $self->{line} = 1;
+    $self->{column_prev} = -1;
+    $self->{column} = 0;
+    
+    $self->{restart_parser} = sub {
+      $embedded_encoding_name = $_[0];
+      die bless {}, 'Whatpm::HTML::InputStream::RestartParser';
+    };
+
+    my $onerror = $_[4] || $DefaultErrorHandler;
+    $self->{parse_error} = sub {
+      $onerror->(line => $self->{line}, column => $self->{column}, @_);
+    };
+
+    $self->_initialize_tokenizer;
+    $self->_initialize_tree_constructor;
+    {
+      my $error;
+      {
+        local $@;
+        eval { $self->_construct_tree; 1 } or $error = $@;
+      }
+      if ($error) {
+        if (ref $error eq 'Whatpm::HTML::InputStream::RestartParser') {
+          redo PARSER;
+        }
+        die $error;
+      }
+      redo if $self->{nc} != EOF_CHAR;
     }
-  };
+    $self->_terminate_tree_constructor;
+    $self->_clear_refs;
+  } # PARSER
 
-  my $wrapped_char_stream = $get_wrapper->($char_stream);
-  $wrapped_char_stream->onerror ($char_onerror);
-
-  my @args = ($_[1], $_[2]); # $doc, $onerror - $get_wrapper = undef;
-  my $return;
-  try {
-    $return = $self->parse_char_stream ($wrapped_char_stream, @args);  
-  } catch Whatpm::HTML::RestartParser with {
-    ## NOTE: Invoked after {change_encoding}.
-
-    if ($e_status & Message::Charset::Info::FALLBACK_ENCODING_IMPL ()) {
-      $self->{input_encoding} = $charset->get_iana_name; ## TODO: Should we set actual charset decoder's encoding name?
-      !!!parse-error (type => 'chardecode:fallback',
-                      level => $self->{level}->{uncertain},
-                      #text => $self->{input_encoding},
-                      line => 1, column => 1,
-                      layer => 'encode');
-    } elsif (not ($e_status &
-                  Message::Charset::Info::ERROR_REPORTING_ENCODING_IMPL ())) {
-      $self->{input_encoding} = $charset->get_iana_name;
-      !!!parse-error (type => 'chardecode:no error',
-                      text => $self->{input_encoding},
-                      level => $self->{level}->{uncertain},
-                      line => 1, column => 1,
-                      layer => 'encode');
-    } else {
-      $self->{input_encoding} = $charset->get_iana_name;
-    }
-    $self->{confident} = 1;
-
-    $wrapped_char_stream = $get_wrapper->($char_stream);
-    $wrapped_char_stream->onerror ($char_onerror);
-
-    $return = $self->parse_char_stream ($wrapped_char_stream, @args);
-  };
-  return $return;
+  return $doc;
 } # parse_byte_stream
 
 ## NOTE: HTML5 spec says that the encoding layer MUST NOT strip BOM
 ## and the HTML layer MUST ignore it.  However, we does strip BOM in
 ## the encoding layer and the HTML layer does not ignore any U+FEFF,
-## because the core part of our HTML parser expects a string of character,
-## not a string of bytes or code units or anything which might contain a BOM.
-## Therefore, any parser interface that accepts a string of bytes,
-## such as |parse_byte_string| in this module, must ensure that it does
-## strip the BOM and never strip any ZWNBSP.
+## because the core part of our HTML parser expects a string of
+## character, not a string of bytes or code units or anything which
+## might contain a BOM.  Therefore, any parser interface that accepts
+## a string of bytes, such as |parse_byte_string| in this module, must
+## ensure that it does strip the BOM and never strip any ZWNBSP.
+
+## XXX The policy mentioned above might change when we implement
+## Encoding Standard spec.
 
 sub parse_char_string ($$$;$$) {
-  #my ($self, $s, $doc, $onerror, $get_wrapper) = @_;
-  my $self = shift;
-  my $s = ref $_[0] ? $_[0] : \($_[0]);
-  require Whatpm::Charset::DecodeHandle;
-  my $input = Whatpm::Charset::DecodeHandle::CharString->new ($s);
-  return $self->parse_char_stream ($input, @_[1..$#_]);
-} # parse_char_string
-*parse_string = \&parse_char_string; ## NOTE: Alias for backward compatibility.
-
-sub parse_char_stream ($$$;$$) {
-  my $self = ref $_[0] ? shift : shift->new;
-  my $input = $_[0];
-  my $doc = $self->{document} = $_[1];
+  #my ($self, $string, $document, $onerror, $get_wrapper) = @_;
+  my $self = ref $_[0] ? $_[0] : $_[0]->new;
+  my $doc = $self->{document} = $_[2];
   @{$self->{document}->child_nodes} = ();
-
-  ## NOTE: |set_inner_html| copies most of this method's code
 
   ## Confidence: irrelevant.
   $self->{confident} = 1 unless exists $self->{confident};
-
   $self->{document}->input_encoding ($self->{input_encoding})
       if defined $self->{input_encoding};
-## TODO: |{input_encoding}| is needless?
 
   $self->{line_prev} = $self->{line} = 1;
   $self->{column_prev} = -1;
   $self->{column} = 0;
-  $self->{set_nc} = sub {
-    my $self = shift;
 
-    my $char = '';
-    if (defined $self->{next_nc}) {
-      $char = $self->{next_nc};
-      delete $self->{next_nc};
-      $self->{nc} = ord $char;
-    } else {
-      $self->{char_buffer} = '';
-      $self->{char_buffer_pos} = 0;
+  $self->{chars} = [split //, $_[1]];
+  $self->{chars_pos} = 0;
+  $self->{chars_pull_next} = sub { 0 };
+  delete $self->{chars_was_cr};
 
-      my $count = $input->manakai_read_until
-         ($self->{char_buffer}, qr/[^\x0A\x0D]/,
-          $self->{char_buffer_pos});
-      if ($count) {
-        $self->{line_prev} = $self->{line};
-        $self->{column_prev} = $self->{column};
-        $self->{column}++;
-        $self->{nc}
-            = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-        return;
-      }
-
-      if ($input->read ($char, 1)) {
-        $self->{nc} = ord $char;
-      } else {
-        $self->{nc} = -1;
-        return;
-      }
-    }
-
-    ($self->{line_prev}, $self->{column_prev})
-        = ($self->{line}, $self->{column});
-    $self->{column}++;
-    
-    if ($self->{nc} == 0x000A) { # LF
-      !!!cp ('j1');
-      $self->{line}++;
-      $self->{column} = 0;
-    } elsif ($self->{nc} == 0x000D) { # CR
-      !!!cp ('j2');
-## TODO: support for abort/streaming
-      my $next = '';
-      if ($input->read ($next, 1) and $next ne "\x0A") {
-        $self->{next_nc} = $next;
-      }
-      $self->{nc} = 0x000A; # LF # MUST
-      $self->{line}++;
-      $self->{column} = 0;
-    }
-  };
-
-  $self->{read_until} = sub {
-    #my ($scalar, $specials_range, $offset) = @_;
-    return 0 if defined $self->{next_nc};
-
-    my $pattern = qr/[^$_[1]\x0A\x0D]/;
-    my $offset = $_[2] || 0;
-
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      pos ($self->{char_buffer}) = $self->{char_buffer_pos};
-      if ($self->{char_buffer} =~ /\G(?>$pattern)+/) {
-        substr ($_[0], $offset)
-            = substr ($self->{char_buffer}, $-[0], $+[0] - $-[0]);
-        my $count = $+[0] - $-[0];
-        if ($count) {
-          $self->{column} += $count;
-          $self->{char_buffer_pos} += $count;
-          $self->{line_prev} = $self->{line};
-          $self->{column_prev} = $self->{column} - 1;
-          $self->{nc} = -1;
-        }
-        return $count;
-      } else {
-        return 0;
-      }
-    } else {
-      my $count = $input->manakai_read_until ($_[0], $pattern, $_[2]);
-      if ($count) {
-        $self->{column} += $count;
-        $self->{line_prev} = $self->{line};
-        $self->{column_prev} = $self->{column} - 1;
-        $self->{nc} = -1;
-      }
-      return $count;
-    }
-  }; # $self->{read_until}
-
-  my $onerror = $_[2] || sub {
-    my (%opt) = @_;
-    my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
-    my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
-    warn "Parse error ($opt{type}) at line $line column $column\n";
-  };
+  my $onerror = $_[3] || $DefaultErrorHandler;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
-
-  my $char_onerror = sub {
-    my (undef, $type, %opt) = @_;
-    !!!parse-error (layer => 'encode',
-                    line => $self->{line}, column => $self->{column} + 1,
-                    %opt, type => $type);
-  }; # $char_onerror
-
-  if ($_[3]) {
-    $input = $_[3]->($input);
-    $input->onerror ($char_onerror);
-  } else {
-    $input->onerror ($char_onerror) unless defined $input->onerror;
-  }
 
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
   $self->_construct_tree;
   $self->_terminate_tree_constructor;
+  $self->_clear_refs;
 
+  return $doc;
+} # parse_char_string
+
+## DEPRECATED - for backward compatibility
+*parse_string = \&parse_char_string;
+
+## DEPRECATED
+sub parse_char_stream ($$$;$$) {
+  #my ($self, $handle, $document, $onerror, $get_wrapper) = @_;
+  my $self = ref $_[0] ? $_[0] : $_[0]->new;
+  my $doc = $self->{document} = $_[2];
+  @{$self->{document}->child_nodes} = ();
+
+  ## Confidence: irrelevant.
+  $self->{confident} = 1 unless exists $self->{confident};
+  $self->{document}->input_encoding ($self->{input_encoding})
+      if defined $self->{input_encoding};
+
+  $self->{line_prev} = $self->{line} = 1;
+  $self->{column_prev} = -1;
+  $self->{column} = 0;
+
+  my $handle = $_[1];
+  $self->{chars} = [];
+  $self->{chars_pos} = 0;
+  $self->{chars_pull_next} = sub {
+    $self->{chars} = [];
+    $self->{chars_pos} = 0;
+    my $i = 0;
+    my $char = '';
+    while ($handle->read ($char, 1, 0)) {
+      push @{$self->{chars}}, $char;
+      last if $i++ == 1024;
+    }
+    return $i > 0;
+  };
+  delete $self->{chars_was_cr};
+
+  my $onerror = $_[3] || $DefaultErrorHandler;
+  $self->{parse_error} = sub {
+    $onerror->(line => $self->{line}, column => $self->{column}, @_);
+  };
+
+  $self->_initialize_tokenizer;
+  $self->_initialize_tree_constructor;
+  {
+    $self->_construct_tree;
+    redo if $self->{nc} != EOF_CHAR;
+  }
+  $self->_terminate_tree_constructor;
+  $self->_clear_refs;
+
+  return $doc;
+} # parse_char_stream
+
+sub _clear_refs ($) {
+  my $self = $_[0];
   ## Remove self references.
   delete $self->{set_nc};
   delete $self->{read_until};
   delete $self->{parse_error};
   delete $self->{document};
-
-  return $doc;
-} # parse_char_stream
+  delete $self->{chars};
+  delete $self->{chars_pull_next};
+  delete $self->{restart_parser};
+} # _clear_refs
 
 sub new ($) {
   my $class = shift;
@@ -777,6 +596,7 @@ sub new ($) {
     # 
   };
   $self->{change_encoding} = sub {
+    $_[0]->_change_encoding ($_[1], $_[2]);
     # if ($_[0] is a supported encoding) {
     #   run "change the encoding" algorithm;
     #   throw Whatpm::HTML::RestartParser (charset => $new_encoding);
@@ -806,7 +626,9 @@ sub IN_CDATA_RCDATA_IM () { 0b1000000000000 }
 
 sub IM_MASK () { 0b11111111111 }
 
-## NOTE: "initial" and "before html" insertion modes have no constants.
+## NOTE: These insertion modes are special.
+sub INITIAL_IM () { -1 }
+sub BEFORE_HTML_IM () { -2 }
 
 ## NOTE: "after after body" insertion mode.
 sub AFTER_HTML_BODY_IM () { AFTER_HTML_IMS | BODY_AFTER_IMS }
@@ -844,11 +666,24 @@ sub _initialize_tree_constructor ($) {
   $self->{document}->set_user_data (manakai_source_column => 1);
 
   $self->{frameset_ok} = 1;
+  delete $self->{active_formatting_elements};
+  delete $self->{insert};
+  delete $self->{open_tables};
+
+  $self->{insertion_mode} = INITIAL_IM;
+  undef $self->{form_element};
+  undef $self->{head_element};
+  $self->{open_elements} = [];
+  undef $self->{inner_html_node};
+  undef $self->{ignore_newline};
 } # _initialize_tree_constructor
 
 sub _terminate_tree_constructor ($) {
   my $self = shift;
   $self->{document}->strict_error_checking (1);
+  delete $self->{active_formatting_elements};
+  delete $self->{insert};
+  delete $self->{open_tables};
   ## TODO: Turn mutation events on
 } # _terminate_tree_constructor
 
@@ -864,24 +699,26 @@ sub _construct_tree ($) {
   ## to the user, or when it begin accepting user input, are
   ## not defined.
   
-  $self->{insertion_mode} = 0; # dummy
   !!!next-token;
+  return if $token->{type} == ABORT_TOKEN;
 
-  undef $self->{form_element};
-  undef $self->{head_element};
-  $self->{open_elements} = [];
-  undef $self->{inner_html_node};
-  undef $self->{ignore_newline};
-
-  ## NOTE: The "initial" insertion mode.
-  $self->_tree_construction_initial; # MUST
-
-  ## NOTE: The "before html" insertion mode.
-  $self->_tree_construction_root_element;
-  $self->{insertion_mode} = BEFORE_HEAD_IM;
-
-  ## NOTE: The "before head" insertion mode and so on.
-  $self->_tree_construction_main;
+  if ($self->{insertion_mode} == INITIAL_IM) {
+    ## NOTE: The "initial" insertion mode.
+    $self->_tree_construction_initial; # MUST
+    $self->{insertion_mode} = BEFORE_HTML_IM;
+    return if $token->{type} == ABORT_TOKEN;
+  }
+  if ($self->{insertion_mode} == BEFORE_HTML_IM) {
+    ## NOTE: The "before html" insertion mode.
+    $self->_tree_construction_root_element;
+    $self->{insertion_mode} = BEFORE_HEAD_IM;
+    return if $token->{type} == ABORT_TOKEN;
+  }
+  if ($self->{insertion_mode} != INITIAL_IM and
+      $self->{insertion_mode} != BEFORE_HTML_IM) {
+    ## NOTE: The "before head" insertion mode and so on.
+    $self->_tree_construction_main;
+  }
 } # _construct_tree
 
 sub _tree_construction_initial ($) {
@@ -1776,17 +1613,21 @@ sub _tree_construction_main ($) {
   ## an array reference, which contains: [0] - the element node; [1] -
   ## the local name of the element; [2] - the token that is used to
   ## create [0].
-  my $active_formatting_elements = [];
+  my $active_formatting_elements = $self->{active_formatting_elements} ||= [];
 
-  my $insert = $insert_to_current;
+  my $insert = $self->{insert} ||= $insert_to_current;
 
   ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
   ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
   ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
-  my $open_tables = [[$self->{open_elements}->[0]->[0]]];
+  my $open_tables = $self->{open_tables} ||= [[$self->{open_elements}->[0]->[0]]];
 
   B: while (1) {
     !!!pdebug { print STDERR join ' ', map { $_->[0]->manakai_local_name } @{$self->{open_elements}}; print STDERR ' '; _printim ($self->{insertion_mode}); warn Dumper $token; };
+
+    if ($token->{type} == ABORT_TOKEN) {
+      return;
+    }
 
     if ($token->{n}++ == 100) {
       !!!parse-error (type => 'parser impl error', # XXXtest
@@ -3185,7 +3026,7 @@ sub _tree_construction_main ($) {
         die "$0: $token->{type}: Unknown token type";
       }
 
-      $insert = $insert_to_current;
+      $self->{insert} = $insert = $insert_to_current;
       #
     } elsif ($self->{insertion_mode} & TABLE_IMS) {
       if ($token->{type} == START_TAG_TOKEN) {
@@ -3522,7 +3363,7 @@ sub _tree_construction_main ($) {
         !!!parse-error (type => 'in table', text => $token->{tag_name},
                         token => $token);
 
-        $insert = $insert_to_foster;
+        $self->{insert} = $insert = $insert_to_foster;
         #
       } elsif ($token->{type} == END_TAG_TOKEN) {
         if ($token->{tag_name} eq 'tr' and
@@ -3804,7 +3645,7 @@ sub _tree_construction_main ($) {
           !!!parse-error (type => 'in table:/',
                           text => $token->{tag_name}, token => $token);
 
-          $insert = $insert_to_foster;
+          $self->{insert} = $insert = $insert_to_foster;
           #
         }
       } elsif ($token->{type} == END_OF_FILE_TOKEN) {
@@ -6008,7 +5849,7 @@ __END__
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

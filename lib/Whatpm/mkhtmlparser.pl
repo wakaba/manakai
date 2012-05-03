@@ -13,15 +13,7 @@ while (<>) {
     } : q{return })
   }e;
   s{!!!next-input-character;}{q{
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   }}ge;
   s{!!!nack\s*\(\s*'([^']+)'\s*\)\s*;}{
     ($TokenizerDebug ? qq{

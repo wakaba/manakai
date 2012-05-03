@@ -314,6 +314,9 @@ sub _initialize_tokenizer ($) {
   undef $self->{last_stag_name}; # last emitted start tag name
   #$self->{prev_state}; # initialized when used
   delete $self->{self_closing};
+  #$self->{chars}
+  $self->{chars_pos} = 0;
+  delete $self->{chars_was_cr};
   $self->{char_buffer} = '';
   $self->{char_buffer_pos} = 0;
   $self->{nc} = -1; # next input character
@@ -322,6 +325,117 @@ sub _initialize_tokenizer ($) {
   $self->{token} = [];
   # $self->{escape}
 } # _initialize_tokenizer
+
+sub _set_nc ($) {
+  my $self = $_[0];
+
+  if ($self->{chars}) {
+    {
+      if ($self->{chars_pos} < @{$self->{chars}}) {
+        $self->{line_prev} = $self->{line};
+        $self->{column_prev} = $self->{column};
+        my $c = ord $self->{chars}->[$self->{chars_pos}++];
+        if ($c == 0x000A) {
+          if ($self->{chars_was_cr}) {
+            delete $self->{chars_was_cr};
+            redo;
+          } else {
+            delete $self->{chars_was_cr};
+            $self->{line}++;
+            $self->{column} = 0;
+          }
+        } elsif ($c == 0x000D) {
+          $self->{chars_was_cr} = 1;
+          $self->{line}++;
+          $self->{column} = 0;
+          $c = 0x000A;
+        } else {
+          if (
+              (0x0001 <= $c and $c <= 0x0008) or
+              (0x000E <= $c and $c <= 0x001F) or
+              (0x007F <= $c and $c <= 0x009F) or
+              (0xFDD0 <= $c and $c <= 0xFDEF) or
+              {0x000B => 1, 0xFFFE => 1, 0xFFFF => 1,
+               0x1FFFE => 1, 0x1FFFF => 1, 0x2FFFE => 1, 0x2FFFF => 1,
+               0x3FFFE => 1, 0x3FFFF => 1, 0x4FFFE => 1, 0x4FFFF => 1,
+               0x5FFFE => 1, 0x5FFFF => 1, 0x6FFFE => 1, 0x6FFFF => 1,
+               0x7FFFE => 1, 0x7FFFF => 1, 0x8FFFE => 1, 0x8FFFF => 1,
+               0x9FFFE => 1, 0x9FFFF => 1, 0xAFFFE => 1, 0xAFFFF => 1,
+               0xBFFFE => 1, 0xBFFFF => 1, 0xCFFFE => 1, 0xCFFFF => 1,
+               0xDFFFE => 1, 0xDFFFF => 1, 0xEFFFE => 1, 0xEFFFF => 1,
+               0xFFFFE => 1, 0xFFFFF => 1, 0x10FFFE => 1, 0x10FFFF => 1,
+             }->{$c}
+           ) {
+            $self->{parse_error}
+                ->(type => ($c < 0xA0
+                                ? (sprintf 'control char:U+%04X', $c)
+                                : (sprintf 'nonchar:U+%04X', $c)),
+                   level => 'm',
+                   line => $self->{line},
+                   column => $self->{column} + 1);
+          }
+
+          delete $self->{chars_was_cr};
+          $self->{column}++;
+        }
+        $self->{nc} = $c;
+      } else {
+        delete $self->{chars_was_cr};
+        if ($self->{chars_pull_next}->()) {
+          $self->{nc} = ABORT_CHAR;
+        } else {
+          $self->{nc} = EOF_CHAR;
+        }
+      }
+    }
+    return;
+  }
+
+  ## Compat (to be deleted, hopefully...)
+  if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+    $self->{line_prev} = $self->{line};
+    $self->{column_prev} = $self->{column};
+    $self->{column}++;
+    $self->{nc}
+        = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+  } else {
+    $self->{set_nc}->($self);
+  }
+} # _set_nc
+
+sub _read_chars ($$) {
+  my ($self, $stoppers) = @_;
+
+  ## Compat (to be deleted, hopefully...)
+  unless ($self->{chars}) {
+    my $buffer = '';
+    my $pattern = join '', keys %$stoppers;
+    if ($pattern =~ s/-//) {
+      $pattern = '-' . $pattern;
+    }
+    $self->{read_until}->($buffer, $pattern, 0);
+    return $buffer;
+  }
+  
+  my $start = $self->{chars_pos};
+  {
+    my $char = $self->{chars}->[$self->{chars_pos}];
+    last if not defined $char;
+    if ($stoppers->{$char}) {
+      last;
+    } else {
+      $self->{chars_pos}++;
+    }
+    redo;
+  }
+  
+  if ($start != $self->{chars_pos}) {
+    $self->{column} += $self->{chars_pos} - $start;
+    return join '', @{$self->{chars}}[$start..($self->{chars_pos}-1)];
+  } else {
+    return '';
+  }
+} # _read_chars
 
 ## A token has:
 ##   ->{type} == DOCTYPE_TOKEN, START_TAG_TOKEN, END_TAG_TOKEN, COMMENT_TOKEN,
@@ -1302,7 +1416,7 @@ sub _get_next_token ($) {
     my $nc = $self->{nc};
 
     if ($nc == ABORT_CHAR) {
-      $self->{set_nc}->($self);
+      $self->_set_nc;
       $nc = $self->{nc};
       return {type => ABORT_TOKEN} if $nc == ABORT_CHAR;
     }
@@ -1436,9 +1550,12 @@ sub _get_next_token ($) {
             $token->{column} = $self->{column};
           }
           if (defined $action->{emit_data_read_until}) {
-            $self->{read_until}->($token->{data},
-                                  $action->{emit_data_read_until},
-                                  length $token->{data});
+            $token->{data} .= $self->_read_chars
+                ({map { $_ => 1 } "\x0D", "\x0A", split //, $action->{emit_data_read_until}});
+
+            #$self->{read_until}->($token->{data},
+            #                      $action->{emit_data_read_until},
+            #                      length $token->{data});
           }
           
           if ($action->{reconsume}) {
@@ -1668,9 +1785,14 @@ sub _get_next_token ($) {
           !!!cp (100.1);
         }
         $self->{ca}->{value} .= chr ($nc);
-        $self->{read_until}->($self->{ca}->{value},
-                              qq[\x00"&<\x09\x0C\x20],
-                              length $self->{ca}->{value});
+
+        $self->{ca}->{value} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, q<&> => 1, "<" => 1,
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ca}->{value},
+        #                      qq[\x00"&<\x09\x0C\x20],
+        #                      length $self->{ca}->{value});
 
         ## Stay in the state
         !!!next-input-character;
@@ -1771,9 +1893,13 @@ sub _get_next_token ($) {
           !!!cp (106.1);
         }
         $self->{ca}->{value} .= chr ($nc);
-        $self->{read_until}->($self->{ca}->{value},
-                              qq[\x00'&<\x09\x0C\x20],
-                              length $self->{ca}->{value});
+        $self->{ca}->{value} .= $self->_read_chars
+            ({"\x00" => 1, q<'> => 1, q<&> => 1, "<" => 1,
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ca}->{value},
+        #                      qq[\x00'&<\x09\x0C\x20],
+        #                      length $self->{ca}->{value});
 
         ## Stay in the state
         !!!next-input-character;
@@ -1904,9 +2030,14 @@ sub _get_next_token ($) {
           !!!cp (116);
         }
         $self->{ca}->{value} .= chr ($nc);
-        $self->{read_until}->($self->{ca}->{value},
-                              qq[\x00"'=&` \x09\x0C<>],
-                              length $self->{ca}->{value});
+        $self->{ca}->{value} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, q<'> => 1, 
+              q<=> => 1, q<&> => 1, q<`> => 1, "<" => 1, ">" => 1,
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ca}->{value},
+        #                      qq[\x00"'=&` \x09\x0C<>],
+        #                      length $self->{ca}->{value});
 
         ## Stay in the state
         !!!next-input-character;
@@ -1979,9 +2110,12 @@ sub _get_next_token ($) {
       } else {
         !!!cp (126);
         $self->{ct}->{data} .= chr ($nc); # comment
-        $self->{read_until}->($self->{ct}->{data},
-                              qq[\x00>],
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data},
+        #                      qq[\x00>],
+        #                      length $self->{ct}->{data});
 
         ## Stay in the state.
         !!!next-input-character;
@@ -2262,9 +2396,12 @@ sub _get_next_token ($) {
       } else {
         !!!cp (147);
         $self->{ct}->{data} .= chr ($nc); # comment
-        $self->{read_until}->($self->{ct}->{data},
-                              qq[-\x00],
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, "-" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data},
+        #                      qq[-\x00],
+        #                      length $self->{ct}->{data});
 
         ## Stay in the state
         !!!next-input-character;
@@ -2847,8 +2984,11 @@ sub _get_next_token ($) {
       } else {
         !!!cp (190);
         $self->{ct}->{pubid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{pubid}, qq[\x00">],
-                              length $self->{ct}->{pubid});
+        $self->{ct}->{pubid} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{pubid}, qq[\x00">],
+        #                      length $self->{ct}->{pubid});
 
         ## Stay in the state.
         !!!next-input-character;
@@ -2898,8 +3038,11 @@ sub _get_next_token ($) {
       } else {
         !!!cp (194);
         $self->{ct}->{pubid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{pubid}, qq[\x00'>],
-                              length $self->{ct}->{pubid});
+        $self->{ct}->{pubid} .= $self->_read_chars
+            ({"\x00" => 1, "'" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{pubid}, qq[\x00'>],
+        #                      length $self->{ct}->{pubid});
 
         ## Stay in the state
         !!!next-input-character;
@@ -3129,8 +3272,11 @@ sub _get_next_token ($) {
       } else {
         !!!cp (210);
         $self->{ct}->{sysid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{sysid}, qq[\x00">],
-                              length $self->{ct}->{sysid});
+        $self->{ct}->{sysid} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{sysid}, qq[\x00">],
+        #                      length $self->{ct}->{sysid});
 
         ## Stay in the state
         !!!next-input-character;
@@ -3176,8 +3322,11 @@ sub _get_next_token ($) {
       } else {
         !!!cp (214);
         $self->{ct}->{sysid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{sysid}, qq[\x00'>],
-                              length $self->{ct}->{sysid});
+        $self->{ct}->{sysid} .= $self->_read_chars
+            ({"\x00" => 1, "'" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{sysid}, qq[\x00'>],
+        #                      length $self->{ct}->{sysid});
 
         ## Stay in the state
         !!!next-input-character;
@@ -3316,7 +3465,10 @@ sub _get_next_token ($) {
       } else {
         !!!cp (221);
         my $s = '';
-        $self->{read_until}->($s, q{>[}, 0);
+        #$self->{read_until}->($s, q{>[}, 0);
+        $self->_read_chars
+            ({"[" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
 
         ## Stay in the state
         !!!next-input-character;
@@ -3355,9 +3507,13 @@ sub _get_next_token ($) {
       } else {
         !!!cp (221.4);
         $self->{ct}->{data} .= chr $nc;
-        $self->{read_until}->($self->{ct}->{data},
-                              qq<\x00]>,
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, "]" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data},
+        #                      qq<\x00]>,
+        #                      length $self->{ct}->{data});
+
         ## NOTE: NULLs are left as is (see spec's comment).  However,
         ## a token cannot contain more than one U+0000 NULL character
         ## for the ease of processing in the tree constructor.
@@ -4009,8 +4165,12 @@ sub _get_next_token ($) {
           !!!parse-error (type => 'NULL');
         }
         $self->{ct}->{data} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # pi
-        $self->{read_until}->($self->{ct}->{data}, qq[\x00?],
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, "?" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data}, qq[\x00?],
+        #                      length $self->{ct}->{data});
+
         ## Stay in the state.
         !!!next-input-character;
         ## Reprocess.

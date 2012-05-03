@@ -11,10 +11,10 @@ ok 6 - Document tree: qq'<p>aaa\x{D800}\x{D801}\x{DFF0}\x{DFFF}'
 ok 7 - Parse error: qq'<p>...&NotNestedGreaterGreater;?'; 1:4:no DOCTYPE;no DOCTYPE
 ok 8 - SHOULD-level error: qq'<p>...&NotNestedGreaterGreater;?'; ;
 ok 9 - Document tree: qq'<p>...&NotNestedGreaterGreater;?'
-ok 10 - Parse error: qq'<p>\x{03}'; 1:1:control char:U+0003, 1:4:no DOCTYPE;no DOCTYPE, U+0003
+ok 10 - Parse error: qq'<p>\x{03}'; 1:4:control char:U+0003, 1:4:no DOCTYPE;no DOCTYPE, U+0003
 ok 11 - SHOULD-level error: qq'<p>\x{03}'; ;
 ok 12 - Document tree: qq'<p>\x{03}'
-ok 13 - Parse error: qq'<p>\x{0B}'; 1:1:control char:U+000B, 1:4:no DOCTYPE;no DOCTYPE, U+000B
+ok 13 - Parse error: qq'<p>\x{0B}'; 1:4:control char:U+000B, 1:4:no DOCTYPE;no DOCTYPE, U+000B
 ok 14 - SHOULD-level error: qq'<p>\x{0B}'; ;
 ok 15 - Document tree: qq'<p>\x{0B}'
 ok 16 - Parse error: qq'<title>a\x{00}</title>'; 1:8:no DOCTYPE, 1:9:NULL;no DOCTYPE, NULL
@@ -4546,76 +4546,76 @@ ok 3570 - Document tree: qq'\x{0B}<p>'
 ok 3571 - Parse error: qq'\x{0B}abc'; 1:1:control char:U+000B, 1:4:no DOCTYPE;no DOCTYPE, U+000B
 ok 3572 - SHOULD-level error: qq'\x{0B}abc'; ;
 ok 3573 - Document tree: qq'\x{0B}abc'
-ok 3574 - Parse error: qq'<!DOCTYPE HTML>\x{0B}<p>'; 1:1:control char:U+000B;U+000B
+ok 3574 - Parse error: qq'<!DOCTYPE HTML>\x{0B}<p>'; 1:16:control char:U+000B;U+000B
 ok 3575 - SHOULD-level error: qq'<!DOCTYPE HTML>\x{0B}<p>'; ;
 ok 3576 - Document tree: qq'<!DOCTYPE HTML>\x{0B}<p>'
-ok 3577 - Parse error: qq'<!DOCTYPE HTML>\x{0B}abc'; 1:1:control char:U+000B;U+000B
+ok 3577 - Parse error: qq'<!DOCTYPE HTML>\x{0B}abc'; 1:16:control char:U+000B;U+000B
 ok 3578 - SHOULD-level error: qq'<!DOCTYPE HTML>\x{0B}abc'; ;
 ok 3579 - Document tree: qq'<!DOCTYPE HTML>\x{0B}abc'
-ok 3580 - Parse error: qq'<!DOCTYPE HTML><html>\x{0B}<p>'; 1:1:control char:U+000B;U+000B
+ok 3580 - Parse error: qq'<!DOCTYPE HTML><html>\x{0B}<p>'; 1:22:control char:U+000B;U+000B
 ok 3581 - SHOULD-level error: qq'<!DOCTYPE HTML><html>\x{0B}<p>'; ;
 ok 3582 - Document tree: qq'<!DOCTYPE HTML><html>\x{0B}<p>'
-ok 3583 - Parse error: qq'<!DOCTYPE HTML><html>\x{0B}abc'; 1:1:control char:U+000B;U+000B
+ok 3583 - Parse error: qq'<!DOCTYPE HTML><html>\x{0B}abc'; 1:22:control char:U+000B;U+000B
 ok 3584 - SHOULD-level error: qq'<!DOCTYPE HTML><html>\x{0B}abc'; ;
 ok 3585 - Document tree: qq'<!DOCTYPE HTML><html>\x{0B}abc'
-ok 3586 - Parse error: qq'<!DOCTYPE HTML><head>\x{0B}<p>'; 1:1:control char:U+000B;U+000B
+ok 3586 - Parse error: qq'<!DOCTYPE HTML><head>\x{0B}<p>'; 1:22:control char:U+000B;U+000B
 ok 3587 - SHOULD-level error: qq'<!DOCTYPE HTML><head>\x{0B}<p>'; ;
 ok 3588 - Document tree: qq'<!DOCTYPE HTML><head>\x{0B}<p>'
-ok 3589 - Parse error: qq'<!DOCTYPE HTML><head>\x{0B}abc'; 1:1:control char:U+000B;U+000B
+ok 3589 - Parse error: qq'<!DOCTYPE HTML><head>\x{0B}abc'; 1:22:control char:U+000B;U+000B
 ok 3590 - SHOULD-level error: qq'<!DOCTYPE HTML><head>\x{0B}abc'; ;
 ok 3591 - Document tree: qq'<!DOCTYPE HTML><head>\x{0B}abc'
-ok 3592 - Parse error: qq'<!DOCTYPE HTML><head></head>\x{0B}<p>'; 1:1:control char:U+000B;U+000B
+ok 3592 - Parse error: qq'<!DOCTYPE HTML><head></head>\x{0B}<p>'; 1:29:control char:U+000B;U+000B
 ok 3593 - SHOULD-level error: qq'<!DOCTYPE HTML><head></head>\x{0B}<p>'; ;
 ok 3594 - Document tree: qq'<!DOCTYPE HTML><head></head>\x{0B}<p>'
-ok 3595 - Parse error: qq'<!DOCTYPE HTML><head></head>\x{0B}abc'; 1:1:control char:U+000B;U+000B
+ok 3595 - Parse error: qq'<!DOCTYPE HTML><head></head>\x{0B}abc'; 1:29:control char:U+000B;U+000B
 ok 3596 - SHOULD-level error: qq'<!DOCTYPE HTML><head></head>\x{0B}abc'; ;
 ok 3597 - Document tree: qq'<!DOCTYPE HTML><head></head>\x{0B}abc'
-ok 3598 - Parse error: qq'<!DOCTYPE HTML><head><noscript>\x{0B}<p>'; 1:1:control char:U+000B, 1:33:in noscript:\#text;no </noscript>, U+000B
+ok 3598 - Parse error: qq'<!DOCTYPE HTML><head><noscript>\x{0B}<p>'; 1:32:control char:U+000B, 1:33:in noscript:\#text;no </noscript>, U+000B
 ok 3599 - SHOULD-level error: qq'<!DOCTYPE HTML><head><noscript>\x{0B}<p>'; ;
 ok 3600 - Document tree: qq'<!DOCTYPE HTML><head><noscript>\x{0B}<p>'
-ok 3601 - Parse error: qq'<!DOCTYPE HTML><head><noscript>\x{0B}abc'; 1:1:control char:U+000B, 1:35:in noscript:\#text;no </noscript>, U+000B
+ok 3601 - Parse error: qq'<!DOCTYPE HTML><head><noscript>\x{0B}abc'; 1:32:control char:U+000B, 1:35:in noscript:\#text;no </noscript>, U+000B
 ok 3602 - SHOULD-level error: qq'<!DOCTYPE HTML><head><noscript>\x{0B}abc'; ;
 ok 3603 - Document tree: qq'<!DOCTYPE HTML><head><noscript>\x{0B}abc'
-ok 3604 - Parse error: qq'<!DOCTYPE HTML><table>\x{0B}<p></table>'; 1:1:control char:U+000B, 1:27:in table:\#text, 1:27:in table:p;char in table, start tag in table, U+000B
+ok 3604 - Parse error: qq'<!DOCTYPE HTML><table>\x{0B}<p></table>'; 1:23:control char:U+000B, 1:27:in table:\#text, 1:27:in table:p;char in table, start tag in table, U+000B
 ok 3605 - SHOULD-level error: qq'<!DOCTYPE HTML><table>\x{0B}<p></table>'; ;
 ok 3606 - Document tree: qq'<!DOCTYPE HTML><table>\x{0B}<p></table>'
-ok 3607 - Parse error: qq'<!DOCTYPE HTML><table>\x{0B}abc</table>'; 1:1:control char:U+000B, 1:34:in table:\#text;char in table, U+000B
+ok 3607 - Parse error: qq'<!DOCTYPE HTML><table>\x{0B}abc</table>'; 1:23:control char:U+000B, 1:34:in table:\#text;char in table, U+000B
 ok 3608 - SHOULD-level error: qq'<!DOCTYPE HTML><table>\x{0B}abc</table>'; ;
 ok 3609 - Document tree: qq'<!DOCTYPE HTML><table>\x{0B}abc</table>'
-ok 3610 - Parse error: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}<p></table>'; 1:1:control char:U+000B, 1:37:in table:\#text, 1:37:in table:p;char in table, start tag in table, U+000B
+ok 3610 - Parse error: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}<p></table>'; 1:33:control char:U+000B, 1:37:in table:\#text, 1:37:in table:p;char in table, start tag in table, U+000B
 ok 3611 - SHOULD-level error: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}<p></table>'; ;
 ok 3612 - Document tree: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}<p></table>'
-ok 3613 - Parse error: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}abc</table>'; 1:1:control char:U+000B, 1:44:in table:\#text;char in table, U+000B
+ok 3613 - Parse error: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}abc</table>'; 1:33:control char:U+000B, 1:44:in table:\#text;char in table, U+000B
 ok 3614 - SHOULD-level error: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}abc</table>'; ;
 ok 3615 - Document tree: qq'<!DOCTYPE HTML><table><colgroup>\x{0B}abc</table>'
-ok 3616 - Parse error: qq'<!DOCTYPE HTML><body></body>\x{0B}<p>'; 1:1:control char:U+000B, 1:30:after body:\#text;char after body, U+000B
+ok 3616 - Parse error: qq'<!DOCTYPE HTML><body></body>\x{0B}<p>'; 1:29:control char:U+000B, 1:30:after body:\#text;char after body, U+000B
 ok 3617 - SHOULD-level error: qq'<!DOCTYPE HTML><body></body>\x{0B}<p>'; ;
 ok 3618 - Document tree: qq'<!DOCTYPE HTML><body></body>\x{0B}<p>'
-ok 3619 - Parse error: qq'<!DOCTYPE HTML><body></body>\x{0B}abc'; 1:1:control char:U+000B, 1:32:after body:\#text;char after body, U+000B
+ok 3619 - Parse error: qq'<!DOCTYPE HTML><body></body>\x{0B}abc'; 1:29:control char:U+000B, 1:32:after body:\#text;char after body, U+000B
 ok 3620 - SHOULD-level error: qq'<!DOCTYPE HTML><body></body>\x{0B}abc'; ;
 ok 3621 - Document tree: qq'<!DOCTYPE HTML><body></body>\x{0B}abc'
-ok 3622 - Parse error: qq'<!DOCTYPE HTML><frameset>\x{0B}<p></frameset>'; 1:1:control char:U+000B, 1:27:in frameset:\#text, 1:30:in frameset:p;char in frameset, start tag in frameset, U+000B
+ok 3622 - Parse error: qq'<!DOCTYPE HTML><frameset>\x{0B}<p></frameset>'; 1:26:control char:U+000B, 1:27:in frameset:\#text, 1:30:in frameset:p;char in frameset, start tag in frameset, U+000B
 ok 3623 - SHOULD-level error: qq'<!DOCTYPE HTML><frameset>\x{0B}<p></frameset>'; ;
 ok 3624 - Document tree: qq'<!DOCTYPE HTML><frameset>\x{0B}<p></frameset>'
-ok 3625 - Parse error: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'; 1:1:control char:U+000B, 1:30:in frameset:\#text;char in frameset, U+000B
+ok 3625 - Parse error: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'; 1:26:control char:U+000B, 1:30:in frameset:\#text;char in frameset, U+000B
 ok 3626 - SHOULD-level error: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'; ;
 ok 3627 - Document tree: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'
-ok 3628 - Parse error: qq'<!DOCTYPE HTML><frameset></frameset>\x{0B}<p>'; 1:1:control char:U+000B, 1:38:after frameset:\#text, 1:40:after frameset:p;char after frameset, tag after frameset, U+000B
+ok 3628 - Parse error: qq'<!DOCTYPE HTML><frameset></frameset>\x{0B}<p>'; 1:37:control char:U+000B, 1:38:after frameset:\#text, 1:40:after frameset:p;char after frameset, tag after frameset, U+000B
 ok 3629 - SHOULD-level error: qq'<!DOCTYPE HTML><frameset></frameset>\x{0B}<p>'; ;
 ok 3630 - Document tree: qq'<!DOCTYPE HTML><frameset></frameset>\x{0B}<p>'
-ok 3631 - Parse error: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'; 1:1:control char:U+000B, 1:30:in frameset:\#text;char after frameset, U+000B
+ok 3631 - Parse error: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'; 1:26:control char:U+000B, 1:30:in frameset:\#text;char after frameset, U+000B
 ok 3632 - SHOULD-level error: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'; ;
 ok 3633 - Document tree: qq'<!DOCTYPE HTML><frameset>\x{0B}abc</frameset>'
-ok 3634 - Parse error: qq'<!DOCTYPE HTML><body></body></html>\x{0B}<p>'; 1:1:control char:U+000B, 1:37:after html:\#text;char after body html, U+000B
+ok 3634 - Parse error: qq'<!DOCTYPE HTML><body></body></html>\x{0B}<p>'; 1:36:control char:U+000B, 1:37:after html:\#text;char after body html, U+000B
 ok 3635 - SHOULD-level error: qq'<!DOCTYPE HTML><body></body></html>\x{0B}<p>'; ;
 ok 3636 - Document tree: qq'<!DOCTYPE HTML><body></body></html>\x{0B}<p>'
-ok 3637 - Parse error: qq'<!DOCTYPE HTML><body></body></html>\x{0B}abc'; 1:1:control char:U+000B, 1:39:after html:\#text;char after body html, U+000B
+ok 3637 - Parse error: qq'<!DOCTYPE HTML><body></body></html>\x{0B}abc'; 1:36:control char:U+000B, 1:39:after html:\#text;char after body html, U+000B
 ok 3638 - SHOULD-level error: qq'<!DOCTYPE HTML><body></body></html>\x{0B}abc'; ;
 ok 3639 - Document tree: qq'<!DOCTYPE HTML><body></body></html>\x{0B}abc'
-ok 3640 - Parse error: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}<p>'; 1:1:control char:U+000B, 1:45:after html:\#text, 1:47:after after frameset:p;char after frameset html, char after frameset html, U+000B
+ok 3640 - Parse error: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}<p>'; 1:44:control char:U+000B, 1:45:after html:\#text, 1:47:after after frameset:p;char after frameset html, char after frameset html, U+000B
 ok 3641 - SHOULD-level error: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}<p>'; ;
 ok 3642 - Document tree: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}<p>'
-ok 3643 - Parse error: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}abc'; 1:1:control char:U+000B, 1:47:after html:\#text;char after frameset html, U+000B
+ok 3643 - Parse error: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}abc'; 1:44:control char:U+000B, 1:47:after html:\#text;char after frameset html, U+000B
 ok 3644 - SHOULD-level error: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}abc'; ;
 ok 3645 - Document tree: qq'<!DOCTYPE HTML><frameset></frameset></html>\x{0B}abc'
 ok 3646 - Parse error: qq'<!DOCTYPE HTML><ul><li><address><li>'; 1:36:not closed:address, 1:36:in body:\#eof;no </address>, no </ul>

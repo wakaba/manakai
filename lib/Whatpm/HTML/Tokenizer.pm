@@ -314,24 +314,130 @@ sub _initialize_tokenizer ($) {
   undef $self->{last_stag_name}; # last emitted start tag name
   #$self->{prev_state}; # initialized when used
   delete $self->{self_closing};
+  #$self->{chars}
+  $self->{chars_pos} = 0;
+  delete $self->{chars_was_cr};
   $self->{char_buffer} = '';
   $self->{char_buffer_pos} = 0;
   $self->{nc} = -1; # next input character
   #$self->{next_nc}
   
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
   $self->{token} = [];
   # $self->{escape}
 } # _initialize_tokenizer
+
+sub _set_nc ($) {
+  my $self = $_[0];
+
+  if ($self->{chars}) {
+    {
+      if ($self->{chars_pos} < @{$self->{chars}}) {
+        $self->{line_prev} = $self->{line};
+        $self->{column_prev} = $self->{column};
+        my $c = ord $self->{chars}->[$self->{chars_pos}++];
+        if ($c == 0x000A) {
+          if ($self->{chars_was_cr}) {
+            delete $self->{chars_was_cr};
+            redo;
+          } else {
+            delete $self->{chars_was_cr};
+            $self->{line}++;
+            $self->{column} = 0;
+          }
+        } elsif ($c == 0x000D) {
+          $self->{chars_was_cr} = 1;
+          $self->{line}++;
+          $self->{column} = 0;
+          $c = 0x000A;
+        } else {
+          if (
+              (0x0001 <= $c and $c <= 0x0008) or
+              (0x000E <= $c and $c <= 0x001F) or
+              (0x007F <= $c and $c <= 0x009F) or
+              (0xFDD0 <= $c and $c <= 0xFDEF) or
+              {0x000B => 1, 0xFFFE => 1, 0xFFFF => 1,
+               0x1FFFE => 1, 0x1FFFF => 1, 0x2FFFE => 1, 0x2FFFF => 1,
+               0x3FFFE => 1, 0x3FFFF => 1, 0x4FFFE => 1, 0x4FFFF => 1,
+               0x5FFFE => 1, 0x5FFFF => 1, 0x6FFFE => 1, 0x6FFFF => 1,
+               0x7FFFE => 1, 0x7FFFF => 1, 0x8FFFE => 1, 0x8FFFF => 1,
+               0x9FFFE => 1, 0x9FFFF => 1, 0xAFFFE => 1, 0xAFFFF => 1,
+               0xBFFFE => 1, 0xBFFFF => 1, 0xCFFFE => 1, 0xCFFFF => 1,
+               0xDFFFE => 1, 0xDFFFF => 1, 0xEFFFE => 1, 0xEFFFF => 1,
+               0xFFFFE => 1, 0xFFFFF => 1, 0x10FFFE => 1, 0x10FFFF => 1,
+             }->{$c}
+           ) {
+            $self->{parse_error}
+                ->(type => ($c < 0xA0
+                                ? (sprintf 'control char:U+%04X', $c)
+                                : (sprintf 'nonchar:U+%04X', $c)),
+                   level => 'm',
+                   line => $self->{line},
+                   column => $self->{column} + 1);
+          }
+
+          delete $self->{chars_was_cr};
+          $self->{column}++;
+        }
+        $self->{nc} = $c;
+      } else {
+        delete $self->{chars_was_cr};
+        if ($self->{chars_pull_next}->()) {
+          $self->{nc} = ABORT_CHAR;
+        } else {
+          $self->{nc} = EOF_CHAR;
+        }
+      }
+    }
+    return;
+  }
+
+  ## Compat (to be deleted, hopefully...)
+  if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
+    $self->{line_prev} = $self->{line};
+    $self->{column_prev} = $self->{column};
+    $self->{column}++;
+    $self->{nc}
+        = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
+  } else {
+    $self->{set_nc}->($self);
+  }
+} # _set_nc
+
+sub _read_chars ($$) {
+  my ($self, $stoppers) = @_;
+
+  ## Compat (to be deleted, hopefully...)
+  unless ($self->{chars}) {
+    my $buffer = '';
+    my $pattern = join '', keys %$stoppers;
+    if ($pattern =~ s/-//) {
+      $pattern = '-' . $pattern;
+    }
+    $self->{read_until}->($buffer, $pattern, 0);
+    return $buffer;
+  }
+  
+  my $start = $self->{chars_pos};
+  {
+    my $char = $self->{chars}->[$self->{chars_pos}];
+    last if not defined $char;
+    if ($stoppers->{$char}) {
+      last;
+    } else {
+      $self->{chars_pos}++;
+    }
+    redo;
+  }
+  
+  if ($start != $self->{chars_pos}) {
+    $self->{column} += $self->{chars_pos} - $start;
+    return join '', @{$self->{chars}}[$start..($self->{chars_pos}-1)];
+  } else {
+    return '';
+  }
+} # _read_chars
 
 ## A token has:
 ##   ->{type} == DOCTYPE_TOKEN, START_TAG_TOKEN, END_TAG_TOKEN, COMMENT_TOKEN,
@@ -1312,7 +1418,7 @@ sub _get_next_token ($) {
     my $nc = $self->{nc};
 
     if ($nc == ABORT_CHAR) {
-      $self->{set_nc}->($self);
+      $self->_set_nc;
       $nc = $self->{nc};
       return {type => ABORT_TOKEN} if $nc == ABORT_CHAR;
     }
@@ -1426,15 +1532,7 @@ sub _get_next_token ($) {
             #
           } else {
             
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
           }
           return  ($self->{ct});
@@ -1456,24 +1554,19 @@ sub _get_next_token ($) {
             $token->{column} = $self->{column};
           }
           if (defined $action->{emit_data_read_until}) {
-            $self->{read_until}->($token->{data},
-                                  $action->{emit_data_read_until},
-                                  length $token->{data});
+            $token->{data} .= $self->_read_chars
+                ({map { $_ => 1 } "\x0D", "\x0A", split //, $action->{emit_data_read_until}});
+
+            #$self->{read_until}->($token->{data},
+            #                      $action->{emit_data_read_until},
+            #                      length $token->{data});
           }
           
           if ($action->{reconsume}) {
             #
           } else {
             
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
           }
           return  ($token);
@@ -1483,15 +1576,7 @@ sub _get_next_token ($) {
           #
         } else {
           
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         }
       }
@@ -1542,15 +1627,7 @@ sub _get_next_token ($) {
           ## Stay in the state.
           $self->{kwd} .= $nch;
           
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
           redo A;
         } else {
@@ -1621,15 +1698,7 @@ sub _get_next_token ($) {
               : SCRIPT_DATA_DOUBLE_ESCAPED_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($token);
         redo A;
@@ -1652,15 +1721,7 @@ sub _get_next_token ($) {
           $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0026) { # &
@@ -1675,15 +1736,7 @@ sub _get_next_token ($) {
         $self->{entity_add} = 0x0022; # "
         $self->{state} = ENTITY_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($self->{is_xml} and 
@@ -1692,15 +1745,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= ' ';
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -1747,15 +1792,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= "\x{FFFD}";
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -1768,21 +1805,18 @@ sub _get_next_token ($) {
           
         }
         $self->{ca}->{value} .= chr ($nc);
-        $self->{read_until}->($self->{ca}->{value},
-                              qq[\x00"&<\x09\x0C\x20],
-                              length $self->{ca}->{value});
+
+        $self->{ca}->{value} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, q<&> => 1, "<" => 1,
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ca}->{value},
+        #                      qq[\x00"&<\x09\x0C\x20],
+        #                      length $self->{ca}->{value});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -1802,15 +1836,7 @@ sub _get_next_token ($) {
           $self->{state} = AFTER_ATTRIBUTE_VALUE_QUOTED_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0026) { # &
@@ -1825,15 +1851,7 @@ sub _get_next_token ($) {
         $self->{prev_state} = $state;
         $self->{state} = ENTITY_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($self->{is_xml} and 
@@ -1842,15 +1860,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= ' ';
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -1900,15 +1910,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= "\x{FFFD}";
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -1921,21 +1923,17 @@ sub _get_next_token ($) {
           
         }
         $self->{ca}->{value} .= chr ($nc);
-        $self->{read_until}->($self->{ca}->{value},
-                              qq[\x00'&<\x09\x0C\x20],
-                              length $self->{ca}->{value});
+        $self->{ca}->{value} .= $self->_read_chars
+            ({"\x00" => 1, q<'> => 1, q<&> => 1, "<" => 1,
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ca}->{value},
+        #                      qq[\x00'&<\x09\x0C\x20],
+        #                      length $self->{ca}->{value});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -1953,15 +1951,7 @@ sub _get_next_token ($) {
           $self->{state} = BEFORE_ATTRIBUTE_NAME_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0026) { # &
@@ -1978,15 +1968,7 @@ sub _get_next_token ($) {
         $self->{prev_state} = $state;
         $self->{state} = ENTITY_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -1996,15 +1978,7 @@ sub _get_next_token ($) {
 
           $self->{state} = DATA_STATE;
           
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
           return  ($self->{ct}); # start tag
           redo A;
@@ -2019,15 +1993,7 @@ sub _get_next_token ($) {
 
           $self->{state} = DATA_STATE;
           
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
           return  ($self->{ct}); # end tag
           redo A;
@@ -2035,15 +2001,7 @@ sub _get_next_token ($) {
           push @{$self->{ct}->{attrdefs}}, $self->{ca};
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
           
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
           return  ($self->{ct}); # ATTLIST
           redo A;
@@ -2098,15 +2056,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= "\x{FFFD}";
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2124,21 +2074,18 @@ sub _get_next_token ($) {
           
         }
         $self->{ca}->{value} .= chr ($nc);
-        $self->{read_until}->($self->{ca}->{value},
-                              qq[\x00"'=&` \x09\x0C<>],
-                              length $self->{ca}->{value});
+        $self->{ca}->{value} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, q<'> => 1, 
+              q<=> => 1, q<&> => 1, q<`> => 1, "<" => 1, ">" => 1,
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ca}->{value},
+        #                      qq[\x00"'=&` \x09\x0C<>],
+        #                      length $self->{ca}->{value});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -2164,15 +2111,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # start tag or end tag
@@ -2196,15 +2135,7 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # comment
@@ -2225,35 +2156,22 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= "\x{FFFD}"; # comment
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
         
         $self->{ct}->{data} .= chr ($nc); # comment
-        $self->{read_until}->($self->{ct}->{data},
-                              qq[\x00>],
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data},
+        #                      qq[\x00>],
+        #                      length $self->{ct}->{data});
 
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -2264,15 +2182,7 @@ sub _get_next_token ($) {
         
         $self->{state} = MD_HYPHEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0044 or # D
@@ -2282,15 +2192,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_DOCTYPE_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif (($self->{is_xml} or
@@ -2301,15 +2203,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_CDATA_STATE;
         $self->{kwd} = '[';
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2350,15 +2244,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 6 and
@@ -2382,15 +2268,7 @@ sub _get_next_token ($) {
                                   column => $self->{column_prev} - 7,
                                  };
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2420,15 +2298,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($self->{kwd} eq '[CDATA' and
@@ -2451,15 +2321,7 @@ sub _get_next_token ($) {
                                   column => $self->{column_prev} - 7};
         $self->{state} = CDATA_SECTION_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2481,15 +2343,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_START_DASH_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -2502,15 +2356,7 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # comment
@@ -2535,15 +2381,7 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= "\x{FFFD}"; # comment
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2552,15 +2390,7 @@ sub _get_next_token ($) {
             .= chr ($nc);
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -2569,15 +2399,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -2590,15 +2412,7 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # comment
@@ -2623,15 +2437,7 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= "-\x{FFFD}"; # comment
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2640,15 +2446,7 @@ sub _get_next_token ($) {
             .= '-' . chr ($nc);
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -2659,15 +2457,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_DASH_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -2688,35 +2478,22 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         $self->{ct}->{data} .= "\x{FFFD}"; # comment
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
         
         $self->{ct}->{data} .= chr ($nc); # comment
-        $self->{read_until}->($self->{ct}->{data},
-                              qq[-\x00],
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, "-" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data},
+        #                      qq[-\x00],
+        #                      length $self->{ct}->{data});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -2727,15 +2504,7 @@ sub _get_next_token ($) {
         
         $self->{state} = COMMENT_END_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -2757,15 +2526,7 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= "-\x{FFFD}"; # comment
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2773,15 +2534,7 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= '-' . chr ($nc); # comment
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -2799,15 +2552,7 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # comment
@@ -2828,15 +2573,7 @@ sub _get_next_token ($) {
           ## Stay in the state
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($state != COMMENT_END_BANG_STATE and
@@ -2845,15 +2582,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'comment end bang'); # XXX error type
         $self->{state} = COMMENT_END_BANG_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -2879,15 +2608,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -2899,15 +2620,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = COMMENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } 
@@ -2916,15 +2629,7 @@ sub _get_next_token ($) {
         
         $self->{state} = BEFORE_DOCTYPE_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -2952,15 +2657,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -2969,15 +2666,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE name');
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # DOCTYPE (quirks)
@@ -2990,15 +2679,7 @@ sub _get_next_token ($) {
         delete $self->{ct}->{quirks};
         $self->{state} = DOCTYPE_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -3017,15 +2698,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -3034,15 +2707,7 @@ sub _get_next_token ($) {
         delete $self->{ct}->{quirks};
         $self->{state} = DOCTYPE_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -3051,15 +2716,7 @@ sub _get_next_token ($) {
         delete $self->{ct}->{quirks};
         $self->{state} = DOCTYPE_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -3070,30 +2727,14 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # DOCTYPE
@@ -3106,15 +2747,7 @@ sub _get_next_token ($) {
         delete $self->{ct}->{quirks};
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -3133,15 +2766,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -3149,15 +2774,7 @@ sub _get_next_token ($) {
         $self->{ct}->{name} .= "\x{FFFD}"; # DOCTYPE
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -3165,15 +2782,7 @@ sub _get_next_token ($) {
         $self->{ct}->{name} .= chr ($nc); # DOCTYPE
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -3185,15 +2794,7 @@ sub _get_next_token ($) {
         
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -3207,15 +2808,7 @@ sub _get_next_token ($) {
         }
         
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
@@ -3240,15 +2833,7 @@ sub _get_next_token ($) {
         $self->{state} = PUBLIC_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0053 or # S
@@ -3257,15 +2842,7 @@ sub _get_next_token ($) {
         $self->{state} = SYSTEM_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022 and # "
@@ -3275,15 +2852,7 @@ sub _get_next_token ($) {
         $self->{state} = DOCTYPE_ENTITY_VALUE_DOUBLE_QUOTED_STATE;
         $self->{ct}->{value} = ''; # ENTITY
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027 and # '
@@ -3293,15 +2862,7 @@ sub _get_next_token ($) {
         $self->{state} = DOCTYPE_ENTITY_VALUE_SINGLE_QUOTED_STATE;
         $self->{ct}->{value} = ''; # ENTITY
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($self->{is_xml} and
@@ -3312,15 +2873,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -3337,15 +2890,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -3371,15 +2916,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 5 and
@@ -3397,15 +2934,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = AFTER_DOCTYPE_PUBLIC_KEYWORD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -3445,15 +2974,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 5 and
@@ -3471,15 +2992,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = AFTER_DOCTYPE_SYSTEM_KEYWORD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -3504,15 +3017,7 @@ sub _get_next_token ($) {
         ## Stay in or switch to the state.
         $self->{state} = BEFORE_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
@@ -3525,15 +3030,7 @@ sub _get_next_token ($) {
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -3546,15 +3043,7 @@ sub _get_next_token ($) {
         $self->{ct}->{pubid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_PUBLIC_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -3570,15 +3059,7 @@ sub _get_next_token ($) {
         }
         
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
@@ -3606,15 +3087,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -3631,15 +3104,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -3648,15 +3113,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -3672,15 +3129,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
@@ -3703,34 +3152,21 @@ sub _get_next_token ($) {
         $self->{ct}->{pubid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
         
         $self->{ct}->{pubid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{pubid}, qq[\x00">],
-                              length $self->{ct}->{pubid});
+        $self->{ct}->{pubid} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{pubid}, qq[\x00">],
+        #                      length $self->{ct}->{pubid});
 
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -3739,15 +3175,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_PUBLIC_IDENTIFIER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -3763,15 +3191,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
@@ -3794,34 +3214,21 @@ sub _get_next_token ($) {
         $self->{ct}->{pubid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
         
         $self->{ct}->{pubid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{pubid}, qq[\x00'>],
-                              length $self->{ct}->{pubid});
+        $self->{ct}->{pubid} .= $self->_read_chars
+            ({"\x00" => 1, "'" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{pubid}, qq[\x00'>],
+        #                      length $self->{ct}->{pubid});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -3832,15 +3239,7 @@ sub _get_next_token ($) {
         ## Stay in or switch to the state.
         $self->{state} = BETWEEN_DOCTYPE_PUBLIC_AND_SYSTEM_IDS_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
@@ -3853,15 +3252,7 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE/ENTITY/NOTATION
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -3874,15 +3265,7 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE/ENTITY/NOTATION
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -3905,15 +3288,7 @@ sub _get_next_token ($) {
         }
         
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
@@ -3941,15 +3316,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -3966,15 +3333,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -3985,15 +3344,7 @@ sub _get_next_token ($) {
         ## Stay in or switch to the state.
         $self->{state} = BEFORE_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
@@ -4006,15 +3357,7 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -4027,29 +3370,13 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} = ''; # DOCTYPE
         $self->{state} = DOCTYPE_SYSTEM_IDENTIFIER_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no SYSTEM literal');
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         if ($self->{ct}->{type} == DOCTYPE_TOKEN) {
@@ -4088,15 +3415,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -4113,15 +3432,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -4130,15 +3441,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif (not $self->{is_xml} and $nc == 0x003E) { # >
@@ -4154,15 +3457,7 @@ sub _get_next_token ($) {
         }
         
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
@@ -4185,34 +3480,21 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
         
         $self->{ct}->{sysid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{sysid}, qq[\x00">],
-                              length $self->{ct}->{sysid});
+        $self->{ct}->{sysid} .= $self->_read_chars
+            ({"\x00" => 1, q<"> => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{sysid}, qq[\x00">],
+        #                      length $self->{ct}->{sysid});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -4221,15 +3503,7 @@ sub _get_next_token ($) {
         
         $self->{state} = AFTER_DOCTYPE_SYSTEM_IDENTIFIER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif (not $self->{is_xml} and $nc == 0x003E) { # >
@@ -4238,15 +3512,7 @@ sub _get_next_token ($) {
 
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         $self->{ct}->{quirks} = 1;
@@ -4272,34 +3538,21 @@ sub _get_next_token ($) {
         $self->{ct}->{sysid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
         
         $self->{ct}->{sysid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
-        $self->{read_until}->($self->{ct}->{sysid}, qq[\x00'>],
-                              length $self->{ct}->{sysid});
+        $self->{ct}->{sysid} .= $self->_read_chars
+            ({"\x00" => 1, "'" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{sysid}, qq[\x00'>],
+        #                      length $self->{ct}->{sysid});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -4313,15 +3566,7 @@ sub _get_next_token ($) {
           ## Stay in the state
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -4334,15 +3579,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
@@ -4354,15 +3591,7 @@ sub _get_next_token ($) {
         $self->{state} = NDATA_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -4388,15 +3617,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -4413,15 +3634,7 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -4430,30 +3643,14 @@ sub _get_next_token ($) {
         
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ENTITY
         redo A;
@@ -4463,15 +3660,7 @@ sub _get_next_token ($) {
         $self->{state} = NDATA_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -4486,15 +3675,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'string after SYSTEM literal');
         $self->{state} = BOGUS_MD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -4503,15 +3684,7 @@ sub _get_next_token ($) {
         
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
 
         return  ($self->{ct}); # DOCTYPE
@@ -4523,15 +3696,7 @@ sub _get_next_token ($) {
         $self->{ct}->{has_internal_subset} = 1; # DOCTYPE
         $self->{in_subset} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # DOCTYPE
         redo A;
@@ -4546,19 +3711,14 @@ sub _get_next_token ($) {
       } else {
         
         my $s = '';
-        $self->{read_until}->($s, q{>[}, 0);
+        #$self->{read_until}->($s, q{>[}, 0);
+        $self->_read_chars
+            ({"[" => 1, ">" => 1,
+              "\x0A" => 1, "\x0D" => 1});
 
         ## Stay in the state
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -4573,15 +3733,7 @@ sub _get_next_token ($) {
         
         $self->{state} = CDATA_SECTION_MSE1_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == -1) {
@@ -4605,24 +3757,20 @@ sub _get_next_token ($) {
       } else {
         
         $self->{ct}->{data} .= chr $nc;
-        $self->{read_until}->($self->{ct}->{data},
-                              qq<\x00]>,
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, "]" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data},
+        #                      qq<\x00]>,
+        #                      length $self->{ct}->{data});
+
         ## NOTE: NULLs are left as is (see spec's comment).  However,
         ## a token cannot contain more than one U+0000 NULL character
         ## for the ease of processing in the tree constructor.
 
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -4635,15 +3783,7 @@ sub _get_next_token ($) {
         
         $self->{state} = CDATA_SECTION_MSE2_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -4660,15 +3800,7 @@ sub _get_next_token ($) {
       if ($nc == 0x003E) { # >
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         if (length $self->{ct}->{data}) { # character
           
@@ -4683,15 +3815,7 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= ']'; ## Add first "]" of "]]]".
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -4737,15 +3861,7 @@ sub _get_next_token ($) {
         $self->{state} = ENTITY_HASH_STATE;
         $self->{kwd} = '#';
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($self->{is_xml} or
@@ -4760,15 +3876,7 @@ sub _get_next_token ($) {
         $self->{entity__value} = $self->{kwd};
         $self->{entity__match} = 0;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -4810,15 +3918,7 @@ sub _get_next_token ($) {
         $self->{state} = HEXREF_X_STATE;
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0058) { # X
@@ -4829,15 +3929,7 @@ sub _get_next_token ($) {
         $self->{state} = HEXREF_X_STATE;
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif (0x0030 <= $nc and
@@ -4846,15 +3938,7 @@ sub _get_next_token ($) {
         $self->{state} = NCR_NUM_STATE;
         $self->{kwd} = $nc - 0x0030;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -4894,29 +3978,13 @@ sub _get_next_token ($) {
         
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003B) { # ;
         
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         #
       } else {
@@ -5009,15 +4077,7 @@ sub _get_next_token ($) {
         $self->{kwd} += $nc - 0x0030;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif (0x0061 <= $nc and
@@ -5027,15 +4087,7 @@ sub _get_next_token ($) {
         $self->{kwd} += $nc - 0x0060 + 9;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif (0x0041 <= $nc and
@@ -5045,29 +4097,13 @@ sub _get_next_token ($) {
         $self->{kwd} += $nc - 0x0040 + 9;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003B) { # ;
         
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         #
       } else {
@@ -5182,15 +4218,7 @@ sub _get_next_token ($) {
             }
             $self->{entity__match} = 1; ## Matched exactly with ";" entity.
             
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
             #
           } else {
@@ -5199,15 +4227,7 @@ sub _get_next_token ($) {
             $self->{entity__match} = -1; ## Exactly matched to non-";" entity.
             ## Stay in the state.
             
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
             redo A;
           }
@@ -5224,15 +4244,7 @@ sub _get_next_token ($) {
             $self->{entity__value} .= chr $nc;
             $self->{entity__match} *= 2; ## Matched (positive) or not (zero)
             
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
             #
           } else {
@@ -5241,15 +4253,7 @@ sub _get_next_token ($) {
             $self->{entity__match} *= 2; ## Matched (positive) or not (zero)
             ## Stay in the state.
             
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
             redo A;
           }
@@ -5378,15 +4382,7 @@ sub _get_next_token ($) {
                       };
         $self->{state} = PI_TARGET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -5395,15 +4391,7 @@ sub _get_next_token ($) {
         $self->{state} = PI_TARGET_AFTER_STATE;
         $self->{kwd} = chr $nc; # "temporary buffer"
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -5423,15 +4411,7 @@ sub _get_next_token ($) {
         $self->{state} = PI_AFTER_STATE;
         $self->{kwd} = ''; # "temporary buffer"
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -5441,15 +4421,7 @@ sub _get_next_token ($) {
         }
         $self->{ct}->{target} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # pi
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -5458,15 +4430,7 @@ sub _get_next_token ($) {
         $self->{kwd} .= chr $nc; # "temporary buffer"
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -5478,15 +4442,7 @@ sub _get_next_token ($) {
       if ($nc == 0x003F) { # ?
         $self->{state} = PI_DATA_AFTER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -5509,19 +4465,15 @@ sub _get_next_token ($) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         }
         $self->{ct}->{data} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # pi
-        $self->{read_until}->($self->{ct}->{data}, qq[\x00?],
-                              length $self->{ct}->{data});
+        $self->{ct}->{data} .= $self->_read_chars
+            ({"\x00" => 1, "?" => 1,
+              "\x0A" => 1, "\x0D" => 1});
+        #$self->{read_until}->($self->{ct}->{data}, qq[\x00?],
+        #                      length $self->{ct}->{data});
+
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Reprocess.
         redo A;
@@ -5536,15 +4488,7 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # pi
         redo A;
@@ -5555,15 +4499,7 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= '?';
         $self->{state} = PI_DATA_AFTER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -5586,15 +4522,7 @@ sub _get_next_token ($) {
           $self->{state} = DATA_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # pi
         redo A;
@@ -5602,15 +4530,7 @@ sub _get_next_token ($) {
         $self->{ct}->{data} .= '?';
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -5624,15 +4544,7 @@ sub _get_next_token ($) {
       if ($nc == 0x003C) { # <
         $self->{state} = DOCTYPE_TAG_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0025) { # %
@@ -5648,44 +4560,20 @@ sub _get_next_token ($) {
         }
 
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x005D) { # ]
         delete $self->{in_subset};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_AFTER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -5703,15 +4591,7 @@ sub _get_next_token ($) {
         }
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -5719,15 +4599,7 @@ sub _get_next_token ($) {
       if ($nc == 0x003E) { # >
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
@@ -5743,15 +4615,7 @@ sub _get_next_token ($) {
 
         $self->{state} = BOGUS_DOCTYPE_INTERNAL_SUBSET_AFTER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -5759,15 +4623,7 @@ sub _get_next_token ($) {
       if ($nc == 0x003E) { # >
         $self->{state} = DATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ({type => END_OF_DOCTYPE_TOKEN});
         redo A;
@@ -5779,15 +4635,7 @@ sub _get_next_token ($) {
       } else {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -5795,29 +4643,13 @@ sub _get_next_token ($) {
       if ($nc == 0x0021) { # !
         $self->{state} = DOCTYPE_MARKUP_DECLARATION_OPEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003F) { # ?
         $self->{state} = PI_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -5834,15 +4666,7 @@ sub _get_next_token ($) {
                        data => '',
                       }; ## NOTE: Will be discarded.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -5852,15 +4676,7 @@ sub _get_next_token ($) {
       if ($nc == 0x002D) { # -
         $self->{state} = MD_HYPHEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0045 or # E
@@ -5868,15 +4684,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_E_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0041 or # A
@@ -5884,15 +4692,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_ATTLIST_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x004E or # N
@@ -5900,15 +4700,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_NOTATION_STATE;
         $self->{kwd} = chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -5929,15 +4721,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_ENTITY_STATE;
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x004C or # L
@@ -5946,15 +4730,7 @@ sub _get_next_token ($) {
         $self->{state} = MD_ELEMENT_STATE;
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -5988,15 +4764,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 5 and
@@ -6013,15 +4781,7 @@ sub _get_next_token ($) {
                        column => $self->{column_prev} - 6};
         $self->{state} = DOCTYPE_MD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -6057,15 +4817,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 6 and
@@ -6082,15 +4834,7 @@ sub _get_next_token ($) {
                        column => $self->{column_prev} - 7};
         $self->{state} = DOCTYPE_MD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -6126,15 +4870,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 6 and
@@ -6152,15 +4888,7 @@ sub _get_next_token ($) {
                        column => $self->{column_prev} - 7};
         $self->{state} = DOCTYPE_MD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -6198,15 +4926,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 7 and
@@ -6223,15 +4943,7 @@ sub _get_next_token ($) {
                        column => $self->{column_prev} - 8};
         $self->{state} = DOCTYPE_MD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -6253,15 +4965,7 @@ sub _get_next_token ($) {
         ## XML5: [NOTATION] Switch to the "DOCTYPE NOTATION identifier state".
         $self->{state} = BEFORE_MD_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN and 
@@ -6270,15 +4974,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before md name'); ## TODO: type
         $self->{state} = DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -6291,15 +4987,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md name'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -6315,30 +5003,14 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($self->{ct}->{type} == GENERAL_ENTITY_TOKEN and 
                $nc == 0x0025) { # %
         $self->{state} = DOCTYPE_ENTITY_PARAMETER_BEFORE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -6346,15 +5018,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md name'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -6370,15 +5034,7 @@ sub _get_next_token ($) {
         $self->{ct}->{name} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         $self->{state} = MD_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -6388,15 +5044,7 @@ sub _get_next_token ($) {
         $self->{ct}->{type} = PARAMETER_ENTITY_TOKEN;
         $self->{state} = BEFORE_MD_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -6404,15 +5052,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md name'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -6440,15 +5080,7 @@ sub _get_next_token ($) {
           $self->{state} = AFTER_DOCTYPE_NAME_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -6459,15 +5091,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ELEMENT/ENTITY/ATTLIST/NOTATION
         redo A;
@@ -6485,15 +5109,7 @@ sub _get_next_token ($) {
         $self->{ct}->{name} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -6501,29 +5117,13 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -6543,15 +5143,7 @@ sub _get_next_token ($) {
                        line => $self->{line}, column => $self->{column}};
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -6559,15 +5151,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_NAME_AFTER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -6575,15 +5159,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr type'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -6592,15 +5168,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before paren'); ## TODO: type
         $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -6608,15 +5176,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -6628,15 +5188,7 @@ sub _get_next_token ($) {
         $self->{ca}->{name} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -6644,15 +5196,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -6660,15 +5204,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr type'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -6676,15 +5212,7 @@ sub _get_next_token ($) {
         ## XML5: Same as "anything else".
         $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -6692,15 +5220,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the token.
         redo A;
@@ -6709,15 +5229,7 @@ sub _get_next_token ($) {
         $self->{ca}->{type} = chr $nc;
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -6725,15 +5237,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_TYPE_AFTER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0023) { # #
@@ -6741,15 +5245,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
@@ -6758,15 +5254,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -6775,15 +5263,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -6791,15 +5271,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -6808,15 +5280,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before paren'); ## TODO: type
         $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == EOF_CHAR) {
@@ -6824,15 +5288,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the token.
         redo A;
@@ -6841,15 +5297,7 @@ sub _get_next_token ($) {
         $self->{ca}->{type} .= chr $nc;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -6857,44 +5305,20 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0028) { # (
         ## XML5: Same as "anything else".
         $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0023) { # #
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
@@ -6902,15 +5326,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -6918,15 +5334,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -6934,15 +5342,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -6951,15 +5351,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -6975,60 +5367,28 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x007C) { # |
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty allowed token'); ## TODO: type
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0029) { # )
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty allowed token'); ## TODO: type
         $self->{state} = AFTER_ALLOWED_TOKENS_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed allowed tokens'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7037,15 +5397,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7056,15 +5408,7 @@ sub _get_next_token ($) {
         push @{$self->{ca}->{tokens}}, $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         $self->{state} = ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -7072,58 +5416,26 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = AFTER_ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x007C) { # |
         $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0029) { # )
         $self->{state} = AFTER_ALLOWED_TOKENS_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed allowed tokens'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7132,15 +5444,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7151,15 +5455,7 @@ sub _get_next_token ($) {
         $self->{ca}->{tokens}->[-1] .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -7167,58 +5463,26 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x007C) { # |
         $self->{state} = BEFORE_ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0029) { # )
         $self->{state} = AFTER_ALLOWED_TOKENS_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed allowed tokens'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7227,15 +5491,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7249,15 +5505,7 @@ sub _get_next_token ($) {
         $self->{ca}->{tokens}->[-1] .= ' ' . ($nc == 0x0000 ? "\x{FFFD}" : chr $nc);
         $self->{state} = ALLOWED_TOKEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -7265,30 +5513,14 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = BEFORE_ATTR_DEFAULT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0023) { # #
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no space before default value'); ## TODO: type
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
@@ -7296,15 +5528,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -7312,30 +5536,14 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7343,15 +5551,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7365,74 +5565,34 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0023) { # #
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_BEFORE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7440,15 +5600,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7471,15 +5623,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -7488,15 +5632,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -7504,15 +5640,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no attr default'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7521,15 +5649,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7537,15 +5657,7 @@ sub _get_next_token ($) {
         $self->{ca}->{default} = chr $nc;
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -7553,15 +5665,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = DOCTYPE_ATTLIST_ATTRIBUTE_DECLARATION_AFTER_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
@@ -7570,15 +5674,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
@@ -7587,15 +5683,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -7603,15 +5691,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{attrdefs}}, $self->{ca};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7621,15 +5701,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{attrdefs}}, $self->{ca};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7637,15 +5709,7 @@ sub _get_next_token ($) {
         $self->{ca}->{default} .= chr $nc;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -7653,60 +5717,28 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0022) { # "
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_DOUBLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0027) { # '
         $self->{ca}->{value} = '';
         $self->{state} = ATTRIBUTE_VALUE_SINGLE_QUOTED_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         push @{$self->{ct}->{attrdefs}}, $self->{ca};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST
         redo A;
@@ -7716,15 +5748,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{attrdefs}}, $self->{ca};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE; ## XML5: "Data state".
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7772,15 +5796,7 @@ sub _get_next_token ($) {
         ## Stay in the state.
         $self->{kwd} .= chr $nc;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ((length $self->{kwd}) == 4 and
@@ -7797,15 +5813,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = AFTER_NDATA_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -7822,30 +5830,14 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = BEFORE_NOTATION_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no notation name'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ENTITY
         redo A;
@@ -7853,15 +5845,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7878,30 +5862,14 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no notation name'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ENTITY
         redo A;
@@ -7909,15 +5877,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -7928,15 +5888,7 @@ sub _get_next_token ($) {
         $self->{ct}->{notation} = $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         $self->{state} = NOTATION_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -7944,29 +5896,13 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = AFTER_MD_DEF_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ENTITY
         redo A;
@@ -7974,15 +5910,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## The current token.
         redo A;
@@ -7993,15 +5921,7 @@ sub _get_next_token ($) {
         $self->{ct}->{notation} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8009,15 +5929,7 @@ sub _get_next_token ($) {
       if ($nc == 0x0022) { # "
         $self->{state} = AFTER_MD_DEF_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0026) { # &
@@ -8025,15 +5937,7 @@ sub _get_next_token ($) {
         $self->{state} = ENTITY_VALUE_ENTITY_STATE;
         $self->{entity_add} = 0x0022; # "
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
 ## TODO: %
@@ -8049,15 +5953,7 @@ sub _get_next_token ($) {
         }
         $self->{ct}->{value} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8065,15 +5961,7 @@ sub _get_next_token ($) {
       if ($nc == 0x0027) { # '
         $self->{state} = AFTER_MD_DEF_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0026) { # &
@@ -8081,15 +5969,7 @@ sub _get_next_token ($) {
         $self->{state} = ENTITY_VALUE_ENTITY_STATE;
         $self->{entity_add} = 0x0027; # '
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
 ## TODO: %
@@ -8105,15 +5985,7 @@ sub _get_next_token ($) {
         }
         $self->{ct}->{value} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ENTITY
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8135,15 +6007,7 @@ sub _get_next_token ($) {
         $self->{state} = ENTITY_HASH_STATE;
         $self->{kwd} = '#';
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } else {
@@ -8158,15 +6022,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = BEFORE_ELEMENT_CONTENT_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0028) { # (
@@ -8174,30 +6030,14 @@ sub _get_next_token ($) {
         $self->{ct}->{content} = ['('];
         $self->{group_depth} = 1;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'no md def'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ELEMENT
         redo A;
@@ -8205,15 +6045,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -8224,15 +6056,7 @@ sub _get_next_token ($) {
         $self->{ct}->{content} = [$nc == 0x0000 ? "\x{FFFD}" : chr $nc];
         $self->{state} = CONTENT_KEYWORD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8240,29 +6064,13 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = AFTER_MD_DEF_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ELEMENT
         redo A;
@@ -8270,15 +6078,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -8289,15 +6089,7 @@ sub _get_next_token ($) {
         $self->{ct}->{content}->[-1] .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # ELEMENT
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8305,15 +6097,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0028) { # (
@@ -8321,15 +6105,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, chr $nc;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x007C or # |
@@ -8337,15 +6113,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty element name'); ## TODO: type
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0029) { # )
@@ -8354,15 +6122,7 @@ sub _get_next_token ($) {
         $self->{group_depth}--;
         $self->{state} = AFTER_CM_GROUP_CLOSE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -8370,15 +6130,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ELEMENT
         redo A;
@@ -8387,15 +6139,7 @@ sub _get_next_token ($) {
         #push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -8406,15 +6150,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         $self->{state} = CM_ELEMENT_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8422,15 +6158,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         $self->{state} = AFTER_CM_ELEMENT_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x002A or # *
@@ -8439,15 +6167,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, chr $nc;
         $self->{state} = AFTER_CM_ELEMENT_NAME_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x007C or # |
@@ -8455,15 +6175,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, $nc == 0x007C ? ' | ' : ', ';
         $self->{state} = AFTER_CM_GROUP_OPEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0029) { # )
@@ -8471,15 +6183,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, chr $nc;
         $self->{state} = AFTER_CM_GROUP_CLOSE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -8487,15 +6191,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ELEMENT
         redo A;
@@ -8504,15 +6200,7 @@ sub _get_next_token ($) {
         #push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the token.
         redo A;
@@ -8523,15 +6211,7 @@ sub _get_next_token ($) {
         $self->{ct}->{content}->[-1] .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc;
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8539,15 +6219,7 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x007C or # |
@@ -8555,15 +6227,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, $nc == 0x007C ? ' | ' : ', ';
         $self->{state} = AFTER_CM_GROUP_OPEN_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0029) { # )
@@ -8571,15 +6235,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, chr $nc;
         $self->{state} = AFTER_CM_GROUP_CLOSE_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
@@ -8587,15 +6243,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ELEMENT
         redo A;
@@ -8604,15 +6252,7 @@ sub _get_next_token ($) {
         #push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -8621,15 +6261,7 @@ sub _get_next_token ($) {
         push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = BOGUS_MD_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
@@ -8641,15 +6273,7 @@ sub _get_next_token ($) {
           $self->{state} = AFTER_MD_DEF_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x002A or # *
@@ -8662,15 +6286,7 @@ sub _get_next_token ($) {
           $self->{state} = AFTER_MD_DEF_STATE;
         }
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x0029) { # )
@@ -8679,15 +6295,7 @@ sub _get_next_token ($) {
           push @{$self->{ct}->{content}}, chr $nc;
           ## Stay in the state.
           
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
           redo A;
         } else {
@@ -8703,15 +6311,7 @@ sub _get_next_token ($) {
         }
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ELEMENT
         redo A;
@@ -8720,15 +6320,7 @@ sub _get_next_token ($) {
         #push @{$self->{ct}->{content}}, (')') x $self->{group_depth};
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -8746,29 +6338,13 @@ sub _get_next_token ($) {
       if ($is_space->{$nc}) {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       } elsif ($nc == 0x003E) { # >
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ENTITY/ELEMENT
         redo A;
@@ -8776,15 +6352,7 @@ sub _get_next_token ($) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         ## Discard the current token.
         redo A;
@@ -8798,15 +6366,7 @@ sub _get_next_token ($) {
       if ($nc == 0x003E) { # >
         $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         return  ($self->{ct}); # ATTLIST/ENTITY/NOTATION
         redo A;
@@ -8818,15 +6378,7 @@ sub _get_next_token ($) {
       } else {
         ## Stay in the state.
         
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      $self->{line_prev} = $self->{line};
-      $self->{column_prev} = $self->{column};
-      $self->{column}++;
-      $self->{nc}
-          = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-    } else {
-      $self->{set_nc}->($self);
-    }
+    $self->_set_nc;
   
         redo A;
       }
