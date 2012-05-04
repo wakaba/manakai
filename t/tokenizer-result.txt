@@ -331,26 +331,7 @@ ok 327 - <!DOCTYPE\u000C: qq'<!DOCTYPE\x{0C}'
 ok 328 - <!DOCTYPE\u000D: qq'<!DOCTYPE\x{0D}'
 ok 329 - <!DOCTYPE\u001F: qq'<!DOCTYPE\x{1F}'
 ok 330 - <!DOCTYPE : qq'<!DOCTYPE '
-not ok 331 - <!DOCTYPE \u0000: qq'<!DOCTYPE \x{00}'
-#   Failed test '<!DOCTYPE \u0000: qq'<!DOCTYPE \x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |   |                           *  3|          qq'ParseError',  *
-# |  3|          [                |  4|          [                |
-# |  4|            qq'DOCTYPE',   |  5|            qq'DOCTYPE',   |
-# |  5|            qq'\x{FFFD}',  |  6|            qq'\x{FFFD}',  |
-# |  6|            undef,         |  7|            undef,         |
-# |  7|            undef,         |  8|            undef,         |
-# |  8|            0              |  9|            0              |
-# |  9|          ]                | 10|          ]                |
-# | 10|        ];                 | 11|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 331 - <!DOCTYPE \u0000: qq'<!DOCTYPE \x{00}'
 ok 332 - <!DOCTYPE \u0008: qq'<!DOCTYPE \x{08}'
 ok 333 - <!DOCTYPE \u0009: qq'<!DOCTYPE \x{09}'
 ok 334 - <!DOCTYPE \u000A: qq'<!DOCTYPE \x{0A}'
@@ -370,25 +351,7 @@ ok 347 - <!DOCTYPE 1: qq'<!DOCTYPE 1'
 ok 348 - <!DOCTYPE 9: qq'<!DOCTYPE 9'
 ok 349 - <!DOCTYPE <: qq'<!DOCTYPE <'
 ok 350 - <!DOCTYPE =: qq'<!DOCTYPE ='
-not ok 351 - <!DOCTYPE >: qq'<!DOCTYPE >'
-#   Failed test '<!DOCTYPE >: qq'<!DOCTYPE >''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---------------------------+
-# | Ln|Got                        |Expected                   |
-# +---+---------------------------+---------------------------+
-# |  1|$VAR1 = [                  |$VAR1 = [                  |
-# |  2|          qq'ParseError',  |          qq'ParseError',  |
-# |  3|          [                |          [                |
-# |  4|            qq'DOCTYPE',   |            qq'DOCTYPE',   |
-# *  5|            undef,         |            qq'',          *
-# |  6|            undef,         |            undef,         |
-# |  7|            undef,         |            undef,         |
-# |  8|            0              |            0              |
-# |  9|          ]                |          ]                |
-# | 10|        ];                 |        ];                 |
-# +---+---------------------------+---------------------------+
-# 
+ok 351 - <!DOCTYPE >: qq'<!DOCTYPE >'
 ok 352 - <!DOCTYPE ?: qq'<!DOCTYPE ?'
 ok 353 - <!DOCTYPE @: qq'<!DOCTYPE @'
 ok 354 - <!DOCTYPE A: qq'<!DOCTYPE A'
@@ -398,26 +361,7 @@ ok 357 - <!DOCTYPE Z: qq'<!DOCTYPE Z'
 ok 358 - <!DOCTYPE [: qq'<!DOCTYPE ['
 ok 359 - <!DOCTYPE `: qq'<!DOCTYPE `'
 ok 360 - <!DOCTYPE a: qq'<!DOCTYPE a'
-not ok 361 - <!DOCTYPE a\u0000: qq'<!DOCTYPE a\x{00}'
-#   Failed test '<!DOCTYPE a\u0000: qq'<!DOCTYPE a\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+----------------------------+---+----------------------------+
-# | Ln|Got                         | Ln|Expected                    |
-# +---+----------------------------+---+----------------------------+
-# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
-# |  2|          qq'ParseError',   |  2|          qq'ParseError',   |
-# |   |                            *  3|          qq'ParseError',   *
-# |  3|          [                 |  4|          [                 |
-# |  4|            qq'DOCTYPE',    |  5|            qq'DOCTYPE',    |
-# |  5|            qq'a\x{FFFD}',  |  6|            qq'a\x{FFFD}',  |
-# |  6|            undef,          |  7|            undef,          |
-# |  7|            undef,          |  8|            undef,          |
-# |  8|            0               |  9|            0               |
-# |  9|          ]                 | 10|          ]                 |
-# | 10|        ];                  | 11|        ];                  |
-# +---+----------------------------+---+----------------------------+
-# 
+ok 361 - <!DOCTYPE a\u0000: qq'<!DOCTYPE a\x{00}'
 ok 362 - <!DOCTYPE a\u0008: qq'<!DOCTYPE a\x{08}'
 ok 363 - <!DOCTYPE a\u0009: qq'<!DOCTYPE a\x{09}'
 ok 364 - <!DOCTYPE a\u000A: qq'<!DOCTYPE a\x{0A}'
@@ -463,27 +407,7 @@ ok 403 - <!DOCTYPE a PUBLIC\u001F: qq'<!DOCTYPE a PUBLIC\x{1F}'
 ok 404 - <!DOCTYPE a PUBLIC : qq'<!DOCTYPE a PUBLIC '
 ok 405 - <!DOCTYPE a PUBLIC!: qq'<!DOCTYPE a PUBLIC!'
 ok 406 - <!DOCTYPE a PUBLIC": qq'<!DOCTYPE a PUBLIC"'
-not ok 407 - <!DOCTYPE a PUBLIC"\u0000: qq'<!DOCTYPE a PUBLIC"\x{00}'
-#   Failed test '<!DOCTYPE a PUBLIC"\u0000: qq'<!DOCTYPE a PUBLIC"\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |   |                           *  4|          qq'ParseError',  *
-# |  4|          [                |  5|          [                |
-# |  5|            qq'DOCTYPE',   |  6|            qq'DOCTYPE',   |
-# |  6|            qq'a',         |  7|            qq'a',         |
-# |  7|            qq'\x{FFFD}',  |  8|            qq'\x{FFFD}',  |
-# |  8|            undef,         |  9|            undef,         |
-# |  9|            0              | 10|            0              |
-# | 10|          ]                | 11|          ]                |
-# | 11|        ];                 | 12|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 407 - <!DOCTYPE a PUBLIC"\u0000: qq'<!DOCTYPE a PUBLIC"\x{00}'
 ok 408 - <!DOCTYPE a PUBLIC"\u0009: qq'<!DOCTYPE a PUBLIC"\x{09}'
 ok 409 - <!DOCTYPE a PUBLIC"\u000A: qq'<!DOCTYPE a PUBLIC"\x{0A}'
 ok 410 - <!DOCTYPE a PUBLIC"\u000B: qq'<!DOCTYPE a PUBLIC"\x{0B}'
@@ -518,27 +442,7 @@ ok 438 - <!DOCTYPE a PUBLIC"\uDBC0\uDC00: qq'<!DOCTYPE a PUBLIC"\x{100000}'
 ok 439 - <!DOCTYPE a PUBLIC\#: qq'<!DOCTYPE a PUBLIC\#'
 ok 440 - <!DOCTYPE a PUBLIC&: qq'<!DOCTYPE a PUBLIC&'
 ok 441 - <!DOCTYPE a PUBLIC': qq'<!DOCTYPE a PUBLIC\x{27}'
-not ok 442 - <!DOCTYPE a PUBLIC'\u0000: qq'<!DOCTYPE a PUBLIC\x{27}\x{00}'
-#   Failed test '<!DOCTYPE a PUBLIC'\u0000: qq'<!DOCTYPE a PUBLIC\x{27}\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |   |                           *  4|          qq'ParseError',  *
-# |  4|          [                |  5|          [                |
-# |  5|            qq'DOCTYPE',   |  6|            qq'DOCTYPE',   |
-# |  6|            qq'a',         |  7|            qq'a',         |
-# |  7|            qq'\x{FFFD}',  |  8|            qq'\x{FFFD}',  |
-# |  8|            undef,         |  9|            undef,         |
-# |  9|            0              | 10|            0              |
-# | 10|          ]                | 11|          ]                |
-# | 11|        ];                 | 12|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 442 - <!DOCTYPE a PUBLIC'\u0000: qq'<!DOCTYPE a PUBLIC\x{27}\x{00}'
 ok 443 - <!DOCTYPE a PUBLIC'\u0009: qq'<!DOCTYPE a PUBLIC\x{27}\x{09}'
 ok 444 - <!DOCTYPE a PUBLIC'\u000A: qq'<!DOCTYPE a PUBLIC\x{27}\x{0A}'
 ok 445 - <!DOCTYPE a PUBLIC'\u000B: qq'<!DOCTYPE a PUBLIC\x{27}\x{0B}'
@@ -640,27 +544,7 @@ ok 540 - <!DOCTYPE a SYSTEM\u001F: qq'<!DOCTYPE a SYSTEM\x{1F}'
 ok 541 - <!DOCTYPE a SYSTEM : qq'<!DOCTYPE a SYSTEM '
 ok 542 - <!DOCTYPE a SYSTEM!: qq'<!DOCTYPE a SYSTEM!'
 ok 543 - <!DOCTYPE a SYSTEM": qq'<!DOCTYPE a SYSTEM"'
-not ok 544 - <!DOCTYPE a SYSTEM"\u0000: qq'<!DOCTYPE a SYSTEM"\x{00}'
-#   Failed test '<!DOCTYPE a SYSTEM"\u0000: qq'<!DOCTYPE a SYSTEM"\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |   |                           *  4|          qq'ParseError',  *
-# |  4|          [                |  5|          [                |
-# |  5|            qq'DOCTYPE',   |  6|            qq'DOCTYPE',   |
-# |  6|            qq'a',         |  7|            qq'a',         |
-# |  7|            undef,         |  8|            undef,         |
-# |  8|            qq'\x{FFFD}',  |  9|            qq'\x{FFFD}',  |
-# |  9|            0              | 10|            0              |
-# | 10|          ]                | 11|          ]                |
-# | 11|        ];                 | 12|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 544 - <!DOCTYPE a SYSTEM"\u0000: qq'<!DOCTYPE a SYSTEM"\x{00}'
 ok 545 - <!DOCTYPE a SYSTEM"\u0009: qq'<!DOCTYPE a SYSTEM"\x{09}'
 ok 546 - <!DOCTYPE a SYSTEM"\u000A: qq'<!DOCTYPE a SYSTEM"\x{0A}'
 ok 547 - <!DOCTYPE a SYSTEM"\u000B: qq'<!DOCTYPE a SYSTEM"\x{0B}'
@@ -695,27 +579,7 @@ ok 575 - <!DOCTYPE a SYSTEM"\uDBC0\uDC00: qq'<!DOCTYPE a SYSTEM"\x{100000}'
 ok 576 - <!DOCTYPE a SYSTEM\#: qq'<!DOCTYPE a SYSTEM\#'
 ok 577 - <!DOCTYPE a SYSTEM&: qq'<!DOCTYPE a SYSTEM&'
 ok 578 - <!DOCTYPE a SYSTEM': qq'<!DOCTYPE a SYSTEM\x{27}'
-not ok 579 - <!DOCTYPE a SYSTEM'\u0000: qq'<!DOCTYPE a SYSTEM\x{27}\x{00}'
-#   Failed test '<!DOCTYPE a SYSTEM'\u0000: qq'<!DOCTYPE a SYSTEM\x{27}\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |   |                           *  4|          qq'ParseError',  *
-# |  4|          [                |  5|          [                |
-# |  5|            qq'DOCTYPE',   |  6|            qq'DOCTYPE',   |
-# |  6|            qq'a',         |  7|            qq'a',         |
-# |  7|            undef,         |  8|            undef,         |
-# |  8|            qq'\x{FFFD}',  |  9|            qq'\x{FFFD}',  |
-# |  9|            0              | 10|            0              |
-# | 10|          ]                | 11|          ]                |
-# | 11|        ];                 | 12|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 579 - <!DOCTYPE a SYSTEM'\u0000: qq'<!DOCTYPE a SYSTEM\x{27}\x{00}'
 ok 580 - <!DOCTYPE a SYSTEM'\u0009: qq'<!DOCTYPE a SYSTEM\x{27}\x{09}'
 ok 581 - <!DOCTYPE a SYSTEM'\u000A: qq'<!DOCTYPE a SYSTEM\x{27}\x{0A}'
 ok 582 - <!DOCTYPE a SYSTEM'\u000B: qq'<!DOCTYPE a SYSTEM\x{27}\x{0B}'
@@ -885,26 +749,7 @@ ok 745 - <!DOCTYPE1: qq'<!DOCTYPE1'
 ok 746 - <!DOCTYPE9: qq'<!DOCTYPE9'
 ok 747 - <!DOCTYPE<: qq'<!DOCTYPE<'
 ok 748 - <!DOCTYPE=: qq'<!DOCTYPE='
-not ok 749 - <!DOCTYPE>: qq'<!DOCTYPE>'
-#   Failed test '<!DOCTYPE>: qq'<!DOCTYPE>''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---------------------------+
-# | Ln|Got                        |Expected                   |
-# +---+---------------------------+---------------------------+
-# |  1|$VAR1 = [                  |$VAR1 = [                  |
-# |  2|          qq'ParseError',  |          qq'ParseError',  |
-# |  3|          qq'ParseError',  |          qq'ParseError',  |
-# |  4|          [                |          [                |
-# |  5|            qq'DOCTYPE',   |            qq'DOCTYPE',   |
-# *  6|            undef,         |            qq'',          *
-# |  7|            undef,         |            undef,         |
-# |  8|            undef,         |            undef,         |
-# |  9|            0              |            0              |
-# | 10|          ]                |          ]                |
-# | 11|        ];                 |        ];                 |
-# +---+---------------------------+---------------------------+
-# 
+ok 749 - <!DOCTYPE>: qq'<!DOCTYPE>'
 ok 750 - <!DOCTYPE?: qq'<!DOCTYPE?'
 ok 751 - <!DOCTYPE@: qq'<!DOCTYPE@'
 ok 752 - <!DOCTYPEA: qq'<!DOCTYPEA'
@@ -913,27 +758,7 @@ ok 754 - <!DOCTYPEY: qq'<!DOCTYPEY'
 ok 755 - <!DOCTYPEZ: qq'<!DOCTYPEZ'
 ok 756 - <!DOCTYPE`: qq'<!DOCTYPE`'
 ok 757 - <!DOCTYPEa: qq'<!DOCTYPEa'
-not ok 758 - <!DOCTYPEa\u0000: qq'<!DOCTYPEa\x{00}'
-#   Failed test '<!DOCTYPEa\u0000: qq'<!DOCTYPEa\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+----------------------------+---+----------------------------+
-# | Ln|Got                         | Ln|Expected                    |
-# +---+----------------------------+---+----------------------------+
-# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
-# |  2|          qq'ParseError',   |  2|          qq'ParseError',   |
-# |  3|          qq'ParseError',   |  3|          qq'ParseError',   |
-# |   |                            *  4|          qq'ParseError',   *
-# |  4|          [                 |  5|          [                 |
-# |  5|            qq'DOCTYPE',    |  6|            qq'DOCTYPE',    |
-# |  6|            qq'a\x{FFFD}',  |  7|            qq'a\x{FFFD}',  |
-# |  7|            undef,          |  8|            undef,          |
-# |  8|            undef,          |  9|            undef,          |
-# |  9|            0               | 10|            0               |
-# | 10|          ]                 | 11|          ]                 |
-# | 11|        ];                  | 12|        ];                  |
-# +---+----------------------------+---+----------------------------+
-# 
+ok 758 - <!DOCTYPEa\u0000: qq'<!DOCTYPEa\x{00}'
 ok 759 - <!DOCTYPEa\u0008: qq'<!DOCTYPEa\x{08}'
 ok 760 - <!DOCTYPEa\u0009: qq'<!DOCTYPEa\x{09}'
 ok 761 - <!DOCTYPEa\u000A: qq'<!DOCTYPEa\x{0A}'
@@ -979,28 +804,7 @@ ok 800 - <!DOCTYPEa PUBLIC\u001F: qq'<!DOCTYPEa PUBLIC\x{1F}'
 ok 801 - <!DOCTYPEa PUBLIC : qq'<!DOCTYPEa PUBLIC '
 ok 802 - <!DOCTYPEa PUBLIC!: qq'<!DOCTYPEa PUBLIC!'
 ok 803 - <!DOCTYPEa PUBLIC": qq'<!DOCTYPEa PUBLIC"'
-not ok 804 - <!DOCTYPEa PUBLIC"\u0000: qq'<!DOCTYPEa PUBLIC"\x{00}'
-#   Failed test '<!DOCTYPEa PUBLIC"\u0000: qq'<!DOCTYPEa PUBLIC"\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |  4|          qq'ParseError',  |  4|          qq'ParseError',  |
-# |   |                           *  5|          qq'ParseError',  *
-# |  5|          [                |  6|          [                |
-# |  6|            qq'DOCTYPE',   |  7|            qq'DOCTYPE',   |
-# |  7|            qq'a',         |  8|            qq'a',         |
-# |  8|            qq'\x{FFFD}',  |  9|            qq'\x{FFFD}',  |
-# |  9|            undef,         | 10|            undef,         |
-# | 10|            0              | 11|            0              |
-# | 11|          ]                | 12|          ]                |
-# | 12|        ];                 | 13|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 804 - <!DOCTYPEa PUBLIC"\u0000: qq'<!DOCTYPEa PUBLIC"\x{00}'
 ok 805 - <!DOCTYPEa PUBLIC"\u0009: qq'<!DOCTYPEa PUBLIC"\x{09}'
 ok 806 - <!DOCTYPEa PUBLIC"\u000A: qq'<!DOCTYPEa PUBLIC"\x{0A}'
 ok 807 - <!DOCTYPEa PUBLIC"\u000B: qq'<!DOCTYPEa PUBLIC"\x{0B}'
@@ -1035,28 +839,7 @@ ok 835 - <!DOCTYPEa PUBLIC"\uDBC0\uDC00: qq'<!DOCTYPEa PUBLIC"\x{100000}'
 ok 836 - <!DOCTYPEa PUBLIC\#: qq'<!DOCTYPEa PUBLIC\#'
 ok 837 - <!DOCTYPEa PUBLIC&: qq'<!DOCTYPEa PUBLIC&'
 ok 838 - <!DOCTYPEa PUBLIC': qq'<!DOCTYPEa PUBLIC\x{27}'
-not ok 839 - <!DOCTYPEa PUBLIC'\u0000: qq'<!DOCTYPEa PUBLIC\x{27}\x{00}'
-#   Failed test '<!DOCTYPEa PUBLIC'\u0000: qq'<!DOCTYPEa PUBLIC\x{27}\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |  4|          qq'ParseError',  |  4|          qq'ParseError',  |
-# |   |                           *  5|          qq'ParseError',  *
-# |  5|          [                |  6|          [                |
-# |  6|            qq'DOCTYPE',   |  7|            qq'DOCTYPE',   |
-# |  7|            qq'a',         |  8|            qq'a',         |
-# |  8|            qq'\x{FFFD}',  |  9|            qq'\x{FFFD}',  |
-# |  9|            undef,         | 10|            undef,         |
-# | 10|            0              | 11|            0              |
-# | 11|          ]                | 12|          ]                |
-# | 12|        ];                 | 13|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 839 - <!DOCTYPEa PUBLIC'\u0000: qq'<!DOCTYPEa PUBLIC\x{27}\x{00}'
 ok 840 - <!DOCTYPEa PUBLIC'\u0009: qq'<!DOCTYPEa PUBLIC\x{27}\x{09}'
 ok 841 - <!DOCTYPEa PUBLIC'\u000A: qq'<!DOCTYPEa PUBLIC\x{27}\x{0A}'
 ok 842 - <!DOCTYPEa PUBLIC'\u000B: qq'<!DOCTYPEa PUBLIC\x{27}\x{0B}'
@@ -1158,28 +941,7 @@ ok 937 - <!DOCTYPEa SYSTEM\u001F: qq'<!DOCTYPEa SYSTEM\x{1F}'
 ok 938 - <!DOCTYPEa SYSTEM : qq'<!DOCTYPEa SYSTEM '
 ok 939 - <!DOCTYPEa SYSTEM!: qq'<!DOCTYPEa SYSTEM!'
 ok 940 - <!DOCTYPEa SYSTEM": qq'<!DOCTYPEa SYSTEM"'
-not ok 941 - <!DOCTYPEa SYSTEM"\u0000: qq'<!DOCTYPEa SYSTEM"\x{00}'
-#   Failed test '<!DOCTYPEa SYSTEM"\u0000: qq'<!DOCTYPEa SYSTEM"\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |  4|          qq'ParseError',  |  4|          qq'ParseError',  |
-# |   |                           *  5|          qq'ParseError',  *
-# |  5|          [                |  6|          [                |
-# |  6|            qq'DOCTYPE',   |  7|            qq'DOCTYPE',   |
-# |  7|            qq'a',         |  8|            qq'a',         |
-# |  8|            undef,         |  9|            undef,         |
-# |  9|            qq'\x{FFFD}',  | 10|            qq'\x{FFFD}',  |
-# | 10|            0              | 11|            0              |
-# | 11|          ]                | 12|          ]                |
-# | 12|        ];                 | 13|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 941 - <!DOCTYPEa SYSTEM"\u0000: qq'<!DOCTYPEa SYSTEM"\x{00}'
 ok 942 - <!DOCTYPEa SYSTEM"\u0009: qq'<!DOCTYPEa SYSTEM"\x{09}'
 ok 943 - <!DOCTYPEa SYSTEM"\u000A: qq'<!DOCTYPEa SYSTEM"\x{0A}'
 ok 944 - <!DOCTYPEa SYSTEM"\u000B: qq'<!DOCTYPEa SYSTEM"\x{0B}'
@@ -1214,28 +976,7 @@ ok 972 - <!DOCTYPEa SYSTEM"\uDBC0\uDC00: qq'<!DOCTYPEa SYSTEM"\x{100000}'
 ok 973 - <!DOCTYPEa SYSTEM\#: qq'<!DOCTYPEa SYSTEM\#'
 ok 974 - <!DOCTYPEa SYSTEM&: qq'<!DOCTYPEa SYSTEM&'
 ok 975 - <!DOCTYPEa SYSTEM': qq'<!DOCTYPEa SYSTEM\x{27}'
-not ok 976 - <!DOCTYPEa SYSTEM'\u0000: qq'<!DOCTYPEa SYSTEM\x{27}\x{00}'
-#   Failed test '<!DOCTYPEa SYSTEM'\u0000: qq'<!DOCTYPEa SYSTEM\x{27}\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |  3|          qq'ParseError',  |  3|          qq'ParseError',  |
-# |  4|          qq'ParseError',  |  4|          qq'ParseError',  |
-# |   |                           *  5|          qq'ParseError',  *
-# |  5|          [                |  6|          [                |
-# |  6|            qq'DOCTYPE',   |  7|            qq'DOCTYPE',   |
-# |  7|            qq'a',         |  8|            qq'a',         |
-# |  8|            undef,         |  9|            undef,         |
-# |  9|            qq'\x{FFFD}',  | 10|            qq'\x{FFFD}',  |
-# | 10|            0              | 11|            0              |
-# | 11|          ]                | 12|          ]                |
-# | 12|        ];                 | 13|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 976 - <!DOCTYPEa SYSTEM'\u0000: qq'<!DOCTYPEa SYSTEM\x{27}\x{00}'
 ok 977 - <!DOCTYPEa SYSTEM'\u0009: qq'<!DOCTYPEa SYSTEM\x{27}\x{09}'
 ok 978 - <!DOCTYPEa SYSTEM'\u000A: qq'<!DOCTYPEa SYSTEM\x{27}\x{0A}'
 ok 979 - <!DOCTYPEa SYSTEM'\u000B: qq'<!DOCTYPEa SYSTEM\x{27}\x{0B}'
@@ -1451,23 +1192,7 @@ ok 1188 - <?: qq'<?'
 ok 1189 - <?\u0000: qq'<?\x{00}'
 ok 1190 - <?\u0009: qq'<?\x{09}'
 ok 1191 - <?\u000A: qq'<?\x{0A}'
-not ok 1192 - <?\u000B: qq'<?\x{0B}'
-#   Failed test '<?\u000B: qq'<?\x{0B}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+---------------------------+---+---------------------------+
-# | Ln|Got                        | Ln|Expected                   |
-# +---+---------------------------+---+---------------------------+
-# |  1|$VAR1 = [                  |  1|$VAR1 = [                  |
-# |  2|          qq'ParseError',  |  2|          qq'ParseError',  |
-# |   |                           *  3|          qq'ParseError',  *
-# |  3|          [                |  4|          [                |
-# |  4|            qq'Comment',   |  5|            qq'Comment',   |
-# |  5|            qq'?\x{0B}'    |  6|            qq'?\x{0B}'    |
-# |  6|          ]                |  7|          ]                |
-# |  7|        ];                 |  8|        ];                 |
-# +---+---------------------------+---+---------------------------+
-# 
+ok 1192 - <?\u000B: qq'<?\x{0B}'
 ok 1193 - <?\u000C: qq'<?\x{0C}'
 ok 1194 - <? : qq'<? '
 ok 1195 - <?!: qq'<?!'
@@ -1888,73 +1613,10 @@ ok 1608 - == attribute: qq'<z ==>'
 ok 1609 - === attribute: qq'<z ===>'
 ok 1610 - ==== attribute: qq'<z ====>'
 ok 1611 - Allowed " after ampersand in attribute value: qq'<z z="&">'
-not ok 1612 - Non-allowed ' after ampersand in attribute value: qq'<z z="&\x{27}">'
-#   Failed test 'Non-allowed ' after ampersand in attribute value: qq'<z z="&\x{27}">''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+------------------------------------+---+------------------------------------+
-# | Ln|Got                                 | Ln|Expected                            |
-# +---+------------------------------------+---+------------------------------------+
-# |  1|$VAR1 = [                           |  1|$VAR1 = [                           |
-# |   |                                    *  2|          qq'ParseError',           *
-# |  2|          [                         |  3|          [                         |
-# |  3|            qq'StartTag',           |  4|            qq'StartTag',           |
-# |  4|            qq'z',                  |  5|            qq'z',                  |
-# |  5|            {                       |  6|            {                       |
-# |  6|              qq'z' => qq'&\x{27}'  |  7|              qq'z' => qq'&\x{27}'  |
-# |  7|            }                       |  8|            }                       |
-# |  8|          ]                         |  9|          ]                         |
-# |  9|        ];                          | 10|        ];                          |
-# +---+------------------------------------+---+------------------------------------+
-# 
+ok 1612 - Non-allowed ' after ampersand in attribute value: qq'<z z="&\x{27}">'
 ok 1613 - Allowed ' after ampersand in attribute value: qq'<z z=\x{27}&\x{27}>'
-not ok 1614 - Non-allowed " after ampersand in attribute value: qq'<z z=\x{27}&"\x{27}>'
-#   Failed test 'Non-allowed " after ampersand in attribute value: qq'<z z=\x{27}&"\x{27}>''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+-------------------------------+---+-------------------------------+
-# | Ln|Got                            | Ln|Expected                       |
-# +---+-------------------------------+---+-------------------------------+
-# |  1|$VAR1 = [                      |  1|$VAR1 = [                      |
-# |   |                               *  2|          qq'ParseError',      *
-# |  2|          [                    |  3|          [                    |
-# |  3|            qq'StartTag',      |  4|            qq'StartTag',      |
-# |  4|            qq'z',             |  5|            qq'z',             |
-# |  5|            {                  |  6|            {                  |
-# |  6|              qq'z' => qq'&"'  |  7|              qq'z' => qq'&"'  |
-# |  7|            }                  |  8|            }                  |
-# |  8|          ]                    |  9|          ]                    |
-# |  9|        ];                     | 10|        ];                     |
-# +---+-------------------------------+---+-------------------------------+
-# 
-not ok 1615 - Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>'
-#   Failed test 'Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+------------------------------------------+---+------------------------------------------+
-# | Ln|Got                                       | Ln|Expected                                  |
-# +---+------------------------------------------+---+------------------------------------------+
-# |  1|$VAR1 = [                                 |  1|$VAR1 = [                                 |
-# |   |                                          *  2|          qq'ParseError',                 *
-# |  2|          [                               |  3|          [                               |
-# |  3|            qq'StartTag',                 |  4|            qq'StartTag',                 |
-# |  4|            qq'z',                        |  5|            qq'z',                        |
-# |  5|            {                             |  6|            {                             |
-# |  6|              qq'z' => qq'&xlink_xmlns;'  |  7|              qq'z' => qq'&xlink_xmlns;'  |
-# |  7|            }                             |  8|            }                             |
-# |  8|          ],                              |  9|          ],                              |
-# |  9|          [                               | 10|          [                               |
-# | 10|            qq'Character',                | 11|            qq'Character',                |
-# | 11|            qq'bar'                       | 12|            qq'bar'                       |
-# | 12|          ],                              | 13|          ],                              |
-# | 13|          [                               | 14|          [                               |
-# | 14|            qq'StartTag',                 | 15|            qq'StartTag',                 |
-# | 15|            qq'z',                        | 16|            qq'z',                        |
-# | 16|            {}                            | 17|            {}                            |
-# | 17|          ]                               | 18|          ]                               |
-# | 18|        ];                                | 19|        ];                                |
-# +---+------------------------------------------+---+------------------------------------------+
-# 
+ok 1614 - Non-allowed " after ampersand in attribute value: qq'<z z=\x{27}&"\x{27}>'
+ok 1615 - Text after bogus character reference: qq'<z z=\x{27}&xlink_xmlns;\x{27}>bar<z>'
 ok 1616 - Text after hex character reference: qq'<z z=\x{27}&\#x0020; foo\x{27}>bar<z>'
 ok 1617 - Attribute name starting with ": qq'<foo "=\x{27}bar\x{27}>'
 ok 1618 - Attribute name starting with ': qq'<foo \x{27}=\x{27}bar\x{27}>'
@@ -2287,25 +1949,7 @@ not ok 1704 - Incorrect comment ending sequences in RCDATA or RAWTEXT: qq'foo<!-
 # 
 # t/data/html-tokenizer/entities.test
 ok 1705 - Undefined named entity in attribute value ending in semicolon and whose name starts with a known entity name.: qq'<h a=\x{27}&noti;\x{27}>'
-not ok 1706 - Entity name followed by the equals sign in an attribute value.: qq'<h a=\x{27}&lang=\x{27}>'
-#   Failed test 'Entity name followed by the equals sign in an attribute value.: qq'<h a=\x{27}&lang=\x{27}>''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+-----------------------------------+---+-----------------------------------+
-# | Ln|Got                                | Ln|Expected                           |
-# +---+-----------------------------------+---+-----------------------------------+
-# |  1|$VAR1 = [                          |  1|$VAR1 = [                          |
-# |   |                                   *  2|          qq'ParseError',          *
-# |  2|          [                        |  3|          [                        |
-# |  3|            qq'StartTag',          |  4|            qq'StartTag',          |
-# |  4|            qq'h',                 |  5|            qq'h',                 |
-# |  5|            {                      |  6|            {                      |
-# |  6|              qq'a' => qq'&lang='  |  7|              qq'a' => qq'&lang='  |
-# |  7|            }                      |  8|            }                      |
-# |  8|          ]                        |  9|          ]                        |
-# |  9|        ];                         | 10|        ];                         |
-# +---+-----------------------------------+---+-----------------------------------+
-# 
+ok 1706 - Entity name followed by the equals sign in an attribute value.: qq'<h a=\x{27}&lang=\x{27}>'
 ok 1707 - CR as numeric entity: qq'&\#013;'
 ok 1708 - CR as hexadecimal numeric entity: qq'&\#x00D;'
 ok 1709 - Windows-1252 EURO SIGN numeric entity.: qq'&\#0128;'
@@ -2375,22 +2019,7 @@ ok 1772 - Decimal numeric entity followed by hex character A.: qq'&\#97A'
 ok 1773 - Decimal numeric entity followed by hex character f.: qq'&\#97f'
 ok 1774 - Decimal numeric entity followed by hex character A.: qq'&\#97F'
 # t/data/html-tokenizer/xmlViolation.test
-not ok 1775 - Non-XML character: qq'a\x{FFFF}b'
-#   Failed test 'Non-XML character: qq'a\x{FFFF}b''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+----------------------------+---+----------------------------+
-# | Ln|Got                         | Ln|Expected                    |
-# +---+----------------------------+---+----------------------------+
-# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
-# |   |                            *  2|          qq'ParseError',   *
-# |  2|          [                 |  3|          [                 |
-# |  3|            qq'Character',  |  4|            qq'Character',  |
-# *  4|            qq'a\x{FFFF}b'  *  5|            qq'a\x{FFFD}b'  *
-# |  5|          ]                 |  6|          ]                 |
-# |  6|        ];                  |  7|        ];                  |
-# +---+----------------------------+---+----------------------------+
-# 
+ok 1775 - Non-XML character: qq'a\x{FFFF}b'
 not ok 1776 - Non-XML space: qq'a\x{0C}b'
 #   Failed test 'Non-XML space: qq'a\x{0C}b''
 #   at HTML-tokenizer.t ok line 1.
@@ -2406,42 +2035,12 @@ not ok 1776 - Non-XML space: qq'a\x{0C}b'
 # |  6|        ];                  |        ];                  |
 # +---+----------------------------+----------------------------+
 # 
-not ok 1777 - Double hyphen in comment: qq'<!-- foo -- bar -->'
-#   Failed test 'Double hyphen in comment: qq'<!-- foo -- bar -->''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+------------------------------+-------------------------------+
-# | Ln|Got                           |Expected                       |
-# +---+------------------------------+-------------------------------+
-# |  1|$VAR1 = [                     |$VAR1 = [                      |
-# |  2|          qq'ParseError',     |          qq'ParseError',      |
-# |  3|          [                   |          [                    |
-# |  4|            qq'Comment',      |            qq'Comment',       |
-# *  5|            qq' foo -- bar '  |            qq' foo - - bar '  *
-# |  6|          ]                   |          ]                    |
-# |  7|        ];                    |        ];                     |
-# +---+------------------------------+-------------------------------+
-# 
+ok 1777 - Double hyphen in comment: qq'<!-- foo -- bar -->'
 ok 1778 - FF between attributes: qq'<a b=\x{27}\x{27}\x{0C}c=\x{27}\x{27}>'
 # t/data/html-tokenizer/domjs.test
 ok 1779 - CR in bogus comment state: qq'<?\x{0D}'
 ok 1780 - CRLF in bogus comment state: qq'<?\x{0D}\x{0A}'
-not ok 1781 - NUL in RCDATA and RAWTEXT: qq'\x{5C}u0000'
-#   Failed test 'NUL in RCDATA and RAWTEXT: qq'\x{5C}u0000''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+-----------------------------+---+-----------------------------+
-# | Ln|Got                          | Ln|Expected                     |
-# +---+-----------------------------+---+-----------------------------+
-# |  1|$VAR1 = [                    |  1|$VAR1 = [                    |
-# |   |                             *  2|          qq'ParseError',    *
-# |  2|          [                  |  3|          [                  |
-# |  3|            qq'Character',   |  4|            qq'Character',   |
-# *  4|            qq'\x{5C}u0000'  *  5|            qq'\x{5C}uFFFD'  *
-# |  5|          ]                  |  6|          ]                  |
-# |  6|        ];                   |  7|        ];                   |
-# +---+-----------------------------+---+-----------------------------+
-# 
+ok 1781 - NUL in RCDATA and RAWTEXT: qq'\x{5C}u0000'
 not ok 1782 - skip first BOM but not later ones: qq'\x{FEFF}foo\x{FEFF}bar'
 #   Failed test 'skip first BOM but not later ones: qq'\x{FEFF}foo\x{FEFF}bar''
 #   at HTML-tokenizer.t ok line 1.
@@ -3585,4 +3184,4 @@ ok 2769 - start tag not closed (self-closing start tag): qq'<p class=\x{27}a\x{2
 ok 2770 - end tag not closed (self-closing start tag): qq'</p/'
 ok 2771 - end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/'
 1..2771
-# Looks like you failed 43 tests of 2771.
+# Looks like you failed 22 tests of 2771.

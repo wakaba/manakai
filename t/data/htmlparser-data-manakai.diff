@@ -1,3 +1,29 @@
+diff --git a/t/data/html-tokenizer/domjs.test b/t/data/html-tokenizer/domjs.test
+index 74771e2..07a611e 100644
+--- a/t/data/html-tokenizer/domjs.test
++++ b/t/data/html-tokenizer/domjs.test
+@@ -15,7 +15,7 @@
+             "doubleEscaped":true,
+             "initialStates":["RCDATA state", "RAWTEXT state"],
+             "input":"\\u0000",
+-            "output":["ParseError", ["Character", "\\uFFFD"]]
++            "output":[["Character", "\\u0000"]]
+         },
+         {
+             "description":"skip first BOM but not later ones",
+diff --git a/t/data/html-tokenizer/entities.test b/t/data/html-tokenizer/entities.test
+index 1cb17a7..cf2cd6e 100644
+--- a/t/data/html-tokenizer/entities.test
++++ b/t/data/html-tokenizer/entities.test
+@@ -6,7 +6,7 @@
+ 
+ {"description": "Entity name followed by the equals sign in an attribute value.",
+ "input":"<h a='&lang='>",
+-"output": ["ParseError", ["StartTag", "h", {"a": "&lang="}]]},
++"output": [["StartTag", "h", {"a": "&lang="}]]},
+ 
+ {"description": "CR as numeric entity",
+ "input":"&#013;",
 diff --git a/t/data/html-tokenizer/test1.test b/t/data/html-tokenizer/test1.test
 index 5de66f5..78f7409 100644
 --- a/t/data/html-tokenizer/test1.test
@@ -72,10 +98,10 @@ index e157514..87a8eba 100644
  {"description":"Unescaped ampersand in attribute value",
  "input":"<h a='&'>",
 diff --git a/t/data/html-tokenizer/test3.test b/t/data/html-tokenizer/test3.test
-index 58519e8..852a8f5 100644
+index 58519e8..8fc529a 100644
 --- a/t/data/html-tokenizer/test3.test
 +++ b/t/data/html-tokenizer/test3.test
-@@ -914,11 +914,11 @@
+@@ -914,7 +914,7 @@
  
  {"description":"<!DOCTYPE",
  "input":"<!DOCTYPE",
@@ -84,11 +110,6 @@ index 58519e8..852a8f5 100644
  
  {"description":"<!DOCTYPE\\u0000",
  "input":"<!DOCTYPE\u0000",
--"output":["ParseError", "ParseError", "ParseError", ["DOCTYPE", "\uFFFD", null, null, false]]},
-+"output":["ParseError", "ParseError", ["DOCTYPE", "\uFFFD", null, null, false]]},
- 
- {"description":"<!DOCTYPE\\u0008",
- "input":"<!DOCTYPE\u0008",
 @@ -926,11 +926,11 @@
  
  {"description":"<!DOCTYPE\\u0009",
@@ -163,3 +184,70 @@ index 58519e8..852a8f5 100644
  
  {"description":"<!DOCTYPE !",
  "input":"<!DOCTYPE !",
+@@ -1034,7 +1034,7 @@
+ 
+ {"description":"<!DOCTYPE >",
+ "input":"<!DOCTYPE >",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE ?",
+ "input":"<!DOCTYPE ?",
+@@ -2626,7 +2626,7 @@
+ 
+ {"description":"<!DOCTYPE>",
+ "input":"<!DOCTYPE>",
+-"output":["ParseError", "ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", "ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE?",
+ "input":"<!DOCTYPE?",
+diff --git a/t/data/html-tokenizer/test4.test b/t/data/html-tokenizer/test4.test
+index 80f859e..a2aac0f 100644
+--- a/t/data/html-tokenizer/test4.test
++++ b/t/data/html-tokenizer/test4.test
+@@ -34,7 +34,7 @@
+ 
+ {"description":"Non-allowed ' after ampersand in attribute value",
+ "input":"<z z=\"&'\">",
+-"output":["ParseError", ["StartTag", "z", {"z": "&'"}]]},
++"output":[["StartTag", "z", {"z": "&'"}]]},
+ 
+ {"description":"Allowed ' after ampersand in attribute value",
+ "input":"<z z='&'>",
+@@ -42,11 +42,11 @@
+ 
+ {"description":"Non-allowed \" after ampersand in attribute value",
+ "input":"<z z='&\"'>",
+-"output":["ParseError", ["StartTag", "z", {"z": "&\""}]]},
++"output":[["StartTag", "z", {"z": "&\""}]]},
+ 
+ {"description":"Text after bogus character reference",
+ "input":"<z z='&xlink_xmlns;'>bar<z>",
+-"output":["ParseError",["StartTag","z",{"z":"&xlink_xmlns;"}],["Character","bar"],["StartTag","z",{}]]},
++"output":[["StartTag","z",{"z":"&xlink_xmlns;"}],["Character","bar"],["StartTag","z",{}]]},
+ 
+ {"description":"Text after hex character reference",
+ "input":"<z z='&#x0020; foo'>bar<z>",
+diff --git a/t/data/html-tokenizer/xmlViolation.test b/t/data/html-tokenizer/xmlViolation.test
+index 137d964..ad966be 100644
+--- a/t/data/html-tokenizer/xmlViolation.test
++++ b/t/data/html-tokenizer/xmlViolation.test
+@@ -3,7 +3,7 @@
+ {"description":"Non-XML character",
+ "input":"a\uFFFFb",
+ "ignoreErrorOrder":true,
+-"output":["ParseError",["Character","a\uFFFDb"]]},
++"output":["ParseError",["Character","a\uFFFFb"]]},
+ 
+ {"description":"Non-XML space",
+ "input":"a\u000Cb",
+@@ -12,7 +12,7 @@
+ 
+ {"description":"Double hyphen in comment",
+ "input":"<!-- foo -- bar -->",
+-"output":["ParseError",["Comment"," foo - - bar "]]},
++"output":["ParseError",["Comment"," foo -- bar "]]},
+ 
+ {"description":"FF between attributes",
+ "input":"<a b=''\u000Cc=''>",

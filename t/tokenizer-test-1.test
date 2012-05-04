@@ -901,7 +901,7 @@
 
 {"description":"VT in attribute value (unquoted) state",
 "input":"<p align=left\u000bc>",
-"output":[["StartTag", "p", {"align":"left\u000bc"}]]},
+"output":["ParseError",["StartTag", "p", {"align":"left\u000bc"}]]},
 
 {"description":"< in attribute value (single-unquoted) state",
 "input":"<p align='left<div>",

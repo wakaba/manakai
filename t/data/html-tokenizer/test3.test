@@ -918,7 +918,7 @@
 
 {"description":"<!DOCTYPE\\u0000",
 "input":"<!DOCTYPE\u0000",
-"output":["ParseError", "ParseError", ["DOCTYPE", "\uFFFD", null, null, false]]},
+"output":["ParseError", "ParseError", "ParseError", ["DOCTYPE", "\uFFFD", null, null, false]]},
 
 {"description":"<!DOCTYPE\\u0008",
 "input":"<!DOCTYPE\u0008",
@@ -1034,7 +1034,7 @@
 
 {"description":"<!DOCTYPE >",
 "input":"<!DOCTYPE >",
-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
+"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
 
 {"description":"<!DOCTYPE ?",
 "input":"<!DOCTYPE ?",
@@ -2626,7 +2626,7 @@
 
 {"description":"<!DOCTYPE>",
 "input":"<!DOCTYPE>",
-"output":["ParseError", "ParseError", ["DOCTYPE", "", null, null, false]]},
+"output":["ParseError", "ParseError", ["DOCTYPE", null, null, null, false]]},
 
 {"description":"<!DOCTYPE?",
 "input":"<!DOCTYPE?",

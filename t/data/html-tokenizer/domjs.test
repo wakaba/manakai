@@ -15,7 +15,7 @@
             "doubleEscaped":true,
             "initialStates":["RCDATA state", "RAWTEXT state"],
             "input":"\\u0000",
-            "output":["ParseError", ["Character", "\\uFFFD"]]
+            "output":[["Character", "\\u0000"]]
         },
         {
             "description":"skip first BOM but not later ones",

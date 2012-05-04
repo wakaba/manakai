@@ -157,9 +157,10 @@ sub CDATA_SECTION_MSE2_STATE () { 41 } # "CDATA section state" in the spec
 sub PUBLIC_STATE () { 42 } # "after DOCTYPE name state" in the spec
 sub SYSTEM_STATE () { 43 } # "after DOCTYPE name state" in the spec
 ##
-## NOTE: "Entity data state", "entity in attribute value state", and
-## the "consume a character reference" algorithm, are jointly
-## implemented as the following six states:
+## NOTE: "Character reference in data state", "Character reference in
+## RCDATA state", "Character reference in attribute value state", and
+## the "consume a character referece" algoritm are implemented as the
+## following six tokenizer states:
 sub ENTITY_STATE () { 44 }
 sub ENTITY_HASH_STATE () { 45 }
 sub NCR_NUM_STATE () { 46 }
@@ -405,6 +406,25 @@ sub _set_nc ($) {
   }
 } # _set_nc
 
+my $CommonStoppers = {
+  ## For newline counter
+  "\x{000D}" => 1, "\x{000A}" => 1,
+
+  ## Parse errors in HTML
+  "\x{000B}" => 1, "\x{FFFE}" => 1, "\x{FFFF}" => 1,
+  "\x{1FFFE}" => 1, "\x{1FFFF}" => 1, "\x{2FFFE}" => 1, "\x{2FFFF}" => 1,
+  "\x{3FFFE}" => 1, "\x{3FFFF}" => 1, "\x{4FFFE}" => 1, "\x{4FFFF}" => 1,
+  "\x{5FFFE}" => 1, "\x{5FFFF}" => 1, "\x{6FFFE}" => 1, "\x{6FFFF}" => 1,
+  "\x{7FFFE}" => 1, "\x{7FFFF}" => 1, "\x{8FFFE}" => 1, "\x{8FFFF}" => 1,
+  "\x{9FFFE}" => 1, "\x{9FFFF}" => 1, "\x{AFFFE}" => 1, "\x{AFFFF}" => 1,
+  "\x{BFFFE}" => 1, "\x{BFFFF}" => 1, "\x{CFFFE}" => 1, "\x{CFFFF}" => 1,
+  "\x{DFFFE}" => 1, "\x{DFFFF}" => 1, "\x{EFFFE}" => 1, "\x{EFFFF}" => 1,
+  "\x{FFFFE}" => 1, "\x{FFFFF}" => 1,
+  "\x{10FFFE}" => 1, "\x{10FFFF}" => 1,
+};
+$CommonStoppers->{chr $_} = 1
+    for 0x0001..0x0008, 0x000E..0x001F, 0x007F..0x009F, 0xFDD0..0xFDEF;
+
 sub _read_chars ($$) {
   my ($self, $stoppers) = @_;
 
@@ -423,7 +443,7 @@ sub _read_chars ($$) {
   {
     my $char = $self->{chars}->[$self->{chars_pos}];
     last if not defined $char;
-    if ($stoppers->{$char}) {
+    if ($stoppers->{$char} or $CommonStoppers->{$char}) {
       last;
     } else {
       $self->{chars_pos}++;
@@ -1555,7 +1575,7 @@ sub _get_next_token ($) {
           }
           if (defined $action->{emit_data_read_until}) {
             $token->{data} .= $self->_read_chars
-                ({map { $_ => 1 } "\x0D", "\x0A", split //, $action->{emit_data_read_until}});
+                ({map { $_ => 1 } split //, $action->{emit_data_read_until}});
 
             #$self->{read_until}->($token->{data},
             #                      $action->{emit_data_read_until},
@@ -1787,8 +1807,7 @@ sub _get_next_token ($) {
 
         $self->{ca}->{value} .= $self->_read_chars
             ({"\x00" => 1, q<"> => 1, q<&> => 1, "<" => 1,
-              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1});
         #$self->{read_until}->($self->{ca}->{value},
         #                      qq[\x00"&<\x09\x0C\x20],
         #                      length $self->{ca}->{value});
@@ -1880,8 +1899,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= chr ($nc);
         $self->{ca}->{value} .= $self->_read_chars
             ({"\x00" => 1, q<'> => 1, q<&> => 1, "<" => 1,
-              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1});
         #$self->{read_until}->($self->{ca}->{value},
         #                      qq[\x00'&<\x09\x0C\x20],
         #                      length $self->{ca}->{value});
@@ -2018,8 +2036,7 @@ sub _get_next_token ($) {
         $self->{ca}->{value} .= $self->_read_chars
             ({"\x00" => 1, q<"> => 1, q<'> => 1, 
               q<=> => 1, q<&> => 1, q<`> => 1, "<" => 1, ">" => 1,
-              "\x09" => 1, "\x0C" => 1, "\x20" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+              "\x09" => 1, "\x0C" => 1, "\x20" => 1});
         #$self->{read_until}->($self->{ca}->{value},
         #                      qq[\x00"'=&` \x09\x0C<>],
         #                      length $self->{ca}->{value});
@@ -2104,8 +2121,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{data} .= chr ($nc); # comment
         $self->{ct}->{data} .= $self->_read_chars
-            ({"\x00" => 1, ">" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, ">" => 1});
         #$self->{read_until}->($self->{ct}->{data},
         #                      qq[\x00>],
         #                      length $self->{ct}->{data});
@@ -2426,8 +2442,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{data} .= chr ($nc); # comment
         $self->{ct}->{data} .= $self->_read_chars
-            ({"\x00" => 1, "-" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, "-" => 1});
         #$self->{read_until}->($self->{ct}->{data},
         #                      qq[-\x00],
         #                      length $self->{ct}->{data});
@@ -2647,6 +2662,7 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } elsif ($nc == 0x0000) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         $self->{ct}->{name} = "\x{FFFD}";
         delete $self->{ct}->{quirks};
         $self->{state} = DOCTYPE_NAME_STATE;
@@ -2715,6 +2731,7 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } elsif ($nc == 0x0000) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         $self->{ct}->{name} .= "\x{FFFD}"; # DOCTYPE
         ## Stay in the state.
         
@@ -3093,6 +3110,7 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE
         redo A;
       } elsif ($nc == 0x0000) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         $self->{ct}->{pubid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
@@ -3103,8 +3121,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{pubid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
         $self->{ct}->{pubid} .= $self->_read_chars
-            ({"\x00" => 1, q<"> => 1, ">" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, q<"> => 1, ">" => 1});
         #$self->{read_until}->($self->{ct}->{pubid}, qq[\x00">],
         #                      length $self->{ct}->{pubid});
 
@@ -3155,6 +3172,7 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($nc == 0x0000) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         $self->{ct}->{pubid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
@@ -3165,8 +3183,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{pubid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
         $self->{ct}->{pubid} .= $self->_read_chars
-            ({"\x00" => 1, "'" => 1, ">" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, "'" => 1, ">" => 1});
         #$self->{read_until}->($self->{ct}->{pubid}, qq[\x00'>],
         #                      length $self->{ct}->{pubid});
 
@@ -3421,6 +3438,7 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($nc == 0x0000) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         $self->{ct}->{sysid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
@@ -3431,8 +3449,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{sysid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
         $self->{ct}->{sysid} .= $self->_read_chars
-            ({"\x00" => 1, q<"> => 1, ">" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, q<"> => 1, ">" => 1});
         #$self->{read_until}->($self->{ct}->{sysid}, qq[\x00">],
         #                      length $self->{ct}->{sysid});
 
@@ -3479,6 +3496,7 @@ sub _get_next_token ($) {
         return  ($self->{ct}); # DOCTYPE/ENTITY/NOTATION
         redo A;
       } elsif ($nc == 0x0000) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL');
         $self->{ct}->{sysid} .= "\x{FFFD}"; # DOCTYPE/ENTITY/NOTATION
         ## Stay in the state.
         
@@ -3489,8 +3507,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{sysid} .= chr $nc; # DOCTYPE/ENTITY/NOTATION
         $self->{ct}->{sysid} .= $self->_read_chars
-            ({"\x00" => 1, "'" => 1, ">" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, "'" => 1, ">" => 1});
         #$self->{read_until}->($self->{ct}->{sysid}, qq[\x00'>],
         #                      length $self->{ct}->{sysid});
 
@@ -3655,10 +3672,8 @@ sub _get_next_token ($) {
       } else {
         
         my $s = '';
+        $self->_read_chars ({"[" => 1, ">" => 1});
         #$self->{read_until}->($s, q{>[}, 0);
-        $self->_read_chars
-            ({"[" => 1, ">" => 1,
-              "\x0A" => 1, "\x0D" => 1});
 
         ## Stay in the state
         
@@ -3702,8 +3717,7 @@ sub _get_next_token ($) {
         
         $self->{ct}->{data} .= chr $nc;
         $self->{ct}->{data} .= $self->_read_chars
-            ({"\x00" => 1, "]" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, "]" => 1});
         #$self->{read_until}->($self->{ct}->{data},
         #                      qq<\x00]>,
         #                      length $self->{ct}->{data});
@@ -4410,8 +4424,7 @@ sub _get_next_token ($) {
         }
         $self->{ct}->{data} .= $nc == 0x0000 ? "\x{FFFD}" : chr $nc; # pi
         $self->{ct}->{data} .= $self->_read_chars
-            ({"\x00" => 1, "?" => 1,
-              "\x0A" => 1, "\x0D" => 1});
+            ({"\x00" => 1, "?" => 1});
         #$self->{read_until}->($self->{ct}->{data}, qq[\x00?],
         #                      length $self->{ct}->{data});
 

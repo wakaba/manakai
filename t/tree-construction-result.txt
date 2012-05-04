@@ -116,28 +116,28 @@ ok 111 - Document tree: qq'<!--a----\x{00}-->'
 ok 112 - Parse error: qq'<!--a----!\x{00}-->'; 1:7:dash in comment, 1:8:dash in comment, 1:10:comment end bang, 1:11:NULL, 1:14:no DOCTYPE;no DOCTYPE, --, --, !, NULL
 ok 113 - SHOULD-level error: qq'<!--a----!\x{00}-->'; ;
 ok 114 - Document tree: qq'<!--a----!\x{00}-->'
-ok 115 - Parse error: qq'<!DOCTYPE \x{00}>'; 1:12:not HTML5;NULL
+ok 115 - Parse error: qq'<!DOCTYPE \x{00}>'; 1:11:NULL, 1:12:not HTML5;NULL, DOCTYPE not HTML5
 ok 116 - SHOULD-level error: qq'<!DOCTYPE \x{00}>'; ;
 ok 117 - Document tree: qq'<!DOCTYPE \x{00}>'
-ok 118 - Parse error: qq'<!DOCTYPE a\x{00}>'; 1:13:not HTML5;NULL
+ok 118 - Parse error: qq'<!DOCTYPE a\x{00}>'; 1:12:NULL, 1:13:not HTML5;NULL, DOCTYPE not HTML5
 ok 119 - SHOULD-level error: qq'<!DOCTYPE a\x{00}>'; ;
 ok 120 - Document tree: qq'<!DOCTYPE a\x{00}>'
-ok 121 - Parse error: qq'<!DOCTYPE html PUBLIC "a\x{00}">'; 1:27:not HTML5;NULL
+ok 121 - Parse error: qq'<!DOCTYPE html PUBLIC "a\x{00}">'; 1:25:NULL, 1:27:not HTML5;NULL, DOCTYPE not HTML5
 ok 122 - SHOULD-level error: qq'<!DOCTYPE html PUBLIC "a\x{00}">'; ;
 ok 123 - Document tree: qq'<!DOCTYPE html PUBLIC "a\x{00}">'
-ok 124 - Parse error: qq'<!DOCTYPE html PUBLIC \x{27}a\x{00}\x{27}>'; 1:27:not HTML5;NULL
+ok 124 - Parse error: qq'<!DOCTYPE html PUBLIC \x{27}a\x{00}\x{27}>'; 1:25:NULL, 1:27:not HTML5;NULL, DOCTYPE not HTML5
 ok 125 - SHOULD-level error: qq'<!DOCTYPE html PUBLIC \x{27}a\x{00}\x{27}>'; ;
 ok 126 - Document tree: qq'<!DOCTYPE html PUBLIC \x{27}a\x{00}\x{27}>'
-ok 127 - Parse error: qq'<!DOCTYPE html PUBLIC "x" "a\x{00}">'; 1:31:not HTML5;NULL
+ok 127 - Parse error: qq'<!DOCTYPE html PUBLIC "x" "a\x{00}">'; 1:29:NULL, 1:31:not HTML5;NULL, DOCTYPE not HTML5
 ok 128 - SHOULD-level error: qq'<!DOCTYPE html PUBLIC "x" "a\x{00}">'; ;
 ok 129 - Document tree: qq'<!DOCTYPE html PUBLIC "x" "a\x{00}">'
-ok 130 - Parse error: qq'<!DOCTYPE html PUBLIC "x" \x{27}a\x{00}\x{27}>'; 1:31:not HTML5;NULL
+ok 130 - Parse error: qq'<!DOCTYPE html PUBLIC "x" \x{27}a\x{00}\x{27}>'; 1:29:NULL, 1:31:not HTML5;NULL, DOCTYPE not HTML5
 ok 131 - SHOULD-level error: qq'<!DOCTYPE html PUBLIC "x" \x{27}a\x{00}\x{27}>'; ;
 ok 132 - Document tree: qq'<!DOCTYPE html PUBLIC "x" \x{27}a\x{00}\x{27}>'
-ok 133 - Parse error: qq'<!DOCTYPE html SYSTEM "a\x{00}">'; 1:27:not HTML5;NULL
+ok 133 - Parse error: qq'<!DOCTYPE html SYSTEM "a\x{00}">'; 1:25:NULL, 1:27:not HTML5;NULL, DOCTYPE not HTML5
 ok 134 - SHOULD-level error: qq'<!DOCTYPE html SYSTEM "a\x{00}">'; ;
 ok 135 - Document tree: qq'<!DOCTYPE html SYSTEM "a\x{00}">'
-ok 136 - Parse error: qq'<!DOCTYPE html SYSTEM \x{27}a\x{00}\x{27}>'; 1:27:not HTML5;NULL
+ok 136 - Parse error: qq'<!DOCTYPE html SYSTEM \x{27}a\x{00}\x{27}>'; 1:25:NULL, 1:27:not HTML5;NULL, DOCTYPE not HTML5
 ok 137 - SHOULD-level error: qq'<!DOCTYPE html SYSTEM \x{27}a\x{00}\x{27}>'; ;
 ok 138 - Document tree: qq'<!DOCTYPE html SYSTEM \x{27}a\x{00}\x{27}>'
 ok 139 - Parse error: qq'<svg><![CDATA[a\x{00}b]]></svg>'; 1:6:no DOCTYPE, 1:21:NULL;no DOCTYPE, NULL
