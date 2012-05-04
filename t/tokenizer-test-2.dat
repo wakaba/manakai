@@ -514,6 +514,22 @@ control character
 #document-fragment p escaped
 | "\U0010ffff"
 
+#data escaped
+\U00110000
+#errors
+no DOCTYPE
+#document escaped
+| <html>
+|   <head>
+|   <body>
+|     "\U00110000"
+
+#data escaped
+\U00110000
+#errors
+#document-fragment p escaped
+| "\U00110000"
+
 #data
 <!DOCTYPE HTML SYSTEM "x"
 #errors

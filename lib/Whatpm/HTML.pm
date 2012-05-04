@@ -6785,119 +6785,18 @@ sub set_inner_html ($$$$;$) {
     ## Step 8 # MUST
     my $i = 0;
     $p->{line_prev} = $p->{line} = 1;
-    $p->{column_prev} = $p->{column} = 0;
-    require Whatpm::Charset::DecodeHandle;
-    my $input = Whatpm::Charset::DecodeHandle::CharString->new (\($_[0]));
-    $input = $get_wrapper->($input);
-    $p->{set_nc} = sub {
-      my $self = shift;
+    $p->{column_prev} = -1;
+    $p->{column} = 0;
 
-      my $char = '';
-      if (defined $self->{next_nc}) {
-        $char = $self->{next_nc};
-        delete $self->{next_nc};
-        $self->{nc} = ord $char;
-      } else {
-        $self->{char_buffer} = '';
-        $self->{char_buffer_pos} = 0;
-        
-        my $count = $input->manakai_read_until
-            ($self->{char_buffer}, qr/[^\x00\x0A\x0D]/,
-             $self->{char_buffer_pos});
-        if ($count) {
-          $self->{line_prev} = $self->{line};
-          $self->{column_prev} = $self->{column};
-          $self->{column}++;
-          $self->{nc}
-              = ord substr ($self->{char_buffer},
-                            $self->{char_buffer_pos}++, 1);
-          return;
-        }
-        
-        if ($input->read ($char, 1)) {
-          $self->{nc} = ord $char;
-        } else {
-          $self->{nc} = -1;
-          return;
-        }
-      }
+    $self->{chars} = [split //, $_[0]];
+    $self->{chars_pos} = 0;
+    $self->{chars_pull_next} = sub { 0 };
+    delete $self->{chars_was_cr};
 
-      ($p->{line_prev}, $p->{column_prev}) = ($p->{line}, $p->{column});
-      $p->{column}++;
-
-      if ($self->{nc} == 0x000A) { # LF
-        $p->{line}++;
-        $p->{column} = 0;
-        
-      } elsif ($self->{nc} == 0x000D) { # CR
-## TODO: support for abort/streaming
-        my $next = '';
-        if ($input->read ($next, 1) and $next ne "\x0A") {
-          $self->{next_nc} = $next;
-        }
-        $self->{nc} = 0x000A; # LF # MUST
-        $p->{line}++;
-        $p->{column} = 0;
-        
-      }
-    };
-
-    $p->{read_until} = sub {
-      #my ($scalar, $specials_range, $offset) = @_;
-      return 0 if defined $p->{next_nc};
-
-      my $pattern = qr/[^$_[1]\x00\x0A\x0D]/;
-      my $offset = $_[2] || 0;
-      
-      if ($p->{char_buffer_pos} < length $p->{char_buffer}) {
-        pos ($p->{char_buffer}) = $p->{char_buffer_pos};
-        if ($p->{char_buffer} =~ /\G(?>$pattern)+/) {
-          substr ($_[0], $offset)
-              = substr ($p->{char_buffer}, $-[0], $+[0] - $-[0]);
-          my $count = $+[0] - $-[0];
-          if ($count) {
-            $p->{column} += $count;
-            $p->{char_buffer_pos} += $count;
-            $p->{line_prev} = $p->{line};
-            $p->{column_prev} = $p->{column} - 1;
-            $p->{nc} = -1;
-          }
-          return $count;
-        } else {
-          return 0;
-        }
-      } else {
-        my $count = $input->manakai_read_until ($_[0], $pattern, $_[2]);
-        if ($count) {
-          $p->{column} += $count;
-          $p->{column_prev} += $count;
-          $p->{nc} = -1;
-        }
-        return $count;
-      }
-    }; # $p->{read_until}
-
-    my $ponerror = $onerror || sub {
-      my (%opt) = @_;
-      my $line = $opt{line};
-      my $column = $opt{column};
-      if (defined $opt{token} and defined $opt{token}->{line}) {
-        $line = $opt{token}->{line};
-        $column = $opt{token}->{column};
-      }
-      warn "Parse error ($opt{type}) at line $line column $column\n";
-    };
+    my $ponerror = $onerror || $DefaultErrorHandler;
     $p->{parse_error} = sub {
       $ponerror->(line => $p->{line}, column => $p->{column}, @_);
     };
-    
-    my $char_onerror = sub {
-      my (undef, $type, %opt) = @_;
-      $ponerror->(layer => 'encode',
-                  line => $p->{line}, column => $p->{column} + 1,
-                  %opt, type => $type);
-    }; # $char_onerror
-    $input->onerror ($char_onerror);
 
     $p->_initialize_tokenizer;
     $p->_initialize_tree_constructor;
@@ -6996,11 +6895,7 @@ sub set_inner_html ($$$$;$) {
     ## ISSUE: mutation events?
 
     $p->_terminate_tree_constructor;
-
-    ## Remove self references.
-    delete $p->{set_nc};
-    delete $p->{read_until};
-    delete $p->{parse_error};
+    $p->_clear_refs;
   } else {
     die "$0: |set_inner_html| is not defined for node of type $nt";
   }
