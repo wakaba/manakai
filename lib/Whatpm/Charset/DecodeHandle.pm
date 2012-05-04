@@ -1,6 +1,8 @@
 package Whatpm::Charset::DecodeHandle;
 use strict;
 
+## DEPRECATED
+
 ## NOTE: |Message::Charset::Info| uses this module without calling
 ## the constructor.
 use Message::Charset::Info;
@@ -560,6 +562,31 @@ sub read {
 } # read
 
 sub close { $_[0]->{filehandle}->close }
+
+package Whatpm::Charset::DecodeHandle::ByteString;
+
+sub new ($$) {
+  my $self = bless {pos => 0}, $_[0];
+  $self->{bytes} = [split //, ${$_[1]}];
+  return $self;
+} # new
+
+sub read ($$$$) {
+  #my ($self, $scalar, $length, $offset) = @_;
+  my $self = $_[0];
+  my $length = $_[2] || 0;
+  my $offset = $_[3];
+  ## NOTE: We don't support standard Perl semantics if $offset is
+  ## greater than the length of $scalar.
+  substr ($_[1], $offset) = join '', @{$self->{bytes}}[$self->{pos}..($self->{pos} + $length - 1)];
+  my $count = (length $_[1]) - $offset;
+  $self->{pos} += $count;
+  return $count;
+} # read
+
+sub close ($) { }
+
+sub onerror ($;$) { }
 
 package Whatpm::Charset::DecodeHandle::CharString;
 

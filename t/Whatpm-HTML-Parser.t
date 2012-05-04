@@ -330,7 +330,7 @@ sub _parse_byte_stream_utf8 : Test(2) {
   my $s = qq{<html><p>\xE5\x9A\x81\xC2\xAFa<p>bc};
 
   require Whatpm::Charset::DecodeHandle;
-  my $input = Whatpm::Charset::DecodeHandle::CharString->new (\$s);
+  my $input = Whatpm::Charset::DecodeHandle::ByteString->new (\$s);
   my $parser = Whatpm::HTML->new;
   $parser->parse_byte_stream ('utf-8', $input => $doc);
 
@@ -344,13 +344,27 @@ sub _parse_byte_stream_latin1 : Test(2) {
   my $s = qq{<html><p>\xE5\x9A\x81\xC2\xAFa<p>bc};
 
   require Whatpm::Charset::DecodeHandle;
-  my $input = Whatpm::Charset::DecodeHandle::CharString->new (\$s);
+  my $input = Whatpm::Charset::DecodeHandle::ByteString->new (\$s);
   my $parser = Whatpm::HTML->new;
   $parser->parse_byte_stream ('latin1', $input => $doc);
 
   eq_or_diff $doc->inner_html, qq{<html><head></head><body><p>\xe5\x{0161}\x{fffd}\xc2\xafa</p><p>bc</p></body></html>};
   is $doc->input_encoding, 'windows-1252';
 } # _parse_byte_stream_latin1
+
+sub _parse_byte_stream_change : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $s = qq{<html><p><foo><meta charset=shift_jis>\xE5\xA3\xC2};
+
+  require Whatpm::Charset::DecodeHandle;
+  my $input = Whatpm::Charset::DecodeHandle::ByteString->new (\$s);
+  my $parser = Whatpm::HTML->new;
+  $parser->parse_byte_stream (undef, $input => $doc);
+
+  eq_or_diff $doc->inner_html, qq{<html><head></head><body><p><foo><meta charset="shift_jis">\x{87a2}\x{ff82}</foo></p></body></html>};
+  is $doc->input_encoding, 'shift_jis';
+} # _parse_byte_stream_change
 
 __PACKAGE__->runtests;
 

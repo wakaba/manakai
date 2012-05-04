@@ -388,39 +388,40 @@ sub parse_byte_stream ($$$$;$$) {
   my $self = ref $_[0] ? $_[0] : $_[0]->new;
   my $doc = $self->{document} = $_[3];
 
+  my $handle = $_[2];
   my $embedded_encoding_name;
-  PARSER: {
-    @{$self->{document}->child_nodes} = ();
-    
-    my $handle = $_[2];
+  $self->{chars} = [];
+  $self->{chars_pos} = 0;
+  my $bytes = '';
+  my $orig_bytes = '';
+  {
+    my $i = 0;
+    while ($handle->read ($bytes, 1, length $bytes)) {
+      $orig_bytes .= substr ($bytes, -1);
+      last if $i++ == 1024;
+    }
+  }
+  $self->{chars_pull_next} = sub {
     $self->{chars} = [];
     $self->{chars_pos} = 0;
-    my $bytes = '';
-    {
-      my $i = 0;
-      while ($handle->read ($bytes, 1, length $bytes)) {
-        last if $i++ == 1024;
-      }
+    my $i = 0;
+    while ($handle->read ($bytes, 1, length $bytes)) {
+      $orig_bytes .= substr ($bytes, -1) unless $embedded_encoding_name;
+      last if $i++ == 1024;
     }
-    $self->{chars_pull_next} = sub {
-      if ($self->{confident}) {
-        $self->{chars} = [];
-        $self->{chars_pos} = 0;
-      }
-      my $i = 0;
-      while ($handle->read ($bytes, 1, length $bytes)) {
-        last if $i++ == 1024;
-      }
-      my @added = split //,
-          decode $self->{input_encoding}, $bytes, Encode::FB_QUIET;
-      if (6 < length $bytes or (length $bytes and $i <= 1024)) { # shit!
-        push @added, "\x{FFFD}";
-        substr ($bytes, 0, 1) = '';
-      }
-      push @{$self->{chars}}, @added;
-      return @added > 0;
-    };
-    delete $self->{chars_was_cr};
+    my @added = split //,
+        decode $self->{input_encoding}, $bytes, Encode::FB_QUIET;
+    if (6 < length $bytes or (length $bytes and $i <= 1024)) { # shit!
+      push @added, "\x{FFFD}";
+      substr ($bytes, 0, 1) = '';
+    }
+    push @{$self->{chars}}, @added;
+    return @added > 0;
+  };
+  delete $self->{chars_was_cr};
+
+  PARSER: {
+    @{$self->{document}->child_nodes} = ();
 
     $self->_encoding_sniffing
         (transport_encoding_name => $_[1],
@@ -436,6 +437,9 @@ sub parse_byte_stream ($$$$;$$) {
     
     $self->{restart_parser} = sub {
       $embedded_encoding_name = $_[0];
+      $bytes = $orig_bytes;
+      $self->{chars} = [];
+      $self->{chars_pos} = 0;
       die bless {}, 'Whatpm::HTML::InputStream::RestartParser';
     };
 
