@@ -549,13 +549,13 @@
 
 {"description":"surrogate character reference",
 "input":"\uD800&#xDFFF;",
-"output":["ParseError", ["Character", "\uFFFD"],
+"output":[["Character", "\uD800"],
           "ParseError", ["Character", "\uFFFD"]]},
 
 {"description":"surrogate character reference",
 "input":"&#xD800;\uDFFF",
 "output":["ParseError", ["Character", "\uFFFD"],
-          "ParseError", ["Character", "\uFFFD"]]},
+          ["Character", "\uDFFF"]]},
 
 {"description":"surrogate character reference",
 "input":"&#55296;",
@@ -667,7 +667,7 @@
 
 {"description":"NULL character",
 "input":"\u0000",
-"output":["ParseError",["Character", "\uFFFD"]]},
+"output":["ParseError",["Character", "\u0000"]]},
 
 {"description":"&TRADE;",
 "input":"&TRADE;",
@@ -901,7 +901,7 @@
 
 {"description":"VT in attribute value (unquoted) state",
 "input":"<p align=left\u000bc>",
-"output":["ParseError", ["StartTag", "p", {"align":"left\u000bc"}]]},
+"output":[["StartTag", "p", {"align":"left\u000bc"}]]},
 
 {"description":"< in attribute value (single-unquoted) state",
 "input":"<p align='left<div>",

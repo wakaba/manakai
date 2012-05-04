@@ -1,6 +1,7 @@
 package test::Whatpm::HTML::Tokenizer::html_tokenizer;
 use strict;
 use warnings;
+no warnings 'utf8';
 use Path::Class;
 use lib file (__FILE__)->dir->subdir ('lib')->stringify;
 use lib file (__FILE__)->dir->parent->subdir ('lib')->stringify;
@@ -22,17 +23,7 @@ $Data::Dumper::Sortkeys = 1;
   no warnings 'redefine';
   sub Data::Dumper::qquote {
     my $s = shift;
-    eval {
-      ## Perl 5.8.8 in some environment does not handle utf8 string
-      ## with surrogate code points well (it breaks the string when it
-      ## is passed to another subroutine even when it can be
-      ## accessible only via traversing reference chain, very
-      ## strange...), so |eval| this statement.  It would not change
-      ## the test result as long as our parser implementation passes
-      ## the tests.
-      $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
-      1;
-    } or warn $@;
+    $s =~ s/([^\x20\x21-\x26\x28-\x5B\x5D-\x7E])/sprintf '\x{%02X}', ord $1/ge;
     return q<qq'> . $s . q<'>;
   } # Data::Dumper::qquote
 }
@@ -117,6 +108,9 @@ sub _tokenize_test ($$) {
       my $i = 0;
       my @token;
 
+      $p->{line} = $p->{line_prev} = 0;
+      $p->{column_prev} = -1;
+      $p->{column} = 0;
       $p->{chars} = [split //, $s];
       $p->{chars_pos} = '';
       $p->{chars_pull_next} = sub { 0 };

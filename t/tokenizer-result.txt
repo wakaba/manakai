@@ -272,7 +272,6 @@ not ok 87 - \u0000: qq'\x{00}'
 # 
 ok 88 - \u0009: qq'\x{09}'
 ok 89 - \u000A: qq'\x{0A}'
-Use of uninitialized value in addition (+) at lib/Whatpm/HTML/Tokenizer.pm line 371.
 ok 90 - \u000B: qq'\x{0B}'
 ok 91 - \u000C: qq'\x{0C}'
 ok 92 -  : qq' '
@@ -289,8 +288,6 @@ ok 102 - 0: qq'0'
 ok 103 - 1: qq'1'
 ok 104 - 9: qq'9'
 ok 105 - ;: qq';'
-Use of uninitialized value in subtraction (-) at lib/Whatpm/HTML/Tokenizer.pm line 1447.
-Use of uninitialized value in subtraction (-) at lib/Whatpm/HTML/Tokenizer.pm line 1551.
 ok 106 - <: qq'<'
 not ok 107 - <\u0000: qq'<\x{00}'
 #   Failed test '<\u0000: qq'<\x{00}''
@@ -10689,8 +10686,6 @@ ok 1582 - z: qq'z'
 ok 1583 - {: qq'{'
 ok 1584 - \uDBC0\uDC00: qq'\x{100000}'
 # t/tokenizer/test4.test
-Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 92.
-Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 92.
 not ok 1585 - < in attribute name: qq'<z/0  <>'
 #   Failed test '< in attribute name: qq'<z/0  <>''
 #   at HTML-tokenizer.t ok line 1.
@@ -14150,25 +14145,21 @@ not ok 2270 - Windows-1252 REPLACEMENT CHAR hexadecimal numeric entity.: qq'&\#x
 ok 2271 - Windows-1252 LATIN SMALL LETTER Z WITH CARON hexadecimal numeric entity.: qq'&\#x09E;'
 ok 2272 - Windows-1252 LATIN CAPITAL LETTER Y WITH DIAERESIS hexadecimal numeric entity.: qq'&\#x09F;'
 # t/tokenizer/xmlViolation.test
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test/Builder.pm line 1759.
-not ok 2273 - Non-XML character: qq'aï¿¿b'
-Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test/Builder.pm line 1759.
-#   Failed test 'Non-XML character: qq'aï¿¿b''
+not ok 2273 - Non-XML character: qq'a\x{FFFF}b'
+#   Failed test 'Non-XML character: qq'a\x{FFFF}b''
 #   at HTML-tokenizer.t ok line 1.
 #   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+----------------------------+---+-----------------------------+
-# | Ln|Got                         | Ln|Expected                     |
-# +---+----------------------------+---+-----------------------------+
-# |  1|$VAR1 = [                   |  1|$VAR1 = [                    |
-# |   |                            *  2|          qq'ParseError',    *
-# |  2|          [                 |  3|          [                  |
-# |  3|            qq'Character',  |  4|            qq'Character',   |
-# *  4|            qq'a\x{ffff}b'  *  5|            qq'a\\x{FFFD}b'  *
-# |  5|          ]                 |  6|          ]                  |
-# |  6|        ];                  |  7|        ];                   |
-# +---+----------------------------+---+-----------------------------+
+# +---+----------------------------+---+----------------------------+
+# | Ln|Got                         | Ln|Expected                    |
+# +---+----------------------------+---+----------------------------+
+# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
+# |   |                            *  2|          qq'ParseError',   *
+# |  2|          [                 |  3|          [                 |
+# |  3|            qq'Character',  |  4|            qq'Character',  |
+# *  4|            qq'a\x{FFFF}b'  *  5|            qq'a\x{FFFD}b'  *
+# |  5|          ]                 |  6|          ]                 |
+# |  6|        ];                  |  7|        ];                  |
+# +---+----------------------------+---+----------------------------+
 # 
 not ok 2274 - Non-XML space: qq'a\x{0C}b'
 #   Failed test 'Non-XML space: qq'a\x{0C}b''
@@ -14203,12 +14194,6 @@ not ok 2275 - Double hyphen in comment: qq'<!-- foo -- bar -->'
 # 
 ok 2276 - FF between attributes: qq'<a b=\x{27}\x{27}\x{0C}c=\x{27}\x{27}>'
 # t/tokenizer-test-1.test
-Unicode character 0x1fffe is illegal at t/HTML-tokenizer.t line 92.
-Unicode character 0x1ffff is illegal at t/HTML-tokenizer.t line 92.
-Unicode character 0x10fffe is illegal at t/HTML-tokenizer.t line 92.
-Unicode character 0x10fffe is illegal at t/HTML-tokenizer.t line 92.
-Unicode character 0x10ffff is illegal at t/HTML-tokenizer.t line 92.
-Unicode character 0x10ffff is illegal at t/HTML-tokenizer.t line 92.
 ok 2277 - <!DOCTYPE (HTML5 revision 3121): qq'<!DOCTYPE'
 ok 2278 - <!DOCTYPE : qq'<!DOCTYPE '
 ok 2279 - <!DOCTYPE >: qq'<!DOCTYPE >'
@@ -14346,56 +14331,8 @@ ok 2395 - Numeric entity representing a Windows-1252 'codepoint': qq'&\#137;'
 ok 2396 - Hexadecimal entity representing a Windows-1252 'codepoint': qq'&\#x89;'
 ok 2397 - surrogate character reference: qq'&\#xD800;'
 ok 2398 - surrogate character references: qq'&\#xD800;&\#xDFFF;'
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test/Builder.pm line 1759.
-not ok 2399 - surrogate character reference: qq'í €&\#xDFFF;'
-Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test/Builder.pm line 1759.
-#   Failed test 'surrogate character reference: qq'í €&\#xDFFF;''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+----------------------------+---+----------------------------+
-# | Ln|Got                         | Ln|Expected                    |
-# +---+----------------------------+---+----------------------------+
-# |  1|$VAR1 = [                   |  1|$VAR1 = [                   |
-# |   |                            *  2|          qq'ParseError',   *
-# |  2|          [                 |  3|          [                 |
-# |  3|            qq'Character',  |  4|            qq'Character',  |
-# *  4|            qq'\x{d800}'    *  5|            qq'\\x{FFFD}'   *
-# |  5|          ],                |  6|          ],                |
-# |  6|          qq'ParseError',   |  7|          qq'ParseError',   |
-# |  7|          [                 |  8|          [                 |
-# |  8|            qq'Character',  |  9|            qq'Character',  |
-# |  9|            qq'\x{FFFD}'    | 10|            qq'\x{FFFD}'    |
-# | 10|          ]                 | 11|          ]                 |
-# | 11|        ];                  | 12|        ];                  |
-# +---+----------------------------+---+----------------------------+
-# 
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test/Builder.pm line 1759.
-not ok 2400 - surrogate character reference: qq'&\#xD800;í¿¿'
-Wide character in print at /usr/lib/perl5/vendor_perl/5.10.1/Test/Builder.pm line 1759.
-#   Failed test 'surrogate character reference: qq'&\#xD800;í¿¿''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+----------------------------------+---+----------------------------+
-# | Ln|Got                               | Ln|Expected                    |
-# +---+----------------------------------+---+----------------------------+
-# |  1|$VAR1 = [                         |  1|$VAR1 = [                   |
-# |  2|          qq'ParseError',         |  2|          qq'ParseError',   |
-# |  3|          [                       |  3|          [                 |
-# |  4|            qq'Character',        |  4|            qq'Character',  |
-# *  5|            qq'\x{fffd}\x{dfff}'  *  5|            qq'\x{FFFD}'    *
-# |   |                                  *  6|          ],                *
-# |   |                                  *  7|          qq'ParseError',   *
-# |   |                                  *  8|          [                 *
-# |   |                                  *  9|            qq'Character',  *
-# |   |                                  * 10|            qq'\x{FFFD}'    *
-# |  6|          ]                       | 11|          ]                 |
-# |  7|        ];                        | 12|        ];                  |
-# +---+----------------------------------+---+----------------------------+
-# 
+ok 2399 - surrogate character reference: qq'\x{D800}&\#xDFFF;'
+ok 2400 - surrogate character reference: qq'&\#xD800;\x{DFFF}'
 ok 2401 - surrogate character reference: qq'&\#55296;'
 ok 2402 - surrogate character reference: qq'&\#57343;'
 ok 2403 - U+FDD0 character reference: qq'&\#xfdd0;'
@@ -14403,11 +14340,7 @@ ok 2404 - U+FDD0 decimal character reference: qq'&\#64976;'
 ok 2405 - U+FDDF character reference: qq'&\#xfddf;'
 ok 2406 - U+FFFE character reference: qq'&\#xfffe;'
 ok 2407 - U+FFFE decimal character reference: qq'&\#65534;'
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
 ok 2408 - U+FFFF character reference: qq'&\#xffff;'
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
-Malformed UTF-8 character (fatal) at t/HTML-tokenizer.t line 33.
 ok 2409 - U+FFFF decimal character reference: qq'&\#65535;'
 ok 2410 - U+1FFFE character reference: qq'&\#x1fffe;'
 ok 2411 - U+1FFFF character reference: qq'&\#x1ffff;'
@@ -14427,22 +14360,7 @@ ok 2424 - Broken hcro (&\#xg;): qq'&\#xg;'
 ok 2425 - Broken hcro (&\#Xg;): qq'&\#Xg;'
 ok 2426 - Broken hcro (&\#x!): qq'&\#x!'
 ok 2427 - Broken hcro (&\#X!): qq'&\#X!'
-not ok 2428 - NULL character: qq'\x{00}'
-#   Failed test 'NULL character: qq'\x{00}''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+----------------------------+----------------------------+
-# | Ln|Got                         |Expected                    |
-# +---+----------------------------+----------------------------+
-# |  1|$VAR1 = [                   |$VAR1 = [                   |
-# |  2|          qq'ParseError',   |          qq'ParseError',   |
-# |  3|          [                 |          [                 |
-# |  4|            qq'Character',  |            qq'Character',  |
-# *  5|            qq'\x{00}'      |            qq'\x{FFFD}'    *
-# |  6|          ]                 |          ]                 |
-# |  7|        ];                  |        ];                  |
-# +---+----------------------------+----------------------------+
-# 
+ok 2428 - NULL character: qq'\x{00}'
 ok 2429 - &TRADE;: qq'&TRADE;'
 ok 2430 - &lang;: qq'&lang;'
 ok 2431 - &rang;: qq'&rang;'
@@ -14520,25 +14438,7 @@ ok 2483 - VT in after attribute name state: qq'<p a \x{0B}b>'
 ok 2484 - < in before attribute value state: qq'<p align=<div>'
 ok 2485 - VT in before attribute value state: qq'<p a=\x{0B}c>'
 ok 2486 - < in attribute value (unquoted) state: qq'<p align=left<div>'
-not ok 2487 - VT in attribute value (unquoted) state: qq'<p align=left\x{0B}c>'
-#   Failed test 'VT in attribute value (unquoted) state: qq'<p align=left\x{0B}c>''
-#   at HTML-tokenizer.t ok line 1.
-#   (in test::Whatpm::HTML::Tokenizer::html_tokenizer->_tests)
-# +---+--------------------------------------------+---+--------------------------------------------+
-# | Ln|Got                                         | Ln|Expected                                    |
-# +---+--------------------------------------------+---+--------------------------------------------+
-# |  1|$VAR1 = [                                   |  1|$VAR1 = [                                   |
-# |   |                                            *  2|          qq'ParseError',                   *
-# |  2|          [                                 |  3|          [                                 |
-# |  3|            qq'StartTag',                   |  4|            qq'StartTag',                   |
-# |  4|            qq'p',                          |  5|            qq'p',                          |
-# |  5|            {                               |  6|            {                               |
-# |  6|              qq'align' => qq'left\x{0B}c'  |  7|              qq'align' => qq'left\x{0B}c'  |
-# |  7|            }                               |  8|            }                               |
-# |  8|          ]                                 |  9|          ]                                 |
-# |  9|        ];                                  | 10|        ];                                  |
-# +---+--------------------------------------------+---+--------------------------------------------+
-# 
+ok 2487 - VT in attribute value (unquoted) state: qq'<p align=left\x{0B}c>'
 not ok 2488 - < in attribute value (single-unquoted) state: qq'<p align=\x{27}left<div>'
 #   Failed test '< in attribute value (single-unquoted) state: qq'<p align=\x{27}left<div>''
 #   at HTML-tokenizer.t ok line 1.
@@ -14740,4 +14640,4 @@ ok 2597 - start tag not closed (self-closing start tag): qq'<p class=\x{27}a\x{2
 ok 2598 - end tag not closed (self-closing start tag): qq'</p/'
 ok 2599 - end tag not closed (self-closing start tag): qq'</p class=\x{27}a\x{27}/'
 1..2599
-# Looks like you failed 670 tests of 2599.
+# Looks like you failed 666 tests of 2599.
