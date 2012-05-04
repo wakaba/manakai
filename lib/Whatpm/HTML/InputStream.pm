@@ -1,6 +1,23 @@
 package Whatpm::HTML::InputStream;
 use strict;
 use warnings;
+our $VERSION = '1.0';
+
+## ------ Parser common operations ------
+
+sub _clear_refs ($) {
+  my $self = $_[0];
+  ## Remove self references.
+  delete $self->{set_nc};
+  delete $self->{read_until};
+  delete $self->{parse_error};
+  delete $self->{document};
+  delete $self->{chars};
+  delete $self->{chars_pull_next};
+  delete $self->{restart_parser};
+} # _clear_refs
+
+## ------ Character encoding processing ------
 
 ## XXX Encoding Standard support
 
@@ -426,3 +443,12 @@ sub _change_encoding {
 } # _change_encoding
 
 1;
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

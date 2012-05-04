@@ -569,18 +569,6 @@ sub parse_char_stream ($$$;$$) {
   return $doc;
 } # parse_char_stream
 
-sub _clear_refs ($) {
-  my $self = $_[0];
-  ## Remove self references.
-  delete $self->{set_nc};
-  delete $self->{read_until};
-  delete $self->{parse_error};
-  delete $self->{document};
-  delete $self->{chars};
-  delete $self->{chars_pull_next};
-  delete $self->{restart_parser};
-} # _clear_refs
-
 sub new ($) {
   my $class = shift;
   my $self = bless {
@@ -6732,7 +6720,8 @@ sub _tree_construction_main ($) {
 
 ## XXX: How this method is organized is somewhat out of date, although
 ## it still does what the current spec documents.
-sub set_inner_html ($$$$;$) {
+sub set_inner_html ($$$$) {
+  #my ($self, $string, $onerror, $get_wrapper) = @_;
   my ($class, $self);
   if (ref $_[0]) {
     $self = shift;
@@ -6858,7 +6847,7 @@ sub set_inner_html ($$$$;$) {
     AN: while (defined $anode) {
       if ($anode->node_type == 1) {
         my $nsuri = $anode->namespace_uri;
-        if (defined $nsuri and $nsuri eq 'http://www.w3.org/1999/xhtml') {
+        if (defined $nsuri and $nsuri eq HTML_NS) {
           if ($anode->manakai_local_name eq 'form') {
             
             $p->{form_element} = $anode;

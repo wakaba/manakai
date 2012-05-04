@@ -4,156 +4,96 @@ use warnings;
 no warnings 'utf8';
 our $VERSION = '2.1';
 
-push our @ISA, 'Whatpm::HTML';
-use Whatpm::HTML::Tokenizer qw/:token/;
+use Whatpm::HTML::Tokenizer qw/:token EOF_CHAR/;
+use Whatpm::HTML::InputStream;
+push our @ISA, qw(Whatpm::HTML Whatpm::HTML::InputStream);
+
+our $DefaultErrorHandler = sub {
+  my (%opt) = @_;
+  my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
+  my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
+  warn "Parse error ($opt{type}) at line $line column $column\n";
+}; # $DefaultErrorHandler
 
 sub parse_char_string ($$$;$$) {
-  #my ($self, $s, $doc, $onerror, $get_wrapper) = @_;
-  my $self = shift;
-  my $s = ref $_[0] ? $_[0] : \($_[0]);
-  require Whatpm::Charset::DecodeHandle;
-  my $input = Whatpm::Charset::DecodeHandle::CharString->new ($s);
-  return $self->parse_char_stream ($input, @_[1..$#_]);
-} # parse_char_string
-
-sub parse_char_stream ($$$;$$) {
-  my $self = ref $_[0] ? shift : shift->new;
-  my $input = $_[0];
-  my $doc = $self->{document} = $_[1];
+  #my ($self, $string, $document, $onerror, $get_wrapper) = @_;
+  my $self = ref $_[0] ? $_[0] : $_[0]->new;
+  my $doc = $self->{document} = $_[2];
   @{$self->{document}->child_nodes} = ();
 
-  ## NOTE: |set_inner_html| copies most of this method's code
-
+  ## Confidence: irrelevant.
   $self->{confident} = 1 unless exists $self->{confident};
   $self->{document}->input_encoding ($self->{input_encoding})
       if defined $self->{input_encoding};
-## TODO: |{input_encoding}| is needless?
 
   $self->{line_prev} = $self->{line} = 1;
   $self->{column_prev} = -1;
   $self->{column} = 0;
-  $self->{set_nc} = sub {
-    my $self = shift;
 
-    my $char = '';
-    if (defined $self->{next_nc}) {
-      $char = $self->{next_nc};
-      delete $self->{next_nc};
-      $self->{nc} = ord $char;
-    } else {
-      $self->{char_buffer} = '';
-      $self->{char_buffer_pos} = 0;
+  $self->{chars} = [split //, $_[1]];
+  $self->{chars_pos} = 0;
+  $self->{chars_pull_next} = sub { 0 };
+  delete $self->{chars_was_cr};
 
-      my $count = $input->manakai_read_until
-         ($self->{char_buffer}, qr/[^\x0A\x0D]/, $self->{char_buffer_pos});
-      if ($count) {
-        $self->{line_prev} = $self->{line};
-        $self->{column_prev} = $self->{column};
-        $self->{column}++;
-        $self->{nc}
-            = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-        return;
-      }
-
-      if ($input->read ($char, 1)) {
-        $self->{nc} = ord $char;
-      } else {
-        $self->{nc} = -1;
-        return;
-      }
-    }
-
-    ($self->{line_prev}, $self->{column_prev})
-        = ($self->{line}, $self->{column});
-    $self->{column}++;
-    
-    if ($self->{nc} == 0x000A) { # LF
-      
-      $self->{line}++;
-      $self->{column} = 0;
-    } elsif ($self->{nc} == 0x000D) { # CR
-      
-## TODO: support for abort/streaming
-      my $next = '';
-      if ($input->read ($next, 1) and $next ne "\x0A") {
-        $self->{next_nc} = $next;
-      }
-      $self->{nc} = 0x000A; # LF # MUST
-      $self->{line}++;
-      $self->{column} = 0;
-    }
-  };
-
-  $self->{read_until} = sub {
-    #my ($scalar, $specials_range, $offset) = @_;
-    return 0 if defined $self->{next_nc};
-
-    my $pattern = qr/[^$_[1]\x00\x0A\x0D]/;
-    my $offset = $_[2] || 0;
-
-    if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-      pos ($self->{char_buffer}) = $self->{char_buffer_pos};
-      if ($self->{char_buffer} =~ /\G(?>$pattern)+/) {
-        substr ($_[0], $offset)
-            = substr ($self->{char_buffer}, $-[0], $+[0] - $-[0]);
-        my $count = $+[0] - $-[0];
-        if ($count) {
-          $self->{column} += $count;
-          $self->{char_buffer_pos} += $count;
-          $self->{line_prev} = $self->{line};
-          $self->{column_prev} = $self->{column} - 1;
-          $self->{nc} = -1;
-        }
-        return $count;
-      } else {
-        return 0;
-      }
-    } else {
-      my $count = $input->manakai_read_until ($_[0], $pattern, $_[2]);
-      if ($count) {
-        $self->{column} += $count;
-        $self->{line_prev} = $self->{line};
-        $self->{column_prev} = $self->{column} - 1;
-        $self->{nc} = -1;
-      }
-      return $count;
-    }
-  }; # $self->{read_until}
-
-  my $onerror = $_[2] || sub {
-    my (%opt) = @_;
-    my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
-    my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
-    warn "Parse error ($opt{type}) at line $line column $column\n";
-  };
+  my $onerror = $_[3] || $DefaultErrorHandler;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
-
-  my $char_onerror = sub {
-    my (undef, $type, %opt) = @_;
-    $self->{parse_error}->(level => $self->{level}->{must}, layer => 'encode',
-                    line => $self->{line}, column => $self->{column} + 1,
-                    %opt, type => $type);
-  }; # $char_onerror
-
-  if ($_[3]) {
-    $input = $_[3]->($input);
-    $input->onerror ($char_onerror);
-  } else {
-    $input->onerror ($char_onerror) unless defined $input->onerror;
-  }
 
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
   $self->_construct_tree;
   $self->_terminate_tree_constructor;
-  
-  ## Remove self references.
-  delete $self->{set_nc};
-  delete $self->{read_until};
-  delete $self->{parse_error};
-  delete $self->{document}; # for safety
+  $self->_clear_refs;
+
+  return $doc;
+} # parse_char_string
+
+## DEPRECATED
+sub parse_char_stream ($$$;$$) {
+  #my ($self, $handle, $document, $onerror, $get_wrapper) = @_;
+  my $self = ref $_[0] ? $_[0] : $_[0]->new;
+  my $doc = $self->{document} = $_[2];
+  @{$self->{document}->child_nodes} = ();
+
+  ## Confidence: irrelevant.
+  $self->{confident} = 1 unless exists $self->{confident};
+  $self->{document}->input_encoding ($self->{input_encoding})
+      if defined $self->{input_encoding};
+
+  $self->{line_prev} = $self->{line} = 1;
+  $self->{column_prev} = -1;
+  $self->{column} = 0;
+
+  my $handle = $_[1];
+  $self->{chars} = [];
+  $self->{chars_pos} = 0;
+  $self->{chars_pull_next} = sub {
+    $self->{chars} = [];
+    $self->{chars_pos} = 0;
+    my $i = 0;
+    my $char = '';
+    while ($handle->read ($char, 1, 0)) {
+      push @{$self->{chars}}, $char;
+      last if $i++ == 1024;
+    }
+    return $i > 0;
+  };
+  delete $self->{chars_was_cr};
+
+  my $onerror = $_[3] || $DefaultErrorHandler;
+  $self->{parse_error} = sub {
+    $onerror->(line => $self->{line}, column => $self->{column}, @_);
+  };
+
+  $self->_initialize_tokenizer;
+  $self->_initialize_tree_constructor;
+  {
+    $self->_construct_tree;
+    redo if $self->{nc} != -1; # EOF_CHAR
+  }
+  $self->_terminate_tree_constructor;
+  $self->_clear_refs;
 
   return $doc;
 } # parse_char_stream
