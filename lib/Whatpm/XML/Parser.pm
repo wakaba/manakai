@@ -4,7 +4,7 @@ use warnings;
 no warnings 'utf8';
 our $VERSION = '2.1';
 
-use Whatpm::HTML::Tokenizer qw/:token EOF_CHAR/;
+use Whatpm::HTML::Tokenizer qw/:token/;
 use Whatpm::HTML::InputStream;
 push our @ISA, qw(Whatpm::HTML Whatpm::HTML::InputStream);
 

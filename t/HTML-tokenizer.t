@@ -116,68 +116,16 @@ sub _tokenize_test ($$) {
       my $p = Whatpm::HTML->new;
       my $i = 0;
       my @token;
-      $p->{set_nc} = sub {
-        my $self = shift;
 
-#        pop @{$self->{prev_char}};
-#        unshift @{$self->{prev_char}}, $self->{nc};
-
-        if ($i >= length $s) {
-          $self->{nc} = -1;
-          return;
-        }
-        $self->{nc} = ord substr $s, $i++, 1;
-
-        # Dummy.
-        $self->{line_prev} = 1;
-        $self->{column_prev} = 1;
-        $self->{line} = 0;
-        $self->{column} = 0;
-
-        if ($self->{nc} == 0x000D) { # CR
-          $i++ if substr ($s, $i, 1) eq "\x0A";
-          $self->{nc} = 0x000A; # LF # MUST
-        } elsif ($self->{nc} > 0x10FFFF) {
-          $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
-          push @token, 'ParseError';
-        } elsif ($self->{nc} == 0x0000 or
-                 (0xD800 <= $self->{nc} and $self->{nc} <= 0xDFFF)) {
-          $self->{nc} = 0xFFFD; # REPLACEMENT CHARACTER # MUST
-          push @token, 'ParseError';
-        } elsif ($self->{nc} <= 0x0008 or
-                 $self->{nc} == 0x000B or
-                 (0x000E <= $self->{nc} and
-                  $self->{nc} <= 0x001F) or
-                 (0x007F <= $self->{nc} and
-                  $self->{nc} <= 0x009F) or
-                 (0xD800 <= $self->{nc} and
-                  $self->{nc} <= 0xDFFF) or
-                 (0xFDD0 <= $self->{nc} and
-                  $self->{nc} <= 0xFDDF) or
-                 {
-                   0xFFFE => 1, 0xFFFF => 1, 0x1FFFE => 1, 0x1FFFF => 1,
-                   0x2FFFE => 1, 0x2FFFF => 1, 0x3FFFE => 1, 0x3FFFF => 1,
-                   0x4FFFE => 1, 0x4FFFF => 1, 0x5FFFE => 1, 0x5FFFF => 1,
-                   0x6FFFE => 1, 0x6FFFF => 1, 0x7FFFE => 1, 0x7FFFF => 1,
-                   0x8FFFE => 1, 0x8FFFF => 1, 0x9FFFE => 1, 0x9FFFF => 1,
-                   0xAFFFE => 1, 0xAFFFF => 1, 0xBFFFE => 1, 0xBFFFF => 1,
-                   0xCFFFE => 1, 0xCFFFF => 1, 0xDFFFE => 1, 0xDFFFF => 1,
-                   0xEFFFE => 1, 0xEFFFF => 1, 0xFFFFE => 1, 0xFFFFF => 1,
-                   0x10FFFE => 1, 0x10FFFF => 1,
-                  }->{$self->{nc}}) {
-          push @token, 'ParseError';
-        }
-      };
-
-      $p->{insertion_mode} = Whatpm::HTML::BEFORE_HEAD_IM (); # dummy
-
-      $p->{read_until} = sub { return 0 };
-      
+      $p->{chars} = [split //, $s];
+      $p->{chars_pos} = '';
+      $p->{chars_pull_next} = sub { 0 };
       $p->{parse_error} = sub {
         my %args = @_;
         warn $args{type}, "\n" if $DEBUG;
         push @token, 'ParseError';
       };
+      $p->{insertion_mode} = Whatpm::HTML::BEFORE_HEAD_IM (); # dummy
       
       $p->_initialize_tokenizer;
       $p->{state} = {
