@@ -8,6 +8,8 @@ use Whatpm::HTML::Defs;
 use Whatpm::HTML::Parser;
 push our @ISA, qw(Whatpm::HTML::Parser);
 
+## DEPRECATED - Use Whatpm::HTML::Parser.
+
 ## DEPRECATED
 sub parse_byte_stream ($$$$;$$) {
   #my ($self, $charset_name, $stream, $doc, $onerror, $get_wrapper) = @_;

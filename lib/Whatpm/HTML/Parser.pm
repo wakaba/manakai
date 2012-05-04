@@ -410,33 +410,6 @@ sub parse_char_string ($$$;$$) {
   return $doc;
 } # parse_char_string
 
-sub new ($) {
-  my $class = shift;
-  my $self = bless {
-    level => {
-      must => 'm',
-      should => 's',
-      obsconforming => 's',
-      warn => 'w',
-      info => 'i',
-      uncertain => 'u',
-    },
-  }, $class;
-  $self->{set_nc} = sub {
-    $self->{nc} = -1;
-  };
-  $self->{parse_error} = sub {
-    # 
-  };
-  $self->{change_encoding} = sub {
-    $_[0]->_change_encoding ($_[1], $_[2]);
-  };
-  $self->{application_cache_selection} = sub {
-    #
-  };
-  return $self;
-} # new
-
 ## Insertion modes
 
 sub AFTER_HTML_IMS () { 0b100 }
@@ -2365,10 +2338,9 @@ sub _tree_construction_main ($) {
                   
                   ## NOTE: Whether the encoding is supported or not,
                   ## an ASCII-compatible charset is not, is handled in
-                  ## the {change_encoding} callback.
-                  $self->{change_encoding}
-                      ->($self, $token->{attributes}->{charset}->{value},
-                         $token);
+                  ## the |_change_encoding| method.
+                  $self->_change_encoding
+                      ($token->{attributes}->{charset}->{value}, $token);
                   
                   $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                       ->set_user_data (manakai_has_reference =>
@@ -2387,10 +2359,9 @@ sub _tree_construction_main ($) {
                     
                     ## NOTE: Whether the encoding is supported or not,
                     ## an ASCII-compatible charset is not, is handled
-                    ## in the {change_encoding} callback.
-                    $self->{change_encoding}
-                        ->($self, defined $1 ? $1 : defined $2 ? $2 : $3,
-                           $token);
+                    ## in the |_change_encoding| method.
+                    $self->_change_encoding
+                        (defined $1 ? $1 : defined $2 ? $2 : $3, $token);
                     $meta_el->[0]->get_attribute_node_ns (undef, 'content')
                         ->set_user_data (manakai_has_reference =>
                                              $token->{attributes}->{content}
@@ -4892,9 +4863,9 @@ sub _tree_construction_main ($) {
             
             ## NOTE: Whether the encoding is supported or not, an
             ## ASCII-compatible charset is not, is handled in the
-            ## {change_encoding} callback.
-            $self->{change_encoding}
-                ->($self, $token->{attributes}->{charset}->{value}, $token);
+            ## |_change_encoding| method.
+            $self->_change_encoding
+                ($token->{attributes}->{charset}->{value}, $token);
             
             $meta_el->[0]->get_attribute_node_ns (undef, 'charset')
                 ->set_user_data (manakai_has_reference =>
@@ -4913,9 +4884,9 @@ sub _tree_construction_main ($) {
               
               ## NOTE: Whether the encoding is supported or not, an
               ## ASCII-compatible charset is not, is handled in the
-              ## {change_encoding} callback.
-              $self->{change_encoding}
-                  ->($self, defined $1 ? $1 : defined $2 ? $2 : $3, $token);
+              ## |_change_encoding| method.
+              $self->_change_encoding
+                  (defined $1 ? $1 : defined $2 ? $2 : $3, $token);
               $meta_el->[0]->get_attribute_node_ns (undef, 'content')
                   ->set_user_data (manakai_has_reference =>
                                        $token->{attributes}->{content}

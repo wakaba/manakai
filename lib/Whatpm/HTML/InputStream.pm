@@ -5,6 +5,27 @@ no warnings 'utf8';
 our $VERSION = '1.0';
 use Whatpm::HTML::Defs;
 
+## ------ Constructor ------
+
+sub new ($) {
+  my $class = shift;
+  my $self = bless {
+    level => {
+      must => 'm',
+      should => 's',
+      obsconforming => 's',
+      warn => 'w',
+      info => 'i',
+      uncertain => 'u',
+    },
+  }, $class;
+  $self->{application_cache_selection} = sub {
+    #
+  };
+  
+  return $self;
+} # new
+
 ## ------ Parser common operations ------
 
 sub _clear_refs ($) {

@@ -33,6 +33,8 @@ sub parse_char_string ($$$;$$) {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
 
+  $self->{is_xml} = 1;
+
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
   $self->_construct_tree;
@@ -79,6 +81,8 @@ sub parse_char_stream ($$$;$$) {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
 
+  $self->{is_xml} = 1;
+
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
   {
@@ -90,31 +94,6 @@ sub parse_char_stream ($$$;$$) {
 
   return $doc;
 } # parse_char_stream
-
-sub new ($) {
-  my $class = shift;
-  my $self = bless {
-    level => {must => 'm',
-              should => 's',
-              warn => 'w',
-              info => 'i',
-              uncertain => 'u'},
-  }, $class;
-  $self->{set_nc} = sub {
-    $self->{nc} = -1;
-  };
-  $self->{parse_error} = sub {
-    # 
-  };
-  $self->{change_encoding} = sub { };
-  $self->{application_cache_selection} = sub {
-    #
-  };
-
-  $self->{is_xml} = 1;
-
-  return $self;
-} # new
 
 sub _initialize_tree_constructor ($) {
   my $self = shift;
