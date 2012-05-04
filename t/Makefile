@@ -53,7 +53,11 @@ whatpm: \
 
 update: clean-remote-files \
   tokenizer-remote-files \
-  tree-construction-remote-files
+  tree-construction-remote-files \
+  update-data
+
+update-data:
+	cd data && $(MAKE) all
 
 dom1core-perl: $(DOMTS2PERL_PL)
 	$(MKDIR) $(DOMTEST_PERL_DIR)level1/core/
