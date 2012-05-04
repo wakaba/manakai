@@ -25,7 +25,7 @@ all: \
   _update \
   Atom-all Charset-all CSS-all HTML-all XML-all ContentChecker-all \
   HTML/Tokenizer.pm HTML/Parser.pm \
-  HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
+  _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
   CacheManifest.html WebIDL.html mklinktypelist.html \
   SWML/Parser.html LangTag.html \
@@ -41,7 +41,7 @@ Charset-all:
 CSS-all:
 	cd CSS && make all
 
-HTML-all: HTML.pm
+HTML-all:
 	cd HTML && make all
 
 XML-all:
@@ -62,10 +62,6 @@ update-remove-old: update-_NamedEntityList.pm \
 
 update-http:
 	cd HTTP && make update
-
-HTML.pm: HTML.pm.src mkhtmlparser.pl
-	perl mkhtmlparser.pl $< > $@
-	perl -I.. -c $@
 
 HTML/Tokenizer.pm HTML/Parser.pm:: %: %.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
