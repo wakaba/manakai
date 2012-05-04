@@ -1,6 +1,11 @@
 package Whatpm::HTML; # -*- Perl -*-
 use strict;
+#use warnings;
+no warnings 'utf8';
 our $VERSION = '3.0';
+use Whatpm::HTML::Defs;
+use Whatpm::HTML::Tokenizer;
+push our @ISA, qw(Whatpm::HTML::Tokenizer);
 !!!pdebug { use Data::Dumper; };
 
 use Whatpm::HTML::Tokenizer;
@@ -20,8 +25,6 @@ use Whatpm::HTML::Tokenizer;
 ## var doc = implementation.createDocument (null, null, null);
 ## doc.write ('');
 ## alert (doc.compatMode);
-
-#require IO::Handle;
 
 ## Namespace URLs
 

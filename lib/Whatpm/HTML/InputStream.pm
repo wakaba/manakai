@@ -446,83 +446,6 @@ sub _change_encoding {
 
 ## ------ Feed characters from input stream to tokenizer ------
 
-sub _set_nc ($) {
-  my $self = $_[0];
-
-  if ($self->{chars}) {
-    {
-      if ($self->{chars_pos} < @{$self->{chars}}) {
-        $self->{line_prev} = $self->{line};
-        $self->{column_prev} = $self->{column};
-        my $c = ord $self->{chars}->[$self->{chars_pos}++];
-        if ($c == 0x000A) {
-          if ($self->{chars_was_cr}) {
-            delete $self->{chars_was_cr};
-            redo;
-          } else {
-            delete $self->{chars_was_cr};
-            $self->{line}++;
-            $self->{column} = 0;
-          }
-        } elsif ($c == 0x000D) {
-          $self->{chars_was_cr} = 1;
-          $self->{line}++;
-          $self->{column} = 0;
-          $c = 0x000A;
-        } else {
-          if (
-              (0x0001 <= $c and $c <= 0x0008) or
-              (0x000E <= $c and $c <= 0x001F) or
-              (0x007F <= $c and $c <= 0x009F) or
-              (0xFDD0 <= $c and $c <= 0xFDEF) or
-              {0x000B => 1, 0xFFFE => 1, 0xFFFF => 1,
-               0x1FFFE => 1, 0x1FFFF => 1, 0x2FFFE => 1, 0x2FFFF => 1,
-               0x3FFFE => 1, 0x3FFFF => 1, 0x4FFFE => 1, 0x4FFFF => 1,
-               0x5FFFE => 1, 0x5FFFF => 1, 0x6FFFE => 1, 0x6FFFF => 1,
-               0x7FFFE => 1, 0x7FFFF => 1, 0x8FFFE => 1, 0x8FFFF => 1,
-               0x9FFFE => 1, 0x9FFFF => 1, 0xAFFFE => 1, 0xAFFFF => 1,
-               0xBFFFE => 1, 0xBFFFF => 1, 0xCFFFE => 1, 0xCFFFF => 1,
-               0xDFFFE => 1, 0xDFFFF => 1, 0xEFFFE => 1, 0xEFFFF => 1,
-               0xFFFFE => 1, 0xFFFFF => 1, 0x10FFFE => 1, 0x10FFFF => 1,
-             }->{$c}
-           ) {
-            $self->{parse_error}
-                ->(type => ($c < 0xA0
-                                ? (sprintf 'control char:U+%04X', $c)
-                                : (sprintf 'nonchar:U+%04X', $c)),
-                   level => 'm',
-                   line => $self->{line},
-                   column => $self->{column} + 1);
-          }
-
-          delete $self->{chars_was_cr};
-          $self->{column}++;
-        }
-        $self->{nc} = $c;
-      } else {
-        delete $self->{chars_was_cr};
-        if ($self->{chars_pull_next}->()) {
-          $self->{nc} = ABORT_CHAR;
-        } else {
-          $self->{nc} = EOF_CHAR;
-        }
-      }
-    }
-    return;
-  }
-
-  ## Compat (to be deleted, hopefully...)
-  if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-    $self->{line_prev} = $self->{line};
-    $self->{column_prev} = $self->{column};
-    $self->{column}++;
-    $self->{nc}
-        = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-  } else {
-    $self->{set_nc}->($self);
-  }
-} # _set_nc
-
 my $CommonStoppers = {
   ## For newline counter
   "\x{000D}" => 1, "\x{000A}" => 1,
@@ -542,19 +465,76 @@ my $CommonStoppers = {
 $CommonStoppers->{chr $_} = 1
     for 0x0001..0x0008, 0x000E..0x001F, 0x007F..0x009F, 0xFDD0..0xFDEF;
 
+my $ParseErrorControlCodePosition = {0x000B => 1};
+$ParseErrorControlCodePosition->{$_} = 1
+    for 0x0001..0x0008, 0x000E..0x001F, 0x007F..0x009F;
+
+my $ParseErrorNoncharCodePosition = {
+  0xFFFE => 1, 0xFFFF => 1,
+  0x1FFFE => 1, 0x1FFFF => 1, 0x2FFFE => 1, 0x2FFFF => 1,
+  0x3FFFE => 1, 0x3FFFF => 1, 0x4FFFE => 1, 0x4FFFF => 1,
+  0x5FFFE => 1, 0x5FFFF => 1, 0x6FFFE => 1, 0x6FFFF => 1,
+  0x7FFFE => 1, 0x7FFFF => 1, 0x8FFFE => 1, 0x8FFFF => 1,
+  0x9FFFE => 1, 0x9FFFF => 1, 0xAFFFE => 1, 0xAFFFF => 1,
+  0xBFFFE => 1, 0xBFFFF => 1, 0xCFFFE => 1, 0xCFFFF => 1,
+  0xDFFFE => 1, 0xDFFFF => 1, 0xEFFFE => 1, 0xEFFFF => 1,
+  0xFFFFE => 1, 0xFFFFF => 1, 0x10FFFE => 1, 0x10FFFF => 1
+};
+$ParseErrorNoncharCodePosition->{$_} = 1 for 0xFDD0..0xFDEF;
+
+sub _set_nc ($) {
+  my $self = $_[0];
+  {
+    if ($self->{chars_pos} < @{$self->{chars}}) {
+      $self->{line_prev} = $self->{line};
+      $self->{column_prev} = $self->{column};
+      my $c = ord $self->{chars}->[$self->{chars_pos}++];
+      if ($c == 0x000A) {
+        if ($self->{chars_was_cr}) {
+          delete $self->{chars_was_cr};
+          redo;
+        } else {
+          delete $self->{chars_was_cr};
+          $self->{line}++;
+          $self->{column} = 0;
+        }
+      } elsif ($c == 0x000D) {
+        $self->{chars_was_cr} = 1;
+        $self->{line}++;
+        $self->{column} = 0;
+        $c = 0x000A;
+      } else {
+        if ($ParseErrorControlCodePosition->{$c}) {
+          $self->{parse_error}
+              ->(type => (sprintf 'control char:U+%04X', $c),
+                 level => 'm',
+                 line => $self->{line},
+                 column => $self->{column} + 1);
+        } elsif ($ParseErrorNoncharCodePosition->{$c}) {
+          $self->{parse_error}
+              ->(type => (sprintf 'nonchar:U+%04X', $c),
+                 level => 'm',
+                 line => $self->{line},
+                 column => $self->{column} + 1);
+        }
+        
+        delete $self->{chars_was_cr};
+        $self->{column}++;
+      }
+      $self->{nc} = $c;
+    } else {
+      delete $self->{chars_was_cr};
+      if ($self->{chars_pull_next}->()) {
+        $self->{nc} = ABORT_CHAR;
+      } else {
+        $self->{nc} = EOF_CHAR;
+      }
+    }
+  } # block
+} # _set_nc
+
 sub _read_chars ($$) {
   my ($self, $stoppers) = @_;
-
-  ## Compat (to be deleted, hopefully...)
-  unless ($self->{chars}) {
-    my $buffer = '';
-    my $pattern = join '', keys %$stoppers;
-    if ($pattern =~ s/-//) {
-      $pattern = '-' . $pattern;
-    }
-    $self->{read_until}->($buffer, $pattern, 0);
-    return $buffer;
-  }
   
   my $start = $self->{chars_pos};
   {
@@ -567,13 +547,10 @@ sub _read_chars ($$) {
     }
     redo;
   }
-  
-  if ($start != $self->{chars_pos}) {
-    $self->{column} += $self->{chars_pos} - $start;
-    return join '', @{$self->{chars}}[$start..($self->{chars_pos}-1)];
-  } else {
-    return '';
-  }
+  return '' if $start == $self->{chars_pos};
+
+  $self->{column} += $self->{chars_pos} - $start;
+  return join '', @{$self->{chars}}[$start..($self->{chars_pos}-1)];
 } # _read_chars
 
 1;

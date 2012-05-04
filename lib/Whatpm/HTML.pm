@@ -1,6 +1,11 @@
 package Whatpm::HTML; # -*- Perl -*-
 use strict;
+#use warnings;
+no warnings 'utf8';
 our $VERSION = '3.0';
+use Whatpm::HTML::Defs;
+use Whatpm::HTML::Tokenizer;
+push our @ISA, qw(Whatpm::HTML::Tokenizer);
 
 
 use Whatpm::HTML::Tokenizer;
@@ -20,8 +25,6 @@ use Whatpm::HTML::Tokenizer;
 ## var doc = implementation.createDocument (null, null, null);
 ## doc.write ('');
 ## alert (doc.compatMode);
-
-#require IO::Handle;
 
 ## Namespace URLs
 
@@ -579,10 +582,6 @@ sub new ($) {
   };
   $self->{change_encoding} = sub {
     $_[0]->_change_encoding ($_[1], $_[2]);
-    # if ($_[0] is a supported encoding) {
-    #   run "change the encoding" algorithm;
-    #   throw Whatpm::HTML::RestartParser (charset => $new_encoding);
-    # }
   };
   $self->{application_cache_selection} = sub {
     #
@@ -6881,9 +6880,6 @@ sub set_inner_html ($$$$) {
 } # set_inner_html
 
 } # tree construction stage
-
-package Whatpm::HTML::RestartParser;
-push our @ISA, 'Error';
 
 1;
 

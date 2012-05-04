@@ -14,53 +14,41 @@ use Whatpm::HTML::Tokenizer qw(:token);
 sub _abort : Test(10) {
   my $tokenizer = Whatpm::HTML->new;
 
-  my $string = '';
-  my $pos = 0;
   my $eof;
 
-  $tokenizer->{line_prev} = 1;
+  $tokenizer->{chars} = [];
+  $tokenizer->{chars_pos} = 0;
+  $tokenizer->{chars_pull_next} = sub { return not $eof };
+  $tokenizer->{line_prev} = $tokenizer->{line} = 1;
   $tokenizer->{column_prev} = -1;
+  $tokenizer->{column} = 0;
   $tokenizer->{token} = [];
-  $tokenizer->{read_until} = sub { return 0 };
-  $tokenizer->{set_nc} = sub {
-    if ($pos < length $string) {
-      $_[0]->{nc} = ord substr $string, $pos, 1;
-      $pos++;
-      $tokenizer->{column_prev}++;
-    } else {
-      if ($eof) {
-        $_[0]->{nc} = -1; # EOF_CHAR
-      } else {
-        $_[0]->{nc} = -3; # ABORT_CHAR
-      }
-    }
-  };
   $tokenizer->_initialize_tokenizer;
 
   my $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => ABORT_TOKEN};
 
-  $string .= "<!DOC";
+  push @{$tokenizer->{chars}}, split //, "<!DOC";
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => ABORT_TOKEN};
 
-  $string .= "TYPE html>";
+  push @{$tokenizer->{chars}}, split //, "TYPE html>";
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => DOCTYPE_TOKEN, name => 'html',
                       line => 1, column => 1};
 
-  $string .= "<";
+  push @{$tokenizer->{chars}}, split //, "<";
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => ABORT_TOKEN};
 
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => ABORT_TOKEN};
 
-  $string .= 'html';
+  push @{$tokenizer->{chars}}, split //, 'html';
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => ABORT_TOKEN};
 
-  $string .= '>';
+  push @{$tokenizer->{chars}}, split //, '>';
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => START_TAG_TOKEN, tag_name => 'html',
                       line => 1, column => 16, data => undef};
@@ -71,11 +59,11 @@ sub _abort : Test(10) {
   $eof = 1;
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => END_OF_FILE_TOKEN,
-                      line => undef, column => undef};
+                      line => 1, column => 21};
 
   $token = $tokenizer->_get_next_token;
   eq_or_diff $token, {type => END_OF_FILE_TOKEN,
-                      line => undef, column => undef};
+                      line => 1, column => 21};
 } # _abort
 
 __PACKAGE__->runtests;
