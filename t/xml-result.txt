@@ -1521,70 +1521,28 @@ ok 1498 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc'
 ok 1499 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc'
 ok 1500 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc'
 ok 1501 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc '
-not ok 1502 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc '
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc ''
-#   at HTML-tree.t test () skip line 112.
-# +---+-------------------------+---+----------+
-# | Ln|Got                      | Ln|Expected  |
-# +---+-------------------------+---+----------+
-# *  1|<!ENTITY abc "" "" "" >  *   |          |
-# +---+-------------------------+---+----------+
+ok 1502 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc '
 ok 1503 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc '
 ok 1504 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}'
-not ok 1505 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}'
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}''
-#   at HTML-tree.t test () skip line 112.
-# +---+-------------------------+---+----------+
-# | Ln|Got                      | Ln|Expected  |
-# +---+-------------------------+---+----------+
-# *  1|<!ENTITY abc "" "" "" >  *   |          |
-# +---+-------------------------+---+----------+
+ok 1505 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}'
 ok 1506 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \x{09}'
 ok 1507 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \#'
 ok 1508 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \#'
 ok 1509 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc  \#'
 ok 1510 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC'
-not ok 1511 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC'
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC''
-#   at HTML-tree.t test () skip line 112.
-# +---+-------------------------+---+----------+
-# | Ln|Got                      | Ln|Expected  |
-# +---+-------------------------+---+----------+
-# *  1|<!ENTITY abc "" "" "" >  *   |          |
-# +---+-------------------------+---+----------+
+ok 1511 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC'
 ok 1512 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC'
 ok 1513 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC '
-not ok 1514 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC '
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC ''
-#   at HTML-tree.t test () skip line 112.
-# +---+-------------------------+---+----------+
-# | Ln|Got                      | Ln|Expected  |
-# +---+-------------------------+---+----------+
-# *  1|<!ENTITY abc "" "" "" >  *   |          |
-# +---+-------------------------+---+----------+
+ok 1514 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC '
 ok 1515 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC '
 ok 1516 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC \#'
 ok 1517 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC \#'
 ok 1518 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC \#'
 ok 1519 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM'
-not ok 1520 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM'
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM''
-#   at HTML-tree.t test () skip line 112.
-# +---+-------------------------+---+----------+
-# | Ln|Got                      | Ln|Expected  |
-# +---+-------------------------+---+----------+
-# *  1|<!ENTITY abc "" "" "" >  *   |          |
-# +---+-------------------------+---+----------+
+ok 1520 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM'
 ok 1521 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM'
 ok 1522 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM '
-not ok 1523 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM '
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM ''
-#   at HTML-tree.t test () skip line 112.
-# +---+-------------------------+---+----------+
-# | Ln|Got                      | Ln|Expected  |
-# +---+-------------------------+---+----------+
-# *  1|<!ENTITY abc "" "" "" >  *   |          |
-# +---+-------------------------+---+----------+
+ok 1523 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM '
 ok 1524 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc SYSTEM '
 ok 1525 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC \#'
 ok 1526 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY abc PUBLIC \#'
@@ -1827,60 +1785,25 @@ ok 1761 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY %'
 ok 1762 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY %'
 ok 1763 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY %'
 ok 1764 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}'
-not ok 1765 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}'
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}''
-#   at HTML-tree.t test () skip line 112.
-# +---+---------------------------+---+----------+
-# | Ln|Got                        | Ln|Expected  |
-# +---+---------------------------+---+----------+
-# *  1|<!ENTITY % abc "" "" "" >  *   |          |
-# +---+---------------------------+---+----------+
+ok 1765 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}'
 ok 1766 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \x{09}'
 ok 1767 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \#'
 ok 1768 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \#'
 ok 1769 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc  \#'
 ok 1770 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC'
-not ok 1771 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC'
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC''
-#   at HTML-tree.t test () skip line 112.
-# +---+---------------------------+---+----------+
-# | Ln|Got                        | Ln|Expected  |
-# +---+---------------------------+---+----------+
-# *  1|<!ENTITY % abc "" "" "" >  *   |          |
-# +---+---------------------------+---+----------+
+ok 1771 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC'
 ok 1772 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC'
 ok 1773 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC '
-not ok 1774 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC '
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC ''
-#   at HTML-tree.t test () skip line 112.
-# +---+---------------------------+---+----------+
-# | Ln|Got                        | Ln|Expected  |
-# +---+---------------------------+---+----------+
-# *  1|<!ENTITY % abc "" "" "" >  *   |          |
-# +---+---------------------------+---+----------+
+ok 1774 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC '
 ok 1775 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC '
 ok 1776 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC \#'
 ok 1777 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC \#'
 ok 1778 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC \#'
 ok 1779 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM'
-not ok 1780 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM'
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM''
-#   at HTML-tree.t test () skip line 112.
-# +---+---------------------------+---+----------+
-# | Ln|Got                        | Ln|Expected  |
-# +---+---------------------------+---+----------+
-# *  1|<!ENTITY % abc "" "" "" >  *   |          |
-# +---+---------------------------+---+----------+
+ok 1780 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM'
 ok 1781 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM'
 ok 1782 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM '
-not ok 1783 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM '
-#   Failed test 'Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM ''
-#   at HTML-tree.t test () skip line 112.
-# +---+---------------------------+---+----------+
-# | Ln|Got                        | Ln|Expected  |
-# +---+---------------------------+---+----------+
-# *  1|<!ENTITY % abc "" "" "" >  *   |          |
-# +---+---------------------------+---+----------+
+ok 1783 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM '
 ok 1784 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc SYSTEM '
 ok 1785 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC \#'
 ok 1786 - Entities: qq'<!DOCTYPE a[\x{0A}<!ENTITY % abc PUBLIC \#'
@@ -2018,16 +1941,7 @@ ok 1916 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION>\x{0A}]><a/>'
 ok 1917 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION'
 ok 1918 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION'
 ok 1919 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>'
-not ok 1920 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>'
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>''
-#   at HTML-tree.t test () skip line 117.
-# +---+-----------------------+---+--------------+
-# | Ln|Got                    | Ln|Expected      |
-# +---+-----------------------+---+--------------+
-# |  1|<!DOCTYPE a>           |  1|<!DOCTYPE a>  |
-# *  2|  <!NOTATION S "" "">  *   |              |
-# |  3|<{} a>                 |  2|<{} a>        |
-# +---+-----------------------+---+--------------+
+ok 1920 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS>\x{0A}]><a/>'
 ok 1921 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS'
 ok 1922 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATIONS'
 ok 1923 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION b>\x{0A}]><a/>'
@@ -2037,15 +1951,7 @@ ok 1926 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b'
 ok 1927 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION b >\x{0A}]><a/>'
 ok 1928 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b >\x{0A}]><a/>'
 ok 1929 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION b '
-not ok 1930 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b '
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b ''
-#   at HTML-tree.t test () skip line 117.
-# +---+-----------------------+---+--------------+
-# | Ln|Got                    | Ln|Expected      |
-# +---+-----------------------+---+--------------+
-# |  1|<!DOCTYPE a>           |  1|<!DOCTYPE a>  |
-# *  2|  <!NOTATION b "" "">  *   |              |
-# +---+-----------------------+---+--------------+
+ok 1930 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION b '
 ok 1931 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION bcd>\x{0A}]><a/>'
 ok 1932 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION bcd>\x{0A}]><a/>'
 ok 1933 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION bcd'
@@ -2053,47 +1959,15 @@ ok 1934 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION bcd'
 ok 1935 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc  \#'
 ok 1936 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc  \#'
 ok 1937 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC'
-not ok 1938 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC'
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC''
-#   at HTML-tree.t test () skip line 117.
-# +---+-------------------------+---+--------------+
-# | Ln|Got                      | Ln|Expected      |
-# +---+-------------------------+---+--------------+
-# |  1|<!DOCTYPE a>             |  1|<!DOCTYPE a>  |
-# *  2|  <!NOTATION abc "" "">  *   |              |
-# +---+-------------------------+---+--------------+
+ok 1938 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC'
 ok 1939 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC '
-not ok 1940 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC '
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC ''
-#   at HTML-tree.t test () skip line 117.
-# +---+-------------------------+---+--------------+
-# | Ln|Got                      | Ln|Expected      |
-# +---+-------------------------+---+--------------+
-# |  1|<!DOCTYPE a>             |  1|<!DOCTYPE a>  |
-# *  2|  <!NOTATION abc "" "">  *   |              |
-# +---+-------------------------+---+--------------+
+ok 1940 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC '
 ok 1941 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC \#'
 ok 1942 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC \#'
 ok 1943 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM'
-not ok 1944 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM'
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM''
-#   at HTML-tree.t test () skip line 117.
-# +---+-------------------------+---+--------------+
-# | Ln|Got                      | Ln|Expected      |
-# +---+-------------------------+---+--------------+
-# |  1|<!DOCTYPE a>             |  1|<!DOCTYPE a>  |
-# *  2|  <!NOTATION abc "" "">  *   |              |
-# +---+-------------------------+---+--------------+
+ok 1944 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM'
 ok 1945 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM '
-not ok 1946 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM '
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM ''
-#   at HTML-tree.t test () skip line 117.
-# +---+-------------------------+---+--------------+
-# | Ln|Got                      | Ln|Expected      |
-# +---+-------------------------+---+--------------+
-# |  1|<!DOCTYPE a>             |  1|<!DOCTYPE a>  |
-# *  2|  <!NOTATION abc "" "">  *   |              |
-# +---+-------------------------+---+--------------+
+ok 1946 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc SYSTEM '
 ok 1947 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC \#'
 ok 1948 - Document tree: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC \#'
 ok 1949 - Parse error: qq'<!DOCTYPE a[\x{0A}<!NOTATION abc PUBLIC "a"x'
@@ -2295,4 +2169,3 @@ ok 2142 - Parse error: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x
 ok 2143 - Entities: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 ok 2144 - Document tree: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 1..2144
-# Looks like you failed 17 tests of 2144.
