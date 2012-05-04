@@ -13,7 +13,7 @@ sub bytes ($) { encode 'utf8', $_[0] }
 my $DEBUG = $ENV{DEBUG};
 
 my $test_dir_name = 't/';
-my $dir_name = 't/tree-construction/';
+my $dir_name = 't/data/html-tree/';
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -156,6 +156,38 @@ my @FILES = grep {$_} split /\s+/, qq[
                       ${dir_name}tests10.dat
                       ${dir_name}tests11.dat
                       ${dir_name}tests12.dat
+                      ${dir_name}tests14.dat
+                      ${dir_name}tests15.dat
+                      ${dir_name}tests16.dat
+                      ${dir_name}tests17.dat
+                      ${dir_name}tests18.dat
+                      ${dir_name}tests19.dat
+                      ${dir_name}tests20.dat
+                      ${dir_name}tests21.dat
+                      ${dir_name}tests22.dat
+                      ${dir_name}tests23.dat
+                      ${dir_name}tests24.dat
+                      ${dir_name}tests25.dat
+                      ${dir_name}tests26.dat
+                      ${dir_name}adoption01.dat
+                      ${dir_name}adoption02.dat
+                      ${dir_name}comments01.dat
+                      ${dir_name}doctype01.dat
+                      ${dir_name}domjs-unsafe.dat
+                      ${dir_name}entities01.dat
+                      ${dir_name}entities02.dat
+                      ${dir_name}html5test-com.dat
+                      ${dir_name}inbody01.dat
+                      ${dir_name}isindex.dat
+                      ${dir_name}plain-text-unsafe.dat
+                      ${dir_name}scriptdata01.dat
+                      ${dir_name}tables01.dat
+                      ${dir_name}tricky01.dat
+                      ${dir_name}webkit01.dat
+                      ${dir_name}webkit02.dat
+                      ${dir_name}tests_innerHTML_1.dat
+                      ${dir_name}pending-spec-changes.dat
+                      ${dir_name}pending-spec-changes-plain-text-unsafe.dat
                       ${test_dir_name}tree-test-1.dat
                       ${test_dir_name}tree-test-2.dat
                       ${test_dir_name}tree-test-3.dat

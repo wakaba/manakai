@@ -14,7 +14,7 @@ $JSON::UTF8 = 1;
 my $DEBUG = $ENV{DEBUG};
 
 my $test_dir_name = 't/';
-my $dir_name = 't/tokenizer/';
+my $dir_name = 't/data/html-tokenizer/';
 
 use Data::Dumper;
 $Data::Dumper::Useqq = 1;
@@ -58,8 +58,14 @@ sub _tests : Tests {
       ${dir_name}escapeFlag.test
       ${dir_name}entities.test
       ${dir_name}xmlViolation.test
+      ${dir_name}domjs.test
+      ${dir_name}numericEntities.test
+      ${dir_name}pendingSpecChanges.test
+      ${dir_name}unicodeChars.test
+      ${dir_name}unicodeCharsProblematic.test
       ${test_dir_name}tokenizer-test-1.test
   ]) {
+    #${dir_name}namedEntities.test
     $self->_tokenize_test ($file_name);
   }                     
 } # $file_name
