@@ -125,11 +125,11 @@ while (<>) {
   s{!!!parse-error\s*\(}{
     q{$self->{parse_error}->(level => $self->{level}->{must}, }
   }ge;
-  s{!!!next-token;}{q{$token = $self->_get_next_token;}}ge;
+  s{!!!next-token;}{q{$self->{t} = $self->_get_next_token;}}ge;
   s{!!!back-token;}{
     q{
-      $token->{self_closing} = $self->{self_closing};
-      unshift @{$self->{token}}, $token;
+      $self->{t}->{self_closing} = $self->{self_closing};
+      unshift @{$self->{token}}, $self->{t};
       delete $self->{self_closing};
     }
   }ge;

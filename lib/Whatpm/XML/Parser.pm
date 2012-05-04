@@ -140,9 +140,6 @@ sub IN_ELEMENT_IM () { 2 }
 sub AFTER_ROOT_ELEMENT_IM () { 3 }
 sub IN_SUBSET_IM () { 4 }
 
-{
-my $token; ## TODO: change to $self->{t}
-
 sub _construct_tree ($) {
   my ($self) = @_;
 
@@ -150,12 +147,12 @@ sub _construct_tree ($) {
   $self->{open_elements} = [];
   $self->{insertion_mode} = INITIAL_IM;
 
-  $token = $self->_get_next_token;
+  $self->{t} = $self->_get_next_token;
 
   ## XML5: No support for the XML declaration
-  if ($token->{type} == PI_TOKEN and
-      $token->{target} eq 'xml' and
-      $token->{data} =~ /\Aversion[\x09\x0A\x20]*=[\x09\x0A\x20]*
+  if ($self->{t}->{type} == PI_TOKEN and
+      $self->{t}->{target} eq 'xml' and
+      $self->{t}->{data} =~ /\Aversion[\x09\x0A\x20]*=[\x09\x0A\x20]*
                          (?>"([^"]*)"|'([^']*)')
                          (?:[\x09\x0A\x20]+
                             encoding[\x09\x0A\x20]*=[\x09\x0A\x20]*
@@ -168,7 +165,7 @@ sub _construct_tree ($) {
     $self->{document}->xml_encoding (defined $3 ? $3 : $4); # possibly undef
     $self->{document}->xml_standalone (($5 || $6 || 'no') ne 'no');
 
-    $token = $self->_get_next_token;
+    $self->{t} = $self->_get_next_token;
   } else {
     $self->{document}->xml_version ('1.0');
     $self->{document}->xml_encoding (undef);
@@ -190,7 +187,7 @@ sub _construct_tree ($) {
       die "$0: Unknown XML insertion mode: $self->{insertion_mode}";
     }
 
-    last if $token->{type} == ABORT_TOKEN;
+    last if $self->{t}->{type} == ABORT_TOKEN;
   }
 } # _construct_tree
 
@@ -198,16 +195,16 @@ sub _tree_initial ($) {
   my $self = shift;
 
   B: while (1) {
-    if ($token->{type} == DOCTYPE_TOKEN) {
+    if ($self->{t}->{type} == DOCTYPE_TOKEN) {
       ## XML5: No "DOCTYPE" token.
       
       my $doctype = $self->{document}->create_document_type_definition
-          (defined $token->{name} ? $token->{name} : '');
+          (defined $self->{t}->{name} ? $self->{t}->{name} : '');
       
       ## NOTE: Default value for both |public_id| and |system_id| attributes
       ## are empty strings, so that we don't set any value in missing cases.
-      $doctype->public_id ($token->{pubid}) if defined $token->{pubid};
-      $doctype->system_id ($token->{sysid}) if defined $token->{sysid};
+      $doctype->public_id ($self->{t}->{pubid}) if defined $self->{t}->{pubid};
+      $doctype->system_id ($self->{t}->{sysid}) if defined $self->{t}->{sysid};
       
       ## TODO: internal_subset
       
@@ -216,73 +213,73 @@ sub _tree_initial ($) {
       $self->{ge} = {};
 
       ## XML5: No "has internal subset" flag.
-      if ($token->{has_internal_subset}) {
+      if ($self->{t}->{has_internal_subset}) {
         $self->{doctype} = $doctype;
         $self->{insertion_mode} = IN_SUBSET_IM;
       } else {
         $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
       }
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       return;
-    } elsif ($token->{type} == START_TAG_TOKEN or
-             $token->{type} == END_OF_FILE_TOKEN) {
+    } elsif ($self->{t}->{type} == START_TAG_TOKEN or
+             $self->{t}->{type} == END_OF_FILE_TOKEN) {
       $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
       ## Reprocess.
       return;
-    } elsif ($token->{type} == COMMENT_TOKEN) {
-      my $comment = $self->{document}->create_comment ($token->{data});
+    } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
+      my $comment = $self->{document}->create_comment ($self->{t}->{data});
       $self->{document}->append_child ($comment);
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == PI_TOKEN) {
+    } elsif ($self->{t}->{type} == PI_TOKEN) {
       my $pi = $self->{document}->create_processing_instruction
-          ($token->{target}, $token->{data});
+          ($self->{t}->{target}, $self->{t}->{data});
       $self->{document}->append_child ($pi);
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == CHARACTER_TOKEN) {
-      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+    } elsif ($self->{t}->{type} == CHARACTER_TOKEN) {
+      while ($self->{t}->{data} =~ s/\x00/\x{FFFD}/) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $self->{t});
       }
 
       if (not $self->{tainted} and
-          not $token->{has_reference} and
-          $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
+          not $self->{t}->{has_reference} and
+          $self->{t}->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
         #
       }
       
-      if (length $token->{data}) {
+      if (length $self->{t}->{data}) {
         ## XML5: Ignore the token.
 
         unless ($self->{tainted}) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'text outside of root element',
-                          token => $token);
+                          token => $self->{t});
           $self->{tainted} = 1;
         }
 
-        $self->{document}->manakai_append_text ($token->{data});
+        $self->{document}->manakai_append_text ($self->{t}->{data});
       }
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == END_TAG_TOKEN) {
+    } elsif ($self->{t}->{type} == END_TAG_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                      text => $token->{tag_name},
-                      token => $token);
+                      text => $self->{t}->{tag_name},
+                      token => $self->{t});
       ## Ignore the token.
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == ABORT_TOKEN) {
+    } elsif ($self->{t}->{type} == ABORT_TOKEN) {
       return;
     } else {
-      die "$0: XML parser initial: Unknown token type $token->{type}";
+      die "$0: XML parser initial: Unknown token type $self->{t}->{type}";
     }
   } # B
 } # _tree_initial
@@ -291,14 +288,14 @@ sub _tree_before_root_element ($) {
   my $self = shift;
 
   B: while (1) {
-    if ($token->{type} == START_TAG_TOKEN) {
+    if ($self->{t}->{type} == START_TAG_TOKEN) {
       my $nsmap = {
         xml => q<http://www.w3.org/XML/1998/namespace>,
         xmlns => q<http://www.w3.org/2000/xmlns/>,
       };
 
-      my $attrs = $token->{attributes};
-      my $attrdefs = $self->{attrdef}->{$token->{tag_name}};
+      my $attrs = $self->{t}->{attributes};
+      my $attrdefs = $self->{attrdef}->{$self->{t}->{tag_name}};
       for my $attr_name (keys %{$attrdefs}) {
         if ($attrs->{$attr_name}) {
           $attrs->{$attr_name}->{type} = $attrdefs->{$attr_name}->{type} || 0;
@@ -348,22 +345,22 @@ sub _tree_before_root_element ($) {
       }
       
       my $ns;
-      my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
+      my ($prefix, $ln) = split /:/, $self->{t}->{tag_name}, 2;
       
       if (defined $ln and $prefix ne '' and $ln ne '') { # prefixed
         if (defined $nsmap->{$prefix}) {
           $ns = $nsmap->{$prefix};
         } else {
-          ($prefix, $ln) = (undef, $token->{tag_name});
+          ($prefix, $ln) = (undef, $self->{t}->{tag_name});
         }
       } else {
         $ns = $nsmap->{''} if $prefix ne '' and not defined $ln;
-        ($prefix, $ln) = (undef, $token->{tag_name});
+        ($prefix, $ln) = (undef, $self->{t}->{tag_name});
       }
 
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
-      $el->set_user_data (manakai_source_line => $token->{line});
-      $el->set_user_data (manakai_source_column => $token->{column});
+      $el->set_user_data (manakai_source_line => $self->{t}->{line});
+      $el->set_user_data (manakai_source_column => $self->{t}->{column});
 
       my $has_attr;
       for my $attr_name (sort {$attrs->{$a}->{index} <=> $attrs->{$b}->{index}}
@@ -416,83 +413,83 @@ sub _tree_before_root_element ($) {
         delete $self->{self_closing};
         $self->{insertion_mode} = AFTER_ROOT_ELEMENT_IM;
       } else {
-        push @{$self->{open_elements}}, [$el, $token->{tag_name}, $nsmap];
+        push @{$self->{open_elements}}, [$el, $self->{t}->{tag_name}, $nsmap];
         $self->{insertion_mode} = IN_ELEMENT_IM;
       }
 
       #delete $self->{tainted};
 
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       return;
-    } elsif ($token->{type} == COMMENT_TOKEN) {
-      my $comment = $self->{document}->create_comment ($token->{data});
+    } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
+      my $comment = $self->{document}->create_comment ($self->{t}->{data});
       $self->{document}->append_child ($comment);
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == PI_TOKEN) {
+    } elsif ($self->{t}->{type} == PI_TOKEN) {
       my $pi = $self->{document}->create_processing_instruction
-          ($token->{target}, $token->{data});
+          ($self->{t}->{target}, $self->{t}->{data});
       $self->{document}->append_child ($pi);
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == CHARACTER_TOKEN) {
-      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+    } elsif ($self->{t}->{type} == CHARACTER_TOKEN) {
+      while ($self->{t}->{data} =~ s/\x00/\x{FFFD}/) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $self->{t});
       }
 
       if (not $self->{tainted} and
-          not $token->{has_reference} and
-          $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
+          not $self->{t}->{has_reference} and
+          $self->{t}->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
         #
       }
       
-      if (length $token->{data}) {
+      if (length $self->{t}->{data}) {
         ## XML5: Ignore the token.
 
         unless ($self->{tainted}) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'text outside of root element',
-                          token => $token);
+                          token => $self->{t});
           $self->{tainted} = 1;
         }
 
-        $self->{document}->manakai_append_text ($token->{data});
+        $self->{document}->manakai_append_text ($self->{t}->{data});
       }
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+    } elsif ($self->{t}->{type} == END_OF_FILE_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'no root element',
-                      token => $token);
+                      token => $self->{t});
       
       $self->{insertion_mode} = AFTER_ROOT_ELEMENT_IM;
       ## Reprocess.
       return;
-    } elsif ($token->{type} == END_TAG_TOKEN) {
+    } elsif ($self->{t}->{type} == END_TAG_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                      text => $token->{tag_name},
-                      token => $token);
+                      text => $self->{t}->{tag_name},
+                      token => $self->{t});
       ## Ignore the token.
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == DOCTYPE_TOKEN) {
+    } elsif ($self->{t}->{type} == DOCTYPE_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#doctype',
-                      token => $token);
+                      token => $self->{t});
       ## Ignore the token.
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == ABORT_TOKEN) {
+    } elsif ($self->{t}->{type} == ABORT_TOKEN) {
       return;
     } else {
-      die "$0: XML parser initial: Unknown token type $token->{type}";
+      die "$0: XML parser initial: Unknown token type $self->{t}->{type}";
     }
   } # B
 } # _tree_before_root_element
@@ -501,20 +498,20 @@ sub _tree_in_element ($) {
   my $self = shift;
   
   B: while (1) {
-    if ($token->{type} == CHARACTER_TOKEN) {
-      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+    if ($self->{t}->{type} == CHARACTER_TOKEN) {
+      while ($self->{t}->{data} =~ s/\x00/\x{FFFD}/) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $self->{t});
       }
-      $self->{open_elements}->[-1]->[0]->manakai_append_text ($token->{data});
+      $self->{open_elements}->[-1]->[0]->manakai_append_text ($self->{t}->{data});
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == START_TAG_TOKEN) {
+    } elsif ($self->{t}->{type} == START_TAG_TOKEN) {
       my $nsmap = {%{$self->{open_elements}->[-1]->[2]}};
 
-      my $attrs = $token->{attributes};
-      my $attrdefs = $self->{attrdef}->{$token->{tag_name}};
+      my $attrs = $self->{t}->{attributes};
+      my $attrdefs = $self->{attrdef}->{$self->{t}->{tag_name}};
       for my $attr_name (keys %{$attrdefs}) {
         if ($attrs->{$attr_name}) {
           $attrs->{$attr_name}->{type} = $attrdefs->{$attr_name}->{type} || 0;
@@ -564,23 +561,23 @@ sub _tree_in_element ($) {
       }
       
       my $ns;
-      my ($prefix, $ln) = split /:/, $token->{tag_name}, 2;
+      my ($prefix, $ln) = split /:/, $self->{t}->{tag_name}, 2;
       
       if (defined $ln and $prefix ne '' and $ln ne '') { # prefixed
         if (defined $nsmap->{$prefix}) {
           $ns = $nsmap->{$prefix};
         } else {
           ## NOTE: Error should be detected at the DOM layer.
-          ($prefix, $ln) = (undef, $token->{tag_name});
+          ($prefix, $ln) = (undef, $self->{t}->{tag_name});
         }
       } else {
         $ns = $nsmap->{''} if $prefix ne '' and not defined $ln;
-        ($prefix, $ln) = (undef, $token->{tag_name});
+        ($prefix, $ln) = (undef, $self->{t}->{tag_name});
       }
 
       my $el = $self->{document}->create_element_ns ($ns, [$prefix, $ln]);
-      $el->set_user_data (manakai_source_line => $token->{line});
-      $el->set_user_data (manakai_source_column => $token->{column});
+      $el->set_user_data (manakai_source_line => $self->{t}->{line});
+      $el->set_user_data (manakai_source_column => $self->{t}->{column});
 
       my $has_attr;
       for my $attr_name (sort {$attrs->{$a}->{index} <=> $attrs->{$b}->{index}}
@@ -632,26 +629,26 @@ sub _tree_in_element ($) {
       if ($self->{self_closing}) {
         delete $self->{self_closing};
       } else {
-        push @{$self->{open_elements}}, [$el, $token->{tag_name}, $nsmap];
+        push @{$self->{open_elements}}, [$el, $self->{t}->{tag_name}, $nsmap];
       }
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == END_TAG_TOKEN) {
-      if ($token->{tag_name} eq '') {
+    } elsif ($self->{t}->{type} == END_TAG_TOKEN) {
+      if ($self->{t}->{tag_name} eq '') {
         ## Short end tag token.
         pop @{$self->{open_elements}};
-      } elsif ($self->{open_elements}->[-1]->[1] eq $token->{tag_name}) {
+      } elsif ($self->{open_elements}->[-1]->[1] eq $self->{t}->{tag_name}) {
         pop @{$self->{open_elements}};
       } else {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                        text => $token->{tag_name},
-                        token => $token);
+                        text => $self->{t}->{tag_name},
+                        token => $self->{t});
         
         ## Has an element in scope
         INSCOPE: for my $i (reverse 0..$#{$self->{open_elements}}) {
-          if ($self->{open_elements}->[$i]->[1] eq $token->{tag_name}) {
+          if ($self->{open_elements}->[$i]->[1] eq $self->{t}->{tag_name}) {
             splice @{$self->{open_elements}}, $i;
             last INSCOPE;
           }
@@ -660,47 +657,47 @@ sub _tree_in_element ($) {
       
       unless (@{$self->{open_elements}}) {
         $self->{insertion_mode} = AFTER_ROOT_ELEMENT_IM;
-        $token = $self->_get_next_token;
+        $self->{t} = $self->_get_next_token;
         return;
       } else {
         ## Stay in the state.
-        $token = $self->_get_next_token;
+        $self->{t} = $self->_get_next_token;
         redo B;
       }
-    } elsif ($token->{type} == COMMENT_TOKEN) {
-      my $comment = $self->{document}->create_comment ($token->{data});
+    } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
+      my $comment = $self->{document}->create_comment ($self->{t}->{data});
       $self->{open_elements}->[-1]->[0]->append_child ($comment);
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == PI_TOKEN) {
+    } elsif ($self->{t}->{type} == PI_TOKEN) {
       my $pi = $self->{document}->create_processing_instruction
-          ($token->{target}, $token->{data});
+          ($self->{t}->{target}, $self->{t}->{data});
       $self->{open_elements}->[-1]->[0]->append_child ($pi);
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+    } elsif ($self->{t}->{type} == END_OF_FILE_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'in body:#eof',
-                      token => $token);
+                      token => $self->{t});
       
       $self->{insertion_mode} = AFTER_ROOT_ELEMENT_IM;
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       return;
-    } elsif ($token->{type} == DOCTYPE_TOKEN) {
+    } elsif ($self->{t}->{type} == DOCTYPE_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#doctype',
-                      token => $token);
+                      token => $self->{t});
       ## Ignore the token.
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == ABORT_TOKEN) {
+    } elsif ($self->{t}->{type} == ABORT_TOKEN) {
       return;
     } else {
-      die "$0: XML parser initial: Unknown token type $token->{type}";
+      die "$0: XML parser initial: Unknown token type $self->{t}->{type}";
     }
   } # B
 } # _tree_in_element
@@ -709,84 +706,84 @@ sub _tree_after_root_element ($) {
   my $self = shift;
 
   B: while (1) {
-    if ($token->{type} == START_TAG_TOKEN) {
+    if ($self->{t}->{type} == START_TAG_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'second root element',
-                      token => $token);
+                      token => $self->{t});
 
       ## XML5: Ignore the token.
 
       $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
       ## Reprocess.
       return;
-    } elsif ($token->{type} == COMMENT_TOKEN) {
-      my $comment = $self->{document}->create_comment ($token->{data});
+    } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
+      my $comment = $self->{document}->create_comment ($self->{t}->{data});
       $self->{document}->append_child ($comment);
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == PI_TOKEN) {
+    } elsif ($self->{t}->{type} == PI_TOKEN) {
       my $pi = $self->{document}->create_processing_instruction
-          ($token->{target}, $token->{data});
+          ($self->{t}->{target}, $self->{t}->{data});
       $self->{document}->append_child ($pi);
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == CHARACTER_TOKEN) {
-      while ($token->{data} =~ s/\x00/\x{FFFD}/) {
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $token);
+    } elsif ($self->{t}->{type} == CHARACTER_TOKEN) {
+      while ($self->{t}->{data} =~ s/\x00/\x{FFFD}/) {
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'NULL', token => $self->{t});
       }
 
       if (not $self->{tainted} and
-          not $token->{has_reference} and
-          $token->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
+          not $self->{t}->{has_reference} and
+          $self->{t}->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
         #
       }
       
-      if (length $token->{data}) {
+      if (length $self->{t}->{data}) {
         ## XML5: Ignore the token.
 
         unless ($self->{tainted}) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'text outside of root element',
-                          token => $token);
+                          token => $self->{t});
           $self->{tainted} = 1;
         }
 
-        $self->{document}->manakai_append_text ($token->{data});
+        $self->{document}->manakai_append_text ($self->{t}->{data});
       }
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == END_OF_FILE_TOKEN) {
+    } elsif ($self->{t}->{type} == END_OF_FILE_TOKEN) {
       ## Stop parsing.
 
       ## TODO: implement "stop parsing".
 
-      $token = {type => ABORT_TOKEN};
+      $self->{t} = {type => ABORT_TOKEN};
       return;
-    } elsif ($token->{type} == END_TAG_TOKEN) {
+    } elsif ($self->{t}->{type} == END_TAG_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                      text => $token->{tag_name},
-                      token => $token);
+                      text => $self->{t}->{tag_name},
+                      token => $self->{t});
       ## Ignore the token.
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == DOCTYPE_TOKEN) {
+    } elsif ($self->{t}->{type} == DOCTYPE_TOKEN) {
       $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#doctype',
-                      token => $token);
+                      token => $self->{t});
       ## Ignore the token.
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == ABORT_TOKEN) {
+    } elsif ($self->{t}->{type} == ABORT_TOKEN) {
       return;
     } else {
-      die "$0: XML parser initial: Unknown token type $token->{type}";
+      die "$0: XML parser initial: Unknown token type $self->{t}->{type}";
     }
   } # B
 } # _tree_after_root_element
@@ -795,67 +792,67 @@ sub _tree_in_subset ($) {
   my $self = shift;
 
   B: while (1) {
-    if ($token->{type} == COMMENT_TOKEN) {
+    if ($self->{t}->{type} == COMMENT_TOKEN) {
       ## Ignore the token.
 
       ## Stay in the state.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == ELEMENT_TOKEN) {
-      unless ($self->{has_element_decl}->{$token->{name}}) {
+    } elsif ($self->{t}->{type} == ELEMENT_TOKEN) {
+      unless ($self->{has_element_decl}->{$self->{t}->{name}}) {
         my $node = $self->{doctype}->get_element_type_definition_node
-            ($token->{name});
+            ($self->{t}->{name});
         unless ($node) {
           $node = $self->{document}->create_element_type_definition
-              ($token->{name});
+              ($self->{t}->{name});
           $self->{doctype}->set_element_type_definition_node ($node);
         }
         
-        $node->set_user_data (manakai_source_line => $token->{line});
-        $node->set_user_data (manakai_source_column => $token->{column});
+        $node->set_user_data (manakai_source_line => $self->{t}->{line});
+        $node->set_user_data (manakai_source_column => $self->{t}->{column});
         
-        $node->content_model_text (join '', @{$token->{content}})
-            if $token->{content};
+        $node->content_model_text (join '', @{$self->{t}->{content}})
+            if $self->{t}->{content};
       } else {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate element decl', ## TODO: type
-                        value => $token->{name},
-                        token => $token);
+                        value => $self->{t}->{name},
+                        token => $self->{t});
         
-        ## TODO: $token->{content} syntax check.
+        ## TODO: $self->{t}->{content} syntax check.
       }
-      $self->{has_element_decl}->{$token->{name}} = 1;
+      $self->{has_element_decl}->{$self->{t}->{name}} = 1;
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == ATTLIST_TOKEN) {
+    } elsif ($self->{t}->{type} == ATTLIST_TOKEN) {
       if ($self->{stop_processing}) {
         ## TODO: syntax validation
       } else {
         my $ed = $self->{doctype}->get_element_type_definition_node
-            ($token->{name});
+            ($self->{t}->{name});
         unless ($ed) {
           $ed = $self->{document}->create_element_type_definition
-              ($token->{name});
-          $ed->set_user_data (manakai_source_line => $token->{line});
-          $ed->set_user_data (manakai_source_column => $token->{column});
+              ($self->{t}->{name});
+          $ed->set_user_data (manakai_source_line => $self->{t}->{line});
+          $ed->set_user_data (manakai_source_column => $self->{t}->{column});
           $self->{doctype}->set_element_type_definition_node ($ed);
-        } elsif ($self->{has_attlist}->{$token->{name}}) {
+        } elsif ($self->{has_attlist}->{$self->{t}->{name}}) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate attlist decl', ## TODO: type
-                          value => $token->{name},
-                          token => $token,
+                          value => $self->{t}->{name},
+                          token => $self->{t},
                           level => $self->{level}->{warn});
         }
-        $self->{has_attlist}->{$token->{name}} = 1;
+        $self->{has_attlist}->{$self->{t}->{name}} = 1;
         
-        unless (@{$token->{attrdefs}}) {
+        unless (@{$self->{t}->{attrdefs}}) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'empty attlist decl', ## TODO: type
-                          value => $token->{name},
-                          token => $token,
+                          value => $self->{t}->{name},
+                          token => $self->{t},
                           level => $self->{level}->{warn});
         }
         
-        for my $at (@{$token->{attrdefs}}) {
+        for my $at (@{$self->{t}->{attrdefs}}) {
           unless ($ed->get_attribute_definition_node ($at->{name})) {
             my $node = $self->{document}->create_attribute_definition
                 ($at->{name});
@@ -915,7 +912,7 @@ sub _tree_in_subset ($) {
             $ed->set_attribute_definition_node ($node);
 
             ## For tree construction
-            $self->{attrdef}->{$token->{name}}->{$at->{name}}
+            $self->{attrdef}->{$self->{t}->{name}}->{$at->{name}}
                 = {
                    type => $type,
                    tokenize => $tokenize,
@@ -935,54 +932,54 @@ sub _tree_in_subset ($) {
       }
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == GENERAL_ENTITY_TOKEN) {
+    } elsif ($self->{t}->{type} == GENERAL_ENTITY_TOKEN) {
       if ($self->{stop_processing}) {
         ## TODO: syntax validation
       } elsif ({
                 amp => 1, apos => 1, quot => 1, lt => 1, gt => 1,
-               }->{$token->{name}}) {
-        if (not defined $token->{value} or
-            $token->{value} !~
+               }->{$self->{t}->{name}}) {
+        if (not defined $self->{t}->{value} or
+            $self->{t}->{value} !~
             {
              amp => qr/\A&#(?:x0*26|0*38);\z/,
              lt => qr/\A&#(?:x0*3[Cc]|0*60);\z/,
              gt => qr/\A(?>&#(?:x0*3[Ee]|0*62);|>)\z/,
              quot => qr/\A(?>&#(?:x0*22|0*34);|")\z/,
              apos => qr/\A(?>&#(?:x0*27|0*39);|')\z/,
-            }->{$token->{name}}) {
+            }->{$self->{t}->{name}}) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'bad predefined entity decl', ## TODO: type
-                          value => $token->{name},
-                          token => $token);
+                          value => $self->{t}->{name},
+                          token => $self->{t});
         }
 
-        $self->{ge}->{$token->{name}.';'} = {name => $token->{name},
+        $self->{ge}->{$self->{t}->{name}.';'} = {name => $self->{t}->{name},
                                              value => {
                                                        amp => '&',
                                                        lt => '<',
                                                        gt => '>',
                                                        quot => '"',
                                                        apos => "'",
-                                                      }->{$token->{name}},
+                                                      }->{$self->{t}->{name}},
                                              only_text => 1};
-      } elsif (not $self->{ge}->{$token->{name}.';'}) {
+      } elsif (not $self->{ge}->{$self->{t}->{name}.';'}) {
         ## For parser.
-        $self->{ge}->{$token->{name}.';'} = $token;
-        if (defined $token->{value} and
-            $token->{value} !~ /[&<]/) {
-          $token->{only_text} = 1;
+        $self->{ge}->{$self->{t}->{name}.';'} = $self->{t};
+        if (defined $self->{t}->{value} and
+            $self->{t}->{value} !~ /[&<]/) {
+          $self->{t}->{only_text} = 1;
         }
         
         ## For DOM.
-        if (defined $token->{notation}) {
-          my $node = $self->{document}->create_general_entity ($token->{name});
-          $node->set_user_data (manakai_source_line => $token->{line});
-          $node->set_user_data (manakai_source_column => $token->{column});
+        if (defined $self->{t}->{notation}) {
+          my $node = $self->{document}->create_general_entity ($self->{t}->{name});
+          $node->set_user_data (manakai_source_line => $self->{t}->{line});
+          $node->set_user_data (manakai_source_column => $self->{t}->{column});
           
-          $node->public_id ($token->{pubid}); # may be undef
-          $node->system_id ($token->{sysid}); # may be undef
-          $node->notation_name ($token->{notation});
+          $node->public_id ($self->{t}->{pubid}); # may be undef
+          $node->system_id ($self->{t}->{sysid}); # may be undef
+          $node->notation_name ($self->{t}->{notation});
           
           $self->{doctype}->set_general_entity_node ($node);
         } else {
@@ -990,80 +987,78 @@ sub _tree_in_subset ($) {
         }
       } else {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate general entity decl', ## TODO: type
-                        value => $token->{name},
-                        token => $token,
+                        value => $self->{t}->{name},
+                        token => $self->{t},
                         level => $self->{level}->{warn});
 
         ## TODO: syntax validation        
       }
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == PARAMETER_ENTITY_TOKEN) {
+    } elsif ($self->{t}->{type} == PARAMETER_ENTITY_TOKEN) {
       if ($self->{stop_processing}) {
         ## TODO: syntax validation
-      } elsif (not $self->{pe}->{$token->{name}}) {
+      } elsif (not $self->{pe}->{$self->{t}->{name}}) {
         ## For parser.
-        $self->{pe}->{$token->{name}} = $token;
+        $self->{pe}->{$self->{t}->{name}} = $self->{t};
 
         ## TODO: syntax validation
       } else {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate para entity decl', ## TODO: type
-                        value => $token->{name},
-                        token => $token,
+                        value => $self->{t}->{name},
+                        token => $self->{t},
                         level => $self->{level}->{warn});
 
         ## TODO: syntax validation        
       }
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == NOTATION_TOKEN) {
+    } elsif ($self->{t}->{type} == NOTATION_TOKEN) {
       unless ($self->{doctype}->get_notation_node
-                ($token->{name})) {
-        my $node = $self->{document}->create_notation ($token->{name});
-        $node->set_user_data (manakai_source_line => $token->{line});
-        $node->set_user_data (manakai_source_column => $token->{column});
+                ($self->{t}->{name})) {
+        my $node = $self->{document}->create_notation ($self->{t}->{name});
+        $node->set_user_data (manakai_source_line => $self->{t}->{line});
+        $node->set_user_data (manakai_source_column => $self->{t}->{column});
         
-        $node->public_id ($token->{pubid}); # may be undef
-        $node->system_id ($token->{sysid}); # may be undef
+        $node->public_id ($self->{t}->{pubid}); # may be undef
+        $node->system_id ($self->{t}->{sysid}); # may be undef
         
         $self->{doctype}->set_notation_node ($node);
       } else {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'duplicate notation decl', ## TODO: type
-                        value => $token->{name},
-                        token => $token);
+                        value => $self->{t}->{name},
+                        token => $self->{t});
 
         ## TODO: syntax validation
       }
 
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == PI_TOKEN) {
+    } elsif ($self->{t}->{type} == PI_TOKEN) {
       my $pi = $self->{document}->create_processing_instruction
-          ($token->{target}, $token->{data});
+          ($self->{t}->{target}, $self->{t}->{data});
       $self->{doctype}->append_child ($pi);
       ## TODO: line/col
       
       ## Stay in the mode.
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       next B;
-    } elsif ($token->{type} == END_OF_DOCTYPE_TOKEN) {
+    } elsif ($self->{t}->{type} == END_OF_DOCTYPE_TOKEN) {
       $self->{insertion_mode} = BEFORE_ROOT_ELEMENT_IM;
-      $token = $self->_get_next_token;
+      $self->{t} = $self->_get_next_token;
       return;
-    } elsif ($token->{type} == ABORT_TOKEN) {
+    } elsif ($self->{t}->{type} == ABORT_TOKEN) {
       return;
     } else {
-      die "$0: XML parser subset im: Unknown token type $token->{type}";
+      die "$0: XML parser subset im: Unknown token type $self->{t}->{type}";
     }
   } # B
 
 } # _tree_in_subset
-
-}
 
 1;
