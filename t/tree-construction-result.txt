@@ -1741,11 +1741,7 @@ ok 1260 - Document tree: qq'<!DOCTYPE html><!--x--'
 ok 1261 - Parse error: qq'<!DOCTYPE html><table><tr><td></p></table>'; 1:35:unmatched end tag:p;Line: 1 Col: 34 Unexpected end tag (p). Ignored.
 ok 1262 - SHOULD-level error: qq'<!DOCTYPE html><table><tr><td></p></table>'; ;
 ok 1263 - Document tree: qq'<!DOCTYPE html><table><tr><td></p></table>'
-not ok 1264 - Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.
-#   Failed test 'Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.'
-#   at HTML-tree.t test () ok line 3.
-#          got: '2'
-#     expected: '3'
+ok 1264 - Parse error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; 1:21:string after DOCTYPE name, 1:26:not HTML5, 1:34:dash in comment;Line: 1 Col: 20 Expected space or '>'. Got '', Line: 1 Col: 25 Erroneous DOCTYPE., Line: 1 Col: 35 Unexpected character in comment found.
 ok 1265 - SHOULD-level error: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'; ;
 ok 1266 - Document tree: qq'<!DOCTYPE <!DOCTYPE HTML>><!--<!--x-->-->'
 # t/tree-construction/tests3.dat
@@ -7947,4 +7943,4 @@ ok 6730 - Parse error: qq'<table><tr><td><svg><desc><td></desc><circle>'; 1:8:no
 ok 6731 - SHOULD-level error: qq'<table><tr><td><svg><desc><td></desc><circle>'; ;
 ok 6732 - Document tree: qq'<table><tr><td><svg><desc><td></desc><circle>'
 1..6732
-# Looks like you failed 162 tests of 6732.
+# Looks like you failed 161 tests of 6732.

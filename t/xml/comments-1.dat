@@ -4,6 +4,10 @@
 < !--y-- >
 --><a/>
 #errors
+2;5;dash in comment;;;m
+2;8;dash in comment;;;m
+3;5;dash in comment;;;m
+3;8;dash in comment;;;m
 #document escaped
 | <!--\u0020
 | < !--x-- >
@@ -14,6 +18,10 @@
 #data
 <!--< !--x-- >< !--y-- >--><a/>
 #errors
+1;12;dash in comment;;;m
+1;19;dash in comment;;;m
+1;22;dash in comment;;;m
+1;9;dash in comment;;;m
 #document escaped
 | <!--\u0020< !--x-- >< !--y-- > -->
 | <{} a>
@@ -21,6 +29,7 @@
 #data
 <!-- xxx -- > yyy --><a/>
 #errors
+1;11;dash in comment;;;m
 #document
 | <!--  xxx -- > yyy  -->
 | <{} a>

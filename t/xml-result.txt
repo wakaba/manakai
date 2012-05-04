@@ -1259,16 +1259,7 @@ ok 1237 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID d>\x{0A}]><a/>'
 ok 1238 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID d'
 ok 1239 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID d'
 ok 1240 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>'
-not ok 1241 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>'
-#   Failed test 'Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>''
-#   at HTML-tree.t test () skip line 117.
-# +---+--------------+---+----------------------------------+
-# | Ln|Got           | Ln|Expected                          |
-# +---+--------------+---+----------------------------------+
-# |  1|<!DOCTYPE a>  |  1|<!DOCTYPE a>                      |
-# |   |              *  2|  <!ELEMENT b >                   *
-# |   |              *  3|    c ID () EXPLICIT "d> ]><a/>"  *
-# +---+--------------+---+----------------------------------+
+ok 1241 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d>\x{0A}]><a/>'
 ok 1242 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d'
 ok 1243 - Document tree: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d'
 ok 1244 - Parse error: qq'<!DOCTYPE a[\x{0A}<!ATTLIST b c ID "d">\x{0A}]><a/>'
@@ -2304,4 +2295,4 @@ ok 2142 - Parse error: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x
 ok 2143 - Entities: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 ok 2144 - Document tree: qq'<!DOCTYPE a[\x{0A}  <!ENTITY b "&\x{4E00}\x{4E01};">\x{0A}]>\x{0A}<a/>'
 1..2144
-# Looks like you failed 18 tests of 2144.
+# Looks like you failed 17 tests of 2144.

@@ -759,7 +759,7 @@
 
 {"description":"entity w/o refc at the end of unterminated attribute value",
 "input":"<a href='&COPY",
-"output":["ParseError", "ParseError", ["StartTag", "a", {"href": "\u00A9"}]]},
+"output":["ParseError", "ParseError"]},
 
 {"description":"entity w/o refc at the end of attribute value",
 "input":"<a href='&COPY'>",
@@ -905,11 +905,11 @@
 
 {"description":"< in attribute value (single-unquoted) state",
 "input":"<p align='left<div>",
-"output":["ParseError", ["StartTag", "p", {"align":"left<div>"}]]},
+"output":["ParseError"]},
 
 {"description":"< in attribute value (double-unquoted) state",
 "input":"<p align=\u0022left<div>",
-"output":["ParseError", ["StartTag", "p", {"align":"left<div>"}]]},
+"output":["ParseError"]},
 
 {"description": "< in after attribute value (quoted) state",
 "input": "<p a=\"b\"\u000bc>",
@@ -992,8 +992,7 @@
 
 {"description": "<span =x\"=\"x>",
 "input": "<span =x\"=\"x>",
-"output": ["ParseError", "ParseError", "ParseError",
-    ["StartTag", "span", {"=x\"": "x>"}]]},
+"output": ["ParseError", "ParseError", "ParseError"]},
 
 {"description": "<span =x\"=\"x\">",
 "input": "<span =x\"=\"x\">",
@@ -1119,37 +1118,38 @@
 "input": "<!----!x-->",
 "output": ["ParseError", ["Comment", "--!x"]]},
 
-{"description": "<!---- >",
+{"description": "<!---- > -- in comment, unclosed comment",
 "input": "<!---- >",
-"output": ["ParseError", ["Comment", "-- >"]]},
+"output": ["ParseError", "ParseError", ["Comment", "-- >"]]},
 
-{"description": "<!--a-- >",
+{"description": "<!--a-- > -- in comment, unclosed comment",
 "input": "<!--a-- >",
-"output": ["ParseError", ["Comment", "a-- >"]]},
+"output": ["ParseError", "ParseError", ["Comment", "a-- >"]]},
 
-{"description": "<!--a--\u000A>",
+{"description": "<!--a--\u000A> -- in comment, unclosed comment",
 "input": "<!--a--\u000A>",
-"output": ["ParseError", ["Comment", "a--\u000A>"]]},
+"output": ["ParseError", "ParseError", ["Comment", "a--\u000A>"]]},
 
-{"description": "<!--a-- a>",
+{"description": "<!--a-- a> -- in comment, unclosed comment",
 "input": "<!--a-- a>",
-"output": ["ParseError", ["Comment", "a-- a>"]]},
+"output": ["ParseError", "ParseError", ["Comment", "a-- a>"]]},
 
-{"description": "<!--a-- ->",
+{"description": "<!--a-- -> -- in comment, unclosed comment",
 "input": "<!--a-- ->",
-"output": ["ParseError", ["Comment", "a-- ->"]]},
+"output": ["ParseError", "ParseError", ["Comment", "a-- ->"]]},
 
-{"description": "<!--a-- -->",
+{"description": "<!--a-- --> -- in comment",
 "input": "<!--a-- -->",
 "output": ["ParseError", ["Comment", "a-- "]]},
 
-{"description": "<!--a-- ",
+{"description": "<!--a--  -- in comment, unclosed comment",
 "input": "<!--a-- ",
-"output": ["ParseError", ["Comment", "a-- "]]},
+"output": ["ParseError", "ParseError", ["Comment", "a-- "]]},
 
-{"description": "<!--a-- --b-- >",
+{"description": "<!--a-- --b-- > -- in comment x 3, unclosed comment",
 "input": "<!--a-- --b-- >",
-"output": ["ParseError", ["Comment", "a-- --b-- >"]]},
+"output": ["ParseError", "ParseError", "ParseError", "ParseError", 
+           ["Comment", "a-- --b-- >"]]},
 
 {"description": "<a href=''rel=''>",
 "input": "<a href=''rel=''>",
@@ -1246,11 +1246,11 @@
 
 {"description": "<a a=\">",
 "input": "<a a=\">",
-"output": ["ParseError", ["StartTag", "a", {"a": ">"}]]},
+"output": ["ParseError"]},
 
 {"description": "<a a='>",
 "input": "<a a='>",
-"output": ["ParseError", ["StartTag", "a", {"a": ">"}]]},
+"output": ["ParseError"]},
 
 {"description": "<a a=a\">",
 "input": "<a a=a\">",

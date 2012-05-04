@@ -1748,41 +1748,20 @@ sub _get_next_token ($) {
     $self->_set_nc;
   
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed attribute value');
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-
+        if ($self->{ct}->{type} == START_TAG_TOKEN or
+            $self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{state} = DATA_STATE;
-          ## reconsume
-          return  ($self->{ct}); # start tag
-          redo A;
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-
-          $self->{state} = DATA_STATE;
-          ## reconsume
-
-          ## Discard the token.
-          #return  ($self->{ct}); # end tag
-
+          ## Reconsume the current input character.
+          ## Discard the current token, including attributes.
           redo A;
         } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
           ## XML5: No parse error above; not defined yet.
           push @{$self->{ct}->{attrdefs}}, $self->{ca};
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-          ## Reconsume.
-
-          ## Discard the token.
-          #return  ($self->{ct}); # ATTLIST
-
+          ## Reconsume the current input character.
+          ## Discard the current token, including attributes.
           redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
@@ -1863,44 +1842,20 @@ sub _get_next_token ($) {
     $self->_set_nc;
   
         redo A;
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed attribute value');
-        if ($self->{ct}->{type} == START_TAG_TOKEN) {
-          
-          $self->{last_stag_name} = $self->{ct}->{tag_name};
-
+        if ($self->{ct}->{type} == START_TAG_TOKEN or
+            $self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{state} = DATA_STATE;
-          ## reconsume
-
-          ## Discard the token.
-          #return  ($self->{ct}); # start tag
-
-          redo A;
-        } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-
-          $self->{state} = DATA_STATE;
-          ## reconsume
-
-          ## Discard the token.
-          #return  ($self->{ct}); # end tag
-
+          ## Reconsume the current input character.
+          ## Discard the current token, including attributes.
           redo A;
         } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
           ## XML5: No parse error above; not defined yet.
           push @{$self->{ct}->{attrdefs}}, $self->{ca};
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-          ## Reconsume.
-
-          ## Discard the token.
-          #return  ($self->{ct}); # ATTLIST
-
+          ## Reconsume the current input character.
+          ## Discard the current token, including attributes.
           redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
@@ -2008,7 +1963,7 @@ sub _get_next_token ($) {
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
         }
-      } elsif ($nc == -1) {
+      } elsif ($nc == EOF_CHAR) {
         if ($self->{ct}->{type} == START_TAG_TOKEN) {
           
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
@@ -2023,30 +1978,16 @@ sub _get_next_token ($) {
           redo A;
         } elsif ($self->{ct}->{type} == END_TAG_TOKEN) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed tag');
-          if ($self->{ct}->{attributes}) {
-            
-            $self->{parse_error}->(level => $self->{level}->{must}, type => 'end tag attribute');
-          } else {
-            ## NOTE: This state should never be reached.
-            
-          }
-
           $self->{state} = DATA_STATE;
-          ## reconsume
-
-          ## Discard the token.
-          #return  ($self->{ct}); # end tag
-
+          ## Reconsume the current input character.
+          ## Discard the current token, including attributes.
           redo A;
         } elsif ($self->{ct}->{type} == ATTLIST_TOKEN) {
           $self->{parse_error}->(level => $self->{level}->{must}, type => 'unclosed md'); ## TODO: type
           push @{$self->{ct}->{attrdefs}}, $self->{ca};
           $self->{state} = DOCTYPE_INTERNAL_SUBSET_STATE;
-          ## Reconsume.
-
-          ## Discard the token.
-          #return  ($self->{ct}); # ATTLIST
-
+          ## Reconsume the current input character.
+          ## Discard the current token, including attributes.
           redo A;
         } else {
           die "$0: $self->{ct}->{type}: Unknown token type";
@@ -2616,6 +2557,9 @@ sub _get_next_token ($) {
         if ($state == COMMENT_END_BANG_STATE) {
           $self->{ct}->{data} .= '--!' . chr ($nc); # comment
         } else {
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'dash in comment',
+                          line => $self->{line_prev},
+                          column => $self->{column_prev});
           $self->{ct}->{data} .= '--' . chr ($nc); # comment
         }
         $self->{state} = COMMENT_STATE;
