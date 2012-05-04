@@ -1,7 +1,6 @@
 package Whatpm::HTML; # -*- Perl -*-
 use strict;
-our $VERSION = '2.0';
-use Error qw(:try);
+our $VERSION = '3.0';
 !!!pdebug { use Data::Dumper; };
 
 use Whatpm::HTML::Tokenizer;
@@ -22,7 +21,7 @@ use Whatpm::HTML::Tokenizer;
 ## doc.write ('');
 ## alert (doc.compatMode);
 
-require IO::Handle;
+#require IO::Handle;
 
 ## Namespace URLs
 
@@ -314,16 +313,7 @@ my $foreign_attr_xname = $Whatpm::HTML::ParserData::ForeignAttrNamespaceFixup;
 ## TODO: Invoke the reset algorithm when a resettable element is
 ## created (cf. HTML5 revision 2259).
 
-require Whatpm::HTML::InputStream;
-push our @ISA, qw(Whatpm::HTML::InputStream);
 use Encode;
-
-our $DefaultErrorHandler = sub {
-  my (%opt) = @_;
-  my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
-  my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
-  warn "Parse error ($opt{type}) at line $line column $column\n";
-}; # $DefaultErrorHandler
 
 sub parse_byte_string ($$$$;$$) {
   #my ($self, $charset_name, $string, $doc, $onerror, $get_wrapper) = @_;
@@ -357,7 +347,7 @@ sub parse_byte_string ($$$$;$$) {
       die bless {}, 'Whatpm::HTML::InputStream::RestartParser';
     };
 
-    my $onerror = $_[4] || $DefaultErrorHandler;
+    my $onerror = $_[4] || $Whatpm::HTML::Defs::DefaultErrorHandler;
     $self->{parse_error} = sub {
       $onerror->(line => $self->{line}, column => $self->{column}, @_);
     };
@@ -443,7 +433,7 @@ sub parse_byte_stream ($$$$;$$) {
       die bless {}, 'Whatpm::HTML::InputStream::RestartParser';
     };
 
-    my $onerror = $_[4] || $DefaultErrorHandler;
+    my $onerror = $_[4] || $Whatpm::HTML::Defs::DefaultErrorHandler;
     $self->{parse_error} = sub {
       $onerror->(line => $self->{line}, column => $self->{column}, @_);
     };
@@ -503,7 +493,7 @@ sub parse_char_string ($$$;$$) {
   $self->{chars_pull_next} = sub { 0 };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $DefaultErrorHandler;
+  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
@@ -552,7 +542,7 @@ sub parse_char_stream ($$$;$$) {
   };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $DefaultErrorHandler;
+  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
@@ -589,10 +579,6 @@ sub new ($) {
   };
   $self->{change_encoding} = sub {
     $_[0]->_change_encoding ($_[1], $_[2]);
-    # if ($_[0] is a supported encoding) {
-    #   run "change the encoding" algorithm;
-    #   throw Whatpm::HTML::RestartParser (charset => $new_encoding);
-    # }
   };
   $self->{application_cache_selection} = sub {
     #
@@ -5618,7 +5604,7 @@ sub set_inner_html ($$$$) {
     $self->{chars_pull_next} = sub { 0 };
     delete $self->{chars_was_cr};
 
-    my $ponerror = $onerror || $DefaultErrorHandler;
+    my $ponerror = $onerror || $Whatpm::HTML::Defs::DefaultErrorHandler;
     $p->{parse_error} = sub {
       $ponerror->(line => $p->{line}, column => $p->{column}, @_);
     };
@@ -5727,9 +5713,6 @@ sub set_inner_html ($$$$) {
 } # set_inner_html
 
 } # tree construction stage
-
-package Whatpm::HTML::RestartParser;
-push our @ISA, 'Error';
 
 1;
 

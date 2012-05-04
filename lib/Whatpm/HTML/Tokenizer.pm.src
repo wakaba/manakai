@@ -1,7 +1,7 @@
 package Whatpm::HTML::Tokenizer; # -*- Perl -*-
 use strict;
 use warnings;
-our $VERSION = '1.34';
+our $VERSION = '2.0';
 
 ## This module implements the tokenization phase of both HTML5 and
 ## XML5.  Notes like this are usually based on the latest HTML
@@ -14,63 +14,27 @@ our $VERSION = '1.34';
 ## related to surrogate code positions, are not useful.
 no warnings 'utf8';
 
-## ------ Token types ------
+## ------ Token types (for compat) ------
 
 BEGIN {
   require Exporter;
   push our @ISA, 'Exporter';
 
   our @EXPORT_OK = qw(
-    DOCTYPE_TOKEN
-    COMMENT_TOKEN
-    START_TAG_TOKEN
-    END_TAG_TOKEN
-    END_OF_FILE_TOKEN
-    CHARACTER_TOKEN
-    PI_TOKEN
-    ABORT_TOKEN
-    END_OF_DOCTYPE_TOKEN
-    ATTLIST_TOKEN
-    ELEMENT_TOKEN
-    GENERAL_ENTITY_TOKEN
-    PARAMETER_ENTITY_TOKEN
-    NOTATION_TOKEN
+    DOCTYPE_TOKEN COMMENT_TOKEN START_TAG_TOKEN END_TAG_TOKEN
+    END_OF_FILE_TOKEN CHARACTER_TOKEN PI_TOKEN ABORT_TOKEN
+    END_OF_DOCTYPE_TOKEN ATTLIST_TOKEN ELEMENT_TOKEN
+    GENERAL_ENTITY_TOKEN PARAMETER_ENTITY_TOKEN NOTATION_TOKEN
   );
   
-  our %EXPORT_TAGS = (
-    token => [qw(
-      DOCTYPE_TOKEN
-      COMMENT_TOKEN
-      START_TAG_TOKEN
-      END_TAG_TOKEN
-      END_OF_FILE_TOKEN
-      CHARACTER_TOKEN
-      PI_TOKEN
-      ABORT_TOKEN
-      END_OF_DOCTYPE_TOKEN
-      ATTLIST_TOKEN
-      ELEMENT_TOKEN
-      GENERAL_ENTITY_TOKEN
-      PARAMETER_ENTITY_TOKEN
-      NOTATION_TOKEN
-    )],
-  );
+  our %EXPORT_TAGS = (token => [@EXPORT_OK]);
 }
-
-sub DOCTYPE_TOKEN () { 1 } ## XML5: No DOCTYPE token.
-sub COMMENT_TOKEN () { 2 }
-sub START_TAG_TOKEN () { 3 }
-sub END_TAG_TOKEN () { 4 }
-sub END_OF_FILE_TOKEN () { 5 }
-sub CHARACTER_TOKEN () { 6 }
-sub PI_TOKEN () { 7 } ## NOTE: XML only.
-sub ABORT_TOKEN () { 8 } ## NOTE: For internal processing.
-sub END_OF_DOCTYPE_TOKEN () { 9 } ## NOTE: XML only.
-sub ATTLIST_TOKEN () { 10 } ## NOTE: XML only.
-sub ELEMENT_TOKEN () { 11 } ## NOTE: XML only.
-sub GENERAL_ENTITY_TOKEN () { 12 } ## NOTE: XML only.
-sub PARAMETER_ENTITY_TOKEN () { 13 } ## NOTE: XML only.
-sub NOTATION_TOKEN () { 14 } ## NOTE: XML only.
+use Whatpm::HTML::Defs qw(
+  DOCTYPE_TOKEN COMMENT_TOKEN START_TAG_TOKEN END_TAG_TOKEN
+  END_OF_FILE_TOKEN CHARACTER_TOKEN PI_TOKEN ABORT_TOKEN
+  END_OF_DOCTYPE_TOKEN ATTLIST_TOKEN ELEMENT_TOKEN 
+  GENERAL_ENTITY_TOKEN PARAMETER_ENTITY_TOKEN NOTATION_TOKEN
+);
 
 ## XML5: XML5 has "empty tag token".  In this implementation, it is
 ## represented as a start tag token with $self->{self_closing} flag
@@ -81,8 +45,9 @@ sub NOTATION_TOKEN () { 14 } ## NOTE: XML only.
 ## to an empty string.
 
 package Whatpm::HTML;
-
-BEGIN { Whatpm::HTML::Tokenizer->import (':token') }
+use Whatpm::HTML::Defs;
+use Whatpm::HTML::InputStream;
+push our @ISA, qw(Whatpm::HTML::InputStream);
 
 ## ------ Tokenizer states ------
 
@@ -223,15 +188,6 @@ sub AFTER_CM_GROUP_CLOSE_STATE () { 99 }
 sub AFTER_MD_DEF_STATE () { 100 }
 sub BOGUS_MD_STATE () { 101 }
 
-## ------ Tree constructor state constants ------
-
-## Whether the parsed string is in the foreign island or not affect
-## how tokenization is done, unfortunately.  These are a copy of some
-## of tokenization state constants.  See Whatpm::HTML for the full
-## list and the descriptions for constants.
-
-sub FOREIGN_EL () { 0b1_00000000000 }
-
 ## ------ Character reference mappings ------
 
 my $charref_map = {
@@ -281,18 +237,6 @@ $charref_map->{$_} = $_
         0xBFFFE, 0xBFFFF, 0xCFFFE, 0xCFFFF, 0xDFFFE, 0xDFFFF, 0xEFFFE,
         0xEFFFF, 0xFFFFE, 0xFFFFF, 0x10FFFE, 0x10FFFF;
 
-## ------ Special character-like constants ------
-
-## The "EOF" pseudo-character in the HTML parsing algorithm.
-sub EOF_CHAR () { -1 }
-
-## A pseudo-character code that can never appear in the input stream.
-sub NEVER_CHAR () { -2 }
-
-## Pause tokenization (and parsing) because of the end of the
-## currently available characters (that could be different from EOF).
-sub ABORT_CHAR () { -3 }
-
 ## ------ The tokenizer ------
 
 ## Implementations MUST act as if state machine in the spec
@@ -326,136 +270,6 @@ sub _initialize_tokenizer ($) {
   $self->{token} = [];
   # $self->{escape}
 } # _initialize_tokenizer
-
-sub _set_nc ($) {
-  my $self = $_[0];
-
-  if ($self->{chars}) {
-    {
-      if ($self->{chars_pos} < @{$self->{chars}}) {
-        $self->{line_prev} = $self->{line};
-        $self->{column_prev} = $self->{column};
-        my $c = ord $self->{chars}->[$self->{chars_pos}++];
-        if ($c == 0x000A) {
-          if ($self->{chars_was_cr}) {
-            delete $self->{chars_was_cr};
-            redo;
-          } else {
-            delete $self->{chars_was_cr};
-            $self->{line}++;
-            $self->{column} = 0;
-          }
-        } elsif ($c == 0x000D) {
-          $self->{chars_was_cr} = 1;
-          $self->{line}++;
-          $self->{column} = 0;
-          $c = 0x000A;
-        } else {
-          if (
-              (0x0001 <= $c and $c <= 0x0008) or
-              (0x000E <= $c and $c <= 0x001F) or
-              (0x007F <= $c and $c <= 0x009F) or
-              (0xFDD0 <= $c and $c <= 0xFDEF) or
-              {0x000B => 1, 0xFFFE => 1, 0xFFFF => 1,
-               0x1FFFE => 1, 0x1FFFF => 1, 0x2FFFE => 1, 0x2FFFF => 1,
-               0x3FFFE => 1, 0x3FFFF => 1, 0x4FFFE => 1, 0x4FFFF => 1,
-               0x5FFFE => 1, 0x5FFFF => 1, 0x6FFFE => 1, 0x6FFFF => 1,
-               0x7FFFE => 1, 0x7FFFF => 1, 0x8FFFE => 1, 0x8FFFF => 1,
-               0x9FFFE => 1, 0x9FFFF => 1, 0xAFFFE => 1, 0xAFFFF => 1,
-               0xBFFFE => 1, 0xBFFFF => 1, 0xCFFFE => 1, 0xCFFFF => 1,
-               0xDFFFE => 1, 0xDFFFF => 1, 0xEFFFE => 1, 0xEFFFF => 1,
-               0xFFFFE => 1, 0xFFFFF => 1, 0x10FFFE => 1, 0x10FFFF => 1,
-             }->{$c}
-           ) {
-            $self->{parse_error}
-                ->(type => ($c < 0xA0
-                                ? (sprintf 'control char:U+%04X', $c)
-                                : (sprintf 'nonchar:U+%04X', $c)),
-                   level => 'm',
-                   line => $self->{line},
-                   column => $self->{column} + 1);
-          }
-
-          delete $self->{chars_was_cr};
-          $self->{column}++;
-        }
-        $self->{nc} = $c;
-      } else {
-        delete $self->{chars_was_cr};
-        if ($self->{chars_pull_next}->()) {
-          $self->{nc} = ABORT_CHAR;
-        } else {
-          $self->{nc} = EOF_CHAR;
-        }
-      }
-    }
-    return;
-  }
-
-  ## Compat (to be deleted, hopefully...)
-  if ($self->{char_buffer_pos} < length $self->{char_buffer}) {
-    $self->{line_prev} = $self->{line};
-    $self->{column_prev} = $self->{column};
-    $self->{column}++;
-    $self->{nc}
-        = ord substr ($self->{char_buffer}, $self->{char_buffer_pos}++, 1);
-  } else {
-    $self->{set_nc}->($self);
-  }
-} # _set_nc
-
-my $CommonStoppers = {
-  ## For newline counter
-  "\x{000D}" => 1, "\x{000A}" => 1,
-
-  ## Parse errors in HTML
-  "\x{000B}" => 1, "\x{FFFE}" => 1, "\x{FFFF}" => 1,
-  "\x{1FFFE}" => 1, "\x{1FFFF}" => 1, "\x{2FFFE}" => 1, "\x{2FFFF}" => 1,
-  "\x{3FFFE}" => 1, "\x{3FFFF}" => 1, "\x{4FFFE}" => 1, "\x{4FFFF}" => 1,
-  "\x{5FFFE}" => 1, "\x{5FFFF}" => 1, "\x{6FFFE}" => 1, "\x{6FFFF}" => 1,
-  "\x{7FFFE}" => 1, "\x{7FFFF}" => 1, "\x{8FFFE}" => 1, "\x{8FFFF}" => 1,
-  "\x{9FFFE}" => 1, "\x{9FFFF}" => 1, "\x{AFFFE}" => 1, "\x{AFFFF}" => 1,
-  "\x{BFFFE}" => 1, "\x{BFFFF}" => 1, "\x{CFFFE}" => 1, "\x{CFFFF}" => 1,
-  "\x{DFFFE}" => 1, "\x{DFFFF}" => 1, "\x{EFFFE}" => 1, "\x{EFFFF}" => 1,
-  "\x{FFFFE}" => 1, "\x{FFFFF}" => 1,
-  "\x{10FFFE}" => 1, "\x{10FFFF}" => 1,
-};
-$CommonStoppers->{chr $_} = 1
-    for 0x0001..0x0008, 0x000E..0x001F, 0x007F..0x009F, 0xFDD0..0xFDEF;
-
-sub _read_chars ($$) {
-  my ($self, $stoppers) = @_;
-
-  ## Compat (to be deleted, hopefully...)
-  unless ($self->{chars}) {
-    my $buffer = '';
-    my $pattern = join '', keys %$stoppers;
-    if ($pattern =~ s/-//) {
-      $pattern = '-' . $pattern;
-    }
-    $self->{read_until}->($buffer, $pattern, 0);
-    return $buffer;
-  }
-  
-  my $start = $self->{chars_pos};
-  {
-    my $char = $self->{chars}->[$self->{chars_pos}];
-    last if not defined $char;
-    if ($stoppers->{$char} or $CommonStoppers->{$char}) {
-      last;
-    } else {
-      $self->{chars_pos}++;
-    }
-    redo;
-  }
-  
-  if ($start != $self->{chars_pos}) {
-    $self->{column} += $self->{chars_pos} - $start;
-    return join '', @{$self->{chars}}[$start..($self->{chars_pos}-1)];
-  } else {
-    return '';
-  }
-} # _read_chars
 
 ## A token has:
 ##   ->{type} == DOCTYPE_TOKEN, START_TAG_TOKEN, END_TAG_TOKEN, COMMENT_TOKEN,

@@ -8,13 +8,6 @@ use Whatpm::HTML::Tokenizer qw/:token/;
 use Whatpm::HTML::InputStream;
 push our @ISA, qw(Whatpm::HTML Whatpm::HTML::InputStream);
 
-our $DefaultErrorHandler = sub {
-  my (%opt) = @_;
-  my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
-  my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
-  warn "Parse error ($opt{type}) at line $line column $column\n";
-}; # $DefaultErrorHandler
-
 sub parse_char_string ($$$;$$) {
   #my ($self, $string, $document, $onerror, $get_wrapper) = @_;
   my $self = ref $_[0] ? $_[0] : $_[0]->new;
@@ -35,7 +28,7 @@ sub parse_char_string ($$$;$$) {
   $self->{chars_pull_next} = sub { 0 };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $DefaultErrorHandler;
+  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
@@ -81,7 +74,7 @@ sub parse_char_stream ($$$;$$) {
   };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $DefaultErrorHandler;
+  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
@@ -113,12 +106,7 @@ sub new ($) {
   $self->{parse_error} = sub {
     # 
   };
-  $self->{change_encoding} = sub {
-    # if ($_[0] is a supported encoding) {
-    #   run "change the encoding" algorithm;
-    #   throw Whatpm::HTML::RestartParser (charset => $new_encoding);
-    # }
-  };
+  $self->{change_encoding} = sub { };
   $self->{application_cache_selection} = sub {
     #
   };
