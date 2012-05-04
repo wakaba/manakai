@@ -1,0 +1,165 @@
+diff --git a/t/data/html-tokenizer/test1.test b/t/data/html-tokenizer/test1.test
+index 5de66f5..78f7409 100644
+--- a/t/data/html-tokenizer/test1.test
++++ b/t/data/html-tokenizer/test1.test
+@@ -115,7 +115,7 @@
+ 
+ {"description":"Unfinished entity",
+ "input":"&f",
+-"output":["ParseError", ["Character", "&f"]]},
++"output":[["Character", "&f"]]},
+ 
+ {"description":"Ampersand, number sign",
+ "input":"&#",
+@@ -143,11 +143,11 @@
+ 
+ {"description":"Partial entity match at end of file",
+ "input":"I'm &no",
+-"output":[["Character","I'm "], "ParseError", ["Character", "&no"]]},
++"output":[["Character","I'm &no"]]},
+ 
+ {"description":"Non-ASCII character reference name",
+ "input":"&\u00AC;",
+-"output":["ParseError", ["Character", "&\u00AC;"]]},
++"output":[["Character", "&\u00AC;"]]},
+ 
+ {"description":"ASCII decimal entity",
+ "input":"&#0036;",
+@@ -163,19 +163,19 @@
+ 
+ {"description":"Entity in attribute without semicolon ending in x",
+ "input":"<h a='&notx'>",
+-"output":["ParseError", ["StartTag", "h", {"a":"&notx"}]]},
++"output":[["StartTag", "h", {"a":"&notx"}]]},
+ 
+ {"description":"Entity in attribute without semicolon ending in 1",
+ "input":"<h a='&not1'>",
+-"output":["ParseError", ["StartTag", "h", {"a":"&not1"}]]},
++"output":[["StartTag", "h", {"a":"&not1"}]]},
+ 
+ {"description":"Entity in attribute without semicolon ending in i",
+ "input":"<h a='&noti'>",
+-"output":["ParseError", ["StartTag", "h", {"a":"&noti"}]]},
++"output":[["StartTag", "h", {"a":"&noti"}]]},
+ 
+ {"description":"Entity in attribute without semicolon",
+ "input":"<h a='&COPY'>",
+-"output":["ParseError", ["StartTag", "h", {"a":"\u00A9"}]]},
++"output":["ParseError",["StartTag", "h", {"a":"\u00A9"}]]},
+ 
+ {"description":"Unquoted attribute ending in ampersand",
+ "input":"<s o=& t>",
+diff --git a/t/data/html-tokenizer/test2.test b/t/data/html-tokenizer/test2.test
+index e157514..87a8eba 100644
+--- a/t/data/html-tokenizer/test2.test
++++ b/t/data/html-tokenizer/test2.test
+@@ -2,7 +2,7 @@
+ 
+ {"description":"DOCTYPE without name",
+ "input":"<!DOCTYPE>",
+-"output":["ParseError", "ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", "ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"DOCTYPE without space before name",
+ "input":"<!DOCTYPEhtml>",
+@@ -82,7 +82,7 @@
+ 
+ {"description":"Entity without a name",
+ "input":"&;",
+-"output":["ParseError", ["Character", "&;"]]},
++"output":[["Character", "&;"]]},
+ 
+ {"description":"Unescaped ampersand in attribute value",
+ "input":"<h a='&'>",
+diff --git a/t/data/html-tokenizer/test3.test b/t/data/html-tokenizer/test3.test
+index 58519e8..852a8f5 100644
+--- a/t/data/html-tokenizer/test3.test
++++ b/t/data/html-tokenizer/test3.test
+@@ -914,11 +914,11 @@
+ 
+ {"description":"<!DOCTYPE",
+ "input":"<!DOCTYPE",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE\\u0000",
+ "input":"<!DOCTYPE\u0000",
+-"output":["ParseError", "ParseError", "ParseError", ["DOCTYPE", "\uFFFD", null, null, false]]},
++"output":["ParseError", "ParseError", ["DOCTYPE", "\uFFFD", null, null, false]]},
+ 
+ {"description":"<!DOCTYPE\\u0008",
+ "input":"<!DOCTYPE\u0008",
+@@ -926,11 +926,11 @@
+ 
+ {"description":"<!DOCTYPE\\u0009",
+ "input":"<!DOCTYPE\u0009",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE\\u000A",
+ "input":"<!DOCTYPE\u000A",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE\\u000B",
+ "input":"<!DOCTYPE\u000B",
+@@ -938,11 +938,11 @@
+ 
+ {"description":"<!DOCTYPE\\u000C",
+ "input":"<!DOCTYPE\u000C",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE\\u000D",
+ "input":"<!DOCTYPE\u000D",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE\\u001F",
+ "input":"<!DOCTYPE\u001F",
+@@ -950,7 +950,7 @@
+ 
+ {"description":"<!DOCTYPE ",
+ "input":"<!DOCTYPE ",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE \\u0000",
+ "input":"<!DOCTYPE \u0000",
+@@ -962,11 +962,11 @@
+ 
+ {"description":"<!DOCTYPE \\u0009",
+ "input":"<!DOCTYPE \u0009",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE \\u000A",
+ "input":"<!DOCTYPE \u000A",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE \\u000B",
+ "input":"<!DOCTYPE \u000B",
+@@ -974,11 +974,11 @@
+ 
+ {"description":"<!DOCTYPE \\u000C",
+ "input":"<!DOCTYPE \u000C",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE \\u000D",
+ "input":"<!DOCTYPE \u000D",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE \\u001F",
+ "input":"<!DOCTYPE \u001F",
+@@ -986,7 +986,7 @@
+ 
+ {"description":"<!DOCTYPE  ",
+ "input":"<!DOCTYPE  ",
+-"output":["ParseError", ["DOCTYPE", "", null, null, false]]},
++"output":["ParseError", ["DOCTYPE", null, null, null, false]]},
+ 
+ {"description":"<!DOCTYPE !",
+ "input":"<!DOCTYPE !",
