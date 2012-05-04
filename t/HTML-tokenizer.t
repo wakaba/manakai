@@ -125,7 +125,7 @@ sub _tokenize_test ($$) {
         warn $args{type}, "\n" if $DEBUG;
         push @token, 'ParseError';
       };
-      $p->{insertion_mode} = Whatpm::HTML::BEFORE_HEAD_IM (); # dummy
+      $p->{insertion_mode} = Whatpm::HTML::Parser::BEFORE_HEAD_IM (); # dummy
       
       $p->_initialize_tokenizer;
       $p->{state} = {

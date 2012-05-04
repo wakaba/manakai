@@ -24,7 +24,7 @@ LANGTAG_XML_FILES = \
 all: \
   _update \
   Atom-all Charset-all CSS-all HTML-all XML-all ContentChecker-all \
-  HTML/Tokenizer.pm \
+  HTML/Tokenizer.pm HTML/Parser.pm \
   HTML.pm _NamedEntityList.pm _LinkTypeList.pm \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
   CacheManifest.html WebIDL.html mklinktypelist.html \
@@ -67,7 +67,7 @@ HTML.pm: HTML.pm.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
 	perl -I.. -c $@
 
-HTML/Tokenizer.pm: HTML/Tokenizer.pm.src mkhtmlparser.pl
+HTML/Tokenizer.pm HTML/Parser.pm:: %: %.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
 	perl -I.. -c $@
 
