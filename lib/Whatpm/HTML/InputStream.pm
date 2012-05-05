@@ -39,6 +39,8 @@ sub _clear_refs ($) {
   delete $self->{chars_pull_next};
   delete $self->{restart_parser};
   delete $self->{t};
+  delete $self->{embedded_encoding_name};
+  delete $self->{byte_buffer};
 } # _clear_refs
 
 ## ------ Error handling ------
@@ -362,6 +364,8 @@ sub _encoding_sniffing ($;%) {
     }
   }
 
+  return if $args{no_body_data_yet};
+
   ## Step 3. Sniffing
   if ($args{read_head}) {
     my $head = $args{read_head}->();
@@ -431,12 +435,12 @@ sub _change_encoding {
   ## <http://www.whatwg.org/specs/web-apps/current-work/#parsing-main-inhead>.
 
   ## "meta". Confidence is /tentative/
-  return if $self->{confident}; # tentative
+  return 0 if $self->{confident}; # tentative
 
   $name = _get_encoding_name $name;
   unless ($name) {
     ## "meta". Supported encoding
-    return;
+    return 0;
   }
 
   ## "meta". ASCII-compatible or UTF-16
@@ -449,7 +453,7 @@ sub _change_encoding {
   if ($self->{input_encoding} eq 'utf-16' or
       $self->{input_encoding} eq 'utf-16be') {
     $self->{confident} = 1; # certain
-    return;
+    return 0;
   }
 
   ## Step 2. UTF-16
@@ -458,7 +462,7 @@ sub _change_encoding {
   ## Step 3. Same
   if ($name eq $self->{input_encoding}) {
     $self->{confident} = 1; # certain
-    return;
+    return 0;
   }
 
   $self->{parse_error}->(type => 'charset label detected',
@@ -477,7 +481,7 @@ sub _change_encoding {
 
   ## Step 5. Can't restart
   $self->{confident} = 1; # certain
-  return;
+  return 0;
 
   # XXX expose info for validator
 } # _change_encoding
