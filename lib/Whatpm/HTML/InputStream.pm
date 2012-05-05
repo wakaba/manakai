@@ -38,6 +38,7 @@ sub _clear_refs ($) {
   delete $self->{chars};
   delete $self->{chars_pull_next};
   delete $self->{restart_parser};
+  delete $self->{t};
 } # _clear_refs
 
 ## ------ Character encoding processing ------

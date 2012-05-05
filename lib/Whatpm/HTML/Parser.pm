@@ -346,6 +346,7 @@ sub parse_byte_string ($$$$;$$) {
 
     $self->_initialize_tokenizer;
     $self->_initialize_tree_constructor;
+    $self->{t} = $self->_get_next_token;
     my $error;
     {
       local $@;
@@ -403,6 +404,7 @@ sub parse_char_string ($$$;$$) {
 
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
+  $self->{t} = $self->_get_next_token;
   $self->_construct_tree;
   $self->_terminate_tree_constructor;
   $self->_clear_refs;
@@ -491,390 +493,8 @@ sub _terminate_tree_constructor ($) {
 
 ## ISSUE: Should append_child (for example) in script executed in tree construction stage fire mutation events?
 
-sub _construct_tree ($) {
-  my ($self) = @_;
-
-  ## When an interactive UA render the $self->{document} available
-  ## to the user, or when it begin accepting user input, are
-  ## not defined.
-  
-  $self->{t} = $self->_get_next_token;
-  return if $self->{t}->{type} == ABORT_TOKEN;
-
-  if ($self->{insertion_mode} == INITIAL_IM) {
-    ## NOTE: The "initial" insertion mode.
-    $self->_tree_construction_initial; # MUST
-    $self->{insertion_mode} = BEFORE_HTML_IM;
-    return if $self->{t}->{type} == ABORT_TOKEN;
-  }
-  if ($self->{insertion_mode} == BEFORE_HTML_IM) {
-    ## NOTE: The "before html" insertion mode.
-    $self->_tree_construction_root_element;
-    $self->{insertion_mode} = BEFORE_HEAD_IM;
-    return if $self->{t}->{type} == ABORT_TOKEN;
-  }
-  if ($self->{insertion_mode} != INITIAL_IM and
-      $self->{insertion_mode} != BEFORE_HTML_IM) {
-    ## NOTE: The "before head" insertion mode and so on.
-    $self->_tree_construction_main;
-  }
-} # _construct_tree
-
-sub _tree_construction_initial ($) {
-  my $self = shift;
-
-  ## NOTE: "initial" insertion mode
-
-  INITIAL: {
-    if ($self->{t}->{type} == DOCTYPE_TOKEN) {
-      ## NOTE: Conformance checkers MAY, instead of reporting "not
-      ## HTML5" error, switch to a conformance checking mode for
-      ## another language.  (We don't support such mode switchings; it
-      ## is nonsense to do anything different from what browsers do.)
-      my $doctype_name = $self->{t}->{name};
-      $doctype_name = '' unless defined $doctype_name;
-      my $doctype = $self->{document}->create_document_type_definition
-          ($doctype_name);
-
-      if ($doctype_name ne 'html') {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $self->{t});
-      } elsif (defined $self->{t}->{pubid}) {
-        ## Obsolete permitted DOCTYPEs (case-sensitive)
-        my $xsysid = {
-          '-//W3C//DTD HTML 4.0//EN' => 'http://www.w3.org/TR/REC-html40/strict.dtd',
-          '-//W3C//DTD HTML 4.01//EN' => 'http://www.w3.org/TR/html4/strict.dtd',
-          '-//W3C//DTD XHTML 1.0 Strict//EN' => 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd',
-          '-//W3C//DTD XHTML 1.1//EN' => 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd',
-        }->{$self->{t}->{pubid}};
-        if (defined $xsysid and
-            (not defined $self->{t}->{sysid} or $self->{t}->{sysid} eq $xsysid)) {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'obs DOCTYPE', token => $self->{t},
-                          level => $self->{level}->{obsconforming});
-        } else {
-          
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $self->{t});
-        }
-      } elsif (defined $self->{t}->{sysid}) {
-        if ($self->{t}->{sysid} eq 'about:legacy-compat') {
-           ## <!DOCTYPE HTML SYSTEM "about:legacy-compat">
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'XSLT-compat', token => $self->{t},
-                          level => $self->{level}->{should});
-        } else {
-          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $self->{t});
-        }
-      } else { ## <!DOCTYPE HTML>
-        
-        #
-      }
-      
-      ## NOTE: Default value for both |public_id| and |system_id| attributes
-      ## are empty strings, so that we don't set any value in missing cases.
-      $doctype->public_id ($self->{t}->{pubid}) if defined $self->{t}->{pubid};
-      $doctype->system_id ($self->{t}->{sysid}) if defined $self->{t}->{sysid};
-
-      ## NOTE: Other DocumentType attributes are null or empty lists.
-      ## In Firefox3, |internalSubset| attribute is set to the empty
-      ## string, while |null| is an allowed value for the attribute
-      ## according to DOM3 Core.
-      $self->{document}->append_child ($doctype);
-      
-      if ($self->{t}->{quirks} or $doctype_name ne 'html') {
-        
-        $self->{document}->manakai_compat_mode ('quirks');
-      } elsif (defined $self->{t}->{pubid}) {
-        my $pubid = $self->{t}->{pubid};
-        $pubid =~ tr/a-z/A-Z/; ## ASCII case-insensitive.
-        my $prefix = [
-          "+//SILMARIL//DTD HTML PRO V0R11 19970101//",
-          "-//ADVASOFT LTD//DTD HTML 3.0 ASWEDIT + EXTENSIONS//",
-          "-//AS//DTD HTML 3.0 ASWEDIT + EXTENSIONS//",
-          "-//IETF//DTD HTML 2.0 LEVEL 1//",
-          "-//IETF//DTD HTML 2.0 LEVEL 2//",
-          "-//IETF//DTD HTML 2.0 STRICT LEVEL 1//",
-          "-//IETF//DTD HTML 2.0 STRICT LEVEL 2//",
-          "-//IETF//DTD HTML 2.0 STRICT//",
-          "-//IETF//DTD HTML 2.0//",
-          "-//IETF//DTD HTML 2.1E//",
-          "-//IETF//DTD HTML 3.0//",
-          "-//IETF//DTD HTML 3.2 FINAL//",
-          "-//IETF//DTD HTML 3.2//",
-          "-//IETF//DTD HTML 3//",
-          "-//IETF//DTD HTML LEVEL 0//",
-          "-//IETF//DTD HTML LEVEL 1//",
-          "-//IETF//DTD HTML LEVEL 2//",
-          "-//IETF//DTD HTML LEVEL 3//",
-          "-//IETF//DTD HTML STRICT LEVEL 0//",
-          "-//IETF//DTD HTML STRICT LEVEL 1//",
-          "-//IETF//DTD HTML STRICT LEVEL 2//",
-          "-//IETF//DTD HTML STRICT LEVEL 3//",
-          "-//IETF//DTD HTML STRICT//",
-          "-//IETF//DTD HTML//",
-          "-//METRIUS//DTD METRIUS PRESENTATIONAL//",
-          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML STRICT//",
-          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 HTML//",
-          "-//MICROSOFT//DTD INTERNET EXPLORER 2.0 TABLES//",
-          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML STRICT//",
-          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 HTML//",
-          "-//MICROSOFT//DTD INTERNET EXPLORER 3.0 TABLES//",
-          "-//NETSCAPE COMM. CORP.//DTD HTML//",
-          "-//NETSCAPE COMM. CORP.//DTD STRICT HTML//",
-          "-//O'REILLY AND ASSOCIATES//DTD HTML 2.0//",
-          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED 1.0//",
-          "-//O'REILLY AND ASSOCIATES//DTD HTML EXTENDED RELAXED 1.0//",
-          "-//SOFTQUAD SOFTWARE//DTD HOTMETAL PRO 6.0::19990601::EXTENSIONS TO HTML 4.0//",
-          "-//SOFTQUAD//DTD HOTMETAL PRO 4.0::19971010::EXTENSIONS TO HTML 4.0//",
-          "-//SPYGLASS//DTD HTML 2.0 EXTENDED//",
-          "-//SQ//DTD HTML 2.0 HOTMETAL + EXTENSIONS//",
-          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA HTML//",
-          "-//SUN MICROSYSTEMS CORP.//DTD HOTJAVA STRICT HTML//",
-          "-//W3C//DTD HTML 3 1995-03-24//",
-          "-//W3C//DTD HTML 3.2 DRAFT//",
-          "-//W3C//DTD HTML 3.2 FINAL//",
-          "-//W3C//DTD HTML 3.2//",
-          "-//W3C//DTD HTML 3.2S DRAFT//",
-          "-//W3C//DTD HTML 4.0 FRAMESET//",
-          "-//W3C//DTD HTML 4.0 TRANSITIONAL//",
-          "-//W3C//DTD HTML EXPERIMETNAL 19960712//",
-          "-//W3C//DTD HTML EXPERIMENTAL 970421//",
-          "-//W3C//DTD W3 HTML//",
-          "-//W3O//DTD W3 HTML 3.0//",
-          "-//WEBTECHS//DTD MOZILLA HTML 2.0//",
-          "-//WEBTECHS//DTD MOZILLA HTML//",
-        ]; # $prefix
-        my $match;
-        for (@$prefix) {
-          if (substr ($prefix, 0, length $_) eq $_) {
-            $match = 1;
-            last;
-          }
-        }
-        if ($match or
-            $pubid eq "-//W3O//DTD W3 HTML STRICT 3.0//EN//" or
-            $pubid eq "-/W3C/DTD HTML 4.0 TRANSITIONAL/EN" or
-            $pubid eq "HTML") {
-          
-          $self->{document}->manakai_compat_mode ('quirks');
-        } elsif ($pubid =~ m[^-//W3C//DTD HTML 4.01 FRAMESET//] or
-                 $pubid =~ m[^-//W3C//DTD HTML 4.01 TRANSITIONAL//]) {
-          if (defined $self->{t}->{sysid}) {
-            
-            $self->{document}->manakai_compat_mode ('quirks');
-          } else {
-            
-            $self->{document}->manakai_compat_mode ('limited quirks');
-          }
-        } elsif ($pubid =~ m[^-//W3C//DTD XHTML 1.0 FRAMESET//] or
-                 $pubid =~ m[^-//W3C//DTD XHTML 1.0 TRANSITIONAL//]) {
-          
-          $self->{document}->manakai_compat_mode ('limited quirks');
-        } else {
-          
-        }
-      } else {
-        
-      }
-      if (defined $self->{t}->{sysid}) {
-        my $sysid = $self->{t}->{sysid};
-        $sysid =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
-        if ($sysid eq "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd") {
-          ## NOTE: Ensure that |PUBLIC "(limited quirks)" "(quirks)"|
-          ## is signaled as in quirks mode!
-          $self->{document}->manakai_compat_mode ('quirks');
-          
-        } else {
-          
-        }
-      } else {
-        
-      }
-      
-      ## Go to the "before html" insertion mode.
-      $self->{t} = $self->_get_next_token;
-      return;
-    } elsif ({
-              START_TAG_TOKEN, 1,
-              END_TAG_TOKEN, 1,
-              END_OF_FILE_TOKEN, 1,
-             }->{$self->{t}->{type}}) {
-      unless ($self->{document}->manakai_is_srcdoc) {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $self->{t});
-        $self->{document}->manakai_compat_mode ('quirks');
-      } else {
-        
-      }
-      ## Go to the "before html" insertion mode.
-      ## reprocess
-      
-      return;
-    } elsif ($self->{t}->{type} == CHARACTER_TOKEN) {
-      if ($self->{t}->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
-        ## Ignore the token
-
-        unless (length $self->{t}->{data}) {
-          
-          ## Stay in the insertion mode.
-          $self->{t} = $self->_get_next_token;
-          redo INITIAL;
-        } else {
-          
-        }
-      } else {
-        
-      }
-      
-      unless ($self->{document}->manakai_is_srcdoc) {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $self->{t});
-        $self->{document}->manakai_compat_mode ('quirks');
-      } else {
-        
-      }
-      ## Go to the "before html" insertion mode.
-      ## reprocess
-      return;
-    } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
-      
-      my $comment = $self->{document}->create_comment ($self->{t}->{data});
-      $self->{document}->append_child ($comment);
-      
-      ## Stay in the insertion mode.
-      $self->{t} = $self->_get_next_token;
-      redo INITIAL;
-    } else {
-      die "$0: $self->{t}->{type}: Unknown token type";
-    }
-  } # INITIAL
-
-  die "$0: _tree_construction_initial: This should be never reached";
-} # _tree_construction_initial
-
-sub _tree_construction_root_element ($) {
-  my $self = shift;
-
-  ## NOTE: The "before html" insertion mode.
-  
-  B: {
-    if ($self->{t}->{type} == DOCTYPE_TOKEN) {
-      
-      $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#DOCTYPE', token => $self->{t});
-      ## Ignore the token.
-      $self->{t} = $self->_get_next_token;
-      redo B;
-    } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
-      
-      my $comment = $self->{document}->create_comment ($self->{t}->{data});
-      $self->{document}->append_child ($comment);
-      $self->{t} = $self->_get_next_token;
-      redo B;
-    } elsif ($self->{t}->{type} == CHARACTER_TOKEN) {
-      if ($self->{t}->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
-        ## Ignore the token.
-        
-        unless (length $self->{t}->{data}) {
-          
-          $self->{t} = $self->_get_next_token;
-          redo B;
-        } else {
-          
-        }
-      } else {
-        
-      }
-      
-      $self->{application_cache_selection}->(undef);
-      
-      #
-    } elsif ($self->{t}->{type} == START_TAG_TOKEN) {
-      if ($self->{t}->{tag_name} eq 'html') {
-        my $root_element;
-        
-      $root_element = $self->{document}->create_element_ns
-        (HTML_NS, [undef,  $self->{t}->{tag_name}]);
-    
-        for my $attr_name (keys %{ $self->{t}->{attributes}}) {
-          my $attr_t =  $self->{t}->{attributes}->{$attr_name};
-          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
-          $attr->value ($attr_t->{value});
-          $attr->set_user_data (manakai_source_line => $attr_t->{line});
-          $attr->set_user_data (manakai_source_column => $attr_t->{column});
-          $root_element->set_attribute_node_ns ($attr);
-        }
-      
-        $root_element->set_user_data (manakai_source_line => $self->{t}->{line})
-            if defined $self->{t}->{line};
-        $root_element->set_user_data (manakai_source_column => $self->{t}->{column})
-            if defined $self->{t}->{column};
-      
-        $self->{document}->append_child ($root_element);
-        push @{$self->{open_elements}}, [$root_element, $el_category->{html}];
-        
-        if ($self->{t}->{attributes}->{manifest}) {
-          
-          ## XXX resolve URL and drop fragment
-          ## <http://html5.org/tools/web-apps-tracker?from=3479&to=3480>
-          ## <http://manakai.g.hatena.ne.jp/task/2/95>
-          $self->{application_cache_selection}
-              ->($self->{t}->{attributes}->{manifest}->{value});
-        } else {
-          
-          $self->{application_cache_selection}->(undef);
-        }
-        
-        
-        
-        $self->{t} = $self->_get_next_token;
-        return; ## Go to the "before head" insertion mode.
-      } else {
-        
-        #
-      }
-    } elsif ($self->{t}->{type} == END_TAG_TOKEN) {
-      if ({
-        head => 1, body => 1, html => 1, br => 1,
-      }->{$self->{t}->{tag_name}}) {
-        
-        #
-      } else {
-        
-        $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
-                        text => $self->{t}->{tag_name},
-                        token => $self->{t});
-        ## Ignore the token.
-        $self->{t} = $self->_get_next_token;
-        redo B;
-      }
-    } elsif ($self->{t}->{type} == END_OF_FILE_TOKEN) {
-      
-      #
-    } else {
-      die "$0: $self->{t}->{type}: Unknown token type";
-    }
-
-    my $root_element;
-    
-      $root_element = $self->{document}->create_element_ns
-        (HTML_NS, [undef,  'html']);
-    
-        $root_element->set_user_data (manakai_source_line => $self->{t}->{line})
-            if defined $self->{t}->{line};
-        $root_element->set_user_data (manakai_source_column => $self->{t}->{column})
-            if defined $self->{t}->{column};
-      
-    $self->{document}->append_child ($root_element);
-    push @{$self->{open_elements}}, [$root_element, $el_category->{html}];
-
-    $self->{application_cache_selection}->(undef);
-
-    ## NOTE: Reprocess the token.
-    
-    return; ## Go to the "before head" insertion mode.
-  } # B
-
-  die "$0: _tree_construction_root_element: This should never be reached";
-} # _tree_construction_root_element
+## When an interactive UA render the $self->{document} available to
+## the user, or when it begin accepting user input, are not defined.
 
 sub _reset_insertion_mode ($) {
   my $self = shift;
@@ -1505,8 +1125,8 @@ sub push_afe ($$) {
     }
   }; # $insert_to_foster
 
-sub _tree_construction_main ($) {
-  my $self = shift;
+sub _construct_tree ($) {
+  my $self = $_[0];
 
   ## "List of active formatting elements".  Each item in this array is
   ## an array reference, which contains: [0] - the element node; [1] -
@@ -1519,7 +1139,7 @@ sub _tree_construction_main ($) {
   ## NOTE: $open_tables->[-1]->[0] is the "current table" element node.
   ## NOTE: $open_tables->[-1]->[1] is the "tainted" flag (OBSOLETE; unused).
   ## NOTE: $open_tables->[-1]->[2] is set false when non-Text node inserted.
-  my $open_tables = $self->{open_tables} ||= [[$self->{open_elements}->[0]->[0]]];
+  my $open_tables = $self->{open_tables} ||= [];
 
   B: while (1) {
     
@@ -1539,7 +1159,296 @@ sub _tree_construction_main ($) {
       next B;
     }
 
-    ## <http://c.whatwg.org/#tree-construction>
+    if ($self->{insertion_mode} == INITIAL_IM) {
+      if ($self->{t}->{type} == DOCTYPE_TOKEN) {
+        ## NOTE: Conformance checkers MAY, instead of reporting "not
+        ## HTML5" error, switch to a conformance checking mode for
+        ## another language.  (We don't support such mode switchings;
+        ## it is nonsense to do anything different from what browsers
+        ## do.)
+        my $doctype_name = $self->{t}->{name};
+        $doctype_name = '' unless defined $doctype_name;
+        my $doctype = $self->{document}->create_document_type_definition
+            ($doctype_name);
+        
+        if ($doctype_name ne 'html') {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $self->{t});
+        } elsif (defined $self->{t}->{pubid}) {
+          ## Obsolete permitted DOCTYPEs (case-sensitive)
+          my $xsysid = $Whatpm::HTML::ParserData::ObsoletePermittedDoctypes
+              ->{$self->{t}->{pubid}};
+          if (defined $xsysid and
+              (not defined $self->{t}->{sysid} or
+               $self->{t}->{sysid} eq $xsysid)) {
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'obs DOCTYPE', token => $self->{t},
+                            level => $self->{level}->{obsconforming});
+          } else {
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $self->{t});
+          }
+        } elsif (defined $self->{t}->{sysid}) {
+          if ($self->{t}->{sysid} eq 'about:legacy-compat') {
+            ## <!DOCTYPE HTML SYSTEM "about:legacy-compat">
+            
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'XSLT-compat', token => $self->{t},
+                            level => $self->{level}->{should});
+          } else {
+            $self->{parse_error}->(level => $self->{level}->{must}, type => 'not HTML5', token => $self->{t});
+          }
+        } else { ## <!DOCTYPE HTML>
+          
+          #
+        }
+        
+        ## NOTE: Default value for both |public_id| and |system_id|
+        ## attributes are empty strings, so that we don't set any
+        ## value in missing cases.
+        $doctype->public_id ($self->{t}->{pubid})
+            if defined $self->{t}->{pubid};
+        $doctype->system_id ($self->{t}->{sysid})
+            if defined $self->{t}->{sysid};
+        
+        ## NOTE: Other DocumentType attributes are null or empty
+        ## lists.  In Firefox3, |internalSubset| attribute is set to
+        ## the empty string, while |null| is an allowed value for the
+        ## attribute according to DOM3 Core.
+
+        $self->{document}->append_child ($doctype);
+        
+        if ($self->{t}->{quirks} or $doctype_name ne 'html') {
+          
+          $self->{document}->manakai_compat_mode ('quirks');
+        } elsif (defined $self->{t}->{pubid}) {
+          my $pubid = $self->{t}->{pubid};
+          $pubid =~ tr/a-z/A-Z/; ## ASCII case-insensitive.
+          my $prefix = $Whatpm::HTML::ParserData::QuirkyPublicIDPrefixes;
+          my $match;
+          for (@$prefix) {
+            if (substr ($pubid, 0, length $_) eq $_) {
+              $match = 1;
+              last;
+            }
+          }
+          if ($match or
+              $Whatpm::HTML::ParserData::QuirkyPublicIDs->{$pubid}) {
+            
+            $self->{document}->manakai_compat_mode ('quirks');
+          } elsif ($pubid =~ m[^-//W3C//DTD HTML 4.01 FRAMESET//] or
+                   $pubid =~ m[^-//W3C//DTD HTML 4.01 TRANSITIONAL//]) {
+            if (defined $self->{t}->{sysid}) {
+              
+              $self->{document}->manakai_compat_mode ('quirks');
+            } else {
+              
+              $self->{document}->manakai_compat_mode ('limited quirks');
+            }
+          } elsif ($pubid =~ m[^-//W3C//DTD XHTML 1.0 FRAMESET//] or
+                   $pubid =~ m[^-//W3C//DTD XHTML 1.0 TRANSITIONAL//]) {
+            
+            $self->{document}->manakai_compat_mode ('limited quirks');
+          } else {
+            
+          }
+        } else {
+          
+        }
+        if (defined $self->{t}->{sysid}) {
+          my $sysid = $self->{t}->{sysid};
+          $sysid =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+          if ($sysid eq "http://www.ibm.com/data/dtd/v11/ibmxhtml1-transitional.dtd") {
+            ## NOTE: Ensure that |PUBLIC "(limited quirks)"
+            ## "(quirks)"| is signaled as in quirks mode!
+            $self->{document}->manakai_compat_mode ('quirks');
+            
+          } else {
+            
+          }
+        } else {
+          
+        }
+        
+        $self->{insertion_mode} = BEFORE_HTML_IM;
+        $self->{t} = $self->_get_next_token;
+        next B;
+      } elsif ({
+                START_TAG_TOKEN, 1,
+                END_TAG_TOKEN, 1,
+                END_OF_FILE_TOKEN, 1,
+               }->{$self->{t}->{type}}) {
+        unless ($self->{document}->manakai_is_srcdoc) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $self->{t});
+          $self->{document}->manakai_compat_mode ('quirks');
+        } else {
+          
+        }
+        $self->{insertion_mode} = BEFORE_HTML_IM;
+        ## Reprocess the token.
+        
+        redo B;
+      } elsif ($self->{t}->{type} == CHARACTER_TOKEN) {
+        if ($self->{t}->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
+          ## Ignore the token
+          
+          unless (length $self->{t}->{data}) {
+            
+            ## Stay in the insertion mode.
+            $self->{t} = $self->_get_next_token;
+            redo B;
+          } else {
+            
+          }
+        } else {
+          
+        }
+        
+        unless ($self->{document}->manakai_is_srcdoc) {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'no DOCTYPE', token => $self->{t});
+          $self->{document}->manakai_compat_mode ('quirks');
+        } else {
+          
+        }
+        $self->{insertion_mode} = BEFORE_HTML_IM;
+        ## Reprocess the token.
+        redo B;
+      } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
+        
+        my $comment = $self->{document}->create_comment
+            ($self->{t}->{data});
+        $self->{document}->append_child ($comment);
+        
+        ## Stay in the insertion mode.
+        $self->{t} = $self->_get_next_token;
+        next B;
+      } else {
+        die "$0: $self->{t}->{type}: Unknown token type";
+      }
+    } elsif ($self->{insertion_mode} == BEFORE_HTML_IM) {
+      if ($self->{t}->{type} == DOCTYPE_TOKEN) {
+        
+        $self->{parse_error}->(level => $self->{level}->{must}, type => 'in html:#DOCTYPE', token => $self->{t});
+        ## Ignore the token.
+        $self->{t} = $self->_get_next_token;
+        redo B;
+      } elsif ($self->{t}->{type} == COMMENT_TOKEN) {
+        
+        my $comment = $self->{document}->create_comment
+            ($self->{t}->{data});
+        $self->{document}->append_child ($comment);
+        $self->{t} = $self->_get_next_token;
+        redo B;
+      } elsif ($self->{t}->{type} == CHARACTER_TOKEN) {
+        if ($self->{t}->{data} =~ s/^([\x09\x0A\x0C\x20]+)//) {
+          ## Ignore the token.
+          
+          unless (length $self->{t}->{data}) {
+            
+            $self->{t} = $self->_get_next_token;
+            redo B;
+          } else {
+            
+          }
+        } else {
+          
+        }
+        
+        $self->{application_cache_selection}->(undef);
+        
+        #
+      } elsif ($self->{t}->{type} == START_TAG_TOKEN) {
+        if ($self->{t}->{tag_name} eq 'html') {
+          my $root_element;
+          
+      $root_element = $self->{document}->create_element_ns
+        (HTML_NS, [undef,  $self->{t}->{tag_name}]);
+    
+        for my $attr_name (keys %{ $self->{t}->{attributes}}) {
+          my $attr_t =  $self->{t}->{attributes}->{$attr_name};
+          my $attr = $self->{document}->create_attribute_ns (undef, [undef, $attr_name]);
+          $attr->value ($attr_t->{value});
+          $attr->set_user_data (manakai_source_line => $attr_t->{line});
+          $attr->set_user_data (manakai_source_column => $attr_t->{column});
+          $root_element->set_attribute_node_ns ($attr);
+        }
+      
+        $root_element->set_user_data (manakai_source_line => $self->{t}->{line})
+            if defined $self->{t}->{line};
+        $root_element->set_user_data (manakai_source_column => $self->{t}->{column})
+            if defined $self->{t}->{column};
+      
+          $self->{document}->append_child ($root_element);
+          push @{$self->{open_elements}},
+              [$root_element, $el_category->{html}];
+          
+          if ($self->{t}->{attributes}->{manifest}) {
+            
+            ## XXX resolve URL and drop fragment
+            ## <http://html5.org/tools/web-apps-tracker?from=3479&to=3480>
+            ## <http://manakai.g.hatena.ne.jp/task/2/95>
+            $self->{application_cache_selection}
+                 ->($self->{t}->{attributes}->{manifest}->{value});
+          } else {
+            
+            $self->{application_cache_selection}->(undef);
+          }
+          
+          
+          
+          $self->{t} = $self->_get_next_token;
+          $self->{insertion_mode} = BEFORE_HEAD_IM;
+          next B;
+        } else {
+          
+          #
+        }
+      } elsif ($self->{t}->{type} == END_TAG_TOKEN) {
+        if ({
+             head => 1, body => 1, html => 1, br => 1,
+            }->{$self->{t}->{tag_name}}) {
+          
+          #
+        } else {
+          
+          $self->{parse_error}->(level => $self->{level}->{must}, type => 'unmatched end tag',
+                          text => $self->{t}->{tag_name},
+                          token => $self->{t});
+          ## Ignore the token.
+          $self->{t} = $self->_get_next_token;
+          redo B;
+        }
+      } elsif ($self->{t}->{type} == END_OF_FILE_TOKEN) {
+        
+        #
+      } else {
+        die "$0: $self->{t}->{type}: Unknown token type";
+      }
+      
+      my $root_element;
+      
+      $root_element = $self->{document}->create_element_ns
+        (HTML_NS, [undef,  'html']);
+    
+        $root_element->set_user_data (manakai_source_line => $self->{t}->{line})
+            if defined $self->{t}->{line};
+        $root_element->set_user_data (manakai_source_column => $self->{t}->{column})
+            if defined $self->{t}->{column};
+      
+      $self->{document}->append_child ($root_element);
+      push @{$self->{open_elements}},
+          [$root_element, $el_category->{html}];
+      push @$open_tables, [[$root_element]];
+      
+      $self->{application_cache_selection}->(undef);
+      
+      ## Reprocess the token.
+      
+      $self->{insertion_mode} = BEFORE_HEAD_IM;
+      redo B;
+    } # insertion mode
+
     if (
       (not @{$self->{open_elements}}) or
       (not $self->{open_elements}->[-1]->[1] & FOREIGN_EL) or ## HTML element
@@ -6641,6 +6550,7 @@ sub set_inner_html ($$$$) {
 
     ## F4.4.
     push @{$p->{open_elements}}, [$root, $el_category->{html}];
+    $p->{open_tables} = [[$root]];
 
     undef $p->{head_element};
 
@@ -6667,11 +6577,8 @@ sub set_inner_html ($$$$) {
     $p->{confident} = 1; ## Confident: irrelevant.
 
     ## F.6. Start the parser.
-    {
-      my $self = $p;
-      $self->{t} = $self->_get_next_token;
-    }
-    $p->_tree_construction_main;
+    $p->{t} = $p->_get_next_token;
+    $p->_construct_tree;
 
     ## F.7.
     my @cn = @{$node->child_nodes};

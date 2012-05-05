@@ -78,6 +78,7 @@ sub parse_byte_stream ($$$$;$$) {
 
     $self->_initialize_tokenizer;
     $self->_initialize_tree_constructor;
+    $self->{t} = $self->_get_next_token;
     {
       my $error;
       {
@@ -143,6 +144,7 @@ sub parse_char_stream ($$$;$$) {
 
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
+  $self->{t} = $self->_get_next_token;
   {
     $self->_construct_tree;
     redo if $self->{nc} != EOF_CHAR;
