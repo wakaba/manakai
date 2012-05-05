@@ -37,6 +37,7 @@ sub parse_char_string ($$$;$$) {
 
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
+  $self->{t} = $self->_get_next_token;
   $self->_construct_tree;
   $self->_terminate_tree_constructor;
   $self->_clear_refs;
@@ -85,15 +86,26 @@ sub parse_char_stream ($$$;$$) {
 
   $self->_initialize_tokenizer;
   $self->_initialize_tree_constructor;
+  $self->{t} = $self->_get_next_token;
   {
     $self->_construct_tree;
-    redo if $self->{nc} != -1; # EOF_CHAR
+    redo if $self->{nc} != EOF_CHAR;
   }
   $self->_terminate_tree_constructor;
   $self->_clear_refs;
 
   return $doc;
 } # parse_char_stream
+
+## ------ Tree construction ------
+
+## Insertion modes
+sub BEFORE_XML_DECL_IM () { 0 }
+sub AFTER_XML_DECL_IM () { 1 }
+sub BEFORE_ROOT_ELEMENT_IM () { 2 }
+sub IN_ELEMENT_IM () { 3 }
+sub AFTER_ROOT_ELEMENT_IM () { 4 }
+sub IN_SUBSET_IM () { 5 }
 
 sub _initialize_tree_constructor ($) {
   my $self = shift;
@@ -112,6 +124,10 @@ sub _initialize_tree_constructor ($) {
   $self->{ge}->{'gt;'} = {value => '>', only_text => 1};
   $self->{ge}->{'lt;'} = {value => '<', only_text => 1};
   $self->{ge}->{'quot;'} = {value => '"', only_text => 1};
+
+  delete $self->{tainted};
+  $self->{open_elements} = [];
+  $self->{insertion_mode} = BEFORE_XML_DECL_IM;
 } # _initialize_tree_constructor
 
 sub _terminate_tree_constructor ($) {
@@ -133,22 +149,32 @@ sub _terminate_tree_constructor ($) {
 ## XML5: Start, main, end phases.  In this implementation, they are
 ## represented by insertion modes.
 
-## Insertion modes
-sub INITIAL_IM () { 0 }
-sub BEFORE_ROOT_ELEMENT_IM () { 1 }
-sub IN_ELEMENT_IM () { 2 }
-sub AFTER_ROOT_ELEMENT_IM () { 3 }
-sub IN_SUBSET_IM () { 4 }
-
 sub _construct_tree ($) {
   my ($self) = @_;
+  while (1) {
+    if ($self->{insertion_mode} == IN_ELEMENT_IM) {
+      $self->_tree_in_element;
+    } elsif ($self->{insertion_mode} == IN_SUBSET_IM) {
+      $self->_tree_in_subset;
+    } elsif ($self->{insertion_mode} == AFTER_ROOT_ELEMENT_IM) {
+      $self->_tree_after_root_element;
+    } elsif ($self->{insertion_mode} == BEFORE_ROOT_ELEMENT_IM) {
+      $self->_tree_before_root_element;
+    } elsif ($self->{insertion_mode} == AFTER_XML_DECL_IM) {
+      $self->_tree_after_xml_decl;
+    } elsif ($self->{insertion_mode} == BEFORE_XML_DECL_IM) {
+      $self->_tree_before_xml_decl;
+    } else {
+      die "$0: Unknown XML insertion mode: $self->{insertion_mode}";
+    }
 
-  delete $self->{tainted};
-  $self->{open_elements} = [];
-  $self->{insertion_mode} = INITIAL_IM;
+    last if $self->{t}->{type} == ABORT_TOKEN;
+  }
+} # _construct_tree
 
-  $self->{t} = $self->_get_next_token;
-
+sub _tree_before_xml_decl ($) {
+  my $self = $_[0];
+  
   ## XML5: No support for the XML declaration
   if ($self->{t}->{type} == PI_TOKEN and
       $self->{t}->{target} eq 'xml' and
@@ -165,33 +191,22 @@ sub _construct_tree ($) {
     $self->{document}->xml_encoding (defined $3 ? $3 : $4); # possibly undef
     $self->{document}->xml_standalone (($5 || $6 || 'no') ne 'no');
 
+    $self->{insertion_mode} = AFTER_XML_DECL_IM;
     $self->{t} = $self->_get_next_token;
+    return;
+  } elsif ($self->{t}->{type} == ABORT_TOKEN) {
+    return;
   } else {
     $self->{document}->xml_version ('1.0');
     $self->{document}->xml_encoding (undef);
     $self->{document}->xml_standalone (0);
+    $self->{insertion_mode} = AFTER_XML_DECL_IM;
+    ## Reconsume the token,
+    return;
   }
-  
-  while (1) {
-    if ($self->{insertion_mode} == IN_ELEMENT_IM) {
-      $self->_tree_in_element;
-    } elsif ($self->{insertion_mode} == IN_SUBSET_IM) {
-      $self->_tree_in_subset;
-    } elsif ($self->{insertion_mode} == AFTER_ROOT_ELEMENT_IM) {
-      $self->_tree_after_root_element;
-    } elsif ($self->{insertion_mode} == BEFORE_ROOT_ELEMENT_IM) {
-      $self->_tree_before_root_element;
-    } elsif ($self->{insertion_mode} == INITIAL_IM) {
-      $self->_tree_initial;
-    } else {
-      die "$0: Unknown XML insertion mode: $self->{insertion_mode}";
-    }
+} # _tree_before_xml_decl
 
-    last if $self->{t}->{type} == ABORT_TOKEN;
-  }
-} # _construct_tree
-
-sub _tree_initial ($) {
+sub _tree_after_xml_decl ($) {
   my $self = shift;
 
   B: while (1) {
