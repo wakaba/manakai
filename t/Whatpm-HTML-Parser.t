@@ -245,7 +245,7 @@ sub _parse_char_string : Test(4) {
   is $doc->manakai_is_html, 1;
 } # _parse_char_string
 
-sub _parse_char_string_onerror : Test(2) {
+sub _parse_char_string_onerror_old : Test(2) {
   my $dom = Message::DOM::DOMImplementation->new;
   my $doc = $dom->create_document;
   my $input = qq{<html lang=en>};
@@ -262,7 +262,27 @@ sub _parse_char_string_onerror : Test(2) {
     line => 1,
     column => 14,
   }];
-} # _parse_char_string_onerror
+} # _parse_char_string_onerror_old
+
+sub _parse_char_string_onerror_new : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $input = qq{<html lang=en>};
+  my $parser = Whatpm::HTML::Parser->new;
+  my @error;
+  $parser->onerror (sub {
+    push @error, {@_};
+  });
+  $parser->parse_char_string ($input => $doc);
+  ok $error[0]->{token};
+  delete $error[0]->{token};
+  eq_or_diff \@error, [{
+    type => 'no DOCTYPE',
+    level => 'm',
+    line => 1,
+    column => 14,
+  }];
+} # _parse_char_string_onerror_new
 
 sub _parse_char_string_old_children : Test(3) {
   my $dom = Message::DOM::DOMImplementation->new;
@@ -309,6 +329,26 @@ sub _parse_byte_string_utf8 : Test(2) {
   eq_or_diff $doc->inner_html, qq{<html lang="en"><head></head><body>\x{03ef}\x{fffd}\x21\x21</body></html>};
   is $doc->input_encoding, 'utf-8';
 } # _parse_byte_string_utf8
+
+sub _parse_byte_string_onerror_new : Test(2) {
+  my $dom = Message::DOM::DOMImplementation->new;
+  my $doc = $dom->create_document;
+  my $input = qq{<html lang=en>\xC3\xAC};
+  my $parser = Whatpm::HTML::Parser->new;
+  my @error;
+  $parser->onerror (sub {
+    push @error, {@_};
+  });
+  $parser->parse_byte_string ('utf-8', $input => $doc);
+  ok $error[0]->{token};
+  delete $error[0]->{token};
+  eq_or_diff \@error, [{
+    type => 'no DOCTYPE',
+    level => 'm',
+    line => 1,
+    column => 15,
+  }];
+} # _parse_byte_string_onerror_new
 
 __PACKAGE__->runtests;
 

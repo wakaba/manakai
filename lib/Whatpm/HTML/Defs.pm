@@ -261,15 +261,6 @@ push @EXPORT, qw(FOREIGN_EL);
 
 sub FOREIGN_EL () { 0b1_00000000000 }
 
-## ------ Error handling ------
-
-our $DefaultErrorHandler = sub {
-  my (%opt) = @_;
-  my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
-  my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
-  warn "Parse error ($opt{type}) at line $line column $column\n";
-}; # $DefaultErrorHandler
-
 1;
 
 =head1 LICENSE

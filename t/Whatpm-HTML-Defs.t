@@ -25,10 +25,6 @@ sub _elements : Test(1) {
   ok FOREIGN_EL;
 } # _elements
 
-sub _error : Test(1) {
-  is ref $Whatpm::HTML::Defs::DefaultErrorHandler, 'CODE';
-} # _error
-
 __PACKAGE__->runtests;
 
 1;

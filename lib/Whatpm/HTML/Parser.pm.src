@@ -339,7 +339,7 @@ sub parse_byte_string ($$$$;$$) {
       die bless {}, 'Whatpm::HTML::InputStream::RestartParser';
     };
 
-    my $onerror = $_[4] || $Whatpm::HTML::Defs::DefaultErrorHandler;
+    my $onerror = $_[4] || $self->onerror;
     $self->{parse_error} = sub {
       $onerror->(line => $self->{line}, column => $self->{column}, @_);
     };
@@ -397,7 +397,7 @@ sub parse_char_string ($$$;$$) {
   $self->{chars_pull_next} = sub { 0 };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
+  my $onerror = $_[3] || $self->onerror;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
@@ -5332,7 +5332,7 @@ sub set_inner_html ($$$$) {
     $self->{chars_pull_next} = sub { 0 };
     delete $self->{chars_was_cr};
 
-    my $ponerror = $onerror || $Whatpm::HTML::Defs::DefaultErrorHandler;
+    my $ponerror = $onerror || $self->onerror;
     $p->{parse_error} = sub {
       $ponerror->(line => $p->{line}, column => $p->{column}, @_);
     };

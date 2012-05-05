@@ -71,7 +71,7 @@ sub parse_byte_stream ($$$$;$$) {
       die bless {}, 'Whatpm::HTML::InputStream::RestartParser';
     };
 
-    my $onerror = $_[4] || $Whatpm::HTML::Defs::DefaultErrorHandler;
+    my $onerror = $_[4] || $self->onerror;
     $self->{parse_error} = sub {
       $onerror->(line => $self->{line}, column => $self->{column}, @_);
     };
@@ -137,7 +137,7 @@ sub parse_char_stream ($$$;$$) {
   };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
+  my $onerror = $_[3] || $self->onerror;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };

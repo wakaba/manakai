@@ -41,6 +41,22 @@ sub _clear_refs ($) {
   delete $self->{t};
 } # _clear_refs
 
+## ------ Error handling ------
+
+our $DefaultErrorHandler = sub {
+  my (%opt) = @_;
+  my $line = $opt{token} ? $opt{token}->{line} : $opt{line};
+  my $column = $opt{token} ? $opt{token}->{column} : $opt{column};
+  warn "Parse error ($opt{type}) at line $line column $column\n";
+}; # $DefaultErrorHandler
+
+sub onerror ($;$) {
+  if (@_ > 1) {
+    $_[0]->{onerror} = $_[1];
+  }
+  return $_[0]->{onerror} || $DefaultErrorHandler;
+} # onerror
+
 ## ------ Character encoding processing ------
 
 ## XXX Encoding Standard support

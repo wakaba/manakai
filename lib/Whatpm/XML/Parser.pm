@@ -28,7 +28,7 @@ sub parse_char_string ($$$;$$) {
   $self->{chars_pull_next} = sub { 0 };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
+  my $onerror = $_[3] || $self->onerror;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
@@ -77,7 +77,7 @@ sub parse_char_stream ($$$;$$) {
   };
   delete $self->{chars_was_cr};
 
-  my $onerror = $_[3] || $Whatpm::HTML::Defs::DefaultErrorHandler;
+  my $onerror = $_[3] || $self->onerror;
   $self->{parse_error} = sub {
     $onerror->(line => $self->{line}, column => $self->{column}, @_);
   };
