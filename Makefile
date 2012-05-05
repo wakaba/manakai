@@ -15,7 +15,8 @@ Makefile.setupenv:
 	wget -O $@ https://raw.github.com/wakaba/perl-setupenv/master/Makefile.setupenv
 
 config/perl/libs.txt local-perl generatepm \
-perl-exec perl-version carton-install carton-update \
+perl-exec perl-version \
+carton-install carton-update carton-install-module \
 : %: Makefile-setupenv
 	make --makefile Makefile.setupenv pmbundler-repo-update $@ \
             PMBUNDLER_REPO_URL=$(PMBUNDLER_REPO_URL)
