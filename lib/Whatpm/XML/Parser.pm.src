@@ -2,7 +2,7 @@ package Whatpm::XML::Parser; # -*- Perl -*-
 use strict;
 use warnings;
 no warnings 'utf8';
-our $VERSION = '2.1';
+our $VERSION = '3.0';
 use Whatpm::HTML::Defs;
 use Whatpm::HTML::InputStream;
 use Whatpm::HTML::Tokenizer;
@@ -1077,3 +1077,12 @@ sub _tree_in_subset ($) {
 } # _tree_in_subset
 
 1;
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
