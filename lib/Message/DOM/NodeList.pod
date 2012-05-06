@@ -1,0 +1,71 @@
+=head1 NAME
+
+Message::DOM::NodeList - DOM |NodeList| interface
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::NodeList> implements the DOM C<NodeList>
+interface.
+
+=head1 METHODS
+
+The C<NodeList> object has following methods:
+
+=over 4
+
+=item $length = scalar @$nodelist
+
+=item $length = $nodelist->length
+
+Return the number of the items in the list.  [DOM] [DOMPERL]
+
+=item $item = $nodelist->[$index]
+
+=item $item = $nodelist->item ($index)
+
+Return an item in the list.  [DOM] [DOMPERL]
+
+=item $boolean = $nodelist->manakai_read_only
+
+Return whether the list is read-only or not.  [MANAKAI]
+
+=item @$nodelist = ()
+
+Remove all items from the list.  This operation is not supported for
+read-only lists.  [DOMPERL]
+
+=back
+
+=head1 SPECIFICATIONS
+
+=over 4
+
+=item [DOM]
+
+DOM
+<http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#interface-nodelist>.
+
+=item [MANAKAI]
+
+manakai DOM Extensions
+<http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions>.
+
+=item [DOMPERL]
+
+manakai's DOM Perl Binding
+<http://suika.fam.cx/~wakaba/wiki/sw/n/manakai's%20DOM%20Perl%20Binding>.
+
+=back
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

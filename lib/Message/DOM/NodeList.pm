@@ -1,6 +1,7 @@
 package Message::DOM::NodeList;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.6 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '2.0';
 push our @ISA, 'Tie::Array', 'Message::IF::NodeList';
 require Message::DOM::DOMException;
 require Tie::Array;
@@ -18,6 +19,9 @@ use overload
       return not ($_[0] eq $_[1]);
     },
     '==' => sub {
+      ## XXX Do we really need this overloading?  Should we delete
+      ## this from our DOM Perl binding spec?
+
       ## NOTE: Same as |StaticNodeList|'s.
       return 0 unless UNIVERSAL::isa ($_[1], 'Message::IF::NodeList');
       
@@ -91,6 +95,8 @@ sub FETCH ($$) {
   return ${$${$_[0]}}->{child_nodes}->[$_[1]];
 } # FETCH
 
+## XXX Maybe we will drop this operation, as this operaton sometimes
+## diverses from Perl's assignment semantics.
 sub STORE ($$$) {
   my $self = $_[0];
   my $list = ${$$$self}->{child_nodes};
@@ -105,6 +111,8 @@ sub STORE ($$$) {
   }
 } # STORE
 
+## XXX Maybe we will drop this operation, as this operaton differs
+## from Perl's |delete| semantics.
 sub DELETE ($$) {
   my $self = $_[0];
   my $list = ${$$$self}->{child_nodes};
@@ -274,14 +282,13 @@ package Message::IF::NodeList;
 package Message::IF::StaticNodeList;
 push our @ISA, 'Message::IF::NodeList';
 
+1;
+
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
-
-1;
-## $Date: 2007/12/22 06:29:32 $

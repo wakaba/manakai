@@ -1,0 +1,113 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Message::DOM::NodeList - DOM |NodeList| interface</title>
+<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#specifications">SPECIFICATIONS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#license">LICENSE</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Message::DOM::NodeList - DOM |NodeList| interface</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <code>Message::DOM::NodeList</code> implements the DOM <code>NodeList</code>
+interface.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>The <code>NodeList</code> object has following methods:</p>
+<dl>
+<dt><strong><a name="_length" class="item">$length = scalar @$nodelist</a></strong></dt>
+
+<dt><strong><a name="length" class="item">$length = $nodelist-&gt;length</a></strong></dt>
+
+<dd>
+<p>Return the number of the items in the list.  [DOM] [DOMPERL]</p>
+</dd>
+<dt><strong><a name="_item" class="item">$item = $nodelist-&gt;[$index]</a></strong></dt>
+
+<dt><strong><a name="item" class="item">$item = $nodelist-&gt;item ($index)</a></strong></dt>
+
+<dd>
+<p>Return an item in the list.  [DOM] [DOMPERL]</p>
+</dd>
+<dt><strong><a name="manakai_read_only" class="item">$boolean = $nodelist-&gt;manakai_read_only</a></strong></dt>
+
+<dd>
+<p>Return whether the list is read-only or not.  [MANAKAI]</p>
+</dd>
+<dt><strong><a name="__nodelist" class="item">@$nodelist = ()</a></strong></dt>
+
+<dd>
+<p>Remove all items from the list.  This operation is not supported for
+read-only lists.  [DOMPERL]</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="specifications">SPECIFICATIONS</a></h1>
+<dl>
+<dt><strong><a name="dom" class="item">[DOM]</a></strong></dt>
+
+<dd>
+<p>DOM
+&lt;http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#interface-nodelist&gt;.</p>
+</dd>
+<dt><strong><a name="manakai" class="item">[MANAKAI]</a></strong></dt>
+
+<dd>
+<p>manakai DOM Extensions
+&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions&gt;.</p>
+</dd>
+<dt><strong><a name="domperl" class="item">[DOMPERL]</a></strong></dt>
+
+<dd>
+<p>manakai's DOM Perl Binding
+&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/manakai's%20DOM%20Perl%20Binding&gt;.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>Copyright 2007-2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
+<p>This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>
