@@ -8,8 +8,7 @@ The C<Whatpm::HTML::Tokenizer> module provides an implementation of
 HTML and XML tokenizer.  Unlike its name, this module can be used for
 XML documents as well as HTML.  It is not intended to be used directly
 from general-purpose applications; instead it is used as part of HTML
-or XML parser, such as L<Whatpm::HTML> (not C<Whatpm::HTML::Parser>,
-at least at the moment, for historical reason.) and
+or XML parser, such as L<Whatpm::HTML::Parser> and
 L<Whatpm::XML::Parser>.
 
 The module is intended to be a conforming HTML tokenizer according to
@@ -22,13 +21,29 @@ later HTML5 development.
 
 =head1 SEE ALSO
 
-L<Whatpm::HTML>, L<Whatpm::XML::Parser>.
+L<Whatpm::HTML::Parser>, L<Whatpm::XML::Parser>.
 
-Web Applications 1.0 (including HTML5)
+L<Whatpm::HTML::InputStream>.
+
+=head1 SPECIFICATIONS
+
+=over 4
+
+=item [HTML]
+
+HTML Living Standard
 <http://www.whatwg.org/specs/web-apps/current-work/complete.html#tokenization>.
+
+=item [XML]
+
+XML 1.0 <http://www.w3.org/TR/xml/>.
+
+XML 1.1 <http://www.w3.org/TR/xml11/>.
 
 XML5.  See <http://suika.fam.cx/~wakaba/wiki/sw/n/XML5> for
 references.
+
+=back
 
 =head1 AUTHOR
 
@@ -36,7 +51,7 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

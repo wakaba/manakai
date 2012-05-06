@@ -1,145 +1,16 @@
 =head1 NAME
 
-Whatpm::HTML - An HTML Parser and Serializer
-
-=head1 SYNOPSIS
-
-  use Whatpm::HTML;
-  
-  my $s = q<<!DOCTYPE html><html>...</html>>;
-  # $doc = an empty DOM |Document| object
-  my $on_error = sub {
-    my %error = @_;
-    warn $error{type}, "\n";
-  };
-  
-  Whatpm::HTML->parse_char_string ($s => $doc, $onerror);
-  
-  ## Now, |$doc| is the DOM representation of |$s|.
+Whatpm::HTML - Old HTML parser API
 
 =head1 DESCRIPTION
 
-The C<Whatpm::HTML> module contains HTML parser and serializer.
-
-The HTML parser can be used to construct the DOM tree representation
-from an HTML document.  The parsing and tree construction are done 
-as described in the Web Application 1.0 specification.
-
-The HTML serializer can be used to obtain the HTML document representation
-of a DOM tree (or a tree fragment thereof).  The serialization
-is performed as described in the Web Applications 1.0 specification
-for C<innerHTML> DOM attribute.
-
-This module is part of Whatpm - Perl Modules for 
-Web Hypertext Application Technologies.
-
-=head1 METHODS
-
-=over 4
-
-=item [I<$doc> =] Whatpm::HTML->parse_char_string (I<$s>, I<$doc>[, I<$onerror>]);
-
-Parse a string I<$s> as an HTML document.
-
-The first argument, I<$s>, MUST be a string.  It is parsed
-as a sequence of characters representing an HTML document.
-
-The second argument, I<$doc>, MUST be an empty read-write 
-DOM C<Document> object.  The HTML DOM tree is constructed
-onto this C<Document> object.
-
-The third argument, I<$onerror>, MUST be a reference to
-the error handler code.  Whenever a parse error is detected,
-this code is invoked with an argument that contains a
-useless string that might describe what is wrong.
-The code MAY throw an exception, so that whole the parsing
-process aborts.  Otherwise, the parser will continue to
-process the input.  The code MUST NOT modify I<$s> or I<$doc>.
-If it does, then the result is undefined.
-This argument is optional; if missing, any
-parse error makes that string being C<warn>ed.
-
-B<NOTE>: To be a conforming user agent, the code MUST either
-abort the processing by throwing an exception at the first
-invocation or MUST continue the processing until the parser
-stops.
-
-The method returns the DOM C<Document> object (i.e. the second argument).
-
-Note that the C<Whatpm::NanoDOM> module provides a non-conforming
-implementation of DOM that only implements a subset that
-is necessary for the purpose of C<Whatpm::HTML>'s parsing and
-serializing.
-With this module, creating a new HTML C<Document> object
-from a string containing HTML document might be coded as:
-
-  use Whatpm::HTML;
-  use Whatpm::NanoDOM;
-  my $doc = Whatpm::HTML->parse_char_string
-      ($s => Whatpm::NanoDOM::Document->new, $onerror);
-
-=back
-
-=head1 LOW-LEVEL INTERFACE
-
-@@ TBW
-
-=head2 Application Cache Selection Algorithm Hook
-
-Once a parser I<$p> is instantiated by method C<new>, 
-a C<CODE> reference can be set to C<< I<$p>->{application_cache_selection} >>.
-That C<CODE> will be called back when the application cache selection
-algorithm MUST be run per HTML5.  By default,
-C<< I<$p>->{application_cache_selection} >> is set to an empty subroutine.
-
-The subroutine will be invoked with an argument I<manifest_uri>, 
-which is set to the manifest URI when the algorithm MUST be invoked
-with a manifest URI, or is set to C<undef> when the algorithm MUST
-be invoked without no manifest URI.
-
-=head1 ERROR REPORTS
-
-@@ TBW
-
-The list of the error types is available in
-Whatpm Error Types <http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
-
-=head1 TO DO
-
-Documentation for parse_byte_string.
-
-Tokenizer should emit a sequence of character tokens as one token
-to improve performance.
-
-A method that accepts a byte stream as an input.
-
-Charset detection algorithm.
-
-Documentation for the setter of inner_html.
-
-And there are many "TODO"s and "ISSUE"s in the source code.
-
-=head1 DEPENDENCY
-
-This module requires L<Error>.  That module is available at CPAN
-<http://search.cpan.org/author/SHLOMIF/Error-0.17009/lib/Error.pm>.
-It is also part of manakai-core distribution
-<http://suika.fam.cx/www/2006/manakai/>.
+The C<Whatpm::HTML> module provides an out-of-date API to HTML parser
+for backward compatibility.  Use L<Whatpm::HTML::Parser> and
+L<Whatpm::HTML::Serializer> for new applications.
 
 =head1 SEE ALSO
 
-Whatpm <http://suika.fam.cx/www/markup/html/whatpm/readme>.
-
-Whatpm Error Types
-<http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types>.
-
-HTML5 <http://whatwg.org/html5>.
-
-L<Whatpm::HTML::Serializer>.
-
-L<Whatpm::NanoDOM>.
-
-L<Whatpm::ContentChecker::HTML>.
+L<Whatpm::HTML::Parser>, L<Whatpm::HTML::Serializer>.
 
 =head1 AUTHOR
 
@@ -147,11 +18,9 @@ Wakaba <w@suika.fam.cx>.
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
-This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
-
-# $Date: 2007/11/11 06:54:36 $

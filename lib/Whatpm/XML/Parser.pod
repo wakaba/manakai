@@ -1,0 +1,130 @@
+=head1 NAME
+
+Whatpm::XML::Parser - An XML parser
+
+=head1 SYNOPSIS
+
+  use Whatpm::XML::Parser;
+  use Message::DOM::DOMImplementation;
+  $parser = Whatpm::XML::Parser->new;
+  $dom = Message::DOM::DOMImplementation->new;
+  $doc = $dom->create_document;
+  
+  $parser->parse_char_string ($chars => $doc);
+
+  ## Or, just use DOM attribute:
+  $doc->inner_html ($chars);
+
+=head1 DESCRIPTION
+
+The C<Whatpm::XML::Parser> module is an implementation of the XML
+parser.  The parser is not Draconian - the parser does not holt on
+well-formedness errors.  It implements a variant of XML5 proposal,
+which defines error handling for ill-formed XML documents.
+
+=head1 METHODS
+
+It is recommended to use standard DOM interface, such as C<inner_html>
+method of the C<Document> object, to parse an XML string, where
+possible.  The L<Whatpm::XML::Parser> module, which, in fact, is used
+to implement the C<inner_html> method, offers more control on how
+parser behaves, which would not be useful unless you are writing a
+complex user agent such as browser or validator.
+
+The L<Whatpm::XML::Parser> module provides following methods:
+
+=over 4
+
+=item $parser = Whatpm::XML::Parser->new
+
+Create a new parser.
+
+=item $parser->parse_char_string ($chars => $doc)
+
+Parse a string of characters (i.e. a possibly utf8-flagged string) as
+XML and construct the DOM tree.
+
+The first argument to the method must be a string to parse.  It may or
+may not be a valid or well-formed XML document.
+
+The second argument to the method must be a DOM C<Document> object
+(L<Message::DOM::Document>).  Any child nodes of the document is first
+removed by the parser.
+
+=item $code = $parser->onerror
+
+=item $parser->onerror ($new_code)
+
+Get or set the error handler for the parser.  Any parse error, as well
+as warning and information, is reported to the handler.  See
+L<Whatpm::Errors> for more information.
+
+=back
+
+Parsed document structure is reflected to the C<Document> object
+specified as an argument to parse methods.
+
+=head1 SEE ALSO
+
+L<Message::DOM::Document>, L<Message::DOM::Element>.
+
+L<Whatpm::ContentChecker>.
+
+L<Whatpm::HTML::Parser>.
+
+=head1 SPECIFICATIONS
+
+=over 4
+
+=item [XML]
+
+XML 1.0 <http://www.w3.org/TR/xml/>.
+
+XML 1.1 <http://www.w3.org/TR/xml11/>.
+
+Namespaces in XML 1.0 <http://www.w3.org/TR/xml-names/>.
+
+Namespaces in XML 1.1 <http://www.w3.org/TR/xml-names11/>.
+
+XML Information Set <http://www.w3.org/TR/xml-infoset/>.
+
+DOM Level 3 Core - Infoset Mapping
+<http://www.w3.org/TR/DOM-Level-3-Core/infoset-mapping.html>.
+
+XML5.  See <http://suika.fam.cx/~wakaba/wiki/sw/n/XML5> for
+references.
+
+=item [HTML]
+
+HTML Living Standard -Parsing XHTML documents
+<http://www.whatwg.org/specs/web-apps/current-work/#parsing-xhtml-documents>.
+
+=item [XMLCC]
+
+manakai's XML Conformance Checking
+<http://suika.fam.cx/www/markup/xml/xmlcc/xmlcc-work>.
+
+=item [DTDEF]
+
+DOM Document Type Definition Module
+<http://suika.fam.cx/www/markup/xml/domdtdef/domdtdef-work>.
+
+=item [MANAKAI]
+
+manakai DOM Extensions
+<http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions>.
+
+=back
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

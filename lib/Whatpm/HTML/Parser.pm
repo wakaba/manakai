@@ -6576,8 +6576,8 @@ sub _construct_tree ($) {
 
 ## XXX: How this method is organized is somewhat out of date, although
 ## it still does what the current spec documents.
-sub set_inner_html ($$$$) {
-  #my ($self, $string, $onerror, $get_wrapper) = @_;
+sub set_inner_html ($$$;$$) {
+  #my ($self, $context, $string, $onerror, $get_wrapper) = @_;
   my ($class, $self);
   if (ref $_[0]) {
     $self = shift;

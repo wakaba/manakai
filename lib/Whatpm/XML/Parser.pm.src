@@ -913,10 +913,10 @@ sub _tree_in_subset ($) {
             }
 
             $type ||= 0;
-            my $self->{t}ize = (2 <= $type and $type <= 10);
+            my $tokenize = (2 <= $type and $type <= 10);
 
             if (defined $at->{value}) {
-              if ($self->{t}ize) {
+              if ($tokenize) {
                 $at->{value} =~ s/  +/ /g;
                 $at->{value} =~ s/\A //;
                 $at->{value} =~ s/ \z//;
@@ -930,7 +930,7 @@ sub _tree_in_subset ($) {
             $self->{attrdef}->{$self->{t}->{name}}->{$at->{name}}
                 = {
                    type => $type,
-                   tokenize => $self->{t}ize,
+                   tokenize => $tokenize,
                    default => (($default and ($default == 1 or $default == 4))
                                  ? defined $at->{value} ? $at->{value} : ''
                                  : undef),

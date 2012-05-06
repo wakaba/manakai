@@ -1,0 +1,148 @@
+=head1 NAME
+
+Whatpm::HTML::Parser - An HTML parser
+
+=head1 SYNOPSIS
+
+  use Whatpm::HTML::Parser;
+  use Message::DOM::DOMImplementation;
+  $parser = Whatpm::HTML::Parser->new;
+  $dom = Message::DOM::DOMImplementation->new;
+  $doc = $dom->create_document;
+  
+  $parser->parse_char_string ($chars => $doc);
+  $parser->parse_byte_string ($encoding, $bytes => $doc);
+
+  ## Or, just use DOM attribute:
+  $doc->manakai_is_html (1);
+  $doc->inner_html ($chars);
+
+=head1 DESCRIPTION
+
+The C<Whatpm::HTML::Parser> module is an implementation of the HTML
+parser.  It implements the HTML parsing algorithm as defined by HTML
+Living Standard.  Therefore, it's parsing behavior is fully compatible
+with Web browsers with HTML5 parser enabled.
+
+=head1 METHODS
+
+It is recommended to use standard DOM interface, such as C<inner_html>
+method of the C<Document> object, to parse an HTML string, where
+possible.  The L<Whatpm::HTML::Parser> module, which, in fact, is used
+to implement the C<inner_html> method, offers more control on how
+parser behaves, which would not be useful unless you are writing a
+complex user agent such as browser or validator.
+
+The L<Whatpm::HTML::Parser> module provides following methods:
+
+=over 4
+
+=item $parser = Whatpm::HTML::Parser->new
+
+Create a new parser.
+
+=item $parser->parse_char_string ($chars => $doc)
+
+Parse a string of characters (i.e. a possibly utf8-flagged string) as
+HTML and construct the DOM tree.
+
+The first argument to the method must be a string to parse.  It may or
+may not be a valid HTML document.
+
+The second argument to the method must be a DOM C<Document> object
+(L<Message::DOM::Document>).  Any child nodes of the document is first
+removed by the parser.
+
+=item $parser->parse_byte_string ($encoding, $bytes => $doc)
+
+Parse a string of bytes as HTML and construct the DOM tree.
+
+The first argument to the method must be the label of a (character)
+encoding, as specified by the Encoding Standard.  The C<undef> value
+can be specified if the encoding is not known.
+
+The second argument to the method must be a string to parse.  It may
+or may not be a valid HTML document.
+
+The third argument to the method must be a DOM C<Document> object
+(L<Message::DOM::Document>).  Any child nodes of the document is first
+removed by the parser.
+
+=item $parser->set_inner_html ($node, $chars)
+
+Parse a string of characters in the context of a node.  If the node is
+a C<Document>, this is equivalent to the C<parse_char_string> method.
+If the node is an C<Element>, parsing is performed in the fragment
+mode.
+
+The first argument to the method must be a DOM C<Node> object
+(L<Message::DOM::Node>) that is also a C<Document>
+(L<Message::DOM::Document>) or an C<Element>
+(L<Message::DOM::Element>).  The node is used to give the context to
+the parser and to receive the parsed subtree.  Any existing child
+node of the node is removed first.
+
+The second argument to the method must be a string of characters.
+
+=item $code = $parser->onerror
+
+=item $parser->onerror ($new_code)
+
+Get or set the error handler for the parser.  Any parse error, as well
+as warning and information, is reported to the handler.  See
+L<Whatpm::Errors> for more information.
+
+=back
+
+Parsed document structure is reflected to the C<Document> object
+specified as an argument to parse methods.  The character encoding
+used to parse the document can be retrieved by the C<input_encoding>
+method of the C<Document>.
+
+Although the parser is intended to be fully conformant to the HTML
+Living Standard, it might not implement latest spec changes yet.  See
+list of bugs on the HTML parser
+<http://manakai.g.hatena.ne.jp/task/2/> for the current implementation
+status.
+
+=head1 SEE ALSO
+
+L<Message::DOM::Document>, L<Message::DOM::Element>.
+
+L<Whatpm::HTML::Serializer>.
+
+L<Whatpm::ContentChecker>.
+
+L<Whatpm::XML::Parser>.
+
+=head1 SPECIFICATIONS
+
+=over 4
+
+=item [HTML]
+
+HTML Living Standard - Parsing HTML documents
+<http://www.whatwg.org/specs/web-apps/current-work/#parsing>.
+
+HTML Living Standard - Parsing HTML fragments
+<http://www.whatwg.org/specs/web-apps/current-work/#parsing-html-fragments>.
+
+=item [ENCODING]
+
+Encoding Standard
+<http://dvcs.w3.org/hg/encoding/raw-file/tip/Overview.html>.
+
+=back
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

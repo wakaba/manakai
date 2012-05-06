@@ -69,12 +69,18 @@ XML parser with non-draconian error handling</a> released.
 
 <p id=modules-html>Modules related to HTML and XHTML are as follows:
 <dl>
-<dt id=module-whatpm-html><a href="Whatpm/HTML.html"><code>Whatpm::HTML</code></a></dt>
+<dt id=module-whatpm-html-parser><a href="Whatpm/HTML/Parser.html"><code>Whatpm::HTML::Parser</code></a></dt>
   <dd>An implementation of HTML5 document and fragment
   parsing algorithms.  It can be used
   to convert an arbitrary string into a 
-  <abbr title="Document Object Model">DOM</abbr>.  (See also
-  <a href="#demo-html-parser">demo</a>.)</dd>
+  <abbr title="Document Object Model">DOM</abbr>.
+
+  <dd>See also <a href="#demo-html-parser">demo</a>.</dd>
+
+  <dd id=module-whatpm-html>Old API, <a
+  href="Whatpm/HTML.html"><code>Whatpm::HTML</code></a> is
+  <em>deprecated</em> in favor of <code>Whatpm::HTML::Parser</code>.
+
 <dt id=module-whatpm-html-serializer><a href="Whatpm/HTML/Serializer.html"><code>Whatpm::HTML::Serializer</code></a></dt>
   <dd>An implementation of HTML5 fragment serialization algorithm.
   (See also <a href="#demo-html-parser">demo</a>.)</dd>
