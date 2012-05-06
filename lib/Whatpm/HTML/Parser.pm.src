@@ -12,11 +12,6 @@ push our @ISA, qw(Whatpm::HTML::Tokenizer);
 
 use Whatpm::HTML::Tokenizer;
 
-## ISSUE:
-## var doc = implementation.createDocument (null, null, null);
-## doc.write ('');
-## alert (doc.compatMode);
-
 ## Namespace URLs
 
 sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
@@ -1272,6 +1267,11 @@ sub _construct_tree ($) {
 
         $self->{document}->append_child ($doctype);
         
+        ## Resetting the quirksness.  Not in the spec, but this has to
+        ## be done for reusing Document object (or for
+        ## |document.open|).
+        $self->{document}->manakai_compat_mode ('no quirks');
+        
         if ($self->{t}->{quirks} or $doctype_name ne 'html') {
           !!!cp ('t4');
           $self->{document}->manakai_compat_mode ('quirks');
@@ -1292,7 +1292,7 @@ sub _construct_tree ($) {
             $self->{document}->manakai_compat_mode ('quirks');
           } elsif ($pubid =~ m[^-//W3C//DTD HTML 4.01 FRAMESET//] or
                    $pubid =~ m[^-//W3C//DTD HTML 4.01 TRANSITIONAL//]) {
-            if (defined $self->{t}->{sysid}) {
+            if (not defined $self->{t}->{sysid}) {
               !!!cp ('t6');
               $self->{document}->manakai_compat_mode ('quirks');
             } else {

@@ -1347,6 +1347,11 @@ sub _construct_tree ($) {
 
         $self->{document}->append_child ($doctype);
         
+        ## Resetting the quirksness.  Not in the spec, but this has to
+        ## be done for reusing Document object (or for
+        ## |document.open|).
+        $self->{document}->manakai_compat_mode ('no quirks');
+        
         if ($self->{t}->{quirks} or $doctype_name ne 'html') {
           
           $self->{document}->manakai_compat_mode ('quirks');
@@ -1367,7 +1372,7 @@ sub _construct_tree ($) {
             $self->{document}->manakai_compat_mode ('quirks');
           } elsif ($pubid =~ m[^-//W3C//DTD HTML 4.01 FRAMESET//] or
                    $pubid =~ m[^-//W3C//DTD HTML 4.01 TRANSITIONAL//]) {
-            if (defined $self->{t}->{sysid}) {
+            if (not defined $self->{t}->{sysid}) {
               
               $self->{document}->manakai_compat_mode ('quirks');
             } else {
@@ -6576,8 +6581,8 @@ sub _construct_tree ($) {
 
 ## XXX: How this method is organized is somewhat out of date, although
 ## it still does what the current spec documents.
-sub set_inner_html ($$$;$$) {
-  #my ($self, $context, $string, $onerror, $get_wrapper) = @_;
+sub set_inner_html ($$$$) {
+  #my ($self, $string, $onerror, $get_wrapper) = @_;
   my ($class, $self);
   if (ref $_[0]) {
     $self = shift;
