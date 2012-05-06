@@ -1090,8 +1090,8 @@ sub push_afe ($$) {
       $new_element->[2] = $formatting_element->[2];
       
       ## Step 12
-      my @cn = @{$furthest_block->[0]->child_nodes};
-      $new_element->[0]->append_child ($_) for @cn;
+      $new_element->[0]->append_child ($_)
+          for $furthest_block->[0]->child_nodes->to_list;
       
       ## Step 13
       $furthest_block->[0]->append_child ($new_element->[0]);
@@ -6600,8 +6600,7 @@ sub set_inner_html ($$$$) {
     ## ISSUE: There is an issue in the spec.
     
     ## Step 2 # MUST
-    my @cn = @{$node->child_nodes};
-    for (@cn) {
+    for ($node->child_nodes->to_list) {
       $node->remove_child ($_);
     }
 
@@ -6723,15 +6722,13 @@ sub set_inner_html ($$$$) {
     $p->_construct_tree;
 
     ## F.7.
-    my @cn = @{$node->child_nodes};
-    for (@cn) {
+    for ($node->child_nodes->to_list) {
       $node->remove_child ($_);
     }
     ## ISSUE: mutation events? read-only?
 
     ## Step 11 # MUST
-    @cn = @{$root->child_nodes};
-    for (@cn) {
+    for ($root->child_nodes->to_list) {
       $this_doc->adopt_node ($_);
       $node->append_child ($_);
     }

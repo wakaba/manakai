@@ -57,7 +57,11 @@ sub manakai_parent_element ($) {
 } # manakai_parent_element
 
 sub child_nodes ($) {
-  return shift->{child_nodes} || [];
+  $_[0]->{child_nodes} ||= [];
+  if (ref $_[0]->{child_nodes} eq 'ARRAY') {
+    bless $_[0]->{child_nodes}, 'Whatpm::NanoDOM::NodeList';
+  }
+  return $_[0]->{child_nodes};
 } # child_nodes
 
 sub node_name ($) { return $_[0]->{node_name} }
@@ -900,6 +904,12 @@ sub declared_type ($;$) {
   $_[0]->{declared_type} = $_[1] if @_ > 1;
   return $_[0]->{declared_type} || 0;
 } # declared_type
+
+package Whatpm::NanoDOM::NodeList;
+
+sub to_list ($) {
+  return @{$_[0]};
+} # to_list
 
 =head1 SEE ALSO
 

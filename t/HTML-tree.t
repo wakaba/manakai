@@ -52,6 +52,12 @@ use Whatpm::NanoDOM;
 use Whatpm::Charset::UnicodeChecker;
 use Whatpm::HTML::Dumper qw/dumptree/;
 
+my $dom;
+if ($ENV{USE_REAL_DOM}) {
+  require Message::DOM::DOMImplementation;
+  $dom = Message::DOM::DOMImplementation->new;
+}
+
 sub test ($) {
   my $test = shift;
   my $data = $test->{data}->[0];
@@ -75,7 +81,7 @@ sub test ($) {
     }
   }
 
-  my $doc = Whatpm::NanoDOM::Document->new;
+  my $doc = $dom ? $dom->create_document : Whatpm::NanoDOM::Document->new;
   my @errors;
   my @shoulds;
   
