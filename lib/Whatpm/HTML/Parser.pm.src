@@ -1229,8 +1229,10 @@ sub _construct_tree ($) {
           my $xsysid = $Whatpm::HTML::ParserData::ObsoletePermittedDoctypes
               ->{$self->{t}->{pubid}};
           if (defined $xsysid and
-              (not defined $self->{t}->{sysid} or
-               $self->{t}->{sysid} eq $xsysid)) {
+              ((not defined $self->{t}->{sysid} and
+                $self->{t}->{pubid} =~ /HTML 4/) or
+               (defined $self->{t}->{sysid} and
+                $self->{t}->{sysid} eq $xsysid))) {
             !!!cp ('t2');
             !!!parse-error (type => 'obs DOCTYPE', token => $self->{t},
                             level => $self->{level}->{obsconforming});

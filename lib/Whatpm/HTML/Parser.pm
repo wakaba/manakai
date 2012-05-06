@@ -12,11 +12,6 @@ push our @ISA, qw(Whatpm::HTML::Tokenizer);
 
 use Whatpm::HTML::Tokenizer;
 
-## ISSUE:
-## var doc = implementation.createDocument (null, null, null);
-## doc.write ('');
-## alert (doc.compatMode);
-
 ## Namespace URLs
 
 sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
@@ -1309,8 +1304,10 @@ sub _construct_tree ($) {
           my $xsysid = $Whatpm::HTML::ParserData::ObsoletePermittedDoctypes
               ->{$self->{t}->{pubid}};
           if (defined $xsysid and
-              (not defined $self->{t}->{sysid} or
-               $self->{t}->{sysid} eq $xsysid)) {
+              ((not defined $self->{t}->{sysid} and
+                $self->{t}->{pubid} =~ /HTML 4/) or
+               (defined $self->{t}->{sysid} and
+                $self->{t}->{sysid} eq $xsysid))) {
             
             $self->{parse_error}->(level => $self->{level}->{must}, type => 'obs DOCTYPE', token => $self->{t},
                             level => $self->{level}->{obsconforming});
