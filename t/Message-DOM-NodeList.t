@@ -20,16 +20,19 @@ sub nodelists (;%) {
 
   ## ChildeNodeList
   push @nodelist, $Doc->last_child->last_child->child_nodes
-      unless $args{non_clearable};
+      if not $args{non_clearable} and not $args{empty_only};
   
   ## EmptyNodeList
-  push @nodelist, $Doc->last_child->last_child->last_child->last_child->child_nodes;
+  push @nodelist, $Doc->last_child->last_child->last_child->last_child->child_nodes
+      unless $args{p2_only};
 
   ## GetElementsList
-  push @nodelist, $Doc->get_elements_by_tag_name ('p');
+  push @nodelist, $Doc->get_elements_by_tag_name ('p')
+      if not $args{empty_only};
   
   ## StaticNodeList
-  push @nodelist, $Doc->query_selector_all ('p');
+  push @nodelist, $Doc->query_selector_all ('p')
+      if not $args{empty_only};
 
   return @nodelist;
 } # nodelists
@@ -105,6 +108,41 @@ sub _clear_child_nodes : Test(2) {
   @$nl = ();
   is $nl->length, 0;
 } # _clear_child_nodes
+
+sub _list : Test(66) {
+  for my $nl (nodelists p2_only => 1) {
+    my $arrayref = $nl->to_a;
+    is ref $arrayref, 'ARRAY';
+    is scalar @$arrayref, 2;
+    is $arrayref->[0], $nl->item (0);
+    is $arrayref->[1], $nl->item (1);
+    isnt $nl->to_a, $arrayref;
+    
+    my $arrayref2 = $nl->as_list;
+    is ref $arrayref2, 'ARRAY';
+    is scalar @$arrayref2, 2;
+    is $arrayref->[0], $nl->item (0);
+    is $arrayref->[1], $nl->item (1);
+    isnt $nl->as_list, $arrayref2;
+    isnt $arrayref2, $arrayref;
+
+    my @list = $nl->to_list;
+    is scalar @list, 2;
+    is $list[0], $nl->item (0);
+    is $list[1], $nl->item (1);
+
+    my @list2 = @$nl;
+    is scalar @list2, 2;
+    is $list2[0], $nl->item (0);
+    is $list2[1], $nl->item (1);
+
+    is $nl->[0], $nl->item (0);
+    is $nl->[1], $nl->item (1);
+    is $nl->[2], undef;
+    is $nl->[-1], $nl->[1];
+    dies_here_ok { ng $nl->[-3] };
+  }
+} # _list
 
 ## XXXtest need more tests!
 

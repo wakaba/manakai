@@ -31,6 +31,20 @@ sub STORESIZE {
   croak "Modification of a read-only value attempted";
 } # STORESIZE
 
+sub to_list ($) {
+  return (@{$_[0]});
+} # to_list
+
+sub to_a ($) {
+  return [@{$_[0]}];
+} # to_a
+
+## For compatibility with Template::Iterator in Template Toolkit.
+## Don't use for any ohter purpose.
+sub as_list ($) {
+  return $_[0]->to_a;
+} # as_list
+
 package Message::DOM::NodeList::ChildNodeList;
 push our @ISA, 'Message::DOM::NodeList';
 
@@ -186,6 +200,18 @@ sub item ($;$) {
   my $index = int ($_[1] or 0);
   return $_[0]->[$index] if $index >= 0;
 } # item
+
+sub to_a ($) {
+  return [@{$_[0]}];
+} # to_a
+
+sub to_list ($) {
+  return @{$_[0]};
+} # to_list
+
+sub as_list ($) {
+  return [@{$_[0]}];
+} # as_list
 
 package Message::IF::NodeList;
 
