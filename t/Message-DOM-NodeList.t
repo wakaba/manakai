@@ -112,7 +112,7 @@ sub _clear_child_nodes : Test(2) {
 sub _list : Test(66) {
   for my $nl (nodelists p2_only => 1) {
     my $arrayref = $nl->to_a;
-    is ref $arrayref, 'ARRAY';
+    is ref $arrayref, 'ARRAY', ref $nl;
     is scalar @$arrayref, 2;
     is $arrayref->[0], $nl->item (0);
     is $arrayref->[1], $nl->item (1);

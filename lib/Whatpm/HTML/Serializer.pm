@@ -33,7 +33,7 @@ sub get_inner_html ($$$) {
   
   ## Step 2
   my $node_in_cdata = _in_cdata ($node);
-  my @node = map { [$_, $node_in_cdata] } @{$node->child_nodes};
+  my @node = map { [$_, $node_in_cdata] } $node->child_nodes->to_list;
   C: while (@node) {
     ## Step 2.1
     my $c = shift @node;
@@ -101,7 +101,7 @@ sub get_inner_html ($$$) {
 
       my $child_in_cdata = _in_cdata ($child);
       unshift @node,
-          (map { [$_, $child_in_cdata] } @{$child->child_nodes}),
+          (map { [$_, $child_in_cdata] } $child->child_nodes->to_list),
           (['</' . $tag_name . '>', 0]);
     } elsif ($nt == 3 or $nt == 4) { # Text or CDATASection
       if ($c->[1]) { # in CDATA or RCDATA or PLAINTEXT element
@@ -122,7 +122,7 @@ sub get_inner_html ($$$) {
     } elsif ($nt == 7) { # ProcessingInstruction
       $s .= '<?' . $child->target . ' ' . $child->data . '>';
     } elsif ($nt == 5) { # EntityReference
-      push @node, map { [$_, $c->[1]] } @{$child->child_nodes};
+      push @node, map { [$_, $c->[1]] } $child->child_nodes->to_list;
     } else {
       # INVALID_STATE_ERROR
       $onerror->($child) if defined $onerror;

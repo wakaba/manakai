@@ -291,7 +291,7 @@ sub next_sibling ($) {
   my $parent = $$self->{parent_node};
   return undef unless defined $parent;
   my $has_self;
-  for (@{$parent->child_nodes}) {
+  for ($parent->child_nodes->to_list) {
     if ($_ eq $self) {
       $has_self = 1;
     } elsif ($has_self) {
@@ -336,7 +336,7 @@ sub previous_sibling ($) {
   my $parent = $$self->{parent_node};
   return undef unless defined $parent;
   my $prev;
-  for (@{$parent->child_nodes}) {
+  for ($parent->child_nodes->to_list) {
     if ($_ eq $self) {
       return $prev;
     } else {
@@ -379,7 +379,7 @@ sub text_content ($;$) {
   if (defined wantarray) {
     local $Error::Depth = $Error::Depth + 1;
     my $r = '';
-    my @node = @{$self->child_nodes};
+    my @node = $self->child_nodes->to_list;
     while (@node) {
       my $child = shift @node;
       my $child_nt = $child->node_type;
@@ -390,7 +390,7 @@ sub text_content ($;$) {
                $child_nt == DOCUMENT_TYPE_NODE) {
         #
       } else {
-        unshift @node, @{$child->child_nodes};
+        unshift @node, $child->child_nodes->to_list;
       }
     }
     return $r;
@@ -413,7 +413,7 @@ sub append_child ($$) {
   my @new_child;
   my $new_child_parent;
   if ($_[1]->node_type == DOCUMENT_FRAGMENT_NODE) {
-    push @new_child, @{$_[1]->child_nodes};
+    push @new_child, $_[1]->child_nodes->to_list;
     $new_child_parent = $_[1];
   } else {
     @new_child = ($_[1]);
@@ -537,7 +537,7 @@ sub clone_node ($;$) {
         push @node, [$attr, $clone] if $attr->specified;
       }
       if ($deep) {
-        push @node, map {[$_, $clone]} @{$node->child_nodes};
+        push @node, map {[$_, $clone]} $node->child_nodes->to_list;
       }
     } elsif ($nt == TEXT_NODE) {
       $clone = $od->create_text_node ($node->data);
@@ -557,7 +557,7 @@ sub clone_node ($;$) {
         $r = $clone;
       }
       $clone->specified (1);
-      push @node, map {[$_, $clone]} @{$node->child_nodes};
+      push @node, map {[$_, $clone]} $node->child_nodes->to_list;
     } elsif ($nt == COMMENT_NODE) {
       $clone = $od->create_comment ($node->data);
       if ($parent) {
@@ -585,7 +585,7 @@ sub clone_node ($;$) {
       if ($er_copy_asis) {
         $clone->manakai_set_read_only (0);
         $clone->text_content (0);
-        for (@{$node->child_nodes}) {
+        for ($node->child_nodes->to_list) {
           $clone->append_child ($_->clone_node (1));
         }
         $clone->manakai_expanded ($node->manakai_expanded);
@@ -599,7 +599,7 @@ sub clone_node ($;$) {
     } elsif ($nt == DOCUMENT_FRAGMENT_NODE) {
       $clone = $od->create_document_fragment;
       $r = $clone;
-      push @node, map {[$_, $clone]} @{$node->child_nodes};
+      push @node, map {[$_, $clone]} $node->child_nodes->to_list;
     } elsif ($nt == DOCUMENT_NODE) {
       $od->strict_error_checking ($strict_check);
       report Message::DOM::DOMException
@@ -766,7 +766,7 @@ sub compare_document_position ($$) {
         return DOCUMENT_POSITION_PRECEDING;
       } else {
         ## A and B are both children
-        for my $cn (@{$acontainer[-1]->child_nodes}) {
+        for my $cn ($acontainer[-1]->child_nodes->to_list) {
           if ($cn eq $acontainer[-2]) {
             return DOCUMENT_POSITION_FOLLOWING;
           } elsif ($cn eq $bcontainer[-2]) {
@@ -837,7 +837,7 @@ sub insert_before ($$) {
   my @new_child;
   my $new_child_parent;
   if ($_[1]->node_type == DOCUMENT_FRAGMENT_NODE) {
-    push @new_child, @{$_[1]->child_nodes};
+    push @new_child, $_[1]->child_nodes->to_list;
     $new_child_parent = $_[1];
   } else {
     @new_child = ($_[1]);
@@ -895,12 +895,11 @@ sub insert_before ($$) {
   if (defined $_[2]) {
     ## error if $_[1] eq $_[2];
     
-    my $cns = $self->child_nodes;
-    my $cnsl = @$cns;
+    my @cns = $self->child_nodes->to_list;
     C: {
       $index = 0;
-      for my $i (0..($cnsl-1)) {
-        my $cn = $cns->[$i];
+      for my $i (0..$#cns) {
+        my $cn = $cns[$i];
         if ($cn eq $_[2]) {
           $index += $i;
           last C;
@@ -1178,7 +1177,7 @@ sub normalize ($) {
   
   ## Children
   my @remove;
-  for my $cn (@{$self->child_nodes}) {
+  for my $cn ($self->child_nodes->to_list) {
     if ($cn->node_type == TEXT_NODE) {
       my $nv = $cn->node_value;
       if (length $nv) {
@@ -1261,7 +1260,7 @@ sub replace_child ($$) {
   my @new_child;
   my $new_child_parent;
   if ($_[1]->node_type == DOCUMENT_FRAGMENT_NODE) {
-    push @new_child, @{$_[1]->child_nodes};
+    push @new_child, $_[1]->child_nodes->to_list;
     $new_child_parent = $_[1];
   } else {
     @new_child = ($_[1]);
@@ -1319,12 +1318,11 @@ sub replace_child ($$) {
   if (defined $_[2]) {
     ## error if $_[1] eq $_[2];
     
-    my $cns = $self->child_nodes;
-    my $cnsl = @$cns;
+    my @cns = $self->child_nodes->to_list;
     C: {
       $index = 0;
-      for my $i (0..($cnsl-1)) {
-        my $cn = $cns->[$i];
+      for my $i (0..$#cns) {
+        my $cn = $cns[$i];
         if ($cn eq $_[2]) {
           $index += $i;
           last C;
@@ -1387,7 +1385,7 @@ sub manakai_set_read_only ($;$$) {
       } else {
         delete $$target->{manakai_read_only};
       }
-      push @target, @{$target->child_nodes};
+      push @target, $target->child_nodes->to_list;
       
       my $nt = $target->node_type;
       if ($nt == ELEMENT_NODE) {

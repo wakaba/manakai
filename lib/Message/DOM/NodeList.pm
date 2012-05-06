@@ -83,6 +83,14 @@ sub FETCH ($$) {
   return ${$${$_[0]}}->{child_nodes}->[$_[1]];
 } # FETCH
 
+sub to_list ($) {
+  return @{${$${$_[0]}}->{child_nodes}};
+} # to_list
+
+sub to_a ($) {
+  return [@{${$${$_[0]}}->{child_nodes}}];
+} # to_a
+
 sub CLEAR ($) {
   my $self = $_[0];
   my $list = ${$$$self}->{child_nodes};
@@ -116,6 +124,14 @@ sub item ($$) { undef }
 
 *FETCH = \&item;
 
+sub to_list ($) {
+  return ();
+} # to_list
+
+sub to_a ($) {
+  return [];
+} # to_a
+
 package Message::DOM::NodeList::GetElementsList;
 push our @ISA, 'Message::DOM::NodeList::EmptyNodeList';
 
@@ -123,15 +139,13 @@ sub ___report_error ($$) {
   $_[1]->throw;
 } # ___report_error
 
-## |NodeList| attributes
-
 sub length ($) {
   my $self = $_[0];
   my $r = 0;
 
   ## TODO: Improve!
   local $Error::Depth = $Error::Depth + 1;
-  my @target = @{$$self->[0]->child_nodes};
+  my @target = $$self->[0]->child_nodes->to_list;
   while (@target) {
     my $target = shift @target;
     if ($target->node_type == 1) { # ELEMENT_NODE
@@ -146,7 +160,13 @@ sub length ($) {
 } # length
 *FETCHSIZE = \&length;
 
-## |NodeList| methods
+sub to_list ($) {
+  return (@{$_[0]});
+} # to_list
+
+sub to_a ($) {
+  return [@{$_[0]}];
+} # to_a
 
 sub item ($;$) {
   my $self = $_[0];

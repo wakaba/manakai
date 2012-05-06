@@ -232,7 +232,7 @@ sub adopt_node ($$) {
     }
 
     push @change_od, $node;
-    push @nodes, @{$node->child_nodes}, @{$node->attributes or []};
+    push @nodes, $node->child_nodes->to_list, @{$node->attributes or []};
   } # @nodes
 
   local $Error::Depth = $Error::Depth + 1;
@@ -281,7 +281,7 @@ sub append_child ($$) {
   my @new_child;
   my $new_child_parent;
   if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
-    push @new_child, @{$_[1]->child_nodes};
+    push @new_child, $_[1]->child_nodes->to_list;
     $new_child_parent = $_[1];
   } else {
     @new_child = ($_[1]);
@@ -319,7 +319,7 @@ sub append_child ($$) {
       } elsif ($child_nt == 10) { # DOCUMENT_TYPE_NODE
         $has_dt = 1;
       } elsif ($child_nt == 11) { # DOCUMENT_FRAGMENT_NODE
-        for my $cn (@{$_[1]->child_nodes}) {
+        for my $cn ($_[1]->child_nodes->to_list) {
           my $cnt = $cn->node_type;
           if ($cnt == 1) { # ELEMENT_NODE
             if ($has_el) {
@@ -446,7 +446,7 @@ sub insert_before ($$) {
   my @new_child;
   my $new_child_parent;
   if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
-    push @new_child, @{$_[1]->child_nodes};
+    push @new_child, $_[1]->child_nodes->to_list;
     $new_child_parent = $_[1];
   } else {
     @new_child = ($_[1]);
@@ -484,7 +484,7 @@ sub insert_before ($$) {
       } elsif ($child_nt == 10) { # DOCUMENT_TYPE_NODE
         $has_dt = 1;
       } elsif ($child_nt == 11) { # DOCUMENT_FRAGMENT_NODE
-        for my $cn (@{$_[1]->child_nodes}) {
+        for my $cn ($_[1]->child_nodes->to_list) {
           my $cnt = $cn->node_type;
           if ($cnt == 1) { # ELEMENT_NODE
             if ($has_el) {
@@ -565,12 +565,11 @@ sub insert_before ($$) {
   if (defined $_[2]) {
     ## error if $_[1] eq $_[2];
     
-    my $cns = $self->child_nodes;
-    my $cnsl = @$cns;
+    my @cns = $self->child_nodes->to_list;
     C: {
       $index = 0;
-      for my $i (0..($cnsl-1)) {
-        my $cn = $cns->[$i];
+      for my $i (0..$#cns) {
+        my $cn = $cns[$i];
         if ($cn eq $_[2]) {
           $index += $i;
           last C;
@@ -635,7 +634,7 @@ sub replace_child ($$) {
   my @new_child;
   my $new_child_parent;
   if ($_[1]->node_type == 11) { # DOCUMENT_FRAGMENT_NODE
-    push @new_child, @{$_[1]->child_nodes};
+    push @new_child, $_[1]->child_nodes->to_list;
     $new_child_parent = $_[1];
   } else {
     @new_child = ($_[1]);
@@ -673,7 +672,7 @@ sub replace_child ($$) {
       } elsif ($child_nt == 10) { # DOCUMENT_TYPE_NODE
         $has_dt = 1;
       } elsif ($child_nt == 11) { # DOCUMENT_FRAGMENT_NODE
-        for my $cn (@{$_[1]->child_nodes}) {
+        for my $cn ($_[1]->child_nodes->to_list) {
           my $cnt = $cn->node_type;
           if ($cnt == 1) { # ELEMENT_NODE
             if ($has_el) {
@@ -749,12 +748,11 @@ sub replace_child ($$) {
   if (defined $_[2]) {
     ## error if $_[1] eq $_[2];
     
-    my $cns = $self->child_nodes;
-    my $cnsl = @$cns;
+    my @cns = $self->child_nodes->to_list;
     C: {
       $index = 0;
-      for my $i (0..($cnsl-1)) {
-        my $cn = $cns->[$i];
+      for my $i (0..$#cns) {
+        my $cn = $cns[$i];
         if ($cn eq $_[2]) {
           $index += $i;
           last C;
@@ -821,7 +819,7 @@ sub manakai_charset ($;$);
 
 sub doctype ($) {
   my $self = $_[0];
-  for (@{$self->child_nodes}) {
+  for ($self->child_nodes->to_list) {
     if ($_->node_type == 10) { # DOCUMENT_TYPE_NODE
       return $_;
     }
@@ -831,7 +829,7 @@ sub doctype ($) {
 
 sub document_element ($) {
   my $self = shift;
-  for (@{$self->child_nodes}) {
+  for ($self->child_nodes->to_list) {
     if ($_->node_type == 1) { # ELEMENT_NODE
       return $_;
     }
@@ -998,7 +996,7 @@ sub xml_version ($;$) {
 
 sub get_element_by_id ($$) {
   local $Error::Depth = $Error::Depth + 1;
-  my @nodes = @{$_[0]->child_nodes};
+  my @nodes = $_[0]->child_nodes->to_list;
   N: while (@nodes) {
     my $node = shift @nodes;
     next N unless $node->node_type == 1; # ELEMENT_NODE
@@ -1007,7 +1005,7 @@ sub get_element_by_id ($$) {
         return $node;
       }
     }
-    unshift @nodes, @{$node->child_nodes};
+    unshift @nodes, $node->child_nodes->to_list;
   } # N
   return undef;
 } # get_element_by_id
@@ -1117,7 +1115,7 @@ sub manakai_head ($) {
   local $Error::Depth = $Error::Depth + 1;
   my $html = $_[0]->manakai_html;
   return undef unless defined $html;
-  for my $el (@{$html->child_nodes}) {
+  for my $el ($html->child_nodes->to_list) {
     next unless $el->node_type == 1; # ELEMENT_NODE
     my $nsuri = $el->namespace_uri;
     next unless defined $nsuri;
@@ -1152,8 +1150,8 @@ sub inner_html ($;$) {
       ## TODO: Stop parsing and ...
       
       ## Step 2
-      my @cn = @{$self->child_nodes};
-      for (@cn) { ## NOTE: Might throw a |NO_MODIFICATION_ALLOWED_ERR|.
+      for ($self->child_nodes->to_list) {
+        ## NOTE: Might throw a |NO_MODIFICATION_ALLOWED_ERR|.
         $self->remove_child ($_); #
       }
 
@@ -1188,14 +1186,14 @@ sub inner_html ($;$) {
       ## TODO: ill-formed -> SYNTAX_ERR # MUST
 
       ## Step 6 # MUST
-      my @cn = @{$self->child_nodes}; ## TODO: If read-only
-      for (@cn) {
+      ## TODO: If read-only
+      for ($self->child_nodes->to_list) {
         $self->remove_child ($_);
       }
       ## TODO: strict-document-children option?
 
       ## Step 7, 8, 9, 10
-      for my $node (map { $_ } @{$doc->child_nodes}) {
+      for my $node (map { $_ } $doc->child_nodes->to_list) {
         $self->append_child ($self->adopt_node ($node));
       }
 
@@ -1205,7 +1203,7 @@ sub inner_html ($;$) {
     ## TODO: This serializer is currently not conformant to HTML5 spec.
     require Whatpm::XMLSerializer;
     my $r = '';
-    for my $node (@{$self->child_nodes}) {
+    for my $node ($self->child_nodes->to_list) {
       $r .= ${ Whatpm::XMLSerializer->get_outer_xml ($node, sub {
         ## TODO: INVALID_STATE_ERR
       }) };
