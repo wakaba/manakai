@@ -3,7 +3,7 @@ POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
 
 HTML_FILES = Parser.html
 
-all: Parser.pm
+all: Parser.pm $(HTML_FILES)
 
 %.html: %.pod
 	$(POD2HTML) $< > $@
