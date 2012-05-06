@@ -96,6 +96,13 @@ successfully processed by the WebVTT parser.  [MANAKAI]</p>
 <dd>
 <p>Remove the cue from the track.  [HTML]</p>
 </dd>
+<dt><strong><a name="manakai_clone_track" class="item">$track2 = $track-&gt;manakai_clone_track</a></strong></dt>
+
+<dd>
+<p>Create a copy of the text track object.  Attributes whose values are
+not cue lists are copied to the clone.  All cues in the
+<a href="#manakai_all_cues"><code>manakai_all_cues</code></a> list are also cloned to the new track.  [MANAKAI]</p>
+</dd>
 </dl>
 <p>
 </p>
@@ -103,6 +110,8 @@ successfully processed by the WebVTT parser.  [MANAKAI]</p>
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p>HTML Standard
 &lt;http://www.whatwg.org/specs/web-apps/current-work/#texttrack&gt;.</p>
+<p>manakai DOM Extensions
+&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions#anchor-59&gt;.</p>
 <p>WebVTT Standard &lt;http://dev.w3.org/html5/webvtt/&gt;.</p>
 <p><a href="../../Message/DOM/TextTrackCue.html">the Message::DOM::TextTrackCue manpage</a>, <a href="../../Message/DOM/TextTrackCueList.html">the Message::DOM::TextTrackCueList manpage</a>.</p>
 <p>

@@ -5,6 +5,7 @@ our $VERSION = '2.0';
 push our @ISA, 'Tie::Array', 'Message::IF::NodeList';
 require Message::DOM::DOMException;
 require Tie::Array;
+use Carp;
 
 use overload
     '@{}' => sub {
@@ -18,30 +19,17 @@ use overload
     ne => sub {
       return not ($_[0] eq $_[1]);
     },
-    '==' => sub {
-      ## XXX Do we really need this overloading?  Should we delete
-      ## this from our DOM Perl binding spec?
-
-      ## NOTE: Same as |StaticNodeList|'s.
-      return 0 unless UNIVERSAL::isa ($_[1], 'Message::IF::NodeList');
-      
-      local $Error::Depth = $Error::Depth + 1;
-      my $l1 = $_[0]->length;
-      my $l2 = $_[1]->length;
-      return 0 unless $l1 == $l2;
-      
-      for my $i (0 .. ($l1-1)) {
-        return 0 unless $_[0]->item ($i) == $_[1]->item ($i);
-      }
-      
-      return 1;
-    },
-    '!=' => sub {
-      return not ($_[0] == $_[1]);
-    },
     fallback => 1;
 
 sub TIEARRAY ($$) { $_[1] }
+
+sub STORE {
+  croak "Modification of a read-only value attempted";
+} # STORE
+
+sub STORESIZE {
+  croak "Modification of a read-only value attempted";
+} # STORESIZE
 
 package Message::DOM::NodeList::ChildNodeList;
 push our @ISA, 'Message::DOM::NodeList';
@@ -64,20 +52,6 @@ sub length ($) {
 
 *FETCHSIZE = \&length;
 
-sub STORESIZE ($$) {
-  my $node = $${$_[0]};
-  my $list = $$node->{child_nodes};
-  my $current_length = @{$list};
-  my $count = $_[1];
-
-  local $Error::Depth = $Error::Depth + 1;
-  if ($current_length > $count) {
-    for (my $i = $current_length - 1; $i >= $count; $i--) {
-      $node->remove_child ($list->[$i]);
-    }
-  }
-} # STORESIZE
-
 sub manakai_read_only ($) {
   local $Error::Depth = $Error::Depth + 1;
   return $${$_[0]}->manakai_read_only;
@@ -94,37 +68,6 @@ sub item ($$) {
 sub FETCH ($$) {
   return ${$${$_[0]}}->{child_nodes}->[$_[1]];
 } # FETCH
-
-## XXX Maybe we will drop this operation, as this operaton sometimes
-## diverses from Perl's assignment semantics.
-sub STORE ($$$) {
-  my $self = $_[0];
-  my $list = ${$$$self}->{child_nodes};
-  my $index = $_[1];
-           
-  local $Error::Depth = $Error::Depth + 1;
-  if (exists $list->[$index]) {
-    $$$self->replace_child ($_[2], $list->[$index]);
-    ## ISSUE: This might not work if new_child is a sibling of ref_child
-  } else {
-    $$$self->append_child ($_[2]);
-  }
-} # STORE
-
-## XXX Maybe we will drop this operation, as this operaton differs
-## from Perl's |delete| semantics.
-sub DELETE ($$) {
-  my $self = $_[0];
-  my $list = ${$$$self}->{child_nodes};
-  my $index = $_[1];
-
-  if (exists $list->[$index]) {
-    local $Error::Depth = $Error::Depth + 1;
-    return $$$self->remove_child ($list->[$index]);
-  } else {
-    return undef;
-  }
-} # DELETE
 
 sub CLEAR ($) {
   my $self = $_[0];
@@ -151,14 +94,6 @@ sub length ($) { 0 }
 
 *FETCHSIZE = \&length;
 
-sub STORESIZE ($$) {
-  report Message::DOM::DOMException
-      -object => $_[0],
-      -type => 'NO_MODIFICATION_ALLOWED_ERR',
-      -subtype => 'READ_ONLY_NODE_LIST_ERR'
-      unless $_[1] == 0;
-} # STORESIZE
-
 sub manakai_read_only ($) { 1 }
 
 ## |NodeList| methods
@@ -166,17 +101,6 @@ sub manakai_read_only ($) { 1 }
 sub item ($$) { undef }
 
 *FETCH = \&item;
-
-sub STORE ($$$) {
-  report Message::DOM::DOMException
-      -object => $_[0],
-      -type => 'NO_MODIFICATION_ALLOWED_ERR',
-      -subtype => 'READ_ONLY_NODE_LIST_ERR';
-} # STORE
-
-*DELETE = \&STORE;
-
-*CLEAR = \&STORE;
 
 package Message::DOM::NodeList::GetElementsList;
 push our @ISA, 'Message::DOM::NodeList::EmptyNodeList';
@@ -241,26 +165,12 @@ sub EXISTS ($$) {
 package Message::DOM::NodeList::StaticNodeList;
 push our @ISA, 'Message::IF::StaticNodeList';
 
-use overload
-    '==' => sub {
-      ## NOTE: Same as |NodeList|'s.
-      return 0 unless UNIVERSAL::isa ($_[1], 'Message::IF::NodeList');
-      
-      local $Error::Depth = $Error::Depth + 1;
-      my $l1 = $_[0]->length;
-      my $l2 = $_[1]->length;
-      return 0 unless $l1 == $l2;
-      
-      for my $i (0 .. ($l1-1)) {
-        return 0 unless $_[0]->item ($i) == $_[1]->item ($i);
-      }
-      
-      return 1;
-    },
-    '!=' => sub {
-      return not ($_[0] == $_[1]);
-    },
-    fallback => 1;
+sub ____new_from_arrayref {
+  my $list = bless $_[1], $_[0];
+  Internals::SvREADONLY (@$list, 1);
+  Internals::SvREADONLY ($_, 1) for @$list;
+  return $list;
+} # ____new_from_arrayref
 
 ## |NodeList| attributes
 

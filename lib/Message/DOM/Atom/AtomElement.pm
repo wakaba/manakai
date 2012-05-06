@@ -273,7 +273,7 @@ sub AUTOLOAD {
           }
         }
         require Message::DOM::NodeList;
-        return bless \$r, 'Message::DOM::NodeList::StaticNodeList';
+        return Message::DOM::NodeList::StaticNodeList->____new_from_arrayref (\$r);
       }
     };
     goto &{ $AUTOLOAD };

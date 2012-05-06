@@ -397,11 +397,7 @@ my $get_elements_by_selectors = sub {
 
   my $is_html = $_[4];
   my $r;
-  if ($_[5]) {
-    # MUST
-    require Message::DOM::NodeList;
-    $r = bless [], 'Message::DOM::NodeList::StaticNodeList';
-  }
+  $r = [] if $_[5];
   
   my @node_cond = map {$_->[1] = [@$selectors]; $_} @{$_[3]};
   while (@node_cond) {
@@ -488,6 +484,12 @@ my $get_elements_by_selectors = sub {
       }
     }
   }
+
+  if ($r) {
+    require Message::DOM::NodeList;
+    $r = Message::DOM::NodeList::StaticNodeList->____new_from_arrayref ($r);
+  }
+
   return $r;
 }; # $get_elements_by_selectors
 
