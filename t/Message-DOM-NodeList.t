@@ -144,6 +144,27 @@ sub _list : Test(66) {
   }
 } # _list
 
+sub _list_empty : Test(8) {
+  for my $nl (nodelists empty_only => 1) {
+    my $arrayref = $nl->to_a;
+    is ref $arrayref, 'ARRAY';
+    is scalar @$arrayref, 0;
+
+    my $arrayref2 = $nl->as_list;
+    is ref $arrayref2, 'ARRAY';
+    is scalar @$arrayref2, 0;
+
+    my @list = @$nl;
+    is scalar @list, 0;
+
+    my @list2 = $nl->to_list;
+    is scalar @list2, 0;
+
+    is $nl->[0], undef;
+    dies_here_ok { ng $nl->[-1] };
+  }
+} # _list_empty
+
 ## XXXtest need more tests!
 
 __PACKAGE__->runtests;
