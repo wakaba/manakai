@@ -489,10 +489,11 @@ sub _change_encoding {
 ## ------ Feed characters from input stream to tokenizer ------
 
 my $CommonStoppers = {
-  ## For newline counter
+  ## Newlines
   "\x{000D}" => 1, "\x{000A}" => 1,
+  "\x{0085}" => 1, "\x{2028}" => 1,
 
-  ## Parse errors in HTML
+  ## Parse errors
   "\x{000B}" => 1, "\x{FFFE}" => 1, "\x{FFFF}" => 1,
   "\x{1FFFE}" => 1, "\x{1FFFF}" => 1, "\x{2FFFE}" => 1, "\x{2FFFF}" => 1,
   "\x{3FFFE}" => 1, "\x{3FFFF}" => 1, "\x{4FFFE}" => 1, "\x{4FFFF}" => 1,
@@ -503,26 +504,47 @@ my $CommonStoppers = {
   "\x{DFFFE}" => 1, "\x{DFFFF}" => 1, "\x{EFFFE}" => 1, "\x{EFFFF}" => 1,
   "\x{FFFFE}" => 1, "\x{FFFFF}" => 1,
   "\x{10FFFE}" => 1, "\x{10FFFF}" => 1,
+  "\x{000C}" => 1,
 };
 $CommonStoppers->{chr $_} = 1
-    for 0x0001..0x0008, 0x000E..0x001F, 0x007F..0x009F, 0xFDD0..0xFDEF;
+    for 0x0001..0x0008, 0x000E..0x001F, 0x007F..0x009F, 0xFDD0..0xFDEF,
+        0xD800..0xDFFF;
 
-my $ParseErrorControlCodePosition = {0x000B => 1};
-$ParseErrorControlCodePosition->{$_} = 1
-    for 0x0001..0x0008, 0x000E..0x001F, 0x007F..0x009F;
-
-my $ParseErrorNoncharCodePosition = {
-  0xFFFE => 1, 0xFFFF => 1,
-  0x1FFFE => 1, 0x1FFFF => 1, 0x2FFFE => 1, 0x2FFFF => 1,
-  0x3FFFE => 1, 0x3FFFF => 1, 0x4FFFE => 1, 0x4FFFF => 1,
-  0x5FFFE => 1, 0x5FFFF => 1, 0x6FFFE => 1, 0x6FFFF => 1,
-  0x7FFFE => 1, 0x7FFFF => 1, 0x8FFFE => 1, 0x8FFFF => 1,
-  0x9FFFE => 1, 0x9FFFF => 1, 0xAFFFE => 1, 0xAFFFF => 1,
-  0xBFFFE => 1, 0xBFFFF => 1, 0xCFFFE => 1, 0xCFFFF => 1,
-  0xDFFFE => 1, 0xDFFFF => 1, 0xEFFFE => 1, 0xEFFFF => 1,
-  0xFFFFE => 1, 0xFFFFF => 1, 0x10FFFE => 1, 0x10FFFF => 1
+## U+0000 error will be detected by tokenizer or tree constructor.
+my $ParseErrorControlCodePosition = {
+  html => {0x000B => 'must', 0x0085 => 'must'},
+  1 => {0x000B => 'must', 0x000C => 'must', 0x0085 => 'warn'},
+  1.1 => {0x000B => 'must', 0x000C => 'must'},
 };
-$ParseErrorNoncharCodePosition->{$_} = 1 for 0xFDD0..0xFDEF;
+$ParseErrorControlCodePosition->{html}->{$_} = 'must',
+$ParseErrorControlCodePosition->{1}->{$_} = 'must',
+$ParseErrorControlCodePosition->{1.1}->{$_} = 'must'
+    for 0x0001..0x0008, 0x000E..0x001F;
+$ParseErrorControlCodePosition->{html}->{$_} = 'must',
+$ParseErrorControlCodePosition->{1}->{$_} = 'warn',
+$ParseErrorControlCodePosition->{1.1}->{$_} = 'must'
+    for 0x007F..0x0084, 0x0086..0x009F;
+
+my $ParseErrorNoncharCodePosition = {};
+$ParseErrorNoncharCodePosition->{html}->{$_} = 'must',
+$ParseErrorNoncharCodePosition->{1}->{$_} = 'warn',
+$ParseErrorNoncharCodePosition->{1.1}->{$_} = 'warn'
+    for 0xFDD0..0xFDEF;
+$ParseErrorNoncharCodePosition->{html}->{$_} = 'must',
+$ParseErrorNoncharCodePosition->{1}->{$_} = 'must',
+$ParseErrorNoncharCodePosition->{1.1}->{$_} = 'must'
+    for 0xFFFE, 0xFFFF;
+$ParseErrorNoncharCodePosition->{1}->{$_} = 'must',
+$ParseErrorNoncharCodePosition->{1.1}->{$_} = 'must'
+    for 0xD800..0xDFFF;
+$ParseErrorNoncharCodePosition->{html}->{$_} = 'must',
+$ParseErrorNoncharCodePosition->{1}->{$_} = 'warn',
+$ParseErrorNoncharCodePosition->{1.1}->{$_} = 'warn'
+    for 0x1FFFE, 0x1FFFF, 0x2FFFE, 0x2FFFF, 0x3FFFE, 0x3FFFF, 0x4FFFE,
+        0x4FFFF, 0x5FFFE, 0x5FFFF, 0x6FFFE, 0x6FFFF, 0x7FFFE, 0x7FFFF,
+        0x8FFFE, 0x8FFFF, 0x9FFFE, 0x9FFFF, 0xAFFFE, 0xAFFFF, 0xBFFFE,
+        0xBFFFF, 0xCFFFE, 0xCFFFF, 0xDFFFE, 0xDFFFF, 0xEFFFE, 0xEFFFF,
+        0xFFFFE, 0xFFFFF, 0x10FFFE, 0x10FFFF;
 
 sub _set_nc ($) {
   my $self = $_[0];
@@ -530,8 +552,10 @@ sub _set_nc ($) {
     if ($self->{chars_pos} < @{$self->{chars}}) {
       $self->{line_prev} = $self->{line};
       $self->{column_prev} = $self->{column};
+      my $lang = $self->{is_xml} || 'html';
       my $c = ord $self->{chars}->[$self->{chars_pos}++];
-      if ($c == 0x000A) {
+      if ($c == 0x000A or
+          ($c == 0x0085 and $lang eq 1.1)) {
         if ($self->{chars_was_cr}) {
           delete $self->{chars_was_cr};
           redo;
@@ -539,23 +563,31 @@ sub _set_nc ($) {
           delete $self->{chars_was_cr};
           $self->{line}++;
           $self->{column} = 0;
+          $c = 0x000A;
         }
       } elsif ($c == 0x000D) {
         $self->{chars_was_cr} = 1;
         $self->{line}++;
         $self->{column} = 0;
         $c = 0x000A;
+      } elsif ($c == 0x2028 and $lang eq 1.1) {
+        delete $self->{chars_was_cr};
+        $self->{line}++;
+        $self->{column} = 0;
+        $c = 0x000A;
       } else {
-        if ($ParseErrorControlCodePosition->{$c}) {
+        if (my $level = $ParseErrorControlCodePosition->{$lang}->{$c}) {
           $self->{parse_error}
-              ->(type => (sprintf 'control char:U+%04X', $c),
-                 level => 'm',
+              ->(type => 'control char', # XXXtype
+                 value => (sprintf 'U+%04X', $c),
+                 level => $self->{level}->{$level},
                  line => $self->{line},
                  column => $self->{column} + 1);
-        } elsif ($ParseErrorNoncharCodePosition->{$c}) {
+        } elsif ($level = $ParseErrorNoncharCodePosition->{$lang}->{$c}) {
           $self->{parse_error}
-              ->(type => (sprintf 'nonchar:U+%04X', $c),
-                 level => 'm',
+              ->(type => 'nonchar', # XXXtype
+                 value => (sprintf 'U+%04X', $c),
+                 level => $self->{level}->{$level},
                  line => $self->{line},
                  column => $self->{column} + 1);
         }
@@ -565,10 +597,10 @@ sub _set_nc ($) {
       }
       $self->{nc} = $c;
     } else {
-      delete $self->{chars_was_cr};
       if ($self->{chars_pull_next}->()) {
         $self->{nc} = ABORT_CHAR;
       } else {
+        delete $self->{chars_was_cr};
         $self->{nc} = EOF_CHAR;
       }
     }

@@ -3,6 +3,10 @@
 #errors
 1;1;text outside of root element;;;m
 1;4;no root element;;;m
+1;1;nonchar;;U+D800;m
+1;2;nonchar;;U+D801;m
+1;3;nonchar;;U+DFF0;m
+1;4;nonchar;;U+DFFF;m
 #document escaped
 | "\uD800\uD801\uDFF0\uDFFF"
 
@@ -175,3 +179,1291 @@ a\u0000b<p></p>
 #document escaped
 | <{} p>
 | "a\uFFFDb"
+
+#data escaped
+<p>a\u0001b</p>
+#errors
+1;5;control char;;U+0001;m
+#document escaped
+| <{} p>
+|   "a\u0001b"
+
+#data escaped
+<p>a\u0002b</p>
+#errors
+1;5;control char;;U+0002;m
+#document escaped
+| <{} p>
+|   "a\u0002b"
+
+#data escaped
+<p>a\u0003b</p>
+#errors
+1;5;control char;;U+0003;m
+#document escaped
+| <{} p>
+|   "a\u0003b"
+
+#data escaped
+<p>a\u0004b</p>
+#errors
+1;5;control char;;U+0004;m
+#document escaped
+| <{} p>
+|   "a\u0004b"
+
+#data escaped
+<p>a\u0005b</p>
+#errors
+1;5;control char;;U+0005;m
+#document escaped
+| <{} p>
+|   "a\u0005b"
+
+#data escaped
+<p>a\u0006b</p>
+#errors
+1;5;control char;;U+0006;m
+#document escaped
+| <{} p>
+|   "a\u0006b"
+
+#data escaped
+<p>a\u0007b</p>
+#errors
+1;5;control char;;U+0007;m
+#document escaped
+| <{} p>
+|   "a\u0007b"
+
+#data escaped
+<p>a\u0008b</p>
+#errors
+1;5;control char;;U+0008;m
+#document escaped
+| <{} p>
+|   "a\u0008b"
+
+#data escaped
+<p>a\u0009b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u0009b"
+
+#data escaped
+<p>a\u000Ab</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000Ab"
+
+#data escaped
+<p>a\u000Bb</p>
+#errors
+1;5;control char;;U+000B;m
+#document escaped
+| <{} p>
+|   "a\u000Bb"
+
+#data escaped
+<p>a\u000Cb</p>
+#errors
+1;5;control char;;U+000C;m
+#document escaped
+| <{} p>
+|   "a\u000Cb"
+
+#data escaped
+<p>a\u000Db</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000Ab"
+
+#data escaped
+<p>a\u000Eb</p>
+#errors
+1;5;control char;;U+000E;m
+#document escaped
+| <{} p>
+|   "a\u000Eb"
+
+#data escaped
+<p>a\u000Fb</p>
+#errors
+1;5;control char;;U+000F;m
+#document escaped
+| <{} p>
+|   "a\u000Fb"
+
+#data escaped
+<p>a\u0010b</p>
+#errors
+1;5;control char;;U+0010;m
+#document escaped
+| <{} p>
+|   "a\u0010b"
+
+#data escaped
+<p>a\u0011b</p>
+#errors
+1;5;control char;;U+0011;m
+#document escaped
+| <{} p>
+|   "a\u0011b"
+
+#data escaped
+<p>a\u0012b</p>
+#errors
+1;5;control char;;U+0012;m
+#document escaped
+| <{} p>
+|   "a\u0012b"
+
+#data escaped
+<p>a\u0013b</p>
+#errors
+1;5;control char;;U+0013;m
+#document escaped
+| <{} p>
+|   "a\u0013b"
+
+#data escaped
+<p>a\u0014b</p>
+#errors
+1;5;control char;;U+0014;m
+#document escaped
+| <{} p>
+|   "a\u0014b"
+
+#data escaped
+<p>a\u0015b</p>
+#errors
+1;5;control char;;U+0015;m
+#document escaped
+| <{} p>
+|   "a\u0015b"
+
+#data escaped
+<p>a\u0016b</p>
+#errors
+1;5;control char;;U+0016;m
+#document escaped
+| <{} p>
+|   "a\u0016b"
+
+#data escaped
+<p>a\u0017b</p>
+#errors
+1;5;control char;;U+0017;m
+#document escaped
+| <{} p>
+|   "a\u0017b"
+
+#data escaped
+<p>a\u0018b</p>
+#errors
+1;5;control char;;U+0018;m
+#document escaped
+| <{} p>
+|   "a\u0018b"
+
+#data escaped
+<p>a\u0019b</p>
+#errors
+1;5;control char;;U+0019;m
+#document escaped
+| <{} p>
+|   "a\u0019b"
+
+#data escaped
+<p>a\u001Ab</p>
+#errors
+1;5;control char;;U+001A;m
+#document escaped
+| <{} p>
+|   "a\u001Ab"
+
+#data escaped
+<p>a\u001Bb</p>
+#errors
+1;5;control char;;U+001B;m
+#document escaped
+| <{} p>
+|   "a\u001Bb"
+
+#data escaped
+<p>a\u001Cb</p>
+#errors
+1;5;control char;;U+001C;m
+#document escaped
+| <{} p>
+|   "a\u001Cb"
+
+#data escaped
+<p>a\u001Db</p>
+#errors
+1;5;control char;;U+001D;m
+#document escaped
+| <{} p>
+|   "a\u001Db"
+
+#data escaped
+<p>a\u001Eb</p>
+#errors
+1;5;control char;;U+001E;m
+#document escaped
+| <{} p>
+|   "a\u001Eb"
+
+#data escaped
+<p>a\u001Fb</p>
+#errors
+1;5;control char;;U+001F;m
+#document escaped
+| <{} p>
+|   "a\u001Fb"
+
+#data escaped
+<p>a\u007Fb</p>
+#errors
+1;5;control char;;U+007F;w
+#document escaped
+| <{} p>
+|   "a\u007Fb"
+
+#data escaped
+<p>a\u0080b</p>
+#errors
+1;5;control char;;U+0080;w
+#document escaped
+| <{} p>
+|   "a\u0080b"
+
+#data escaped
+<p>a\u0081b</p>
+#errors
+1;5;control char;;U+0081;w
+#document escaped
+| <{} p>
+|   "a\u0081b"
+
+#data escaped
+<p>a\u0082b</p>
+#errors
+1;5;control char;;U+0082;w
+#document escaped
+| <{} p>
+|   "a\u0082b"
+
+#data escaped
+<p>a\u0083b</p>
+#errors
+1;5;control char;;U+0083;w
+#document escaped
+| <{} p>
+|   "a\u0083b"
+
+#data escaped
+<p>a\u0084b</p>
+#errors
+1;5;control char;;U+0084;w
+#document escaped
+| <{} p>
+|   "a\u0084b"
+
+#data escaped
+<p>a\u0085b</p>
+#errors
+1;5;control char;;U+0085;w
+#document escaped
+| <{} p>
+|   "a\u0085b"
+
+#data escaped
+<p>a\u0086b</p>
+#errors
+1;5;control char;;U+0086;w
+#document escaped
+| <{} p>
+|   "a\u0086b"
+
+#data escaped
+<p>a\u0087b</p>
+#errors
+1;5;control char;;U+0087;w
+#document escaped
+| <{} p>
+|   "a\u0087b"
+
+#data escaped
+<p>a\u0088b</p>
+#errors
+1;5;control char;;U+0088;w
+#document escaped
+| <{} p>
+|   "a\u0088b"
+
+#data escaped
+<p>a\u0089b</p>
+#errors
+1;5;control char;;U+0089;w
+#document escaped
+| <{} p>
+|   "a\u0089b"
+
+#data escaped
+<p>a\u008Ab</p>
+#errors
+1;5;control char;;U+008A;w
+#document escaped
+| <{} p>
+|   "a\u008Ab"
+
+#data escaped
+<p>a\u008Bb</p>
+#errors
+1;5;control char;;U+008B;w
+#document escaped
+| <{} p>
+|   "a\u008Bb"
+
+#data escaped
+<p>a\u008Cb</p>
+#errors
+1;5;control char;;U+008C;w
+#document escaped
+| <{} p>
+|   "a\u008Cb"
+
+#data escaped
+<p>a\u008Db</p>
+#errors
+1;5;control char;;U+008D;w
+#document escaped
+| <{} p>
+|   "a\u008Db"
+
+#data escaped
+<p>a\u008Eb</p>
+#errors
+1;5;control char;;U+008E;w
+#document escaped
+| <{} p>
+|   "a\u008Eb"
+
+#data escaped
+<p>a\u008Fb</p>
+#errors
+1;5;control char;;U+008F;w
+#document escaped
+| <{} p>
+|   "a\u008Fb"
+
+#data escaped
+<p>a\u0090b</p>
+#errors
+1;5;control char;;U+0090;w
+#document escaped
+| <{} p>
+|   "a\u0090b"
+
+#data escaped
+<p>a\u0091b</p>
+#errors
+1;5;control char;;U+0091;w
+#document escaped
+| <{} p>
+|   "a\u0091b"
+
+#data escaped
+<p>a\u0092b</p>
+#errors
+1;5;control char;;U+0092;w
+#document escaped
+| <{} p>
+|   "a\u0092b"
+
+#data escaped
+<p>a\u0093b</p>
+#errors
+1;5;control char;;U+0093;w
+#document escaped
+| <{} p>
+|   "a\u0093b"
+
+#data escaped
+<p>a\u0094b</p>
+#errors
+1;5;control char;;U+0094;w
+#document escaped
+| <{} p>
+|   "a\u0094b"
+
+#data escaped
+<p>a\u0095b</p>
+#errors
+1;5;control char;;U+0095;w
+#document escaped
+| <{} p>
+|   "a\u0095b"
+
+#data escaped
+<p>a\u0096b</p>
+#errors
+1;5;control char;;U+0096;w
+#document escaped
+| <{} p>
+|   "a\u0096b"
+
+#data escaped
+<p>a\u0097b</p>
+#errors
+1;5;control char;;U+0097;w
+#document escaped
+| <{} p>
+|   "a\u0097b"
+
+#data escaped
+<p>a\u0098b</p>
+#errors
+1;5;control char;;U+0098;w
+#document escaped
+| <{} p>
+|   "a\u0098b"
+
+#data escaped
+<p>a\u0099b</p>
+#errors
+1;5;control char;;U+0099;w
+#document escaped
+| <{} p>
+|   "a\u0099b"
+
+#data escaped
+<p>a\u009Ab</p>
+#errors
+1;5;control char;;U+009A;w
+#document escaped
+| <{} p>
+|   "a\u009Ab"
+
+#data escaped
+<p>a\u009Bb</p>
+#errors
+1;5;control char;;U+009B;w
+#document escaped
+| <{} p>
+|   "a\u009Bb"
+
+#data escaped
+<p>a\u009Cb</p>
+#errors
+1;5;control char;;U+009C;w
+#document escaped
+| <{} p>
+|   "a\u009Cb"
+
+#data escaped
+<p>a\u009Db</p>
+#errors
+1;5;control char;;U+009D;w
+#document escaped
+| <{} p>
+|   "a\u009Db"
+
+#data escaped
+<p>a\u009Eb</p>
+#errors
+1;5;control char;;U+009E;w
+#document escaped
+| <{} p>
+|   "a\u009Eb"
+
+#data escaped
+<p>a\u009Fb</p>
+#errors
+1;5;control char;;U+009F;w
+#document escaped
+| <{} p>
+|   "a\u009Fb"
+
+#data escaped
+<p>a\u00A0b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u00A0b"
+
+#data escaped
+<p>a\u2028b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u2028b"
+
+#data escaped
+<p>a\uD9ACb</p>
+#errors
+1;5;nonchar;;U+D9AC;m
+#document escaped
+| <{} p>
+|   "a\uD9ACb"
+
+#data escaped
+<p>a\uDF9Fb</p>
+#errors
+1;5;nonchar;;U+DF9F;m
+#document escaped
+| <{} p>
+|   "a\uDF9Fb"
+
+#data escaped
+<p>a\uFDD0b</p>
+#errors
+1;5;nonchar;;U+FDD0;w
+#document escaped
+| <{} p>
+|   "a\uFDD0b"
+
+#data escaped
+<p>a\uFDE0b</p>
+#errors
+1;5;nonchar;;U+FDE0;w
+#document escaped
+| <{} p>
+|   "a\uFDE0b"
+
+#data escaped
+<p>a\uFDEFb</p>
+#errors
+1;5;nonchar;;U+FDEF;w
+#document escaped
+| <{} p>
+|   "a\uFDEFb"
+
+#data escaped
+<p>a\uFFFEb</p>
+#errors
+1;5;nonchar;;U+FFFE;m
+#document escaped
+| <{} p>
+|   "a\uFFFEb"
+
+#data escaped
+<p>a\uFFFFb</p>
+#errors
+1;5;nonchar;;U+FFFF;m
+#document escaped
+| <{} p>
+|   "a\uFFFFb"
+
+#data escaped
+<p>a\U0002FFFEb</p>
+#errors
+1;5;nonchar;;U+2FFFE;w
+#document escaped
+| <{} p>
+|   "a\U0002FFFEb"
+
+#data escaped
+<p>a\U0010FFFFb</p>
+#errors
+1;5;nonchar;;U+10FFFF;w
+#document escaped
+| <{} p>
+|   "a\U0010FFFFb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0001b</p>
+#errors
+2;5;control char;;U+0001;m
+#document escaped
+| <{} p>
+|   "a\u0001b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0002b</p>
+#errors
+2;5;control char;;U+0002;m
+#document escaped
+| <{} p>
+|   "a\u0002b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0003b</p>
+#errors
+2;5;control char;;U+0003;m
+#document escaped
+| <{} p>
+|   "a\u0003b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0004b</p>
+#errors
+2;5;control char;;U+0004;m
+#document escaped
+| <{} p>
+|   "a\u0004b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0005b</p>
+#errors
+2;5;control char;;U+0005;m
+#document escaped
+| <{} p>
+|   "a\u0005b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0006b</p>
+#errors
+2;5;control char;;U+0006;m
+#document escaped
+| <{} p>
+|   "a\u0006b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0007b</p>
+#errors
+2;5;control char;;U+0007;m
+#document escaped
+| <{} p>
+|   "a\u0007b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0008b</p>
+#errors
+2;5;control char;;U+0008;m
+#document escaped
+| <{} p>
+|   "a\u0008b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0009b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u0009b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000Ab</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000Bb</p>
+#errors
+2;5;control char;;U+000B;m
+#document escaped
+| <{} p>
+|   "a\u000Bb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000Cb</p>
+#errors
+2;5;control char;;U+000C;m
+#document escaped
+| <{} p>
+|   "a\u000Cb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000Db</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000Eb</p>
+#errors
+2;5;control char;;U+000E;m
+#document escaped
+| <{} p>
+|   "a\u000Eb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000Fb</p>
+#errors
+2;5;control char;;U+000F;m
+#document escaped
+| <{} p>
+|   "a\u000Fb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0010b</p>
+#errors
+2;5;control char;;U+0010;m
+#document escaped
+| <{} p>
+|   "a\u0010b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0011b</p>
+#errors
+2;5;control char;;U+0011;m
+#document escaped
+| <{} p>
+|   "a\u0011b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0012b</p>
+#errors
+2;5;control char;;U+0012;m
+#document escaped
+| <{} p>
+|   "a\u0012b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0013b</p>
+#errors
+2;5;control char;;U+0013;m
+#document escaped
+| <{} p>
+|   "a\u0013b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0014b</p>
+#errors
+2;5;control char;;U+0014;m
+#document escaped
+| <{} p>
+|   "a\u0014b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0015b</p>
+#errors
+2;5;control char;;U+0015;m
+#document escaped
+| <{} p>
+|   "a\u0015b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0016b</p>
+#errors
+2;5;control char;;U+0016;m
+#document escaped
+| <{} p>
+|   "a\u0016b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0017b</p>
+#errors
+2;5;control char;;U+0017;m
+#document escaped
+| <{} p>
+|   "a\u0017b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0018b</p>
+#errors
+2;5;control char;;U+0018;m
+#document escaped
+| <{} p>
+|   "a\u0018b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0019b</p>
+#errors
+2;5;control char;;U+0019;m
+#document escaped
+| <{} p>
+|   "a\u0019b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u001Ab</p>
+#errors
+2;5;control char;;U+001A;m
+#document escaped
+| <{} p>
+|   "a\u001Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u001Bb</p>
+#errors
+2;5;control char;;U+001B;m
+#document escaped
+| <{} p>
+|   "a\u001Bb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u001Cb</p>
+#errors
+2;5;control char;;U+001C;m
+#document escaped
+| <{} p>
+|   "a\u001Cb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u001Db</p>
+#errors
+2;5;control char;;U+001D;m
+#document escaped
+| <{} p>
+|   "a\u001Db"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u001Eb</p>
+#errors
+2;5;control char;;U+001E;m
+#document escaped
+| <{} p>
+|   "a\u001Eb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u001Fb</p>
+#errors
+2;5;control char;;U+001F;m
+#document escaped
+| <{} p>
+|   "a\u001Fb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u007Fb</p>
+#errors
+2;5;control char;;U+007F;m
+#document escaped
+| <{} p>
+|   "a\u007Fb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0080b</p>
+#errors
+2;5;control char;;U+0080;m
+#document escaped
+| <{} p>
+|   "a\u0080b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0081b</p>
+#errors
+2;5;control char;;U+0081;m
+#document escaped
+| <{} p>
+|   "a\u0081b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0082b</p>
+#errors
+2;5;control char;;U+0082;m
+#document escaped
+| <{} p>
+|   "a\u0082b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0083b</p>
+#errors
+2;5;control char;;U+0083;m
+#document escaped
+| <{} p>
+|   "a\u0083b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0084b</p>
+#errors
+2;5;control char;;U+0084;m
+#document escaped
+| <{} p>
+|   "a\u0084b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0085b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000D\u0085b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0085\u000Db</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000A\u000Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u000A\u0085b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000A\u000Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0086b</p>
+#errors
+2;5;control char;;U+0086;m
+#document escaped
+| <{} p>
+|   "a\u0086b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0087b</p>
+#errors
+2;5;control char;;U+0087;m
+#document escaped
+| <{} p>
+|   "a\u0087b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0088b</p>
+#errors
+2;5;control char;;U+0088;m
+#document escaped
+| <{} p>
+|   "a\u0088b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0089b</p>
+#errors
+2;5;control char;;U+0089;m
+#document escaped
+| <{} p>
+|   "a\u0089b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u008Ab</p>
+#errors
+2;5;control char;;U+008A;m
+#document escaped
+| <{} p>
+|   "a\u008Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u008Bb</p>
+#errors
+2;5;control char;;U+008B;m
+#document escaped
+| <{} p>
+|   "a\u008Bb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u008Cb</p>
+#errors
+2;5;control char;;U+008C;m
+#document escaped
+| <{} p>
+|   "a\u008Cb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u008Db</p>
+#errors
+2;5;control char;;U+008D;m
+#document escaped
+| <{} p>
+|   "a\u008Db"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u008Eb</p>
+#errors
+2;5;control char;;U+008E;m
+#document escaped
+| <{} p>
+|   "a\u008Eb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u008Fb</p>
+#errors
+2;5;control char;;U+008F;m
+#document escaped
+| <{} p>
+|   "a\u008Fb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0090b</p>
+#errors
+2;5;control char;;U+0090;m
+#document escaped
+| <{} p>
+|   "a\u0090b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0091b</p>
+#errors
+2;5;control char;;U+0091;m
+#document escaped
+| <{} p>
+|   "a\u0091b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0092b</p>
+#errors
+2;5;control char;;U+0092;m
+#document escaped
+| <{} p>
+|   "a\u0092b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0093b</p>
+#errors
+2;5;control char;;U+0093;m
+#document escaped
+| <{} p>
+|   "a\u0093b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0094b</p>
+#errors
+2;5;control char;;U+0094;m
+#document escaped
+| <{} p>
+|   "a\u0094b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0095b</p>
+#errors
+2;5;control char;;U+0095;m
+#document escaped
+| <{} p>
+|   "a\u0095b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0096b</p>
+#errors
+2;5;control char;;U+0096;m
+#document escaped
+| <{} p>
+|   "a\u0096b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0097b</p>
+#errors
+2;5;control char;;U+0097;m
+#document escaped
+| <{} p>
+|   "a\u0097b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0098b</p>
+#errors
+2;5;control char;;U+0098;m
+#document escaped
+| <{} p>
+|   "a\u0098b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u0099b</p>
+#errors
+2;5;control char;;U+0099;m
+#document escaped
+| <{} p>
+|   "a\u0099b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u009Ab</p>
+#errors
+2;5;control char;;U+009A;m
+#document escaped
+| <{} p>
+|   "a\u009Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u009Bb</p>
+#errors
+2;5;control char;;U+009B;m
+#document escaped
+| <{} p>
+|   "a\u009Bb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u009Cb</p>
+#errors
+2;5;control char;;U+009C;m
+#document escaped
+| <{} p>
+|   "a\u009Cb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u009Db</p>
+#errors
+2;5;control char;;U+009D;m
+#document escaped
+| <{} p>
+|   "a\u009Db"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u009Eb</p>
+#errors
+2;5;control char;;U+009E;m
+#document escaped
+| <{} p>
+|   "a\u009Eb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u009Fb</p>
+#errors
+2;5;control char;;U+009F;m
+#document escaped
+| <{} p>
+|   "a\u009Fb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u00A0b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u00A0b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\u2028b</p>
+#errors
+#document escaped
+| <{} p>
+|   "a\u000Ab"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\uD9ACb</p>
+#errors
+2;5;nonchar;;U+D9AC;m
+#document escaped
+| <{} p>
+|   "a\uD9ACb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\uDF9Fb</p>
+#errors
+2;5;nonchar;;U+DF9F;m
+#document escaped
+| <{} p>
+|   "a\uDF9Fb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\uFDD0b</p>
+#errors
+2;5;nonchar;;U+FDD0;w
+#document escaped
+| <{} p>
+|   "a\uFDD0b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\uFDE0b</p>
+#errors
+2;5;nonchar;;U+FDE0;w
+#document escaped
+| <{} p>
+|   "a\uFDE0b"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\uFDEFb</p>
+#errors
+2;5;nonchar;;U+FDEF;w
+#document escaped
+| <{} p>
+|   "a\uFDEFb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\uFFFEb</p>
+#errors
+2;5;nonchar;;U+FFFE;m
+#document escaped
+| <{} p>
+|   "a\uFFFEb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\uFFFFb</p>
+#errors
+2;5;nonchar;;U+FFFF;m
+#document escaped
+| <{} p>
+|   "a\uFFFFb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\U0002FFFEb</p>
+#errors
+2;5;nonchar;;U+2FFFE;w
+#document escaped
+| <{} p>
+|   "a\U0002FFFEb"
+
+#data escaped
+<?xml version="1.1"?>
+<p>a\U0010FFFFb</p>
+#errors
+2;5;nonchar;;U+10FFFF;w
+#document escaped
+| <{} p>
+|   "a\U0010FFFFb"

@@ -195,6 +195,7 @@ my @FILES = grep {$_} split /\s+/, qq[
   ${test_dir_name}pis-1.dat
   ${test_dir_name}pis-2.dat
   ${test_dir_name}xmldecls-1.dat
+  ${test_dir_name}xmldecls-2.dat
   ${test_dir_name}tree-1.dat
   ${test_dir_name}ns-elements-1.dat
   ${test_dir_name}ns-attrs-1.dat

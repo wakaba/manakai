@@ -4147,9 +4147,12 @@ sub _get_next_token ($) {
         } else {
           $self->{state} = DATA_STATE;
         }
-        
-    $self->_set_nc;
-  
+        ## Don't read the next character in case the PI is in fact the
+        ## XML (or text) declaration; If the version specified in the
+        ## XML declaration is XML 1.1, interpretation of some
+        ## characters differs from XML 1.0.
+        #!!! next-input-character;
+        $self->{nc} = ABORT_CHAR;
         return  ($self->{ct}); # pi
         redo A;
       } elsif ($nc == 0x003F) { # ?

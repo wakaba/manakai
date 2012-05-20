@@ -188,6 +188,7 @@ sub _tree_before_xml_decl ($) {
                             (?>"(yes|no)"|'(yes|no)'))?
                          [\x09\x0A\x20]*\z/x) {
     $self->{document}->xml_version (defined $1 ? $1 : $2);
+    $self->{is_xml} = 1.1 if defined $1 and $1 eq '1.1';
     $self->{document}->xml_encoding (defined $3 ? $3 : $4); # possibly undef
     $self->{document}->xml_standalone (($5 || $6 || 'no') ne 'no');
 

@@ -1,0 +1,72 @@
+#data escaped
+\u0085<p>abc</p>
+#errors
+1;1;control char;;U+0085;w
+1;1;text outside of root element;;;m
+#document escaped
+| "\u0085"
+| <{} p>
+|   "abc"
+
+#data escaped
+<?xml version="1.1"?>\u0085<p>abc</p>
+#errors
+#document
+| <{} p>
+|   "abc"
+
+#data escaped
+<?xml version="1.1"?>\u000D\u0085<p>abc</p>
+#errors
+#document
+| <{} p>
+|   "abc"
+
+#data escaped
+<?xml version="1.1"?>\u2028<p>abc</p>
+#errors
+#document
+| <{} p>
+|   "abc"
+
+#data escaped
+<?xml version="1.0"?>\u0085<p>abc</p>
+#errors
+1;22;control char;;U+0085;w
+1;22;text outside of root element;;;m
+#document escaped
+| "\u0085"
+| <{} p>
+|   "abc"
+
+#data escaped
+<?xml version="1.0"?>\u2028<p>abc</p>
+#errors
+1;22;text outside of root element;;;m
+#document escaped
+| "\u2028"
+| <{} p>
+|   "abc"
+
+#data escaped
+<?xml version="1.1"\u0085?>\u0085<p>abc</p>
+#errors
+1;20;control char;;U+0085;w
+1;23;control char;;U+0085;w
+1;23;text outside of root element;;;m
+#document escaped
+| <?xml version="1.1"\u0085?>
+| "\u0085"
+| <{} p>
+|   "abc"
+
+#data escaped
+<?xml version="1.1"\u2028?>\u0085<p>abc</p>
+#errors
+1;23;control char;;U+0085;w
+1;23;text outside of root element;;;m
+#document escaped
+| <?xml version="1.1"\u0085?>
+| "\u0085"
+| <{} p>
+|   "abc"
