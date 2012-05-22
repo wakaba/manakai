@@ -3359,12 +3359,14 @@ sub _get_next_token ($) {
         !!!cp (1015);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
+                        level => $self->{level}->{must},
                         line => $l, column => $c);
         $code = $charref_map->{$code};
       } elsif ($code > 0x10FFFF) {
         !!!cp (1016);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U-%08X', $code),
+                        level => $self->{level}->{must},
                         line => $l, column => $c);
         $code = 0xFFFD;
       }
@@ -3472,12 +3474,14 @@ sub _get_next_token ($) {
         !!!cp (1008);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
+                        level => $self->{level}->{must},
                         line => $l, column => $c);
         $code = $charref_map->{$code};
       } elsif ($code > 0x10FFFF) {
         !!!cp (1009);
         !!!parse-error (type => 'invalid character reference',
                         text => (sprintf 'U-%08X', $code),
+                        level => $self->{level}->{must},
                         line => $l, column => $c);
         $code = 0xFFFD;
       }
