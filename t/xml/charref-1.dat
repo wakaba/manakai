@@ -1,4 +1,3 @@
-
 #data
 &#x20;<a/>
 #errors
@@ -115,6 +114,22 @@
 |   "\uFFFD"
 
 #data
+<a>&#x1;</a>
+#errors
+error
+#document escaped
+| <{} a>
+|   "\u0001"
+
+#data
+<a>&#01;</a>
+#errors
+error
+#document escaped
+| <{} a>
+|   "\u0001"
+
+#data
 <a>&#xd800;</a>
 #errors
 1;11;invalid character reference;U+D800;;m
@@ -145,20 +160,6 @@
 #document escaped
 | <{} a>
 |   "\uFFFD"
-
-#data
-<a>&#x1;</a>
-#errors
-#document escaped
-| <{} a>
-|   "\u0001"
-
-#data
-<a>&#01;</a>
-#errors
-#document escaped
-| <{} a>
-|   "\u0001"
 
 #data
 <a>&#x0D;</a>

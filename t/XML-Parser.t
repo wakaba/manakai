@@ -128,6 +128,9 @@ sub test ($) {
   if ($test->{'xml-version'}) {
     is $doc->xml_version, $test->{'xml-version'}->[0],
         bytes 'XML version: ' . Data::Dumper::qquote ($test->{data}->[0]);
+  } else {
+    is $doc->xml_version, '1.0',
+        bytes 'XML version: ' . Data::Dumper::qquote ($test->{data}->[0]);
   }
 
   if ($test->{'xml-encoding'}) {
@@ -138,11 +141,18 @@ sub test ($) {
       is $doc->xml_encoding, $test->{'xml-encoding'}->[0],
           bytes 'XML encoding: ' . Data::Dumper::qquote ($test->{data}->[0]);
     }
+  } else {
+    is $doc->xml_encoding, undef,
+        bytes 'XML encoding: ' . Data::Dumper::qquote ($test->{data}->[0]);
   }
 
   if ($test->{'xml-standalone'}) {
     is $doc->xml_standalone ? 1 : 0,
-        $test->{'xml-standalone'}->[1]->[0] eq 'true' ? 1 : 0,
+        ($test->{'xml-standalone'}->[0] || $test->{'xml-standalone'}->[1]->[0])
+            eq 'true' ? 1 : 0,
+        bytes 'XML standalone: ' . Data::Dumper::qquote ($test->{data}->[0]);
+  } else {
+    is $doc->xml_standalone ? 1 : 0, 0,
         bytes 'XML standalone: ' . Data::Dumper::qquote ($test->{data}->[0]);
   }
 
