@@ -5,6 +5,7 @@ no warnings 'utf8';
 our $VERSION = '2.0';
 use Whatpm::HTML::Defs;
 use Whatpm::HTML::InputStream;
+use Whatpm::HTML::ParserData;
 push our @ISA, qw(Whatpm::HTML::InputStream);
 
 ## This module implements the tokenization phase of both HTML5 and
@@ -46,52 +47,39 @@ use Whatpm::HTML::Defs qw(
 
 ## ------ Character reference mappings ------
 
-my $charref_map = {
-  0x00 => 0xFFFD, # REPLACEMENT CHARACTER
-  0x0D => 0x000D, # CARRIAGE RETURN
-  0x80 => 0x20AC,
-  0x81 => 0x0081,
-  0x82 => 0x201A,
-  0x83 => 0x0192,
-  0x84 => 0x201E,
-  0x85 => 0x2026,
-  0x86 => 0x2020,
-  0x87 => 0x2021,
-  0x88 => 0x02C6,
-  0x89 => 0x2030,
-  0x8A => 0x0160,
-  0x8B => 0x2039,
-  0x8C => 0x0152,
-  0x8D => 0x008D,
-  0x8E => 0x017D,
-  0x8F => 0x008F,
-  0x90 => 0x0090,
-  0x91 => 0x2018,
-  0x92 => 0x2019,
-  0x93 => 0x201C,
-  0x94 => 0x201D,
-  0x95 => 0x2022,
-  0x96 => 0x2013,
-  0x97 => 0x2014,
-  0x98 => 0x02DC,
-  0x99 => 0x2122,
-  0x9A => 0x0161,
-  0x9B => 0x203A,
-  0x9C => 0x0153,
-  0x9D => 0x009D,
-  0x9E => 0x017E,
-  0x9F => 0x0178,
-}; # $charref_map
-$charref_map->{$_} = 0xFFFD # REPLACEMENT CHARACTER
-    for 0xD800..0xDFFF;
-$charref_map->{$_} = $_
-    for 0x0001..0x0008, 0x000B, 0x000E..0x001F, 0x007F, 
-        0xFDD0..0xFDEF,
-        0xFFFE, 0xFFFF, 0x1FFFE, 0x1FFFF, 0x2FFFE, 0x2FFFF, 0x3FFFE, 0x3FFFF,
-        0x4FFFE, 0x4FFFF, 0x5FFFE, 0x5FFFF, 0x6FFFE, 0x6FFFF, 0x7FFFE,
-        0x7FFFF, 0x8FFFE, 0x8FFFF, 0x9FFFE, 0x9FFFF, 0xAFFFE, 0xAFFFF,
-        0xBFFFE, 0xBFFFF, 0xCFFFE, 0xCFFFF, 0xDFFFE, 0xDFFFF, 0xEFFFE,
-        0xEFFFF, 0xFFFFE, 0xFFFFF, 0x10FFFE, 0x10FFFF;
+my $InvalidCharRefs = {};
+
+for (0x0000, 0xD800..0xDFFF) {
+  $InvalidCharRefs->{0}->{$_} =
+  $InvalidCharRefs->{1.0}->{$_} =
+  $InvalidCharRefs->{1.1}->{$_} = [0xFFFD, 'must'];
+}
+for (0x0001..0x0008, 0x000B, 0x000E..0x001F) {
+  $InvalidCharRefs->{0}->{$_} =
+  $InvalidCharRefs->{1.0}->{$_} = [$_, 'must'];
+  $InvalidCharRefs->{1.1}->{$_} = [$_, 'warn'];
+}
+$InvalidCharRefs->{1.0}->{0x000C} = [0x000C, 'must'];
+$InvalidCharRefs->{1.1}->{0x000C} = [0x000C, 'warn'];
+$InvalidCharRefs->{0}->{0x007F} = [0x007F, 'must'];
+for (0x007F..0x009F) {
+  $InvalidCharRefs->{1.0}->{$_} =
+  $InvalidCharRefs->{1.1}->{$_} = [$_, 'warn'];
+}
+delete $InvalidCharRefs->{1.1}->{0x0085};
+for (keys %$Whatpm::HTML::ParserData::NoncharacterCodePoints) {
+  $InvalidCharRefs->{0}->{$_} = [$_, 'must'];
+  $InvalidCharRefs->{1.0}->{$_} =
+  $InvalidCharRefs->{1.1}->{$_} = [$_, 'warn'];
+}
+for (0xFFFE, 0xFFFF) {
+  $InvalidCharRefs->{1.0}->{$_} =
+  $InvalidCharRefs->{1.1}->{$_} = [$_, 'must'];
+}
+for (keys %$Whatpm::HTML::ParserData::CharRefReplacements) {
+  $InvalidCharRefs->{0}->{$_}
+      = [$Whatpm::HTML::ParserData::CharRefReplacements->{$_}, 'must'];
+}
 
 ## ------ The tokenizer ------
 
@@ -3625,15 +3613,12 @@ sub _get_next_token ($) {
       my $code = $self->{kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ((not $self->{is_xml} and $charref_map->{$code}) or
-          ($self->{is_xml} and 0xD800 <= $code and $code <= 0xDFFF) or
-          ($self->{is_xml} and $code == 0x0000)) {
-        
+      if (my $replace = $InvalidCharRefs->{$self->{is_xml} || 0}->{$code}) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
-                        level => $self->{level}->{must},
+                        level => $self->{level}->{$replace->[1]},
                         line => $l, column => $c);
-        $code = $charref_map->{$code};
+        $code = $replace->[0];
       } elsif ($code > 0x10FFFF) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
@@ -3748,15 +3733,12 @@ sub _get_next_token ($) {
       my $code = $self->{kwd};
       my $l = $self->{line_prev};
       my $c = $self->{column_prev};
-      if ((not $self->{is_xml} and $charref_map->{$code}) or
-          ($self->{is_xml} and 0xD800 <= $code and $code <= 0xDFFF) or
-          ($self->{is_xml} and $code == 0x0000)) {
-        
+      if (my $replace = $InvalidCharRefs->{$self->{is_xml} || 0}->{$code}) {
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',
                         text => (sprintf 'U+%04X', $code),
-                        level => $self->{level}->{must},
+                        level => $self->{level}->{$replace->[1]},
                         line => $l, column => $c);
-        $code = $charref_map->{$code};
+        $code = $replace->[0];
       } elsif ($code > 0x10FFFF) {
         
         $self->{parse_error}->(level => $self->{level}->{must}, type => 'invalid character reference',

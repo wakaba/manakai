@@ -368,6 +368,48 @@
 #data
 <a b="ab&#xd;&#xa;&#x9;&#x20;&#xc;"/>
 #errors
+1;34;invalid character reference;U+000C;;m
 #document escaped
 | <{} a>
 |   b="ab\u000d\u000a\u0009\u0020\u000c"
+
+#data
+<a b="ab&#xd;&#xa;&#x9;&#x20;&#xf;"/>
+#errors
+1;34;invalid character reference;U+000F;;m
+#document escaped
+| <{} a>
+|   b="ab\u000d\u000a\u0009\u0020\u000F"
+
+#data
+<?xml version="1.1"?>
+<a b="ab&#xd;&#xa;&#x9;&#x20;&#xc;"/>
+#errors
+2;34;invalid character reference;U+000C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   b="ab\u000d\u000a\u0009\u0020\u000C"
+
+#data
+<?xml version="1.1"?>
+<a b="ab&#xd;&#xa;&#x9;&#x20;&#xb;"/>
+#errors
+2;34;invalid character reference;U+000B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   b="ab\u000d\u000a\u0009\u0020\u000B"
+
+#data
+<?xml version="1.1"?>
+<a b="ab&#xd;&#xa;&#x9;&#x20;&#xf;"/>
+#errors
+2;34;invalid character reference;U+000F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   b="ab\u000d\u000a\u0009\u0020\u000F"

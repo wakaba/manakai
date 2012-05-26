@@ -114,9 +114,31 @@
 |   "\uFFFD"
 
 #data
+<?xml version="1.1"?>
+<a>&#x0;</a>
+#errors
+2;8;invalid character reference;U+0000;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<?xml version="1.1"?>
+<a>&#0;</a>
+#errors
+2;7;invalid character reference;U+0000;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
 <a>&#x1;</a>
 #errors
-error
+1;8;invalid character reference;U+0001;;m
 #document escaped
 | <{} a>
 |   "\u0001"
@@ -124,10 +146,2426 @@ error
 #data
 <a>&#01;</a>
 #errors
-error
+1;8;invalid character reference;U+0001;;m
 #document escaped
 | <{} a>
 |   "\u0001"
+
+#data
+<?xml version="1.1"?>
+<a>&#x1;</a>
+#errors
+2;8;invalid character reference;U+0001;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0001"
+
+#data
+<?xml version="1.1"?>
+<a>&#01;</a>
+#errors
+2;8;invalid character reference;U+0001;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0001"
+
+#data
+<a>&#x2;</a>
+#errors
+1;8;invalid character reference;U+0002;;m
+#document escaped
+| <{} a>
+|   "\u0002"
+
+#data
+<a>&#2;</a>
+#errors
+1;7;invalid character reference;U+0002;;m
+#document escaped
+| <{} a>
+|   "\u0002"
+
+#data
+<?xml version="1.1"?>
+<a>&#x2;</a>
+#errors
+2;8;invalid character reference;U+0002;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0002"
+
+#data
+<?xml version="1.1"?>
+<a>&#2;</a>
+#errors
+2;7;invalid character reference;U+0002;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0002"
+
+#data
+<a>&#x3;</a>
+#errors
+1;8;invalid character reference;U+0003;;m
+#document escaped
+| <{} a>
+|   "\u0003"
+
+#data
+<a>&#3;</a>
+#errors
+1;7;invalid character reference;U+0003;;m
+#document escaped
+| <{} a>
+|   "\u0003"
+
+#data
+<?xml version="1.1"?>
+<a>&#x3;</a>
+#errors
+2;8;invalid character reference;U+0003;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0003"
+
+#data
+<?xml version="1.1"?>
+<a>&#3;</a>
+#errors
+2;7;invalid character reference;U+0003;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0003"
+
+#data
+<a>&#x4;</a>
+#errors
+1;8;invalid character reference;U+0004;;m
+#document escaped
+| <{} a>
+|   "\u0004"
+
+#data
+<a>&#4;</a>
+#errors
+1;7;invalid character reference;U+0004;;m
+#document escaped
+| <{} a>
+|   "\u0004"
+
+#data
+<?xml version="1.1"?>
+<a>&#x4;</a>
+#errors
+2;8;invalid character reference;U+0004;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0004"
+
+#data
+<?xml version="1.1"?>
+<a>&#4;</a>
+#errors
+2;7;invalid character reference;U+0004;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0004"
+
+#data
+<a>&#x5;</a>
+#errors
+1;8;invalid character reference;U+0005;;m
+#document escaped
+| <{} a>
+|   "\u0005"
+
+#data
+<a>&#5;</a>
+#errors
+1;7;invalid character reference;U+0005;;m
+#document escaped
+| <{} a>
+|   "\u0005"
+
+#data
+<?xml version="1.1"?>
+<a>&#x5;</a>
+#errors
+2;8;invalid character reference;U+0005;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0005"
+
+#data
+<?xml version="1.1"?>
+<a>&#5;</a>
+#errors
+2;7;invalid character reference;U+0005;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0005"
+
+#data
+<a>&#x6;</a>
+#errors
+1;8;invalid character reference;U+0006;;m
+#document escaped
+| <{} a>
+|   "\u0006"
+
+#data
+<a>&#6;</a>
+#errors
+1;7;invalid character reference;U+0006;;m
+#document escaped
+| <{} a>
+|   "\u0006"
+
+#data
+<?xml version="1.1"?>
+<a>&#x6;</a>
+#errors
+2;8;invalid character reference;U+0006;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0006"
+
+#data
+<?xml version="1.1"?>
+<a>&#6;</a>
+#errors
+2;7;invalid character reference;U+0006;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0006"
+
+#data
+<a>&#x7;</a>
+#errors
+1;8;invalid character reference;U+0007;;m
+#document escaped
+| <{} a>
+|   "\u0007"
+
+#data
+<a>&#7;</a>
+#errors
+1;7;invalid character reference;U+0007;;m
+#document escaped
+| <{} a>
+|   "\u0007"
+
+#data
+<?xml version="1.1"?>
+<a>&#x7;</a>
+#errors
+2;8;invalid character reference;U+0007;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0007"
+
+#data
+<?xml version="1.1"?>
+<a>&#7;</a>
+#errors
+2;7;invalid character reference;U+0007;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0007"
+
+#data
+<a>&#x8;</a>
+#errors
+1;8;invalid character reference;U+0008;;m
+#document escaped
+| <{} a>
+|   "\u0008"
+
+#data
+<a>&#8;</a>
+#errors
+1;7;invalid character reference;U+0008;;m
+#document escaped
+| <{} a>
+|   "\u0008"
+
+#data
+<?xml version="1.1"?>
+<a>&#x8;</a>
+#errors
+2;8;invalid character reference;U+0008;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0008"
+
+#data
+<?xml version="1.1"?>
+<a>&#8;</a>
+#errors
+2;7;invalid character reference;U+0008;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0008"
+
+#data
+<a>&#x9;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u0009"
+
+#data
+<a>&#9;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u0009"
+
+#data
+<?xml version="1.1"?>
+<a>&#x9;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0009"
+
+#data
+<?xml version="1.1"?>
+<a>&#9;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0009"
+
+#data
+<a>&#xA;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000A"
+
+#data
+<a>&#10;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000A"
+
+#data
+<?xml version="1.1"?>
+<a>&#xA;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000A"
+
+#data
+<?xml version="1.1"?>
+<a>&#10;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000A"
+
+#data
+<a>&#xB;</a>
+#errors
+1;8;invalid character reference;U+000B;;m
+#document escaped
+| <{} a>
+|   "\u000B"
+
+#data
+<a>&#11;</a>
+#errors
+1;8;invalid character reference;U+000B;;m
+#document escaped
+| <{} a>
+|   "\u000B"
+
+#data
+<?xml version="1.1"?>
+<a>&#xB;</a>
+#errors
+2;8;invalid character reference;U+000B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000B"
+
+#data
+<?xml version="1.1"?>
+<a>&#11;</a>
+#errors
+2;8;invalid character reference;U+000B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000B"
+
+#data
+<a>&#xC;</a>
+#errors
+1;8;invalid character reference;U+000C;;m
+#document escaped
+| <{} a>
+|   "\u000C"
+
+#data
+<a>&#12;</a>
+#errors
+1;8;invalid character reference;U+000C;;m
+#document escaped
+| <{} a>
+|   "\u000C"
+
+#data
+<?xml version="1.1"?>
+<a>&#xC;</a>
+#errors
+2;8;invalid character reference;U+000C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000C"
+
+#data
+<?xml version="1.1"?>
+<a>&#12;</a>
+#errors
+2;8;invalid character reference;U+000C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000C"
+
+#data
+<a>&#xD;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000D"
+
+#data
+<a>&#13;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000D"
+
+#data
+<?xml version="1.1"?>
+<a>&#xD;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000D"
+
+#data
+<?xml version="1.1"?>
+<a>&#13;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000D"
+
+#data
+<a>&#x0D;&#x0a;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000D\u000A"
+
+#data
+<a>&#13;&#10;</a>
+#errors
+#document escaped
+| <{} a>
+|   "\u000D\u000A"
+
+#data
+<a>&#xE;</a>
+#errors
+1;8;invalid character reference;U+000E;;m
+#document escaped
+| <{} a>
+|   "\u000E"
+
+#data
+<a>&#14;</a>
+#errors
+1;8;invalid character reference;U+000E;;m
+#document escaped
+| <{} a>
+|   "\u000E"
+
+#data
+<?xml version="1.1"?>
+<a>&#xE;</a>
+#errors
+2;8;invalid character reference;U+000E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000E"
+
+#data
+<?xml version="1.1"?>
+<a>&#14;</a>
+#errors
+2;8;invalid character reference;U+000E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000E"
+
+#data
+<a>&#xF;</a>
+#errors
+1;8;invalid character reference;U+000F;;m
+#document escaped
+| <{} a>
+|   "\u000F"
+
+#data
+<a>&#15;</a>
+#errors
+1;8;invalid character reference;U+000F;;m
+#document escaped
+| <{} a>
+|   "\u000F"
+
+#data
+<?xml version="1.1"?>
+<a>&#xF;</a>
+#errors
+2;8;invalid character reference;U+000F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000F"
+
+#data
+<?xml version="1.1"?>
+<a>&#15;</a>
+#errors
+2;8;invalid character reference;U+000F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u000F"
+
+#data
+<a>&#x10;</a>
+#errors
+1;9;invalid character reference;U+0010;;m
+#document escaped
+| <{} a>
+|   "\u0010"
+
+#data
+<a>&#16;</a>
+#errors
+1;8;invalid character reference;U+0010;;m
+#document escaped
+| <{} a>
+|   "\u0010"
+
+#data
+<?xml version="1.1"?>
+<a>&#x10;</a>
+#errors
+2;9;invalid character reference;U+0010;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0010"
+
+#data
+<?xml version="1.1"?>
+<a>&#16;</a>
+#errors
+2;8;invalid character reference;U+0010;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0010"
+
+#data
+<a>&#x11;</a>
+#errors
+1;9;invalid character reference;U+0011;;m
+#document escaped
+| <{} a>
+|   "\u0011"
+
+#data
+<a>&#17;</a>
+#errors
+1;8;invalid character reference;U+0011;;m
+#document escaped
+| <{} a>
+|   "\u0011"
+
+#data
+<?xml version="1.1"?>
+<a>&#x11;</a>
+#errors
+2;9;invalid character reference;U+0011;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0011"
+
+#data
+<?xml version="1.1"?>
+<a>&#17;</a>
+#errors
+2;8;invalid character reference;U+0011;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0011"
+
+#data
+<a>&#x12;</a>
+#errors
+1;9;invalid character reference;U+0012;;m
+#document escaped
+| <{} a>
+|   "\u0012"
+
+#data
+<a>&#18;</a>
+#errors
+1;8;invalid character reference;U+0012;;m
+#document escaped
+| <{} a>
+|   "\u0012"
+
+#data
+<?xml version="1.1"?>
+<a>&#x12;</a>
+#errors
+2;9;invalid character reference;U+0012;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0012"
+
+#data
+<?xml version="1.1"?>
+<a>&#18;</a>
+#errors
+2;8;invalid character reference;U+0012;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0012"
+
+#data
+<a>&#x13;</a>
+#errors
+1;9;invalid character reference;U+0013;;m
+#document escaped
+| <{} a>
+|   "\u0013"
+
+#data
+<a>&#19;</a>
+#errors
+1;8;invalid character reference;U+0013;;m
+#document escaped
+| <{} a>
+|   "\u0013"
+
+#data
+<?xml version="1.1"?>
+<a>&#x13;</a>
+#errors
+2;9;invalid character reference;U+0013;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0013"
+
+#data
+<?xml version="1.1"?>
+<a>&#19;</a>
+#errors
+2;8;invalid character reference;U+0013;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0013"
+
+#data
+<a>&#x14;</a>
+#errors
+1;9;invalid character reference;U+0014;;m
+#document escaped
+| <{} a>
+|   "\u0014"
+
+#data
+<a>&#20;</a>
+#errors
+1;8;invalid character reference;U+0014;;m
+#document escaped
+| <{} a>
+|   "\u0014"
+
+#data
+<?xml version="1.1"?>
+<a>&#x14;</a>
+#errors
+2;9;invalid character reference;U+0014;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0014"
+
+#data
+<?xml version="1.1"?>
+<a>&#20;</a>
+#errors
+2;8;invalid character reference;U+0014;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0014"
+
+#data
+<a>&#x15;</a>
+#errors
+1;9;invalid character reference;U+0015;;m
+#document escaped
+| <{} a>
+|   "\u0015"
+
+#data
+<a>&#21;</a>
+#errors
+1;8;invalid character reference;U+0015;;m
+#document escaped
+| <{} a>
+|   "\u0015"
+
+#data
+<?xml version="1.1"?>
+<a>&#x15;</a>
+#errors
+2;9;invalid character reference;U+0015;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0015"
+
+#data
+<?xml version="1.1"?>
+<a>&#21;</a>
+#errors
+2;8;invalid character reference;U+0015;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0015"
+
+#data
+<a>&#x16;</a>
+#errors
+1;9;invalid character reference;U+0016;;m
+#document escaped
+| <{} a>
+|   "\u0016"
+
+#data
+<a>&#22;</a>
+#errors
+1;8;invalid character reference;U+0016;;m
+#document escaped
+| <{} a>
+|   "\u0016"
+
+#data
+<?xml version="1.1"?>
+<a>&#x16;</a>
+#errors
+2;9;invalid character reference;U+0016;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0016"
+
+#data
+<?xml version="1.1"?>
+<a>&#22;</a>
+#errors
+2;8;invalid character reference;U+0016;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0016"
+
+#data
+<a>&#x17;</a>
+#errors
+1;9;invalid character reference;U+0017;;m
+#document escaped
+| <{} a>
+|   "\u0017"
+
+#data
+<a>&#23;</a>
+#errors
+1;8;invalid character reference;U+0017;;m
+#document escaped
+| <{} a>
+|   "\u0017"
+
+#data
+<?xml version="1.1"?>
+<a>&#x17;</a>
+#errors
+2;9;invalid character reference;U+0017;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0017"
+
+#data
+<?xml version="1.1"?>
+<a>&#23;</a>
+#errors
+2;8;invalid character reference;U+0017;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0017"
+
+#data
+<a>&#x18;</a>
+#errors
+1;9;invalid character reference;U+0018;;m
+#document escaped
+| <{} a>
+|   "\u0018"
+
+#data
+<a>&#24;</a>
+#errors
+1;8;invalid character reference;U+0018;;m
+#document escaped
+| <{} a>
+|   "\u0018"
+
+#data
+<?xml version="1.1"?>
+<a>&#x18;</a>
+#errors
+2;9;invalid character reference;U+0018;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0018"
+
+#data
+<?xml version="1.1"?>
+<a>&#24;</a>
+#errors
+2;8;invalid character reference;U+0018;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0018"
+
+#data
+<a>&#x19;</a>
+#errors
+1;9;invalid character reference;U+0019;;m
+#document escaped
+| <{} a>
+|   "\u0019"
+
+#data
+<a>&#25;</a>
+#errors
+1;8;invalid character reference;U+0019;;m
+#document escaped
+| <{} a>
+|   "\u0019"
+
+#data
+<?xml version="1.1"?>
+<a>&#x19;</a>
+#errors
+2;9;invalid character reference;U+0019;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0019"
+
+#data
+<?xml version="1.1"?>
+<a>&#25;</a>
+#errors
+2;8;invalid character reference;U+0019;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0019"
+
+#data
+<a>&#x1A;</a>
+#errors
+1;9;invalid character reference;U+001A;;m
+#document escaped
+| <{} a>
+|   "\u001A"
+
+#data
+<a>&#26;</a>
+#errors
+1;8;invalid character reference;U+001A;;m
+#document escaped
+| <{} a>
+|   "\u001A"
+
+#data
+<?xml version="1.1"?>
+<a>&#x1A;</a>
+#errors
+2;9;invalid character reference;U+001A;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001A"
+
+#data
+<?xml version="1.1"?>
+<a>&#26;</a>
+#errors
+2;8;invalid character reference;U+001A;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001A"
+
+#data
+<a>&#x1B;</a>
+#errors
+1;9;invalid character reference;U+001B;;m
+#document escaped
+| <{} a>
+|   "\u001B"
+
+#data
+<a>&#27;</a>
+#errors
+1;8;invalid character reference;U+001B;;m
+#document escaped
+| <{} a>
+|   "\u001B"
+
+#data
+<?xml version="1.1"?>
+<a>&#x1B;</a>
+#errors
+2;9;invalid character reference;U+001B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001B"
+
+#data
+<?xml version="1.1"?>
+<a>&#27;</a>
+#errors
+2;8;invalid character reference;U+001B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001B"
+
+#data
+<a>&#x1C;</a>
+#errors
+1;9;invalid character reference;U+001C;;m
+#document escaped
+| <{} a>
+|   "\u001C"
+
+#data
+<a>&#28;</a>
+#errors
+1;8;invalid character reference;U+001C;;m
+#document escaped
+| <{} a>
+|   "\u001C"
+
+#data
+<?xml version="1.1"?>
+<a>&#x1C;</a>
+#errors
+2;9;invalid character reference;U+001C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001C"
+
+#data
+<?xml version="1.1"?>
+<a>&#28;</a>
+#errors
+2;8;invalid character reference;U+001C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001C"
+
+#data
+<a>&#x1D;</a>
+#errors
+1;9;invalid character reference;U+001D;;m
+#document escaped
+| <{} a>
+|   "\u001D"
+
+#data
+<a>&#29;</a>
+#errors
+1;8;invalid character reference;U+001D;;m
+#document escaped
+| <{} a>
+|   "\u001D"
+
+#data
+<?xml version="1.1"?>
+<a>&#x1D;</a>
+#errors
+2;9;invalid character reference;U+001D;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001D"
+
+#data
+<?xml version="1.1"?>
+<a>&#29;</a>
+#errors
+2;8;invalid character reference;U+001D;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001D"
+
+#data
+<a>&#x1E;</a>
+#errors
+1;9;invalid character reference;U+001E;;m
+#document escaped
+| <{} a>
+|   "\u001E"
+
+#data
+<a>&#30;</a>
+#errors
+1;8;invalid character reference;U+001E;;m
+#document escaped
+| <{} a>
+|   "\u001E"
+
+#data
+<?xml version="1.1"?>
+<a>&#x1E;</a>
+#errors
+2;9;invalid character reference;U+001E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001E"
+
+#data
+<?xml version="1.1"?>
+<a>&#30;</a>
+#errors
+2;8;invalid character reference;U+001E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001E"
+
+#data
+<a>&#x1F;</a>
+#errors
+1;9;invalid character reference;U+001F;;m
+#document escaped
+| <{} a>
+|   "\u001F"
+
+#data
+<a>&#31;</a>
+#errors
+1;8;invalid character reference;U+001F;;m
+#document escaped
+| <{} a>
+|   "\u001F"
+
+#data
+<?xml version="1.1"?>
+<a>&#x1F;</a>
+#errors
+2;9;invalid character reference;U+001F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001F"
+
+#data
+<?xml version="1.1"?>
+<a>&#31;</a>
+#errors
+2;8;invalid character reference;U+001F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u001F"
+
+#data
+<a>&#x7F;</a>
+#errors
+1;9;invalid character reference;U+007F;;w
+#document escaped
+| <{} a>
+|   "\u007F"
+
+#data
+<a>&#127;</a>
+#errors
+1;9;invalid character reference;U+007F;;w
+#document escaped
+| <{} a>
+|   "\u007F"
+
+#data
+<?xml version="1.1"?>
+<a>&#x7F;</a>
+#errors
+2;9;invalid character reference;U+007F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u007F"
+
+#data
+<?xml version="1.1"?>
+<a>&#127;</a>
+#errors
+2;9;invalid character reference;U+007F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u007F"
+
+#data
+<a>&#x80;</a>
+#errors
+1;9;invalid character reference;U+0080;;w
+#document escaped
+| <{} a>
+|   "\u0080"
+
+#data
+<a>&#128;</a>
+#errors
+1;9;invalid character reference;U+0080;;w
+#document escaped
+| <{} a>
+|   "\u0080"
+
+#data
+<?xml version="1.1"?>
+<a>&#x80;</a>
+#errors
+2;9;invalid character reference;U+0080;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0080"
+
+#data
+<?xml version="1.1"?>
+<a>&#128;</a>
+#errors
+2;9;invalid character reference;U+0080;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0080"
+
+#data
+<a>&#x81;</a>
+#errors
+1;9;invalid character reference;U+0081;;w
+#document escaped
+| <{} a>
+|   "\u0081"
+
+#data
+<a>&#129;</a>
+#errors
+1;9;invalid character reference;U+0081;;w
+#document escaped
+| <{} a>
+|   "\u0081"
+
+#data
+<?xml version="1.1"?>
+<a>&#x81;</a>
+#errors
+2;9;invalid character reference;U+0081;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0081"
+
+#data
+<?xml version="1.1"?>
+<a>&#129;</a>
+#errors
+2;9;invalid character reference;U+0081;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0081"
+
+#data
+<a>&#x82;</a>
+#errors
+1;9;invalid character reference;U+0082;;w
+#document escaped
+| <{} a>
+|   "\u0082"
+
+#data
+<a>&#130;</a>
+#errors
+1;9;invalid character reference;U+0082;;w
+#document escaped
+| <{} a>
+|   "\u0082"
+
+#data
+<?xml version="1.1"?>
+<a>&#x82;</a>
+#errors
+2;9;invalid character reference;U+0082;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0082"
+
+#data
+<?xml version="1.1"?>
+<a>&#130;</a>
+#errors
+2;9;invalid character reference;U+0082;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0082"
+
+#data
+<a>&#x83;</a>
+#errors
+1;9;invalid character reference;U+0083;;w
+#document escaped
+| <{} a>
+|   "\u0083"
+
+#data
+<a>&#131;</a>
+#errors
+1;9;invalid character reference;U+0083;;w
+#document escaped
+| <{} a>
+|   "\u0083"
+
+#data
+<?xml version="1.1"?>
+<a>&#x83;</a>
+#errors
+2;9;invalid character reference;U+0083;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0083"
+
+#data
+<?xml version="1.1"?>
+<a>&#131;</a>
+#errors
+2;9;invalid character reference;U+0083;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0083"
+
+#data
+<a>&#x84;</a>
+#errors
+1;9;invalid character reference;U+0084;;w
+#document escaped
+| <{} a>
+|   "\u0084"
+
+#data
+<a>&#132;</a>
+#errors
+1;9;invalid character reference;U+0084;;w
+#document escaped
+| <{} a>
+|   "\u0084"
+
+#data
+<?xml version="1.1"?>
+<a>&#x84;</a>
+#errors
+2;9;invalid character reference;U+0084;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0084"
+
+#data
+<?xml version="1.1"?>
+<a>&#132;</a>
+#errors
+2;9;invalid character reference;U+0084;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0084"
+
+#data
+<a>&#x85;</a>
+#errors
+1;9;invalid character reference;U+0085;;w
+#document escaped
+| <{} a>
+|   "\u0085"
+
+#data
+<a>&#133;</a>
+#errors
+1;9;invalid character reference;U+0085;;w
+#document escaped
+| <{} a>
+|   "\u0085"
+
+#data
+<?xml version="1.1"?>
+<a>&#x85;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0085"
+
+#data
+<?xml version="1.1"?>
+<a>&#133;</a>
+#errors
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0085"
+
+#data
+<a>&#x86;</a>
+#errors
+1;9;invalid character reference;U+0086;;w
+#document escaped
+| <{} a>
+|   "\u0086"
+
+#data
+<a>&#134;</a>
+#errors
+1;9;invalid character reference;U+0086;;w
+#document escaped
+| <{} a>
+|   "\u0086"
+
+#data
+<?xml version="1.1"?>
+<a>&#x86;</a>
+#errors
+2;9;invalid character reference;U+0086;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0086"
+
+#data
+<?xml version="1.1"?>
+<a>&#134;</a>
+#errors
+2;9;invalid character reference;U+0086;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0086"
+
+#data
+<a>&#x87;</a>
+#errors
+1;9;invalid character reference;U+0087;;w
+#document escaped
+| <{} a>
+|   "\u0087"
+
+#data
+<a>&#135;</a>
+#errors
+1;9;invalid character reference;U+0087;;w
+#document escaped
+| <{} a>
+|   "\u0087"
+
+#data
+<?xml version="1.1"?>
+<a>&#x87;</a>
+#errors
+2;9;invalid character reference;U+0087;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0087"
+
+#data
+<?xml version="1.1"?>
+<a>&#135;</a>
+#errors
+2;9;invalid character reference;U+0087;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0087"
+
+#data
+<a>&#x88;</a>
+#errors
+1;9;invalid character reference;U+0088;;w
+#document escaped
+| <{} a>
+|   "\u0088"
+
+#data
+<a>&#136;</a>
+#errors
+1;9;invalid character reference;U+0088;;w
+#document escaped
+| <{} a>
+|   "\u0088"
+
+#data
+<?xml version="1.1"?>
+<a>&#x88;</a>
+#errors
+2;9;invalid character reference;U+0088;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0088"
+
+#data
+<?xml version="1.1"?>
+<a>&#136;</a>
+#errors
+2;9;invalid character reference;U+0088;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0088"
+
+#data
+<a>&#x89;</a>
+#errors
+1;9;invalid character reference;U+0089;;w
+#document escaped
+| <{} a>
+|   "\u0089"
+
+#data
+<a>&#137;</a>
+#errors
+1;9;invalid character reference;U+0089;;w
+#document escaped
+| <{} a>
+|   "\u0089"
+
+#data
+<?xml version="1.1"?>
+<a>&#x89;</a>
+#errors
+2;9;invalid character reference;U+0089;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0089"
+
+#data
+<?xml version="1.1"?>
+<a>&#137;</a>
+#errors
+2;9;invalid character reference;U+0089;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0089"
+
+#data
+<a>&#x8A;</a>
+#errors
+1;9;invalid character reference;U+008A;;w
+#document escaped
+| <{} a>
+|   "\u008A"
+
+#data
+<a>&#138;</a>
+#errors
+1;9;invalid character reference;U+008A;;w
+#document escaped
+| <{} a>
+|   "\u008A"
+
+#data
+<?xml version="1.1"?>
+<a>&#x8A;</a>
+#errors
+2;9;invalid character reference;U+008A;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008A"
+
+#data
+<?xml version="1.1"?>
+<a>&#138;</a>
+#errors
+2;9;invalid character reference;U+008A;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008A"
+
+#data
+<a>&#x8B;</a>
+#errors
+1;9;invalid character reference;U+008B;;w
+#document escaped
+| <{} a>
+|   "\u008B"
+
+#data
+<a>&#139;</a>
+#errors
+1;9;invalid character reference;U+008B;;w
+#document escaped
+| <{} a>
+|   "\u008B"
+
+#data
+<?xml version="1.1"?>
+<a>&#x8B;</a>
+#errors
+2;9;invalid character reference;U+008B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008B"
+
+#data
+<?xml version="1.1"?>
+<a>&#139;</a>
+#errors
+2;9;invalid character reference;U+008B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008B"
+
+#data
+<a>&#x8C;</a>
+#errors
+1;9;invalid character reference;U+008C;;w
+#document escaped
+| <{} a>
+|   "\u008C"
+
+#data
+<a>&#140;</a>
+#errors
+1;9;invalid character reference;U+008C;;w
+#document escaped
+| <{} a>
+|   "\u008C"
+
+#data
+<?xml version="1.1"?>
+<a>&#x8C;</a>
+#errors
+2;9;invalid character reference;U+008C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008C"
+
+#data
+<?xml version="1.1"?>
+<a>&#140;</a>
+#errors
+2;9;invalid character reference;U+008C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008C"
+
+#data
+<a>&#x8D;</a>
+#errors
+1;9;invalid character reference;U+008D;;w
+#document escaped
+| <{} a>
+|   "\u008D"
+
+#data
+<a>&#141;</a>
+#errors
+1;9;invalid character reference;U+008D;;w
+#document escaped
+| <{} a>
+|   "\u008D"
+
+#data
+<?xml version="1.1"?>
+<a>&#x8D;</a>
+#errors
+2;9;invalid character reference;U+008D;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008D"
+
+#data
+<?xml version="1.1"?>
+<a>&#141;</a>
+#errors
+2;9;invalid character reference;U+008D;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008D"
+
+#data
+<a>&#x8E;</a>
+#errors
+1;9;invalid character reference;U+008E;;w
+#document escaped
+| <{} a>
+|   "\u008E"
+
+#data
+<a>&#142;</a>
+#errors
+1;9;invalid character reference;U+008E;;w
+#document escaped
+| <{} a>
+|   "\u008E"
+
+#data
+<?xml version="1.1"?>
+<a>&#x8E;</a>
+#errors
+2;9;invalid character reference;U+008E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008E"
+
+#data
+<?xml version="1.1"?>
+<a>&#142;</a>
+#errors
+2;9;invalid character reference;U+008E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008E"
+
+#data
+<a>&#x8F;</a>
+#errors
+1;9;invalid character reference;U+008F;;w
+#document escaped
+| <{} a>
+|   "\u008F"
+
+#data
+<a>&#143;</a>
+#errors
+1;9;invalid character reference;U+008F;;w
+#document escaped
+| <{} a>
+|   "\u008F"
+
+#data
+<?xml version="1.1"?>
+<a>&#x8F;</a>
+#errors
+2;9;invalid character reference;U+008F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008F"
+
+#data
+<?xml version="1.1"?>
+<a>&#143;</a>
+#errors
+2;9;invalid character reference;U+008F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u008F"
+
+#data
+<a>&#x90;</a>
+#errors
+1;9;invalid character reference;U+0090;;w
+#document escaped
+| <{} a>
+|   "\u0090"
+
+#data
+<a>&#144;</a>
+#errors
+1;9;invalid character reference;U+0090;;w
+#document escaped
+| <{} a>
+|   "\u0090"
+
+#data
+<?xml version="1.1"?>
+<a>&#x90;</a>
+#errors
+2;9;invalid character reference;U+0090;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0090"
+
+#data
+<?xml version="1.1"?>
+<a>&#144;</a>
+#errors
+2;9;invalid character reference;U+0090;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0090"
+
+#data
+<a>&#x91;</a>
+#errors
+1;9;invalid character reference;U+0091;;w
+#document escaped
+| <{} a>
+|   "\u0091"
+
+#data
+<a>&#145;</a>
+#errors
+1;9;invalid character reference;U+0091;;w
+#document escaped
+| <{} a>
+|   "\u0091"
+
+#data
+<?xml version="1.1"?>
+<a>&#x91;</a>
+#errors
+2;9;invalid character reference;U+0091;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0091"
+
+#data
+<?xml version="1.1"?>
+<a>&#145;</a>
+#errors
+2;9;invalid character reference;U+0091;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0091"
+
+#data
+<a>&#x92;</a>
+#errors
+1;9;invalid character reference;U+0092;;w
+#document escaped
+| <{} a>
+|   "\u0092"
+
+#data
+<a>&#146;</a>
+#errors
+1;9;invalid character reference;U+0092;;w
+#document escaped
+| <{} a>
+|   "\u0092"
+
+#data
+<?xml version="1.1"?>
+<a>&#x92;</a>
+#errors
+2;9;invalid character reference;U+0092;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0092"
+
+#data
+<?xml version="1.1"?>
+<a>&#146;</a>
+#errors
+2;9;invalid character reference;U+0092;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0092"
+
+#data
+<a>&#x93;</a>
+#errors
+1;9;invalid character reference;U+0093;;w
+#document escaped
+| <{} a>
+|   "\u0093"
+
+#data
+<a>&#147;</a>
+#errors
+1;9;invalid character reference;U+0093;;w
+#document escaped
+| <{} a>
+|   "\u0093"
+
+#data
+<?xml version="1.1"?>
+<a>&#x93;</a>
+#errors
+2;9;invalid character reference;U+0093;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0093"
+
+#data
+<?xml version="1.1"?>
+<a>&#147;</a>
+#errors
+2;9;invalid character reference;U+0093;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0093"
+
+#data
+<a>&#x94;</a>
+#errors
+1;9;invalid character reference;U+0094;;w
+#document escaped
+| <{} a>
+|   "\u0094"
+
+#data
+<a>&#148;</a>
+#errors
+1;9;invalid character reference;U+0094;;w
+#document escaped
+| <{} a>
+|   "\u0094"
+
+#data
+<?xml version="1.1"?>
+<a>&#x94;</a>
+#errors
+2;9;invalid character reference;U+0094;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0094"
+
+#data
+<?xml version="1.1"?>
+<a>&#148;</a>
+#errors
+2;9;invalid character reference;U+0094;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0094"
+
+#data
+<a>&#x95;</a>
+#errors
+1;9;invalid character reference;U+0095;;w
+#document escaped
+| <{} a>
+|   "\u0095"
+
+#data
+<a>&#149;</a>
+#errors
+1;9;invalid character reference;U+0095;;w
+#document escaped
+| <{} a>
+|   "\u0095"
+
+#data
+<?xml version="1.1"?>
+<a>&#x95;</a>
+#errors
+2;9;invalid character reference;U+0095;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0095"
+
+#data
+<?xml version="1.1"?>
+<a>&#149;</a>
+#errors
+2;9;invalid character reference;U+0095;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0095"
+
+#data
+<a>&#x96;</a>
+#errors
+1;9;invalid character reference;U+0096;;w
+#document escaped
+| <{} a>
+|   "\u0096"
+
+#data
+<a>&#150;</a>
+#errors
+1;9;invalid character reference;U+0096;;w
+#document escaped
+| <{} a>
+|   "\u0096"
+
+#data
+<?xml version="1.1"?>
+<a>&#x96;</a>
+#errors
+2;9;invalid character reference;U+0096;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0096"
+
+#data
+<?xml version="1.1"?>
+<a>&#150;</a>
+#errors
+2;9;invalid character reference;U+0096;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0096"
+
+#data
+<a>&#x97;</a>
+#errors
+1;9;invalid character reference;U+0097;;w
+#document escaped
+| <{} a>
+|   "\u0097"
+
+#data
+<a>&#151;</a>
+#errors
+1;9;invalid character reference;U+0097;;w
+#document escaped
+| <{} a>
+|   "\u0097"
+
+#data
+<?xml version="1.1"?>
+<a>&#x97;</a>
+#errors
+2;9;invalid character reference;U+0097;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0097"
+
+#data
+<?xml version="1.1"?>
+<a>&#151;</a>
+#errors
+2;9;invalid character reference;U+0097;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0097"
+
+#data
+<a>&#x98;</a>
+#errors
+1;9;invalid character reference;U+0098;;w
+#document escaped
+| <{} a>
+|   "\u0098"
+
+#data
+<a>&#152;</a>
+#errors
+1;9;invalid character reference;U+0098;;w
+#document escaped
+| <{} a>
+|   "\u0098"
+
+#data
+<?xml version="1.1"?>
+<a>&#x98;</a>
+#errors
+2;9;invalid character reference;U+0098;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0098"
+
+#data
+<?xml version="1.1"?>
+<a>&#152;</a>
+#errors
+2;9;invalid character reference;U+0098;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0098"
+
+#data
+<a>&#x99;</a>
+#errors
+1;9;invalid character reference;U+0099;;w
+#document escaped
+| <{} a>
+|   "\u0099"
+
+#data
+<a>&#153;</a>
+#errors
+1;9;invalid character reference;U+0099;;w
+#document escaped
+| <{} a>
+|   "\u0099"
+
+#data
+<?xml version="1.1"?>
+<a>&#x99;</a>
+#errors
+2;9;invalid character reference;U+0099;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0099"
+
+#data
+<?xml version="1.1"?>
+<a>&#153;</a>
+#errors
+2;9;invalid character reference;U+0099;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u0099"
+
+#data
+<a>&#x9A;</a>
+#errors
+1;9;invalid character reference;U+009A;;w
+#document escaped
+| <{} a>
+|   "\u009A"
+
+#data
+<a>&#154;</a>
+#errors
+1;9;invalid character reference;U+009A;;w
+#document escaped
+| <{} a>
+|   "\u009A"
+
+#data
+<?xml version="1.1"?>
+<a>&#x9A;</a>
+#errors
+2;9;invalid character reference;U+009A;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009A"
+
+#data
+<?xml version="1.1"?>
+<a>&#154;</a>
+#errors
+2;9;invalid character reference;U+009A;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009A"
+
+#data
+<a>&#x9B;</a>
+#errors
+1;9;invalid character reference;U+009B;;w
+#document escaped
+| <{} a>
+|   "\u009B"
+
+#data
+<a>&#155;</a>
+#errors
+1;9;invalid character reference;U+009B;;w
+#document escaped
+| <{} a>
+|   "\u009B"
+
+#data
+<?xml version="1.1"?>
+<a>&#x9B;</a>
+#errors
+2;9;invalid character reference;U+009B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009B"
+
+#data
+<?xml version="1.1"?>
+<a>&#155;</a>
+#errors
+2;9;invalid character reference;U+009B;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009B"
+
+#data
+<a>&#x9C;</a>
+#errors
+1;9;invalid character reference;U+009C;;w
+#document escaped
+| <{} a>
+|   "\u009C"
+
+#data
+<a>&#156;</a>
+#errors
+1;9;invalid character reference;U+009C;;w
+#document escaped
+| <{} a>
+|   "\u009C"
+
+#data
+<?xml version="1.1"?>
+<a>&#x9C;</a>
+#errors
+2;9;invalid character reference;U+009C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009C"
+
+#data
+<?xml version="1.1"?>
+<a>&#156;</a>
+#errors
+2;9;invalid character reference;U+009C;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009C"
+
+#data
+<a>&#x9D;</a>
+#errors
+1;9;invalid character reference;U+009D;;w
+#document escaped
+| <{} a>
+|   "\u009D"
+
+#data
+<a>&#157;</a>
+#errors
+1;9;invalid character reference;U+009D;;w
+#document escaped
+| <{} a>
+|   "\u009D"
+
+#data
+<?xml version="1.1"?>
+<a>&#x9D;</a>
+#errors
+2;9;invalid character reference;U+009D;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009D"
+
+#data
+<?xml version="1.1"?>
+<a>&#157;</a>
+#errors
+2;9;invalid character reference;U+009D;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009D"
+
+#data
+<a>&#x9E;</a>
+#errors
+1;9;invalid character reference;U+009E;;w
+#document escaped
+| <{} a>
+|   "\u009E"
+
+#data
+<a>&#158;</a>
+#errors
+1;9;invalid character reference;U+009E;;w
+#document escaped
+| <{} a>
+|   "\u009E"
+
+#data
+<?xml version="1.1"?>
+<a>&#x9E;</a>
+#errors
+2;9;invalid character reference;U+009E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009E"
+
+#data
+<?xml version="1.1"?>
+<a>&#158;</a>
+#errors
+2;9;invalid character reference;U+009E;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009E"
+
+#data
+<a>&#x9F;</a>
+#errors
+1;9;invalid character reference;U+009F;;w
+#document escaped
+| <{} a>
+|   "\u009F"
+
+#data
+<a>&#159;</a>
+#errors
+1;9;invalid character reference;U+009F;;w
+#document escaped
+| <{} a>
+|   "\u009F"
+
+#data
+<?xml version="1.1"?>
+<a>&#x9F;</a>
+#errors
+2;9;invalid character reference;U+009F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009F"
+
+#data
+<?xml version="1.1"?>
+<a>&#159;</a>
+#errors
+2;9;invalid character reference;U+009F;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\u009F"
 
 #data
 <a>&#xd800;</a>
@@ -141,6 +2579,28 @@ error
 <a>&#55296;</a>
 #errors
 1;11;invalid character reference;U+D800;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<?xml version="1.1"?>
+<a>&#xd800;</a>
+#errors
+2;11;invalid character reference;U+D800;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<?xml version="1.1"?>
+<a>&#55296;</a>
+#errors
+2;11;invalid character reference;U+D800;;m
+#xml-version
+1.1
 #document escaped
 | <{} a>
 |   "\uFFFD"
@@ -162,15 +2622,191 @@ error
 |   "\uFFFD"
 
 #data
-<a>&#x0D;</a>
+<a>&#xFDD0;</a>
 #errors
+1;11;invalid character reference;U+FDD0;;w
 #document escaped
 | <{} a>
-|   "\u000D"
+|   "\uFDD0"
 
 #data
-<a>&#13;</a>
+<a>&#64976;</a>
 #errors
+1;11;invalid character reference;U+FDD0;;w
 #document escaped
 | <{} a>
-|   "\u000D"
+|   "\uFDD0"
+
+#data
+<?xml version="1.1"?>
+<a>&#xFDD0;</a>
+#errors
+2;11;invalid character reference;U+FDD0;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFDD0"
+
+#data
+<?xml version="1.1"?>
+<a>&#64976;</a>
+#errors
+2;11;invalid character reference;U+FDD0;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFDD0"
+
+#data
+<a>&#xFFFE;</a>
+#errors
+1;11;invalid character reference;U+FFFE;;m
+#document escaped
+| <{} a>
+|   "\uFFFE"
+
+#data
+<a>&#65534;</a>
+#errors
+1;11;invalid character reference;U+FFFE;;m
+#document escaped
+| <{} a>
+|   "\uFFFE"
+
+#data
+<?xml version="1.1"?>
+<a>&#xFFFE;</a>
+#errors
+2;11;invalid character reference;U+FFFE;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFE"
+
+#data
+<?xml version="1.1"?>
+<a>&#65534;</a>
+#errors
+2;11;invalid character reference;U+FFFE;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFE"
+
+#data
+<a>&#xFFFF;</a>
+#errors
+1;11;invalid character reference;U+FFFF;;m
+#document escaped
+| <{} a>
+|   "\uFFFF"
+
+#data
+<a>&#65535;</a>
+#errors
+1;11;invalid character reference;U+FFFF;;m
+#document escaped
+| <{} a>
+|   "\uFFFF"
+
+#data
+<?xml version="1.1"?>
+<a>&#xFFFF;</a>
+#errors
+2;11;invalid character reference;U+FFFF;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFF"
+
+#data
+<?xml version="1.1"?>
+<a>&#65535;</a>
+#errors
+2;11;invalid character reference;U+FFFF;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFF"
+
+#data
+<a>&#x10FFFF;</a>
+#errors
+1;13;invalid character reference;U+10FFFF;;w
+#document escaped
+| <{} a>
+|   "\U0010FFFF"
+
+#data
+<a>&#1114111;</a>
+#errors
+1;13;invalid character reference;U+10FFFF;;w
+#document escaped
+| <{} a>
+|   "\U0010FFFF"
+
+#data
+<?xml version="1.1"?>
+<a>&#x10FFFF;</a>
+#errors
+2;13;invalid character reference;U+10FFFF;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\U0010FFFF"
+
+#data
+<?xml version="1.1"?>
+<a>&#1114111;</a>
+#errors
+2;13;invalid character reference;U+10FFFF;;w
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\U0010FFFF"
+
+#data
+<a>&#x11FFFF;</a>
+#errors
+1;13;invalid character reference;U-0011FFFF;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<a>&#1114112;</a>
+#errors
+1;13;invalid character reference;U-00110000;;m
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<?xml version="1.1"?>
+<a>&#x12FFFF;</a>
+#errors
+2;13;invalid character reference;U-0012FFFF;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFD"
+
+#data
+<?xml version="1.1"?>
+<a>&#1114113;</a>
+#errors
+2;13;invalid character reference;U-00110001;;m
+#xml-version
+1.1
+#document escaped
+| <{} a>
+|   "\uFFFD"

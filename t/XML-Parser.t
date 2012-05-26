@@ -126,7 +126,8 @@ sub test ($) {
       bytes 'Parse error: ' . Data::Dumper::qquote ($test->{data}->[0]);
 
   if ($test->{'xml-version'}) {
-    is $doc->xml_version, $test->{'xml-version'}->[0],
+    is $doc->xml_version,
+        $test->{'xml-version'}->[0],
         bytes 'XML version: ' . Data::Dumper::qquote ($test->{data}->[0]);
   } else {
     is $doc->xml_version, '1.0',
@@ -134,7 +135,7 @@ sub test ($) {
   }
 
   if ($test->{'xml-encoding'}) {
-    if (($test->{'xml-encoding'}->[1]->[0] || '') eq 'null') {
+    if (($test->{'xml-encoding'}->[1]->[0] // '') eq 'null') {
       is $doc->xml_encoding, undef, 
           bytes 'XML encoding: ' . Data::Dumper::qquote ($test->{data}->[0]);
     } else {
