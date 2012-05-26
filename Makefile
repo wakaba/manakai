@@ -2,24 +2,24 @@ PERL = perl
 PERL_VERSION = latest
 PERL_PATH = $(abspath local/perlbrew/perls/perl-$(PERL_VERSION)/bin)
 PROVE = prove
+WGET = wget
 
-all: config/perl/libs.txt
+all: 
 
 ## ------ Deps ------
 
 Makefile-setupenv: Makefile.setupenv
-	make --makefile Makefile.setupenv setupenv-update \
-            SETUPENV_MIN_REVISION=20120330
+	$(MAKE) --makefile Makefile.setupenv setupenv-update \
+            SETUPENV_MIN_REVISION=20120331
 
 Makefile.setupenv:
-	wget -O $@ https://raw.github.com/wakaba/perl-setupenv/master/Makefile.setupenv
+	$(WGET) -O $@ https://raw.github.com/wakaba/perl-setupenv/master/Makefile.setupenv
 
-config/perl/libs.txt local-perl generatepm \
+local-perl generatepm \
 perl-exec perl-version \
-carton-install carton-update carton-install-module \
+pmb-update pmb-install \
 : %: Makefile-setupenv
-	make --makefile Makefile.setupenv pmbundler-repo-update $@ \
-            PMBUNDLER_REPO_URL=$(PMBUNDLER_REPO_URL)
+	$(MAKE) --makefile Makefile.setupenv $@
 
 ## ------ Tests ------
 
@@ -27,7 +27,7 @@ PERL_ENV = PATH=$(PERL_PATH):$(PATH) PERL5LIB=$(shell cat config/perl/libs.txt)
 
 test: safetest
 
-test-deps: carton-install config/perl/libs.txt
+test-deps: pmb-install
 
 safetest: test-deps safetest-main
 
