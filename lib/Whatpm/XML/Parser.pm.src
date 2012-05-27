@@ -16,8 +16,6 @@ sub parse_char_string ($$$;$$) {
 
   ## Confidence: irrelevant.
   $self->{confident} = 1 unless exists $self->{confident};
-  $self->{document}->input_encoding ($self->{input_encoding})
-      if defined $self->{input_encoding};
 
   $self->{line_prev} = $self->{line} = 1;
   $self->{column_prev} = -1;
@@ -54,8 +52,6 @@ sub parse_char_stream ($$$;$$) {
 
   ## Confidence: irrelevant.
   $self->{confident} = 1 unless exists $self->{confident};
-  $self->{document}->input_encoding ($self->{input_encoding})
-      if defined $self->{input_encoding};
 
   $self->{line_prev} = $self->{line} = 1;
   $self->{column_prev} = -1;
