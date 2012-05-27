@@ -1810,9 +1810,17 @@ sub _get_next_token ($) {
     $self->_set_nc;
   
         redo A;
-      } elsif (($self->{is_xml} or
+      } elsif ((
+                ## Whatpm::XML::Parser
+                $self->{is_xml} or
+
+                ## Temma::Parser
+                $self->{enable_cdata_section} or
+
+                ## Whatpm::HTML::Parser
                 (@{$self->{open_elements} || []} and
-                 ($self->{open_elements}->[-1]->[1] & FOREIGN_EL))) and
+                 ($self->{open_elements}->[-1]->[1] & FOREIGN_EL))
+               ) and
                $nc == 0x005B) { # [
                         
         $self->{state} = MD_CDATA_STATE;
