@@ -1,10 +1,14 @@
 package Message::DOM::Node;
 use strict;
-our $VERSION=do{my @r=(q$Revision: 1.19 $=~/\d+/g);sprintf "%d."."%02d" x $#r,@r};
+use warnings;
+our $VERSION = '1.20';
 push our @ISA, 'Message::IF::Node',
     'Message::IF::NSResolver';
 require Scalar::Util;
 require Message::DOM::DOMException;
+use Exporter::Lite;
+
+our @EXPORT;
 
 ## NOTE:
 ##   Node
@@ -53,6 +57,13 @@ sub DOCUMENT_FRAGMENT_NODE () { 11 }
 sub NOTATION_NODE () { 12 }
 sub ELEMENT_TYPE_DEFINITION_NODE () { 81001 }
 sub ATTRIBUTE_DEFINITION_NODE () { 81002 }
+
+push @EXPORT, qw(
+  ELEMENT_NODE ATTRIBUTE_NODE TEXT_NODE CDATA_SECTION_NODE
+  ENTITY_REFERENCE_NODE ENTITY_NODE PROCESSING_INSTRUCTION_NODE
+  COMMENT_NODE DOCUMENT_NODE DOCUMENT_TYPE_NODE DOCUMENT_FRAGMENT_NODE
+  NOTATION_NODE ELEMENT_TYPE_DEFINITION_NODE ATTRIBUTE_DEFINITION_NODE
+);
 
 ## Definition group DocumentPosition
 
