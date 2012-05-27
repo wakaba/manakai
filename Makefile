@@ -2,6 +2,7 @@ PERL = perl
 PERL_VERSION = latest
 PERL_PATH = $(abspath local/perlbrew/perls/perl-$(PERL_VERSION)/bin)
 PROVE = prove
+WGET = wget
 
 all: config/perl/libs.txt
 
@@ -12,7 +13,7 @@ Makefile-setupenv: Makefile.setupenv
             SETUPENV_MIN_REVISION=20120330
 
 Makefile.setupenv:
-	wget -O $@ https://raw.github.com/wakaba/perl-setupenv/master/Makefile.setupenv
+	$(WGET) -O $@ https://raw.github.com/wakaba/perl-setupenv/master/Makefile.setupenv
 
 config/perl/libs.txt local-perl generatepm \
 perl-exec perl-version \
