@@ -3,6 +3,51 @@ use strict;
 use warnings;
 our $VERSION = '1.0';
 
+## ------ Foreign element integration points ------
+
+## MathML text integration point
+## <http://www.whatwg.org/specs/web-apps/current-work/#mathml-text-integration-point>.
+our $MathMLTextIntegrationPoints = {
+  mi => 1,
+  mo => 1,
+  mn => 1,
+  ms => 1,
+  mtext => 1,
+};
+
+## <http://www.whatwg.org/specs/web-apps/current-work/#tree-construction>.
+our $MathMLTextIntegrationPointMathMLElements = {
+  mglyph => 1,
+  malignmark => 1,
+};
+
+## HTML integration point (SVG elements)
+## <http://www.whatwg.org/specs/web-apps/current-work/#html-integration-point>.
+our $SVGHTMLIntegrationPoints = {
+  foreignObject => 1,
+  desc => 1,
+  title => 1,
+};
+
+## HTML integration point (MathML elements)
+## <http://www.whatwg.org/specs/web-apps/current-work/#html-integration-point>.
+our $MathMLHTMLIntegrationPoints = {
+  #'annotation-xml' with encoding (ASCII case-insensitive) text/html
+  #or application/xhtml+xml
+};
+
+## <http://www.whatwg.org/specs/web-apps/current-work/#parsing-main-inforeign>.
+our $ForeignContentBreakers = {
+  b => 1, big => 1, blockquote => 1, body => 1, br => 1, center => 1,
+  code => 1, dd => 1, div => 1, dl => 1, dt => 1, em => 1, embed => 1,
+  h1 => 1, h2 => 1, h3 => 1, h4 => 1, h5 => 1, h6 => 1, head => 1,
+  hr => 1, i => 1, img => 1, li => 1, listing => 1, menu => 1, meta => 1,
+  nobr => 1, ol => 1, p => 1, pre => 1, ruby => 1, s => 1, small => 1,
+  span => 1, strong => 1, strike => 1, sub => 1, sup => 1, table => 1,
+  tt => 1, u => 1, ul => 1, var => 1,
+  # font with "color"/"face"/"size"
+};
+
 ## ------ Attribute name mappings ------
 
 ## Adjust MathML attributes
@@ -308,6 +353,14 @@ extracted from the HTML Living Standard.
 Following data from the HTML specification are included:
 
 =over 4
+
+=item $MathMLTextIntegrationPoints
+
+=item $MathMLHTMLIntegrationPoints
+
+=item $SVGHTMLIntegrationPoints
+
+=item $ForeignContentBreakers
 
 =item $MathMLAttrNameFixup
 

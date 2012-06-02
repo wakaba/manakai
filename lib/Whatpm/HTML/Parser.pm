@@ -1635,16 +1635,7 @@ sub _construct_tree ($) {
         ## "In foreign content", start tag token.
 
         if (
-          {
-            b => 1, big => 1, blockquote => 1, body => 1, br => 1,
-            center => 1, code => 1, dd => 1, div => 1, dl => 1, dt => 1,
-            em => 1, embed => 1, h1 => 1, h2 => 1, h3 => 1, h4 => 1,
-            h5 => 1, h6 => 1, head => 1, hr => 1, i => 1, img => 1, li => 1,
-            listing => 1, menu => 1, meta => 1, nobr => 1, ol => 1,
-            p => 1, pre => 1, ruby => 1, s => 1, small => 1, span => 1,
-            strong => 1, strike => 1, sub => 1, sup => 1, table => 1,
-            tt => 1, u => 1, ul => 1, var => 1,
-          }->{$self->{t}->{tag_name}} or
+          $Whatpm::HTML::ParserData::ForeignContentBreakers->{$self->{t}->{tag_name}} or
           ($self->{t}->{tag_name} eq 'font' and
            ($self->{t}->{attributes}->{color} or
             $self->{t}->{attributes}->{face} or
