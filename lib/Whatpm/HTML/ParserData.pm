@@ -3,6 +3,15 @@ use strict;
 use warnings;
 our $VERSION = '1.0';
 
+## ------ Namespace URLs ------
+
+sub HTML_NS () { q<http://www.w3.org/1999/xhtml> }
+sub MML_NS () { q<http://www.w3.org/1998/Math/MathML> }
+sub SVG_NS () { q<http://www.w3.org/2000/svg> }
+sub XLINK_NS () { q<http://www.w3.org/1999/xlink> }
+sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
+sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
+
 ## ------ Foreign element integration points ------
 
 ## MathML text integration point
@@ -122,10 +131,6 @@ our $SVGAttrNameFixup = {
   ychannelselector => 'yChannelSelector',
   zoomandpan => 'zoomAndPan',
 }; # $SVGAttrNameFixup
-
-sub XLINK_NS () { q<http://www.w3.org/1999/xlink> }
-sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
-sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
 ## Adjust foreign attributes
 ## <http://www.whatwg.org/specs/web-apps/current-work/#adjust-foreign-attributes>.
@@ -347,6 +352,13 @@ Whatpm::HTML::ParserData - Data for HTML parser
 
 The C<Whatpm::HTML::ParserData> module contains data for HTML parser,
 extracted from the HTML Living Standard.
+
+=head1 CONSTANTS
+
+Following constants for namespace URLs are defined (but not exported):
+C<HTML_NS> (HTML namespace), C<SVG_NS> (SVG namespace), C<MML_NS>
+(MathML namespace), C<XML_NS> (XML namespace), C<XMLNS_NS> (XML
+Namespace namespace), and C<XLINK_NS> (XLink namespace).
 
 =head1 VARIABLES
 

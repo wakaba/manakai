@@ -7,6 +7,15 @@ use base qw(Test::Class);
 use Test::More;
 use Whatpm::HTML::ParserData;
 
+sub _nsurls : Test(6) {
+  ok Whatpm::HTML::ParserData::HTML_NS;
+  ok Whatpm::HTML::ParserData::SVG_NS;
+  ok Whatpm::HTML::ParserData::MML_NS;
+  ok Whatpm::HTML::ParserData::XML_NS;
+  ok Whatpm::HTML::ParserData::XMLNS_NS;
+  ok Whatpm::HTML::ParserData::XLINK_NS;
+} # _nsurls
+
 sub _mathml_attr : Test(1) {
   is $Whatpm::HTML::ParserData::MathMLAttrNameFixup->{definitionurl},
       'definitionURL';
