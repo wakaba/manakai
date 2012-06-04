@@ -1,0 +1,51 @@
+=head1 NAME
+
+Message::DOM::Node - DOM |Node| interface
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::Node> implements the DOM C<Node> interface.
+
+=head1 METHODS
+
+The C<Node> object has following methods:
+
+=over 4
+
+=item ...
+
+=item $url = $node->manakai_get_child_namespace_uri ($tag_name)
+
+Return the default namespace URL for the tag name, using the node as
+the context.  [MANAKAI]
+
+=back
+
+=head1 SPECIFICATIONS
+
+=over 4
+
+=item [DOM]
+
+DOM
+<http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#interface-node>.
+
+=item [MANAKAI]
+
+manakai DOM Extensions
+<http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions>.
+
+=back
+
+=head1 AUTHOR
+
+Wakaba <w@suika.fam.cx>.
+
+=head1 LICENSE
+
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

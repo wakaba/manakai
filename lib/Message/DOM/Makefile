@@ -4,7 +4,7 @@ RM = rm
 RMALL = $(RM) -fv
 
 HTML_FILES = DOMImplementation.html Document.html \
-  NodeList.html \
+  Node.html NodeList.html \
   TextTrack.html TextTrackCue.html TextTrackCueList.html
 
 all: $(HTML_FILES)

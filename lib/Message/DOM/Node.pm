@@ -1128,6 +1128,69 @@ sub lookup_namespace_uri ($$) {
   }
 } # lookup_namespace_uri
 
+sub manakai_get_child_namespace_uri ($) {
+  my $self = $_[0];
+  my $doc = $$self->{owner_document} || $self;
+  if ($doc->manakai_is_html) {
+    my $tag_name = defined $_[1] ? $_[1] : '';
+    $tag_name =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+
+    require Whatpm::HTML::ParserData;
+    my $ns = $self->namespace_uri;
+    my $ln = $self->manakai_local_name;
+    if (not defined $ln or not defined $ns) {
+      #
+    } elsif ($ns eq Whatpm::HTML::ParserData::SVG_NS ()) {
+      if ($Whatpm::HTML::ParserData::SVGHTMLIntegrationPoints->{$ln}) {
+        #
+      } else {
+        return $ns;
+      }
+    } elsif ($ns eq Whatpm::HTML::ParserData::MML_NS ()) {
+      if ($Whatpm::HTML::ParserData::MathMLTextIntegrationPoints->{$ln}) {
+        if ($tag_name eq 'mglyph' or $tag_name eq 'malignmark') {
+          return Whatpm::HTML::ParserData::MML_NS ();
+        }
+      } elsif ($ln eq 'annotation-xml') {
+        if ($tag_name eq 'svg') {
+          return Whatpm::HTML::ParserData::SVG_NS ();
+        }
+        my $encoding = $self->get_attribute ('encoding') || '';
+        $encoding =~ tr/A-Z/a-z/; ## ASCII case-insensitive.
+        if ($encoding eq 'text/html' or $encoding eq 'application/xhtml+xml') {
+          #
+        } else {
+          return $ns;
+        }
+      } elsif ($Whatpm::HTML::ParserData::MathMLHTMLIntegrationPoints->{$ln}) {
+        #
+      } else {
+        return $ns;
+      }
+    } # $ns
+
+    if ($tag_name eq 'svg') {
+      return Whatpm::HTML::ParserData::SVG_NS ();
+    } elsif ($tag_name eq 'math') {
+      return Whatpm::HTML::ParserData::MML_NS ();
+    } else {
+      return Whatpm::HTML::ParserData::HTML_NS ();
+    }
+  } else {
+    if (defined $_[1] and $_[1] =~ /:/) {
+      my $prefix = $_[1];
+      $prefix =~ s/:.*//gs;
+      if ($prefix eq '') {
+        return undef;
+      } else {
+        return $self->lookup_namespace_uri ($prefix);
+      }
+    } else {
+      return $self->lookup_namespace_uri (undef);
+    }
+  }
+} # manakai_get_child_namespace_uri
+
 sub lookup_prefix ($$) {
   my $namespace_uri = defined $_[1] ? $_[1] : '';
   if ($namespace_uri eq '') {
