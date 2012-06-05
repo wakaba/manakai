@@ -16,6 +16,14 @@ sub _nsurls : Test(6) {
   ok Whatpm::HTML::ParserData::XLINK_NS;
 } # _nsurls
 
+sub _void : Test(5) {
+  ok $Whatpm::HTML::ParserData::AllVoidElements->{br};
+  ok !$Whatpm::HTML::ParserData::AllVoidElements->{canvas};
+  ok $Whatpm::HTML::ParserData::AllVoidElements->{embed};
+  ok $Whatpm::HTML::ParserData::AllVoidElements->{bgsound};
+  ok !$Whatpm::HTML::ParserData::AllVoidElements->{image};
+} # _void
+
 sub _mathml_attr : Test(1) {
   is $Whatpm::HTML::ParserData::MathMLAttrNameFixup->{definitionurl},
       'definitionURL';

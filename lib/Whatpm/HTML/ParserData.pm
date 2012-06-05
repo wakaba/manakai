@@ -12,6 +12,24 @@ sub XLINK_NS () { q<http://www.w3.org/1999/xlink> }
 sub XML_NS () { q<http://www.w3.org/XML/1998/namespace> }
 sub XMLNS_NS () { q<http://www.w3.org/2000/xmlns/> }
 
+## ------ Element categories ------
+
+our $AllVoidElements = {
+  ## "Void elements" per syntax spec
+  ## <http://www.whatwg.org/specs/web-apps/current-work/#void-elements>.
+  area => 1, base => 1, br => 1, col => 1, command => 1, embed => 1,
+  hr => 1, img => 1, input => 1, keygen => 1, link => 1, meta => 1,
+  param => 1, source => 1, track => 1, wbr => 1,
+
+  ## Obsolete void elements from serialization spec
+  ## <http://www.whatwg.org/specs/web-apps/current-work/#serializing-html-fragments>.
+  basefont => 1, bgsound => 1, frame => 1,
+
+  ## "Macro" elements, from spec comment at
+  ## <http://www.whatwg.org/specs/web-apps/current-work/#serializing-html-fragments>.
+  #image => 1, isindex => 1,
+}; ## $AllVoidElements
+
 ## ------ Foreign element integration points ------
 
 ## MathML text integration point
@@ -365,6 +383,8 @@ Namespace namespace), and C<XLINK_NS> (XLink namespace).
 Following data from the HTML specification are included:
 
 =over 4
+
+=item $AllVoidElements
 
 =item $MathMLTextIntegrationPoints
 
