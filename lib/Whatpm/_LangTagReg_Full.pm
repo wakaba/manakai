@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2012-02-28',
+          '_file_date' => '2012-07-05',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -60204,6 +60204,18 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ],
                                       '_added' => '2007-07-05'
                                     },
+                         'bohoric' => {
+                                        'Comments' => [
+                                                        'The subtag represents the alphabet codified by Adam Bohorič in  1584 and used from the first printed Slovene book and up to the mid-  19th century.'
+                                                      ],
+                                        'Description' => [
+                                                           'Slovene in Bohorič alphabet'
+                                                         ],
+                                        'Prefix' => [
+                                                      'sl'
+                                                    ],
+                                        '_added' => '2012-06-27'
+                                      },
                          'boont' => {
                                       'Comments' => [
                                                       'Jargon embedded in American English'
@@ -60216,6 +60228,18 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ],
                                       '_added' => '2006-09-18'
                                     },
+                         'dajnko' => {
+                                       'Comments' => [
+                                                       'The subtag represents the alphabet codified by Peter Dajnko  and used from 1824 to 1839 mostly in Styria (in what is now Eastern  Slovenia).'
+                                                     ],
+                                       'Description' => [
+                                                          'Slovene in Dajnko alphabet'
+                                                        ],
+                                       'Prefix' => [
+                                                     'sl'
+                                                   ],
+                                       '_added' => '2012-06-27'
+                                     },
                          'emodeng' => {
                                         'Description' => [
                                                            'Early Modern English (1500-1700)'
@@ -60323,6 +60347,16 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ],
                                       '_added' => '2008-10-14'
                                     },
+                         'kscor' => {
+                                      'Description' => [
+                                                         'Standard Cornish orthography of Revived Cornish',
+                                                         'Kernowek Standard'
+                                                       ],
+                                      'Prefix' => [
+                                                    'kw'
+                                                  ],
+                                      '_added' => '2012-06-27'
+                                    },
                          'laukika' => {
                                         'Description' => [
                                                            'Classical Sanskrit'
@@ -60358,6 +60392,18 @@ $Whatpm::LangTag::RegistryFull = {
                                          '_added' => '2010-10-10',
                                          '_canon' => 'luna1918'
                                        },
+                         'metelko' => {
+                                        'Comments' => [
+                                                        'The subtag represents the alphabet codified by Franc Serafin  Metelko and used from 1825 to 1833.'
+                                                      ],
+                                        'Description' => [
+                                                           'Slovene in Metelko alphabet'
+                                                         ],
+                                        'Prefix' => [
+                                                      'sl'
+                                                    ],
+                                        '_added' => '2012-06-27'
+                                      },
                          'monoton' => {
                                         'Description' => [
                                                            'Monotonic Greek'

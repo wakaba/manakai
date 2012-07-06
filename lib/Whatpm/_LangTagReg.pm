@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2012-02-28',
+          '_file_date' => '2012-07-05',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
@@ -12943,11 +12943,21 @@ $Whatpm::LangTag::Registry = {
                                                     'sl-rozaj'
                                                   ]
                                     },
+                         'bohoric' => {
+                                        'Prefix' => [
+                                                      'sl'
+                                                    ]
+                                      },
                          'boont' => {
                                       'Prefix' => [
                                                     'en'
                                                   ]
                                     },
+                         'dajnko' => {
+                                       'Prefix' => [
+                                                     'sl'
+                                                   ]
+                                     },
                          'emodeng' => {
                                         'Prefix' => [
                                                       'en'
@@ -12993,6 +13003,11 @@ $Whatpm::LangTag::Registry = {
                                                     'kw'
                                                   ]
                                     },
+                         'kscor' => {
+                                      'Prefix' => [
+                                                    'kw'
+                                                  ]
+                                    },
                          'laukika' => {
                                         'Prefix' => [
                                                       'sa'
@@ -13009,6 +13024,11 @@ $Whatpm::LangTag::Registry = {
                                                      ],
                                          '_canon' => 'luna1918'
                                        },
+                         'metelko' => {
+                                        'Prefix' => [
+                                                      'sl'
+                                                    ]
+                                      },
                          'monoton' => {
                                         'Prefix' => [
                                                       'el'
