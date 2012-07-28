@@ -21,6 +21,7 @@ sub dumptree ($) {
     q<urn:x-suika-fam-cx:markup:suikawiki:0:9:> => 'sw',
     q<urn:x-suika-fam-cx:markup:suikawiki:0:10:> => 'sw10',
     q<http://suika.fam.cx/www/markup/temma> => 'temma',
+    q<http://suika.fam.cx/www/markup/temma/macro> => 'temmacro',
   };
 
   my @node = map { [$_, ''] } @{$node->child_nodes};
