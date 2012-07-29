@@ -1126,6 +1126,22 @@ sub manakai_head ($) {
   return undef;
 } # manakai_head
 
+## XXX test
+sub body ($) {
+  local $Error::Depth = $Error::Depth + 1;
+  my $html = $_[0]->manakai_html;
+  return undef unless defined $html;
+  for my $el ($html->child_nodes->to_list) {
+    next unless $el->node_type == 1; # ELEMENT_NODE
+    my $nsuri = $el->namespace_uri;
+    next unless defined $nsuri;
+    next unless $nsuri eq q<http://www.w3.org/1999/xhtml>;
+    next unless $el->manakai_local_name eq 'body';
+    return $el;
+  }
+  return undef;
+} # body
+
 ## TODO: documentation
 sub manakai_html ($) {
   local $Error::Depth = $Error::Depth + 1;
