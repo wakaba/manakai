@@ -88,15 +88,26 @@ by C<">.
 
 =item Namespace designators are extended.
 
-For the SuikaWiki/0.9 namespace
-(C<urn:x-suika-fam-cx:markup:suikawiki:0:9:>), the namespace
-designator is C<sw>.  For the SuikaWiki/0.10 namespace
-(C<urn:x-suika-fam-cx:markup:suikawiki:0:10:>), the namespace
-designator is C<sw10>.  For the Temma namespace
-(C<http://suika.fam.cx/www/markup/temma>), the namespace designator is
-C<temma>.  For the Temma Macro namespace
-(C<http://suika.fam.cx/www/markup/temma/macro>), the namespace
-designator is C<temmacro>.
+The namespace designator for the HTML namespace
+(C<http://www.w3.org/1999/xhtml>) is C<html>.  While elements in the
+HTML namespace are serialized without the namespace designator as in
+original format, attributes in the HTML namespace are serialized with
+this namespace designator.
+
+An application can define a custom namespace designator by setting the
+key-value pair to the C<%$Whatpm::HTML::Dumper::NamespaceMapping>
+hash:
+
+  $Whatpm::HTML::Dumper::NamespaceMapping->{$url} = $prefix;
+
+For example, if the application does:
+
+  $Whatpm::HTML::Dumper::NamespaceMapping
+      ->{q<urn:x-suika-fam-cx:markup:suikawiki:0:9:>}
+      = 'sw';
+
+... then C<document> in the SuikaWiki/0.9 namespace is serialized as
+C<sw document>.
 
 When no namespace designator is explicitly defined for a namespace,
 the namespace designator for the namespace is C<{> followed by the

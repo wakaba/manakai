@@ -121,13 +121,23 @@ by <code>&quot;</code>.</p>
 <dt><strong><a name="namespace_designators_are_extended" class="item">Namespace designators are extended.</a></strong></dt>
 
 <dd>
-<p>For the SuikaWiki/0.9 namespace
-(<code>urn:x-suika-fam-cx:markup:suikawiki:0:9:</code>), the namespace
-designator is <code>sw</code>.  For the SuikaWiki/0.10 namespace
-(<code>urn:x-suika-fam-cx:markup:suikawiki:0:10:</code>), the namespace
-designator is <code>sw10</code>.  For the Temma namespace
-(<code>http://suika.fam.cx/www/markup/temma</code>), the namespace designator is
-<code>temma</code>.</p>
+<p>The namespace designator for the HTML namespace
+(<code>http://www.w3.org/1999/xhtml</code>) is <code>html</code>.  While elements in the
+HTML namespace are serialized without the namespace designator as in
+original format, attributes in the HTML namespace are serialized with
+this namespace designator.</p>
+<p>An application can define a custom namespace designator by setting the
+key-value pair to the <code>%$Whatpm::HTML::Dumper::NamespaceMapping</code>
+hash:</p>
+<pre>
+  $Whatpm::HTML::Dumper::NamespaceMapping-&gt;{$url} = $prefix;</pre>
+<p>For example, if the application does:</p>
+<pre>
+  $Whatpm::HTML::Dumper::NamespaceMapping
+      -&gt;{q&lt;urn:x-suika-fam-cx:markup:suikawiki:0:9:&gt;}
+      = 'sw';</pre>
+<p>... then <code>document</code> in the SuikaWiki/0.9 namespace is serialized as
+<code>sw document</code>.</p>
 <p>When no namespace designator is explicitly defined for a namespace,
 the namespace designator for the namespace is <code>{</code> followed by the
 namespace URL followed by <code>}</code>.  If an element has no namespace, the

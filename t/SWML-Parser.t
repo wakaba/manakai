@@ -25,6 +25,9 @@ use Whatpm::SWML::Parser;
 use Whatpm::NanoDOM;
 use Whatpm::HTML::Dumper qw/dumptree/;
 
+$Whatpm::HTML::Dumper::NamespaceMapping->{q<urn:x-suika-fam-cx:markup:suikawiki:0:9:>} = 'sw';
+$Whatpm::HTML::Dumper::NamespaceMapping->{q<urn:x-suika-fam-cx:markup:suikawiki:0:10:>} = 'sw10';
+
 sub test ($) {
   my $test = shift;
 

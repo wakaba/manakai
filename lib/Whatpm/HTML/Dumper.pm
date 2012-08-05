@@ -1,28 +1,22 @@
 package Whatpm::HTML::Dumper;
 use strict;
 use warnings;
-our $VERSION = '1.7';
+our $VERSION = '1.8';
 use Exporter::Lite;
 
 our @EXPORT = qw(dumptree);
 
+our $NamespaceMapping;
+$NamespaceMapping->{q<http://www.w3.org/1999/xhtml>} = 'html';
+$NamespaceMapping->{q<http://www.w3.org/2000/svg>} = 'svg';
+$NamespaceMapping->{q<http://www.w3.org/1998/Math/MathML>} = 'math';
+$NamespaceMapping->{q<http://www.w3.org/1999/xlink>} = 'xlink';
+$NamespaceMapping->{q<http://www.w3.org/XML/1998/namespace>} = 'xml';
+$NamespaceMapping->{q<http://www.w3.org/2000/xmlns/>} = 'xmlns';
+
 sub dumptree ($) {
   my $node = shift;
   my $r = '';
-
-  my $ns_id = {
-    q<http://www.w3.org/1999/xhtml> => 'html',
-    q<http://www.w3.org/2000/svg> => 'svg',
-    q<http://www.w3.org/1998/Math/MathML> => 'math',
-    q<http://www.w3.org/1999/xlink> => 'xlink',
-    q<http://www.w3.org/XML/1998/namespace> => 'xml',
-    q<http://www.w3.org/2000/xmlns/> => 'xmlns',
-
-    q<urn:x-suika-fam-cx:markup:suikawiki:0:9:> => 'sw',
-    q<urn:x-suika-fam-cx:markup:suikawiki:0:10:> => 'sw10',
-    q<http://suika.fam.cx/www/markup/temma> => 'temma',
-    q<http://suika.fam.cx/www/markup/temma/macro> => 'temmacro',
-  };
 
   my @node = map { [$_, ''] } @{$node->child_nodes};
   while (@node) {
@@ -34,8 +28,8 @@ sub dumptree ($) {
         $ns = '{} ';
       } elsif ($ns eq q<http://www.w3.org/1999/xhtml>) {
         $ns = '';
-      } elsif ($ns_id->{$ns}) {
-        $ns = $ns_id->{$ns} . ' ';
+      } elsif (defined $NamespaceMapping->{$ns}) {
+        $ns = $NamespaceMapping->{$ns} . ' ';
       } else {
         $ns = '{' . $ns . '} ';
       }
@@ -45,8 +39,8 @@ sub dumptree ($) {
                       my $ns = $_->namespace_uri;
                       unless (defined $ns) {
                         $ns = '';
-                      } elsif ($ns_id->{$ns}) {
-                        $ns = $ns_id->{$ns} . ' ';
+                      } elsif (defined $NamespaceMapping->{$ns}) {
+                        $ns = $NamespaceMapping->{$ns} . ' ';
                       } else {
                         $ns = '{' . $ns . '} ';
                       }
