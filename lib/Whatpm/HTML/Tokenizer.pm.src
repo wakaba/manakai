@@ -83,7 +83,8 @@ for (keys %$Whatpm::HTML::ParserData::CharRefReplacements) {
 
 ## ------ The tokenizer ------
 
-## Implementations MUST act as if state machine in the spec
+my $Action = [];
+my $XMLAction = [];
 
 sub _initialize_tokenizer ($) {
   my $self = shift;
@@ -113,6 +114,12 @@ sub _initialize_tokenizer ($) {
   !!!next-input-character;
   $self->{token} = [];
   # $self->{escape}
+
+  if ($self->{is_xml}) {
+    $self->{action_set} = $XMLAction;
+  } else {
+    $self->{action_set} = $Action;
+  }
 } # _initialize_tokenizer
 
 ## A token has:
@@ -164,8 +171,6 @@ sub KEY_LLATIN_CHAR () { 253 }
 sub KEY_EOF_CHAR () { 252 }
 sub KEY_SPACE_CHAR () { 251 }
 
-my $Action;
-my $XMLAction;
 $Action->[DATA_STATE]->[0x0026] = {
   name => 'data &',
   state => ENTITY_STATE, # "entity data state" + "consume a character reference"
@@ -1066,6 +1071,11 @@ $Action->[MD_HYPHEN_STATE]->[KEY_ELSE_CHAR] = {
   reconsume => 1,
   ct => {type => COMMENT_TOKEN, data => '-', delta => 3},
 };
+for my $state (0..$#$Action) {
+  for my $char (0..$#{$Action->[$state]}) {
+    $XMLAction->[$state]->[$char] ||= $Action->[$state]->[$char];
+  }
+}
 
 my $c_to_key = [];
 $c_to_key->[255] = KEY_EOF_CHAR; # EOF_CHAR
@@ -1104,16 +1114,8 @@ sub _get_next_token ($) {
     !!!tdebug { printf STDERR "U+%04X\t%d\n", $nc, $state };
 
     my $c = $nc > 0x007F ? KEY_ELSE_CHAR : $c_to_key->[$nc];
-    my $action;
-    if ($self->{is_xml}) {
-      $action = $XMLAction->[$state]->[$c]
-          || $Action->[$state]->[$c]
-          || $XMLAction->[$state]->[KEY_ELSE_CHAR]
-          || $Action->[$state]->[KEY_ELSE_CHAR];
-    } else {
-      $action = $Action->[$state]->[$c]
-          || $Action->[$state]->[KEY_ELSE_CHAR];
-    }
+    my $action = $self->{action_set}->[$state]->[$c]
+        || $self->{action_set}->[$state]->[KEY_ELSE_CHAR];
 
     if ($action and not $action->{skip}) {
       !!!tdebug { warn "ACTION: $action->{name}\n" };
