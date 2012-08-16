@@ -11982,7 +11982,8 @@ $Whatpm::LangTag::Registry = {
                       'standard' => {},
                       'stroke' => {},
                       'trad' => {},
-                      'unihan' => {}
+                      'unihan' => {},
+                      'zhuyin' => {}
                     },
           'u_cu' => {
                       'adp' => {},

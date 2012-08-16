@@ -55796,6 +55796,11 @@ $Whatpm::LangTag::RegistryFull = {
                                     'Description' => [
                                                        'Pinyin ordering for Latin, Unihan radical-stroke ordering for CJK characters (used in Chinese)'
                                                      ]
+                                  },
+                      'zhuyin' => {
+                                    'Description' => [
+                                                       'Pinyin ordering for Latin, zhuyin order for Bopomofo and CJK characters (used in Chinese)'
+                                                     ]
                                   }
                     },
           'u_cu' => {
