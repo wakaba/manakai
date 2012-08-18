@@ -1073,11 +1073,23 @@ $Action->[MD_HYPHEN_STATE]->[KEY_ELSE_CHAR] = {
   reconsume => 1,
   ct => {type => COMMENT_TOKEN, data => '-', delta => 3},
 };
-for my $state (0..$#$Action) {
-  for my $char (0..$#{$Action->[$state]}) {
-    $XMLAction->[$state]->[$char] ||= $Action->[$state]->[$char];
+
+## This class method can be used to create a custom tokenizer based on
+## the HTML tokenizer.  The argument to the method must be an
+## (incomplete) action set, whose missing definitions are completed by
+## the method.  The action set is then used as the value of the
+## |$self->{action_set}| of the tokenizer object.
+sub complete_action_def ($$) {
+  my (undef, $actions) = @_;
+  for my $state (0..$#$Action) {
+    for my $char (0..$#{$Action->[$state]}) {
+      $actions->[$state]->[$char] ||= $Action->[$state]->[$char];
+    }
   }
-}
+  return $actions;
+} # complete_action_def
+
+__PACKAGE__->complete_action_def ($XMLAction);
 
 my $c_to_key = [];
 $c_to_key->[255] = KEY_EOF_CHAR; # EOF_CHAR
