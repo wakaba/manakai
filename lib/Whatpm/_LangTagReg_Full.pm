@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2012-08-26',
+          '_file_date' => '2012-08-27',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -20109,7 +20109,8 @@ $Whatpm::LangTag::RegistryFull = {
                           'jkp' => {
                                      'Description' => [
                                                         'Paku Karen'
-                                                      ]
+                                                      ],
+                                     '_added' => '2012-08-12'
                                    },
                           'jkr' => {
                                      'Description' => [
@@ -32782,7 +32783,8 @@ $Whatpm::LangTag::RegistryFull = {
                           'nph' => {
                                      'Description' => [
                                                         'Phom Naga'
-                                                      ]
+                                                      ],
+                                     '_added' => '2009-07-29'
                                    },
                           'npi' => {
                                      'Description' => [
@@ -45057,7 +45059,8 @@ $Whatpm::LangTag::RegistryFull = {
                           'tvt' => {
                                      'Description' => [
                                                         'Tutsa Naga'
-                                                      ]
+                                                      ],
+                                     '_added' => '2009-07-29'
                                    },
                           'tvu' => {
                                      'Description' => [
@@ -47661,14 +47664,16 @@ $Whatpm::LangTag::RegistryFull = {
                                      '_added' => '2009-07-29'
                                    },
                           'wnu' => {
-                                     '' => [
-                                             '%%%'
-                                           ],
                                      'Description' => [
-                                                        'Usan',
-                                                        'Wanyi'
+                                                        'Usan'
                                                       ],
                                      '_added' => '2009-07-29'
+                                   },
+                          'wny' => {
+                                     'Description' => [
+                                                        'Wanyi'
+                                                      ],
+                                     '_added' => '2012-08-12'
                                    },
                           'wo' => {
                                     'Description' => [
