@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2012-08-29',
+          '_file_date' => '2012-09-04',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -14050,6 +14050,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ekl' => {
                                      'Description' => [
+                                                        'Kol (Bangladesh)',
                                                         'Kol'
                                                       ],
                                      '_added' => '2009-07-29'
