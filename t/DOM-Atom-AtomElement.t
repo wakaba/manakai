@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 use Test;
-BEGIN { plan tests => 38 } 
+BEGIN { plan tests => 39 } 
 
 require Message::DOM::DOMImplementation;
 
@@ -90,15 +90,20 @@ for my $m (
   ok $el->container, $con, 'ATC->container xhtml container [2]';
 }
 
+{
+  my $doc = $impl->create_document;
+  my $el = $doc->create_element_ns ($ATOM_NS, 'updated');
+  $el->text_content (q{2012-09-02T15:14:49-0700(PD:T)});
+  ok $el->value, 1346624089;
+}
+
 ## TODO: 
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =cut
-
-## $Date: 2007/07/29 07:46:50 $
