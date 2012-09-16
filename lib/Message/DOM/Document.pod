@@ -83,6 +83,11 @@ C<manakai_compat_mode>, C<manakai_create_serial_walker>,
 C<manakai_entity_base_uri>, C<manakai_has_bom>, C<manakai_head>,
 C<manakai_html>, C<manakai_is_html>, C<manakai_is_srcdoc>.
 
+=item $el = $doc->atom_feed_element
+
+Return the Atom C<feed> element, if the document is an Atom feed
+document.  [ATOM DOM]
+
 =back
 
 =head1 SEE ALSO
@@ -95,6 +100,9 @@ Web DOM Core <http://simon.html5.org/specs/web-dom-core>.
 
 Web Applications 1.0
 <http://www.whatwg.org/specs/web-apps/current-work/complete.html>.
+
+[ATOM DOM] Atom DOM Living Standard
+<http://suika.fam.cx/~wakaba/wiki/sw/n/Atom%20DOM>.
 
 =head1 AUTHOR
 
