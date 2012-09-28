@@ -12129,6 +12129,7 @@ $Whatpm::LangTag::Registry = {
                       'buddhist' => {},
                       'chinese' => {},
                       'coptic' => {},
+                      'dangi' => {},
                       'ethioaa' => {},
                       'ethiopic' => {},
                       'gregory' => {},

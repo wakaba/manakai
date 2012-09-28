@@ -56375,6 +56375,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Coptic calendar'
                                                      ]
                                   },
+                      'dangi' => {
+                                   'Description' => [
+                                                      'Traditional Korean calendar'
+                                                    ]
+                                 },
                       'ethioaa' => {
                                      'Description' => [
                                                         'Ethiopic calendar, Amete Alem (epoch approx. 5493 B.C.E)'
