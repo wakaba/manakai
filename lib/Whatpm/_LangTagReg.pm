@@ -12119,10 +12119,12 @@ $Whatpm::LangTag::Registry = {
           't_m0' => {
                       'alaloc' => {},
                       'bgn' => {},
+                      'buckwalt' => {},
                       'din' => {},
                       'gost' => {},
                       'iso' => {},
                       'mcst' => {},
+                      'satts' => {},
                       'ungegn' => {}
                     },
           'u_ca' => {

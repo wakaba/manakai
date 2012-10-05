@@ -56333,6 +56333,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'US Board on Geographic Names'
                                                   ]
                                },
+                      'buckwalt' => {
+                                      'Description' => [
+                                                         'Buckwalter Arabic transliteration system'
+                                                       ]
+                                    },
                       'din' => {
                                  'Description' => [
                                                     'Deutsches Institut für Normung'
@@ -56353,6 +56358,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Korean Ministry of Culture, Sports and Tourism'
                                                    ]
                                 },
+                      'satts' => {
+                                   'Description' => [
+                                                      'Standard Arabic Technical Transliteration System (SATTS)'
+                                                    ]
+                                 },
                       'ungegn' => {
                                     'Description' => [
                                                        'United Nations Group of Experts on Geographical Names'
