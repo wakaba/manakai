@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2012-09-04',
+          '_file_date' => '2012-11-01',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
@@ -11586,6 +11586,9 @@ $Whatpm::LangTag::Registry = {
                         'afak' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'aghb' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'arab' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -11821,6 +11824,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'lydi' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'mahj' => {
                                     '_canon' => '_titlecase'
                                   },
                         'mand' => {

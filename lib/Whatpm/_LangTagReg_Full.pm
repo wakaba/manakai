@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2012-09-04',
+          '_file_date' => '2012-11-01',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -55104,6 +55104,13 @@ $Whatpm::LangTag::RegistryFull = {
                                     '_added' => '2011-01-07',
                                     '_canon' => '_titlecase'
                                   },
+                        'aghb' => {
+                                    'Description' => [
+                                                       'Caucasian Albanian'
+                                                     ],
+                                    '_added' => '2012-11-01',
+                                    '_canon' => '_titlecase'
+                                  },
                         'arab' => {
                                     'Description' => [
                                                        'Arabic'
@@ -55476,7 +55483,8 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                         'hung' => {
                                     'Description' => [
-                                                       'Old Hungarian'
+                                                       'Old Hungarian',
+                                                       'Hungarian Runic'
                                                      ],
                                     '_added' => '2005-10-16',
                                     '_canon' => '_titlecase'
@@ -55672,6 +55680,13 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Lydian'
                                                      ],
                                     '_added' => '2006-07-21',
+                                    '_canon' => '_titlecase'
+                                  },
+                        'mahj' => {
+                                    'Description' => [
+                                                       'Mahajani'
+                                                     ],
+                                    '_added' => '2012-11-01',
                                     '_canon' => '_titlecase'
                                   },
                         'mand' => {
