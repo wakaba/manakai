@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2012-11-01',
+          '_file_date' => '2013-01-25',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -51434,6 +51434,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                       ],
                                      '_added' => '2009-07-29',
                                      '_macro' => 'za'
+                                   },
+                          'zgh' => {
+                                     'Description' => [
+                                                        'Standard Moroccan Tamazight'
+                                                      ],
+                                     '_added' => '2013-01-25'
                                    },
                           'zgm' => {
                                      'Description' => [

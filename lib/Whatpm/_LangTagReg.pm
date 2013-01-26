@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2012-11-01',
+          '_file_date' => '2013-01-25',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
@@ -10221,6 +10221,7 @@ $Whatpm::LangTag::Registry = {
                           'zen' => {},
                           'zga' => {},
                           'zgb' => {},
+                          'zgh' => {},
                           'zgm' => {},
                           'zgn' => {},
                           'zgr' => {},
