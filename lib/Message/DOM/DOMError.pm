@@ -46,8 +46,6 @@ sub severity ($) {
 
 ## |DOMError| manakai's Perl Binding method
 
-## ISSUE: Document this in the spec.
-
 use overload
     '""' => 'stringify',
     fallback => 1;
@@ -73,15 +71,12 @@ sub stringify ($) {
   return $r;
 } # stringify
 
-## ISSUE: Document that a |DOMErrorHandler| MUST be a CODE reference
-## in the Perl DOM Binding spec.
-
 package Message::IF::DOMError;
 push our @ISA, 'Message::Util::Error';
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007-2012 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -89,4 +84,3 @@ modify it under the same terms as Perl itself.
 =cut
 
 1;
-## $Date: 2007/06/21 11:59:36 $
