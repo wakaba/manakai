@@ -58002,6 +58002,11 @@ $Whatpm::LangTag::RegistryFull = {
                                },
                       'zmk' => {
                                  'Description' => [
+                                                    'Zambian Kwacha (1968-2012)'
+                                                  ]
+                               },
+                      'zmw' => {
+                                 'Description' => [
                                                     'Zambian Kwacha'
                                                   ]
                                },

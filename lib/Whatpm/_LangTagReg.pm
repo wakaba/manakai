@@ -12461,6 +12461,7 @@ $Whatpm::LangTag::Registry = {
                       'zal' => {},
                       'zar' => {},
                       'zmk' => {},
+                      'zmw' => {},
                       'zrn' => {},
                       'zrz' => {},
                       'zwd' => {},
