@@ -56438,12 +56438,12 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                       'islamic' => {
                                      'Description' => [
-                                                        'Astronomical Arabic calendar'
+                                                        'Islamic calendar'
                                                       ]
                                    },
                       'islamicc' => {
                                       'Description' => [
-                                                         'Civil (algorithmic) Arabic calendar'
+                                                         'Islamic (arithmetic) calendar'
                                                        ]
                                     },
                       'iso8601' => {
@@ -58036,6 +58036,28 @@ $Whatpm::LangTag::RegistryFull = {
                                                   ]
                                }
                     },
+          'u_cv' => {
+                      'caltab' => {
+                                    'Description' => [
+                                                       'Islamic - Calendrica arithmetic'
+                                                     ]
+                                  },
+                      'mshijri' => {
+                                     'Description' => [
+                                                        'Islamic - Microsoft Hijri calendar'
+                                                      ]
+                                   },
+                      'rgsa' => {
+                                  'Description' => [
+                                                     'Islamic - Saudi Arabia visual sighting'
+                                                   ]
+                                },
+                      'umalgura' => {
+                                      'Description' => [
+                                                         'Islamic - Umm Al-Qura calendar of Saudi Arabia'
+                                                       ]
+                                    }
+                    },
           'u_ka' => {
                       'noignore' => {
                                       'Description' => [
@@ -58086,6 +58108,11 @@ $Whatpm::LangTag::RegistryFull = {
                        'cu' => {
                                  'Description' => [
                                                     'Currency type key'
+                                                  ]
+                               },
+                       'cv' => {
+                                 'Description' => [
+                                                    'Calendar algorithm variant'
                                                   ]
                                },
                        'ka' => {
