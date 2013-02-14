@@ -12472,7 +12472,7 @@ $Whatpm::LangTag::Registry = {
                       'caltab' => {},
                       'mshijri' => {},
                       'rgsa' => {},
-                      'umalgura' => {}
+                      'umalqura' => {}
                     },
           'u_ka' => {
                       'noignore' => {},

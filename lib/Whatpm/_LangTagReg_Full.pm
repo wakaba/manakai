@@ -58052,7 +58052,7 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Islamic - Saudi Arabia visual sighting'
                                                    ]
                                 },
-                      'umalgura' => {
+                      'umalqura' => {
                                       'Description' => [
                                                          'Islamic - Umm Al-Qura calendar of Saudi Arabia'
                                                        ]
