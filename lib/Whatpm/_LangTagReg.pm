@@ -12468,12 +12468,6 @@ $Whatpm::LangTag::Registry = {
                       'zwl' => {},
                       'zwr' => {}
                     },
-          'u_cv' => {
-                      'caltab' => {},
-                      'mshijri' => {},
-                      'rgsa' => {},
-                      'umalqura' => {}
-                    },
           'u_ka' => {
                       'noignore' => {},
                       'shifted' => {}
@@ -12490,7 +12484,6 @@ $Whatpm::LangTag::Registry = {
                        'ca' => {},
                        'co' => {},
                        'cu' => {},
-                       'cv' => {},
                        'ka' => {},
                        'kb' => {},
                        'kc' => {},
