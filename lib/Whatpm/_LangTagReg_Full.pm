@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2013-01-25',
+          '_file_date' => '2013-02-28',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -54522,7 +54522,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                         'ps' => {
                                   'Description' => [
-                                                     'Occupied Palestinian Territory'
+                                                     'State of Palestine'
                                                    ],
                                   '_added' => '2005-10-16',
                                   '_canon' => '_uppercase'
