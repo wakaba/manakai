@@ -59224,6 +59224,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'Berlin, Germany'
                                                     ]
                                  },
+                      'debsngn' => {
+                                     'Description' => [
+                                                        'Busingen, Germany'
+                                                      ]
+                                   },
                       'djjib' => {
                                    'Description' => [
                                                       'Djibouti'
@@ -60119,6 +60124,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'Kaliningrad, Russia'
                                                     ]
                                  },
+                      'rukhndg' => {
+                                     'Description' => [
+                                                        'Khandyga Tomponsky, Russia'
+                                                      ]
+                                   },
                       'rukra' => {
                                    'Description' => [
                                                       'Krasnoyarsk, Russia'
@@ -60154,6 +60164,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'Kamchatka Peninsula, Russia'
                                                     ]
                                  },
+                      'ruunera' => {
+                                     'Description' => [
+                                                        'Ust-Nera Oymyakonsky, Russia'
+                                                      ]
+                                   },
                       'ruuus' => {
                                    'Description' => [
                                                       'Sakhalin, Russia'
