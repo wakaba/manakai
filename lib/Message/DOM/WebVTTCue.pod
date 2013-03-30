@@ -1,0 +1,80 @@
+=head1 NAME
+
+Message::DOM::WebVTTCue - DOM |WebVTTCue| object
+
+=head1 DESCRIPTION
+
+The C<Message::DOM::WebVTTCue> class implements the DOM C<WebVTTCue>
+interface.
+
+=head1 METHODS
+
+The C<Message::DOM::WebVTTCue> object has following methods, in
+addition to the methods in the L<Message::DOM::TextTrackCue>:
+
+=over 4
+
+=item $value = $cue->vertical
+
+=item $cue->vertical ($new_value)
+
+Get or set the writing direction of the cue.  [WEBVTT]
+
+=item $bool = $cue->snap_to_lines
+
+=item $cue->snap_to_lines ($new_bool)
+
+Get or set the snap-to-lines flag of the cue.  [WEBVTT]
+
+=item $int = $cue->line
+
+=item $cue->line ($new_int)
+
+Get the computed line position, or set the line position, of the cue.
+[WEBVTT]
+
+=item $int = $cue->size
+
+=item $cue->size ($new_int)
+
+Get or set the text position of the cue.  [WEBVTT]
+
+=item $value = $cue->align
+
+=item $cue->align ($new_value)
+
+Get or set the alignment of the cue.  [WEBVTT]
+
+=item $text = $cue->text
+
+=item $cue->text ($new_text)
+
+Get or set the text of the cue, in raw unparsed format.  [WEBVTT]
+
+=item $cue->get_cue_as_html
+
+XXX Not implemented yet.
+
+=back
+
+=head1 SEE ALSO
+
+[HTML] HTML Standard
+<http://www.whatwg.org/specs/web-apps/current-work/#texttrackcue>.
+
+[WEBVTT] WebVTT Standard <http://dev.w3.org/html5/webvtt/>.
+
+L<Message::DOM::TextTrackCue>.
+
+=head1 AUTHOR
+
+Wakaba <wakaba@suikawiki.org>.
+
+=head1 LICENSE
+
+Copyright 2012-2013 Wakaba <wakaba@suikawiki.org>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

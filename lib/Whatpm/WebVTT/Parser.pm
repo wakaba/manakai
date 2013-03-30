@@ -36,7 +36,7 @@ sub init ($) {
   $self->{c} = 0;
   
   require Message::DOM::TextTrack;
-  require Message::DOM::TextTrackCue;
+  require Message::DOM::WebVTTCue;
   require Message::DOM::TextTrackCueList;
   $self->{parsed} = Message::DOM::TextTrack->____new_from_hashref
       ({
@@ -284,7 +284,7 @@ sub feed_line ($$$) {
                                line => $self->{l},
                                column => 1 + length $_[1]);
             push @{$self->{parsed}->{all_cues}},
-                Message::DOM::TextTrackCue->____new_from_hashref
+                Message::DOM::WebVTTCue->____new_from_hashref
                     ($self->{new_cue});
             $self->{state} = 'end';
           }
@@ -305,7 +305,7 @@ sub feed_line ($$$) {
     } elsif ($self->{state} eq 'cue text 1') {
       if ($line eq '') {
         push @{$self->{parsed}->{all_cues}},
-            Message::DOM::TextTrackCue->____new_from_hashref
+            Message::DOM::WebVTTCue->____new_from_hashref
                 ($self->{new_cue});
         $self->{state} = 'cue text 1 blank';
       } else {
@@ -342,7 +342,7 @@ sub feed_line ($$$) {
       if ($line =~ /-->/ or $line eq '' or not defined $eol) {
         $self->{new_cue}->{text} =~ tr/\x00/\x{FFFD}/;
         push @{$self->{parsed}->{all_cues}},
-            Message::DOM::TextTrackCue->____new_from_hashref
+            Message::DOM::WebVTTCue->____new_from_hashref
                 ($self->{new_cue});
         $self->{state} = defined $eol ? 'before cue' : 'end';
         redo STATE if defined $eol;

@@ -1,11 +1,11 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
+POD2HTML = pod2html --css "http://suika.suikawiki.org/www/style/html/pod.css" \
   --htmlroot "../.."
 RM = rm
 RMALL = $(RM) -fv
 
 HTML_FILES = DOMImplementation.html Document.html \
   Node.html NodeList.html \
-  TextTrack.html TextTrackCue.html TextTrackCueList.html
+  TextTrack.html TextTrackCue.html TextTrackCueList.html WebVTTCue.html
 
 all: $(HTML_FILES)
 
