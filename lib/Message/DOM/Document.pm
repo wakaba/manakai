@@ -1261,6 +1261,18 @@ sub _set_ready_state ($$) {
   # XXX fire a simple event named |readystatechange|
 } # _set_ready_state
 
+## ------ The |AtomDocument| interface ------
+
+sub atom_feed_element ($) {
+  my $de = $_[0]->document_element or return undef;
+  return undef unless $de->manakai_local_name eq 'feed';
+  return undef unless ($de->namespace_uri || '') eq q<http://www.w3.org/2005/Atom>;
+
+  # XXX Atom 0.3 support
+
+  return $de;
+} # atom_feed_element
+
 package Message::IF::Document;
 package Message::IF::DocumentTraversal;
 package Message::IF::DocumentXDoctype;
@@ -1301,7 +1313,7 @@ sub create_document ($;$$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2011 Wakaba <w@suika.fam.cx>
+Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

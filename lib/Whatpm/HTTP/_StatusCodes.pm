@@ -1,4 +1,4 @@
-$Whatpm::HTTP::_StatusCodes::VERSION = 20120502;
+$Whatpm::HTTP::_StatusCodes::VERSION = 20121201;
 $Whatpm::HTTP::StatusCodes = {
           '0' => {
                    'text' => ''
@@ -197,7 +197,6 @@ $Whatpm::HTTP::StatusCodes = {
                      'text' => 'Failed Dependency'
                    },
           '425' => {
-                     'reserved' => 1,
                      'text' => 'Unordered Collection'
                    },
           '426' => {

@@ -363,11 +363,12 @@ sub value ($;$) {
 
   my $value = $_[0]->text_content;
   if ($value =~ /\A(\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?
-      (?:Z|([+-]\d+):(\d+))\z/x) {
+      (?:Z|([+-]\d+):(\d+)|([+-]\d{2})(\d{2}))/x) {
     require Time::Local;
+    my $zh = $8 || $10 || 0;
+    my $zm = $9 || $11 || 0;
     my $r = Time::Local::timegm_nocheck
-        ($6, defined $8 ? $8 > 0 ? $5 - $9 : $5 + $9 : $5,
-         defined $8 ? $4 - $8 : $4, $3, $2-1, $1-1900);
+        ($6, $zh > 0 ? $5 - $zm : $5 + $zm, $4 - $zh, $3, $2-1, $1-1900);
     $r += "0$7" if defined $7;
     return $r;
   } else {
