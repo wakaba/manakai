@@ -56438,9 +56438,29 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                       'islamic' => {
                                      'Description' => [
-                                                        'Astronomical Arabic calendar'
+                                                        'Islamic calendar'
                                                       ]
                                    },
+                      'islamic-civil' => {
+                                           'Description' => [
+                                                              'Islamic calendar, tabular (intercalary years [2,5,7,10,13,16,18,21,24,26,29] - civil epoch)'
+                                                            ]
+                                         },
+                      'islamic-rgsa' => {
+                                          'Description' => [
+                                                             'Islamic calendar, Saudi Arabia sighting'
+                                                           ]
+                                        },
+                      'islamic-tbla' => {
+                                          'Description' => [
+                                                             'Islamic calendar, tabular (intercalary years [2,5,7,10,13,16,18,21,24,26,29] - astronomical epoch)'
+                                                           ]
+                                        },
+                      'islamic-umalqura' => {
+                                              'Description' => [
+                                                                 'Islamic calendar, Umm al-Qura'
+                                                               ]
+                                            },
                       'islamicc' => {
                                       'Description' => [
                                                          'Civil (algorithmic) Arabic calendar'
