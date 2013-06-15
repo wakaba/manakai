@@ -12160,6 +12160,7 @@ $Whatpm::LangTag::Registry = {
                       'dict' => {},
                       'direct' => {},
                       'ducet' => {},
+                      'eor' => {},
                       'gb2312' => {},
                       'phonebk' => {},
                       'phonetic' => {},

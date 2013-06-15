@@ -56508,6 +56508,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'The default Unicode collation element table order'
                                                     ]
                                  },
+                      'eor' => {
+                                 'Description' => [
+                                                    'European ordering rules'
+                                                  ]
+                               },
                       'gb2312' => {
                                     'Description' => [
                                                        'Pinyin ordering for Latin, gb2312han charset ordering for CJK characters (used in Chinese)'
