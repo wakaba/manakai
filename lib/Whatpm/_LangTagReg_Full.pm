@@ -58279,12 +58279,12 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                       'armn' => {
                                   'Description' => [
-                                                     'Armenian upper case numerals — non-decimal'
+                                                     'Armenian upper case numerals — algorithmic'
                                                    ]
                                 },
                       'armnlow' => {
                                      'Description' => [
-                                                        'Armenian lower case numerals — non-decimal'
+                                                        'Armenian lower case numerals — algorithmic'
                                                       ]
                                    },
                       'bali' => {
@@ -58319,12 +58319,12 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'ethi' => {
                                   'Description' => [
-                                                     'Ethiopic numerals — non-decimal'
+                                                     'Ethiopic numerals — algorithmic'
                                                    ]
                                 },
                       'finance' => {
                                      'Description' => [
-                                                        'Financial numerals — may be non-decimal'
+                                                        'Financial numerals — may be algorithmic'
                                                       ]
                                    },
                       'fullwide' => {
@@ -58334,17 +58334,17 @@ $Whatpm::LangTag::RegistryFull = {
                                     },
                       'geor' => {
                                   'Description' => [
-                                                     'Georgian numerals — non-decimal'
+                                                     'Georgian numerals — algorithmic'
                                                    ]
                                 },
                       'grek' => {
                                   'Description' => [
-                                                     'Greek upper case numerals — non-decimal'
+                                                     'Greek upper case numerals — algorithmic'
                                                    ]
                                 },
                       'greklow' => {
                                      'Description' => [
-                                                        'Greek lower case numerals — non-decimal'
+                                                        'Greek lower case numerals — algorithmic'
                                                       ]
                                    },
                       'gujr' => {
@@ -58364,27 +58364,27 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                       'hans' => {
                                   'Description' => [
-                                                     'Simplified Chinese numerals — non-decimal'
+                                                     'Simplified Chinese numerals — algorithmic'
                                                    ]
                                 },
                       'hansfin' => {
                                      'Description' => [
-                                                        'Simplified Chinese financial numerals — non-decimal'
+                                                        'Simplified Chinese financial numerals — algorithmic'
                                                       ]
                                    },
                       'hant' => {
                                   'Description' => [
-                                                     'Traditional Chinese numerals — non-decimal'
+                                                     'Traditional Chinese numerals — algorithmic'
                                                    ]
                                 },
                       'hantfin' => {
                                      'Description' => [
-                                                        'Traditional Chinese financial numerals — non-decimal'
+                                                        'Traditional Chinese financial numerals — algorithmic'
                                                       ]
                                    },
                       'hebr' => {
                                   'Description' => [
-                                                     'Hebrew numerals — non-decimal'
+                                                     'Hebrew numerals — algorithmic'
                                                    ]
                                 },
                       'java' => {
@@ -58394,12 +58394,12 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'jpan' => {
                                   'Description' => [
-                                                     'Japanese numerals — non-decimal'
+                                                     'Japanese numerals — algorithmic'
                                                    ]
                                 },
                       'jpanfin' => {
                                      'Description' => [
-                                                        'Japanese financial numerals — non-decimal'
+                                                        'Japanese financial numerals — algorithmic'
                                                       ]
                                    },
                       'kali' => {
@@ -58499,12 +58499,12 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'roman' => {
                                    'Description' => [
-                                                      'Roman upper case numerals — non-decimal'
+                                                      'Roman upper case numerals — algorithmic'
                                                     ]
                                  },
                       'romanlow' => {
                                       'Description' => [
-                                                         'Roman lowercase numerals — non-decimal'
+                                                         'Roman lowercase numerals — algorithmic'
                                                        ]
                                     },
                       'saur' => {
@@ -58539,7 +58539,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'taml' => {
                                   'Description' => [
-                                                     'Tamil numerals — non-decimal'
+                                                     'Tamil numerals — algorithmic'
                                                    ]
                                 },
                       'tamldec' => {
@@ -58564,7 +58564,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                       'traditio' => {
                                       'Description' => [
-                                                         'Traditional numerals — may be non-decimal'
+                                                         'Traditional numerals — may be algorithmic'
                                                        ]
                                     },
                       'vaii' => {
