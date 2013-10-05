@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2013-09-23',
+          '_file_date' => '2013-10-04',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
@@ -13500,6 +13500,15 @@ $Whatpm::LangTag::Registry = {
                          'ulster' => {
                                        'Prefix' => [
                                                      'sco'
+                                                   ]
+                                     },
+                         'unifon' => {
+                                       'Prefix' => [
+                                                     'hup',
+                                                     'kyh',
+                                                     'tol',
+                                                     'yur',
+                                                     'en'
                                                    ]
                                      },
                          'vaidika' => {

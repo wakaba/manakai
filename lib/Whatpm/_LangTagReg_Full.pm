@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2013-09-23',
+          '_file_date' => '2013-10-04',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -62255,6 +62255,19 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'sco'
                                                    ],
                                        '_added' => '2010-04-10'
+                                     },
+                         'unifon' => {
+                                       'Description' => [
+                                                          'Unifon phonetic alphabet'
+                                                        ],
+                                       'Prefix' => [
+                                                     'hup',
+                                                     'kyh',
+                                                     'tol',
+                                                     'yur',
+                                                     'en'
+                                                   ],
+                                       '_added' => '2013-10-02'
                                      },
                          'vaidika' => {
                                         'Comments' => [
