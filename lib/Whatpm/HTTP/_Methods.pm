@@ -1,9 +1,10 @@
-$Whatpm::HTTP::_Methods::VERSION = 20130930;
+$Whatpm::HTTP::_Methods::VERSION = 20131103;
 $Whatpm::HTTP::Methods = {
           'ACL' => {},
           'BASELINE-CONTROL' => {},
           'BCOPY' => {},
           'BDELETE' => {},
+          'BIND' => {},
           'BMOVE' => {},
           'BPROPFIND' => {},
           'BPROPPATCH' => {},
@@ -32,19 +33,28 @@ $Whatpm::HTTP::Methods = {
                       'simple' => 1
                     },
           'LABEL' => {},
+          'LINK' => {},
           'LOCK' => {},
+          'M-GET' => {},
+          'M-POST' => {},
+          'M-PUT' => {},
+          'MDELETE' => {},
           'MERGE' => {},
+          'MGET' => {},
           'MKACTIVITY' => {},
           'MKCALENDAR' => {},
           'MKCOL' => {},
+          'MKREDIRECTREF' => {},
           'MKWORKSPACE' => {},
           'MOVE' => {},
+          'MPUT' => {},
           'NOTIFY' => {},
           'OPTIONS' => {
                          'case_insensitive' => 1,
                          'idempotent' => 1
                        },
           'ORDERPATCH' => {},
+          'PATCH' => {},
           'PEP' => {},
           'PEP-PUT' => {},
           'POLL' => {},
@@ -58,6 +68,7 @@ $Whatpm::HTTP::Methods = {
                      'case_insensitive' => 1,
                      'idempotent' => 1
                    },
+          'REBIND' => {},
           'REPORT' => {},
           'RPC_IN_DATA' => {},
           'RPC_OUT_DATA' => {},
@@ -76,10 +87,13 @@ $Whatpm::HTTP::Methods = {
                        'case_insensitive' => 1,
                        'xhr_unsafe' => 1
                      },
+          'UNBIND' => {},
           'UNCHECKOUT' => {},
+          'UNLINK' => {},
           'UNLOCK' => {},
           'UNSUBSCRIBE' => {},
           'UPDATE' => {},
+          'UPDATEREDIRECTREF' => {},
           'VERSION-CONTROL' => {},
           'X-MS-ENUMATTS' => {}
         };
