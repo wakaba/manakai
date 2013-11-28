@@ -1,4 +1,4 @@
-$Whatpm::HTTP::_Methods::VERSION = 20131103;
+$Whatpm::HTTP::_Methods::VERSION = 20131128;
 $Whatpm::HTTP::Methods = {
           'ACL' => {},
           'BASELINE-CONTROL' => {},
@@ -26,6 +26,7 @@ $Whatpm::HTTP::Methods = {
                      'safe' => 1,
                      'simple' => 1
                    },
+          'GET-WITH-BODY' => {},
           'HEAD' => {
                       'case_insensitive' => 1,
                       'idempotent' => 1,
