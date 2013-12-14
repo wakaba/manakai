@@ -1,5 +1,5 @@
 $Whatpm::LangTag::Registry = {
-          '_file_date' => '2013-10-04',
+          '_file_date' => '2013-12-13',
           'extlang' => {
                          'aao' => {
                                     'Prefix' => [
@@ -11747,6 +11747,9 @@ $Whatpm::LangTag::Registry = {
                         'aghb' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'ahom' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'arab' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -11885,6 +11888,9 @@ $Whatpm::LangTag::Registry = {
                         'hant' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'hatr' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'hebr' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -12008,6 +12014,9 @@ $Whatpm::LangTag::Registry = {
                         'mlym' => {
                                     '_canon' => '_titlecase'
                                   },
+                        'modi' => {
+                                    '_canon' => '_titlecase'
+                                  },
                         'mong' => {
                                     '_canon' => '_titlecase'
                                   },
@@ -12018,6 +12027,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'mtei' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'mult' => {
                                     '_canon' => '_titlecase'
                                   },
                         'mymr' => {
@@ -12054,6 +12066,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'palm' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'pauc' => {
                                     '_canon' => '_titlecase'
                                   },
                         'perm' => {
@@ -12160,6 +12175,9 @@ $Whatpm::LangTag::Registry = {
                                     '_canon' => '_titlecase'
                                   },
                         'shrd' => {
+                                    '_canon' => '_titlecase'
+                                  },
+                        'sidd' => {
                                     '_canon' => '_titlecase'
                                   },
                         'sind' => {
@@ -13279,6 +13297,11 @@ $Whatpm::LangTag::Registry = {
                                                      ],
                                          '_canon' => 'baku1926'
                                        },
+                         'barla' => {
+                                      'Prefix' => [
+                                                    'kea'
+                                                  ]
+                                    },
                          'bauddha' => {
                                         'Prefix' => [
                                                       'sa'
@@ -13309,6 +13332,13 @@ $Whatpm::LangTag::Registry = {
                                                      'sl'
                                                    ]
                                      },
+                         'ekavsk' => {
+                                       'Prefix' => [
+                                                     'sr-cyrl',
+                                                     'sr-latn',
+                                                     'sr'
+                                                   ]
+                                     },
                          'emodeng' => {
                                         'Prefix' => [
                                                       'en'
@@ -13332,6 +13362,13 @@ $Whatpm::LangTag::Registry = {
                          'hognorsk' => {
                                          'Prefix' => [
                                                        'nn'
+                                                     ]
+                                       },
+                         'ijekavsk' => {
+                                         'Prefix' => [
+                                                       'sr-cyrl',
+                                                       'sr-latn',
+                                                       'sr'
                                                      ]
                                        },
                          'itihasa' => {
@@ -13465,6 +13502,11 @@ $Whatpm::LangTag::Registry = {
                          'solba' => {
                                       'Prefix' => [
                                                     'sl-rozaj'
+                                                  ]
+                                    },
+                         'sotav' => {
+                                      'Prefix' => [
+                                                    'kea'
                                                   ]
                                     },
                          'surmiran' => {

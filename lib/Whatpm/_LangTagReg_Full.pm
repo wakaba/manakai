@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2013-10-04',
+          '_file_date' => '2013-12-13',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -55900,6 +55900,14 @@ $Whatpm::LangTag::RegistryFull = {
                                     '_added' => '2012-11-01',
                                     '_canon' => '_titlecase'
                                   },
+                        'ahom' => {
+                                    'Description' => [
+                                                       'Ahom',
+                                                       'Tai Ahom'
+                                                     ],
+                                    '_added' => '2013-12-02',
+                                    '_canon' => '_titlecase'
+                                  },
                         'arab' => {
                                     'Description' => [
                                                        'Arabic'
@@ -56233,6 +56241,13 @@ $Whatpm::LangTag::RegistryFull = {
                                     '_added' => '2005-10-16',
                                     '_canon' => '_titlecase'
                                   },
+                        'hatr' => {
+                                    'Description' => [
+                                                       'Hatran'
+                                                     ],
+                                    '_added' => '2013-12-02',
+                                    '_canon' => '_titlecase'
+                                  },
                         'hebr' => {
                                     'Description' => [
                                                        'Hebrew'
@@ -56502,7 +56517,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                         'mend' => {
                                     'Description' => [
-                                                       'Mende'
+                                                       'Mende Kikakui'
                                                      ],
                                     '_added' => '2010-04-10',
                                     '_canon' => '_titlecase'
@@ -56526,6 +56541,14 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Malayalam'
                                                      ],
                                     '_added' => '2005-10-16',
+                                    '_canon' => '_titlecase'
+                                  },
+                        'modi' => {
+                                    'Description' => [
+                                                       'Modi',
+                                                       'Moḍī'
+                                                     ],
+                                    '_added' => '2013-12-02',
                                     '_canon' => '_titlecase'
                                   },
                         'mong' => {
@@ -56560,6 +56583,13 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Meetei'
                                                      ],
                                     '_added' => '2007-01-26',
+                                    '_canon' => '_titlecase'
+                                  },
+                        'mult' => {
+                                    'Description' => [
+                                                       'Multani'
+                                                     ],
+                                    '_added' => '2013-12-02',
                                     '_canon' => '_titlecase'
                                   },
                         'mymr' => {
@@ -56653,6 +56683,13 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Palmyrene'
                                                      ],
                                     '_added' => '2010-04-10',
+                                    '_canon' => '_titlecase'
+                                  },
+                        'pauc' => {
+                                    'Description' => [
+                                                       'Pau Cin Hau'
+                                                     ],
+                                    '_added' => '2013-12-02',
                                     '_canon' => '_titlecase'
                                   },
                         'perm' => {
@@ -56840,6 +56877,15 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'Śāradā'
                                                      ],
                                     '_added' => '2011-01-07',
+                                    '_canon' => '_titlecase'
+                                  },
+                        'sidd' => {
+                                    'Description' => [
+                                                       'Siddham',
+                                                       'Siddhaṃ',
+                                                       'Siddhamātṛkā'
+                                                     ],
+                                    '_added' => '2013-12-02',
                                     '_canon' => '_titlecase'
                                   },
                         'sind' => {
@@ -61752,6 +61798,18 @@ $Whatpm::LangTag::RegistryFull = {
                                          '_added' => '2007-04-18',
                                          '_canon' => 'baku1926'
                                        },
+                         'barla' => {
+                                      'Comments' => [
+                                                      'Barlavento is one of the two main dialect groups of  Kabuverdianu.'
+                                                    ],
+                                      'Description' => [
+                                                         'The Barlavento dialect group of Kabuverdianu'
+                                                       ],
+                                      'Prefix' => [
+                                                    'kea'
+                                                  ],
+                                      '_added' => '2013-12-10'
+                                    },
                          'bauddha' => {
                                         'Description' => [
                                                            'Buddhist Hybrid Sanskrit'
@@ -61819,6 +61877,17 @@ $Whatpm::LangTag::RegistryFull = {
                                                    ],
                                        '_added' => '2012-06-27'
                                      },
+                         'ekavsk' => {
+                                       'Description' => [
+                                                          'Serbian with Ekavian pronunciation'
+                                                        ],
+                                       'Prefix' => [
+                                                     'sr-cyrl',
+                                                     'sr-latn',
+                                                     'sr'
+                                                   ],
+                                       '_added' => '2013-12-02'
+                                     },
                          'emodeng' => {
                                         'Description' => [
                                                            'Early Modern English (1500-1700)'
@@ -61883,6 +61952,17 @@ $Whatpm::LangTag::RegistryFull = {
                                                        'nn'
                                                      ],
                                          '_added' => '2010-01-02'
+                                       },
+                         'ijekavsk' => {
+                                         'Description' => [
+                                                            'Serbian with Ijekavian pronunciation'
+                                                          ],
+                                         'Prefix' => [
+                                                       'sr-cyrl',
+                                                       'sr-latn',
+                                                       'sr'
+                                                     ],
+                                         '_added' => '2013-12-02'
                                        },
                          'itihasa' => {
                                         'Description' => [
@@ -62180,6 +62260,18 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'sl-rozaj'
                                                   ],
                                       '_added' => '2007-07-05'
+                                    },
+                         'sotav' => {
+                                      'Comments' => [
+                                                      'Sotavento is one of the two main dialect groups of  Kabuverdianu.'
+                                                    ],
+                                      'Description' => [
+                                                         'The Sotavento dialect group of Kabuverdianu'
+                                                       ],
+                                      'Prefix' => [
+                                                    'kea'
+                                                  ],
+                                      '_added' => '2013-12-10'
                                     },
                          'surmiran' => {
                                          'Comments' => [
