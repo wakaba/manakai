@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2013-12-13',
+          '_file_date' => '2014-01-21',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -61843,7 +61843,7 @@ $Whatpm::LangTag::RegistryFull = {
                                     },
                          'bohoric' => {
                                         'Comments' => [
-                                                        'The subtag represents the alphabet codified by Adam Bohorič in  1584 and used from the first printed Slovene book and up to the mid-  19th century.'
+                                                        'The subtag represents the alphabet codified by Adam Bohorič  in 1584 and used from the first printed Slovene book and up to the  mid-19th century.'
                                                       ],
                                         'Description' => [
                                                            'Slovene in Bohorič alphabet'
