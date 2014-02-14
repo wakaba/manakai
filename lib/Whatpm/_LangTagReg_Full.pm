@@ -59186,6 +59186,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                      'Gurmukhi digits'
                                                    ]
                                 },
+                      'hanidays' => {
+                                      'Description' => [
+                                                         'Han-character day-of-month numbering for lunar/other traditional calendars'
+                                                       ]
+                                    },
                       'hanidec' => {
                                      'Description' => [
                                                         'Positional decimal system using Chinese number ideographs as digits'
