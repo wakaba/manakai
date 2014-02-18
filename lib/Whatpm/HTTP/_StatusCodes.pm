@@ -1,4 +1,4 @@
-$Whatpm::HTTP::_StatusCodes::VERSION = 20140201;
+$Whatpm::HTTP::_StatusCodes::VERSION = 20140218;
 $Whatpm::HTTP::StatusCodes = {
           '0' => {
                    'text' => ''
@@ -90,7 +90,7 @@ $Whatpm::HTTP::StatusCodes = {
                    },
           '306' => {
                      'registered' => 1,
-                     'text' => 'Reserved'
+                     'text' => '(Unused)'
                    },
           '307' => {
                      'registered' => 1,
@@ -154,11 +154,11 @@ $Whatpm::HTTP::StatusCodes = {
                    },
           '413' => {
                      'registered' => 1,
-                     'text' => 'Request Entity Too Large'
+                     'text' => 'Payload Too Large'
                    },
           '414' => {
                      'registered' => 1,
-                     'text' => 'Request-URI Too Long'
+                     'text' => 'URI Too Long'
                    },
           '415' => {
                      'registered' => 1,
