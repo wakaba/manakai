@@ -1,4 +1,4 @@
-$Whatpm::HTTP::_StatusCodes::VERSION = 20140218;
+$Whatpm::HTTP::_StatusCodes::VERSION = 20140219;
 $Whatpm::HTTP::StatusCodes = {
           '0' => {
                    'text' => ''

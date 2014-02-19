@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2014-01-21',
+          '_file_date' => '2014-02-18',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -61803,6 +61803,18 @@ $Whatpm::LangTag::RegistryFull = {
                                          '_added' => '2007-04-18',
                                          '_canon' => 'baku1926'
                                        },
+                         'balanka' => {
+                                        'Comments' => [
+                                                        'Balanka is one of 19 Anii dialects.'
+                                                      ],
+                                        'Description' => [
+                                                           'The Balanka dialect of Anii'
+                                                         ],
+                                        'Prefix' => [
+                                                      'blo'
+                                                    ],
+                                        '_added' => '2014-02-15'
+                                      },
                          'barla' => {
                                       'Comments' => [
                                                       'Barlavento is one of the two main dialect groups of  Kabuverdianu.'
