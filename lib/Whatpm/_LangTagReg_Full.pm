@@ -58987,6 +58987,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                     'Collation parameter key for collation strength'
                                                   ]
                                },
+                       'kv' => {
+                                 'Description' => [
+                                                    'Collation parameter key for maxVariable, the last reordering group to be affected by ka-shifted'
+                                                  ]
+                               },
                        'nu' => {
                                  'Description' => [
                                                     'Numbering system type key'
@@ -59064,7 +59069,7 @@ $Whatpm::LangTag::RegistryFull = {
           'u_kr' => {
                       'reorder_code' => {
                                           'Description' => [
-                                                             'One or more collation reorder codes: LDML 5.14.12)'
+                                                             'One or more collation reorder codes, see LDML Part 5: Collation'
                                                            ]
                                         }
                     },
@@ -59092,6 +59097,28 @@ $Whatpm::LangTag::RegistryFull = {
                       'level4' => {
                                     'Description' => [
                                                        'The quaternary level'
+                                                     ]
+                                  }
+                    },
+          'u_kv' => {
+                      'currency' => {
+                                      'Description' => [
+                                                         'Spaces, punctuation and all symbols are affected by ka-shifted'
+                                                       ]
+                                    },
+                      'punct' => {
+                                   'Description' => [
+                                                      'Spaces and punctuation are affected by ka-shifted (CLDR default)'
+                                                    ]
+                                 },
+                      'space' => {
+                                   'Description' => [
+                                                      'Only spaces are affected by ka-shifted'
+                                                    ]
+                                 },
+                      'symbol' => {
+                                    'Description' => [
+                                                       'Spaces, punctuation and symbols except for currency symbols are affected by ka-shifted (UCA default)'
                                                      ]
                                   }
                     },

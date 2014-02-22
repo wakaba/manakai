@@ -12673,6 +12673,7 @@ $Whatpm::LangTag::Registry = {
                        'kn' => {},
                        'kr' => {},
                        'ks' => {},
+                       'kv' => {},
                        'nu' => {},
                        'tz' => {},
                        'va' => {},
@@ -12704,6 +12705,12 @@ $Whatpm::LangTag::Registry = {
                       'level2' => {},
                       'level3' => {},
                       'level4' => {}
+                    },
+          'u_kv' => {
+                      'currency' => {},
+                      'punct' => {},
+                      'space' => {},
+                      'symbol' => {}
                     },
           'u_nu' => {
                       'arab' => {},
