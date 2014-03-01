@@ -59480,11 +59480,6 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'Luanda, Angola'
                                                     ]
                                  },
-                      'aqams' => {
-                                   'Description' => [
-                                                      'Amundsen-Scott Station, South Pole'
-                                                    ]
-                                 },
                       'aqcas' => {
                                    'Description' => [
                                                       'Casey Station, Bailey Peninsula'
@@ -59883,11 +59878,6 @@ $Whatpm::LangTag::RegistryFull = {
                       'camon' => {
                                    'Description' => [
                                                       'Moncton, Canada'
-                                                    ]
-                                 },
-                      'camtr' => {
-                                   'Description' => [
-                                                      'Montreal, Canada'
                                                     ]
                                  },
                       'canpg' => {
@@ -61400,11 +61390,6 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'Metlakatla (Alaska), United States'
                                                     ]
                                  },
-                      'usnavajo' => {
-                                      'Description' => [
-                                                         'Shiprock (Navajo), United States'
-                                                       ]
-                                    },
                       'usndcnt' => {
                                      'Description' => [
                                                         'Center (North Dakota), United States'
