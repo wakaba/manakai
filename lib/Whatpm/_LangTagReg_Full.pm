@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2014-02-18',
+          '_file_date' => '2014-03-13',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -983,6 +983,7 @@ $Whatpm::LangTag::RegistryFull = {
                                   },
                          'hps' => {
                                     'Description' => [
+                                                       'Hawai\'i Sign Language (HSL)',
                                                        'Hawai\'i Pidgin Sign Language'
                                                      ],
                                     'Prefix' => [
@@ -2309,6 +2310,16 @@ $Whatpm::LangTag::RegistryFull = {
                                     '_added' => '2009-07-29',
                                     '_preferred' => 'yds'
                                   },
+                         'ygs' => {
+                                    'Description' => [
+                                                       'Yolŋu Sign Language'
+                                                     ],
+                                    'Prefix' => [
+                                                  'sgn'
+                                                ],
+                                    '_added' => '2014-02-28',
+                                    '_preferred' => 'ygs'
+                                  },
                          'ysl' => {
                                     'Description' => [
                                                        'Yugoslavian Sign Language'
@@ -3343,7 +3354,8 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'afi' => {
                                      'Description' => [
-                                                        'Akrukay'
+                                                        'Akrukay',
+                                                        'Chini'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -4800,6 +4812,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                         'Arhâ'
                                                       ],
                                      '_added' => '2009-07-29'
+                                   },
+                          'aqt' => {
+                                     'Description' => [
+                                                        'Angaité'
+                                                      ],
+                                     '_added' => '2014-02-28'
                                    },
                           'aqz' => {
                                      'Description' => [
@@ -6695,6 +6713,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'bfc' => {
                                      'Description' => [
+                                                        'Panyi Bai',
                                                         'Northern Bai'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -12681,8 +12700,8 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'dhg' => {
                                      'Description' => [
-                                                        'Djangu',
-                                                        'Dhangu'
+                                                        'Dhangu',
+                                                        'Djangu'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -14300,7 +14319,8 @@ $Whatpm::LangTag::RegistryFull = {
                                      'Description' => [
                                                         'Emok'
                                                       ],
-                                     '_added' => '2009-07-29'
+                                     '_added' => '2009-07-29',
+                                     '_deprecated' => 1
                                    },
                           'emp' => {
                                      'Description' => [
@@ -14382,6 +14402,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
+                          'enl' => {
+                                     'Description' => [
+                                                        'Enlhet'
+                                                      ],
+                                     '_added' => '2014-02-28'
+                                   },
                           'enm' => {
                                      'Description' => [
                                                         'Middle English (1100-1500)'
@@ -14430,6 +14456,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                         'Enwan (Akwa Ibom State)'
                                                       ],
                                      '_added' => '2009-07-29'
+                                   },
+                          'enx' => {
+                                     'Description' => [
+                                                        'Enxet'
+                                                      ],
+                                     '_added' => '2014-02-28'
                                    },
                           'eo' => {
                                     'Description' => [
@@ -15030,6 +15062,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'fly' => {
                                      'Description' => [
+                                                        'Flaaitaal',
                                                         'Tsotsitaal'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -15934,6 +15967,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
+                          'gev' => {
+                                     'Description' => [
+                                                        'Eviya'
+                                                      ],
+                                     '_added' => '2014-02-28'
+                                   },
                           'gew' => {
                                      'Description' => [
                                                         'Gera'
@@ -16033,7 +16072,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'ggr' => {
                                      'Comments' => [
-                                                     'see ggm, gtu, ikr'
+                                                     'see gtu, ikr'
                                                    ],
                                      'Description' => [
                                                         'Aghu Tharnggalu'
@@ -16418,6 +16457,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                   'collection'
                                                 ],
                                      '_added' => '2009-07-29'
+                                   },
+                          'gmg' => {
+                                     'Description' => [
+                                                        'Magɨyi'
+                                                      ],
+                                     '_added' => '2014-02-28'
                                    },
                           'gmh' => {
                                      'Description' => [
@@ -18322,6 +18367,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'hps' => {
                                      'Description' => [
+                                                        'Hawai\'i Sign Language (HSL)',
                                                         'Hawai\'i Pidgin Sign Language'
                                                       ],
                                      '_added' => '2009-07-29'
@@ -24935,7 +24981,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'lay' => {
                                      'Description' => [
-                                                        'Lama (Myanmar)'
+                                                        'Lama Bai'
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
@@ -25277,10 +25323,14 @@ $Whatpm::LangTag::RegistryFull = {
                                      '_added' => '2009-07-29'
                                    },
                           'leg' => {
+                                     'Comments' => [
+                                                     'see enl, enx'
+                                                   ],
                                      'Description' => [
                                                         'Lengua'
                                                       ],
-                                     '_added' => '2009-07-29'
+                                     '_added' => '2009-07-29',
+                                     '_deprecated' => 1
                                    },
                           'leh' => {
                                      'Description' => [
@@ -26054,7 +26104,9 @@ $Whatpm::LangTag::RegistryFull = {
                                      'Description' => [
                                                         'Lamam'
                                                       ],
-                                     '_added' => '2009-07-29'
+                                     '_added' => '2009-07-29',
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'rmx'
                                    },
                           'lmn' => {
                                      'Description' => [
@@ -28040,7 +28092,8 @@ $Whatpm::LangTag::RegistryFull = {
                                      'Description' => [
                                                         'Maskoy Pidgin'
                                                       ],
-                                     '_added' => '2009-07-29'
+                                     '_added' => '2009-07-29',
+                                     '_deprecated' => 1
                                    },
                           'mhi' => {
                                      'Description' => [
@@ -34465,6 +34518,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
+                          'olt' => {
+                                     'Description' => [
+                                                        'Old Lithuanian'
+                                                      ],
+                                     '_added' => '2014-02-28'
+                                   },
                           'om' => {
                                     'Description' => [
                                                        'Oromo'
@@ -37214,7 +37273,9 @@ $Whatpm::LangTag::RegistryFull = {
                                      'Description' => [
                                                         'Purum Naga'
                                                       ],
-                                     '_added' => '2009-07-29'
+                                     '_added' => '2009-07-29',
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'pub'
                                    },
                           'pwa' => {
                                      'Description' => [
@@ -39351,10 +39412,14 @@ $Whatpm::LangTag::RegistryFull = {
                                      '_added' => '2009-07-29'
                                    },
                           'sap' => {
+                                     'Comments' => [
+                                                     'see aqt, spn'
+                                                   ],
                                      'Description' => [
                                                         'Sanapaná'
                                                       ],
-                                     '_added' => '2009-07-29'
+                                     '_added' => '2009-07-29',
+                                     '_deprecated' => 1
                                    },
                           'saq' => {
                                      'Description' => [
@@ -41395,6 +41460,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                         'Akukem'
                                                       ],
                                      '_added' => '2009-07-29'
+                                   },
+                          'spn' => {
+                                     'Description' => [
+                                                        'Sanapaná'
+                                                      ],
+                                     '_added' => '2014-02-28'
                                    },
                           'spo' => {
                                      'Description' => [
@@ -43927,6 +43998,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                         'Upper Necaxa Totonac'
                                                       ],
                                      '_added' => '2009-07-29'
+                                   },
+                          'tkv' => {
+                                     'Description' => [
+                                                        'Mur Pano'
+                                                      ],
+                                     '_added' => '2014-02-28'
                                    },
                           'tkw' => {
                                      'Description' => [
@@ -48639,6 +48716,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
+                          'xaj' => {
+                                     'Description' => [
+                                                        'Ararandewára'
+                                                      ],
+                                     '_added' => '2014-02-28'
+                                   },
                           'xal' => {
                                      'Description' => [
                                                         'Kalmyk',
@@ -49045,6 +49128,7 @@ $Whatpm::LangTag::RegistryFull = {
                                    },
                           'xgm' => {
                                      'Description' => [
+                                                        'Dharumbal',
                                                         'Guwinmal'
                                                       ],
                                      '_added' => '2013-09-10'
@@ -49175,6 +49259,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                         'Xiriâna'
                                                       ],
                                      '_added' => '2009-07-29'
+                                   },
+                          'xis' => {
+                                     'Description' => [
+                                                        'Kisan'
+                                                      ],
+                                     '_added' => '2014-02-28'
                                    },
                           'xiv' => {
                                      'Description' => [
@@ -50880,6 +50970,12 @@ $Whatpm::LangTag::RegistryFull = {
                                                       ],
                                      '_added' => '2009-07-29'
                                    },
+                          'ygs' => {
+                                     'Description' => [
+                                                        'Yolŋu Sign Language'
+                                                      ],
+                                     '_added' => '2014-02-28'
+                                   },
                           'ygu' => {
                                      'Description' => [
                                                         'Yugul'
@@ -51788,7 +51884,9 @@ $Whatpm::LangTag::RegistryFull = {
                                      'Description' => [
                                                         'Yugh'
                                                       ],
-                                     '_added' => '2009-07-29'
+                                     '_added' => '2009-07-29',
+                                     '_deprecated' => 1,
+                                     '_preferred' => 'yug'
                                    },
                           'yuw' => {
                                      'Description' => [
