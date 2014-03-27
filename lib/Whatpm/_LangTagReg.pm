@@ -12829,6 +12829,7 @@ $Whatpm::LangTag::Registry = {
                       'aqplm' => {},
                       'aqrot' => {},
                       'aqsyw' => {},
+                      'aqtrl' => {},
                       'aqvos' => {},
                       'arbue' => {},
                       'arcor' => {},

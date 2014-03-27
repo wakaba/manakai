@@ -59623,6 +59623,11 @@ $Whatpm::LangTag::RegistryFull = {
                                                       'Syowa Station, East Ongul Island'
                                                     ]
                                  },
+                      'aqtrl' => {
+                                   'Description' => [
+                                                      'Troll Station, Queen Maud Land'
+                                                    ]
+                                 },
                       'aqvos' => {
                                    'Description' => [
                                                       'Vostok Station, Lake Vostok'
