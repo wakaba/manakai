@@ -1,6 +1,6 @@
 $Whatpm::LangTag::RegistryFull = {
           '_ext_file_date' => '2010-09-02',
-          '_file_date' => '2014-03-13',
+          '_file_date' => '2014-03-27',
           'extension' => {
                            'u' => {
                                     'Comments' => [
@@ -54429,6 +54429,7 @@ $Whatpm::LangTag::RegistryFull = {
                                 },
                         'cv' => {
                                   'Description' => [
+                                                     'Cabo Verde',
                                                      'Cape Verde'
                                                    ],
                                   '_added' => '2005-10-16',
