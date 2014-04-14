@@ -67,7 +67,7 @@ sub parse_char_string ($$$;$) {
   my @s = split /\x0D\x0A?|\x0A/, ref $_[0] ? ${$_[0]} : $_[0], -1;
 
   my $doc = $_[1];
-  @{$doc->child_nodes} = ();
+  $doc->remove_child ($_) for @{$doc->child_nodes};
   my $html_el = $doc->create_element_ns (HTML_NS, [undef, 'html']);
   $doc->append_child ($html_el);
   $html_el->set_attribute_ns
