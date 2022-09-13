@@ -1,166 +1,140 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::XML::Parser - An XML parser</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#specifications">SPECIFICATIONS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::XML::Parser</code></h1><h2>An XML parser</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::XML::Parser - An XML parser</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::XML::Parser;
+<pre><code>  use Whatpm::XML::Parser;
   use Message::DOM::DOMImplementation;
   $parser = Whatpm::XML::Parser-&gt;new;
   $dom = Message::DOM::DOMImplementation-&gt;new;
   $doc = $dom-&gt;create_document;
   
-  $parser-&gt;parse_char_string ($chars =&gt; $doc);</pre>
-<pre>
+  $parser-&gt;parse_char_string ($chars =&gt; $doc);
+
   ## Or, just use DOM attribute:
-  $doc-&gt;inner_html ($chars);</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::XML::Parser</code> module is an implementation of the XML
-parser.  The parser is not Draconian - the parser does not holt on
-well-formedness errors.  It implements a variant of XML5 proposal,
-which defines error handling for ill-formed XML documents.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
-<p>It is recommended to use standard DOM interface, such as <code>inner_html</code>
-method of the <code>Document</code> object, to parse an XML string, where
-possible.  The <a href="../../Whatpm/XML/Parser.html">the Whatpm::XML::Parser manpage</a> module, which, in fact, is used
-to implement the <code>inner_html</code> method, offers more control on how
-parser behaves, which would not be useful unless you are writing a
-complex user agent such as browser or validator.</p>
-<p>The <a href="../../Whatpm/XML/Parser.html">the Whatpm::XML::Parser manpage</a> module provides following methods:</p>
+  $doc-&gt;inner_html ($chars);</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::XML::Parser</code> module is an implementation of the XML parser. The parser is not Draconian - the parser does not holt on well-formedness errors. It implements a variant of XML5 proposal, which defines error handling for ill-formed XML documents.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
+<p>It is recommended to use standard DOM interface, such as <code>inner_html</code> method of the <code>Document</code> object, to parse an XML string, where possible. The <a href="../../Whatpm/XML/Parser" class="podlinkpod">Whatpm::XML::Parser</a> module, which, in fact, is used to implement the <code>inner_html</code> method, offers more control on how parser behaves, which would not be useful unless you are writing a complex user agent such as browser or validator.</p>
+
+<p>The <a href="../../Whatpm/XML/Parser" class="podlinkpod">Whatpm::XML::Parser</a> module provides following methods:</p>
+
 <dl>
-<dt><strong><a name="new" class="item">$parser = Whatpm::XML::Parser-&gt;new</a></strong></dt>
+<dt id="$parser_=_Whatpm::XML::Parser->new"><code>$parser = Whatpm::XML::Parser-&gt;<strong id="member-new">new</strong></code></dt>
 
 <dd>
 <p>Create a new parser.</p>
-</dd>
-<dt><strong><a name="parse_char_string" class="item">$parser-&gt;parse_char_string ($chars =&gt; $doc)</a></strong></dt>
+
+</dd><dt id="$parser->parse_char_string_($chars_=>_$doc)"><code>$parser-&gt;<strong id="member-parse_char_string">parse_char_string</strong> ($chars =&gt; $doc)</code></dt>
 
 <dd>
-<p>Parse a string of characters (i.e. a possibly utf8-flagged string) as
-XML and construct the DOM tree.</p>
-<p>The first argument to the method must be a string to parse.  It may or
-may not be a valid or well-formed XML document.</p>
-<p>The second argument to the method must be a DOM <code>Document</code> object
-(<a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a>).  Any child nodes of the document is first
-removed by the parser.</p>
-</dd>
-<dt><strong><a name="onerror" class="item">$code = $parser-&gt;onerror</a></strong></dt>
+<p>Parse a string of characters (i.e. a possibly utf8-flagged string) as XML and construct the DOM tree.</p>
 
-<dt><strong>$parser-&gt;onerror ($new_code)</strong></dt>
+<p>The first argument to the method must be a string to parse. It may or may not be a valid or well-formed XML document.</p>
+
+<p>The second argument to the method must be a DOM <code>Document</code> object (<a href="../../Message/DOM/Document" class="podlinkpod">Message::DOM::Document</a>). Any child nodes of the document is first removed by the parser.</p>
+
+</dd><dt id="$code_=_$parser->onerror"><code>$code = $parser-&gt;<strong id="member-onerror">onerror</strong></code></dt>
+
+<dt id="$parser->onerror_($new_code)"><code>$parser-&gt;<strong>onerror</strong> ($new_code)</code></dt>
 
 <dd>
-<p>Get or set the error handler for the parser.  Any parse error, as well
-as warning and information, is reported to the handler.  See
-<a href="../../Whatpm/Errors.html">the Whatpm::Errors manpage</a> for more information.</p>
+<p>Get or set the error handler for the parser. Any parse error, as well as warning and information, is reported to the handler. See <a href="../../Whatpm/Errors" class="podlinkpod">Whatpm::Errors</a> for more information.</p>
 </dd>
 </dl>
-<p>Parsed document structure is reflected to the <code>Document</code> object
-specified as an argument to parse methods.</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a>, <a href="../../Message/DOM/Element.html">the Message::DOM::Element manpage</a>.</p>
-<p><a href="../../Whatpm/ContentChecker.html">the Whatpm::ContentChecker manpage</a>.</p>
-<p><a href="../../Whatpm/HTML/Parser.html">the Whatpm::HTML::Parser manpage</a>.</p>
-<p>
-</p>
-<hr />
-<h1><a name="specifications">SPECIFICATIONS</a></h1>
+
+<p>Parsed document structure is reflected to the <code>Document</code> object specified as an argument to parse methods.</p>
+
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
+
+<p><a href="../../Message/DOM/Document" class="podlinkpod">Message::DOM::Document</a>, <a href="../../Message/DOM/Element" class="podlinkpod">Message::DOM::Element</a>.</p>
+
+<p><a href="../../Whatpm/ContentChecker" class="podlinkpod">Whatpm::ContentChecker</a>.</p>
+
+<p><a href="../../Whatpm/HTML/Parser" class="podlinkpod">Whatpm::HTML::Parser</a>.</p>
+
+</section><section id="SPECIFICATIONS"><h1>SPECIFICATIONS</h1>
+
 <dl>
-<dt><strong><a name="xml" class="item">[XML]</a></strong></dt>
+<dt id="[XML]">[XML]</dt>
 
 <dd>
-<p>XML 1.0 &lt;http://www.w3.org/TR/xml/&gt;.</p>
-<p>XML 1.1 &lt;http://www.w3.org/TR/xml11/&gt;.</p>
-<p>Namespaces in XML 1.0 &lt;http://www.w3.org/TR/xml-names/&gt;.</p>
-<p>Namespaces in XML 1.1 &lt;http://www.w3.org/TR/xml-names11/&gt;.</p>
-<p>XML Information Set &lt;http://www.w3.org/TR/xml-infoset/&gt;.</p>
-<p>DOM Level 3 Core - Infoset Mapping
-&lt;http://www.w3.org/TR/DOM-Level-3-Core/infoset-mapping.html&gt;.</p>
-<p>XML5.  See &lt;http://suika.fam.cx/~wakaba/wiki/sw/n/XML5&gt; for
-references.</p>
-</dd>
-<dt><strong><a name="html" class="item">[HTML]</a></strong></dt>
+<p>XML 1.0 <code class="url">&lt;<a href="http://www.w3.org/TR/xml/">http://www.w3.org/TR/xml/</a>&gt;</code>.</p>
+
+<p>XML 1.1 <code class="url">&lt;<a href="http://www.w3.org/TR/xml11/">http://www.w3.org/TR/xml11/</a>&gt;</code>.</p>
+
+<p>Namespaces in XML 1.0 <code class="url">&lt;<a href="http://www.w3.org/TR/xml-names/">http://www.w3.org/TR/xml-names/</a>&gt;</code>.</p>
+
+<p>Namespaces in XML 1.1 <code class="url">&lt;<a href="http://www.w3.org/TR/xml-names11/">http://www.w3.org/TR/xml-names11/</a>&gt;</code>.</p>
+
+<p>XML Information Set <code class="url">&lt;<a href="http://www.w3.org/TR/xml-infoset/">http://www.w3.org/TR/xml-infoset/</a>&gt;</code>.</p>
+
+<p>DOM Level 3 Core - Infoset Mapping <code class="url">&lt;<a href="http://www.w3.org/TR/DOM-Level-3-Core/infoset-mapping.html">http://www.w3.org/TR/DOM-Level-3-Core/infoset-mapping.html</a>&gt;</code>.</p>
+
+<p>XML5. See <code class="url">&lt;<a href="https://suika.suikawiki.org/~wakaba/wiki/sw/n/XML5">https://suika.suikawiki.org/~wakaba/wiki/sw/n/XML5</a>&gt;</code> for references.</p>
+
+</dd><dt id="[HTML]">[HTML]</dt>
 
 <dd>
-<p>HTML Living Standard -Parsing XHTML documents
-&lt;http://www.whatwg.org/specs/web-apps/current-work/#parsing-xhtml-documents&gt;.</p>
-</dd>
-<dt><strong><a name="xmlcc" class="item">[XMLCC]</a></strong></dt>
+<p>HTML Living Standard -Parsing XHTML documents <code class="url">&lt;<a href="http://www.whatwg.org/specs/web-apps/current-work/#parsing-xhtml-documents">http://www.whatwg.org/specs/web-apps/current-work/#parsing-xhtml-documents</a>&gt;</code>.</p>
+
+</dd><dt id="[XMLCC]">[XMLCC]</dt>
 
 <dd>
-<p>manakai's XML Conformance Checking
-&lt;http://suika.fam.cx/www/markup/xml/xmlcc/xmlcc-work&gt;.</p>
-</dd>
-<dt><strong><a name="dtdef" class="item">[DTDEF]</a></strong></dt>
+<p>manakai's XML Conformance Checking <code class="url">&lt;<a href="https://suika.suikawiki.org/www/markup/xml/xmlcc/xmlcc-work">https://suika.suikawiki.org/www/markup/xml/xmlcc/xmlcc-work</a>&gt;</code>.</p>
+
+</dd><dt id="[DTDEF]">[DTDEF]</dt>
 
 <dd>
-<p>DOM Document Type Definition Module
-&lt;http://suika.fam.cx/www/markup/xml/domdtdef/domdtdef-work&gt;.</p>
-</dd>
-<dt><strong><a name="manakai" class="item">[MANAKAI]</a></strong></dt>
+<p>DOM Document Type Definition Module <code class="url">&lt;<a href="https://suika.suikawiki.org/www/markup/xml/domdtdef/domdtdef-work">https://suika.suikawiki.org/www/markup/xml/domdtdef/domdtdef-work</a>&gt;</code>.</p>
+
+</dd><dt id="[MANAKAI]">[MANAKAI]</dt>
 
 <dd>
-<p>manakai DOM Extensions
-&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions&gt;.</p>
+<p>manakai DOM Extensions <code class="url">&lt;<a href="https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions">https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions</a>&gt;</code>.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
 
-</html>
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2012 Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

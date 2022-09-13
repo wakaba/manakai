@@ -1,89 +1,78 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Message::URI::URIReferemce - URI Reference Object Class</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
 
-<p><a name="__index__"></a></p>
-<!-- INDEX BEGIN -->
+        <h1><a href="../../" rel=top>manakai</a></h1>
 
-<ul>
+        
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#constructors">CONSTRUCTORS</a></li>
-	<li><a href="#attributes">ATTRIBUTES</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-<!-- INDEX END -->
 
-<hr />
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Message::URI::URIReferemce - URI Reference Object Class</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  ## Invoke constructor via DOM Interface
+
+
+
+<hgroup><h1><code>Message::URI::URIReferemce</code></h1><h2>URI Reference Object Class</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
+
+<pre><code>  ## Invoke constructor via DOM Interface
   require Message::DOM::DOMImplementation;
   my $dom = Message::DOM::DOMImplementation-&gt;new;
   
-  my $uri = $dom-&gt;create_uri_reference ($uri_string);</pre>
-<pre>
+  my $uri = $dom-&gt;create_uri_reference ($uri_string);
+
   ## Invoke constructor directly
   require Message::URI::URIReference;
   
   my $uri = Message::DOM::DOMImplementation
-      -&gt;create_uri_reference ($uri_string);</pre>
-<pre>
+      -&gt;create_uri_reference ($uri_string);
+
   ## Methods and attributes
   print $uri-&gt;uri_scheme;
   print $uri-&gt;uri_authority;
-  print $uri-&gt;get_absolute_reference ($base_uri);</pre>
-<p>
-</p>
-<hr />
-<h1><a name="constructors">CONSTRUCTORS</a></h1>
+  print $uri-&gt;get_absolute_reference ($base_uri);</code></pre>
+
+</section><section id="CONSTRUCTORS"><h1>CONSTRUCTORS</h1>
+
 <p>@@ TBD</p>
-<p>
-</p>
-<hr />
-<h1><a name="attributes">ATTRIBUTES</a></h1>
+
+</section><section id="ATTRIBUTES"><h1>ATTRIBUTES</h1>
+
 <p>@@ TBD</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
 <p>@@ TBD</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
+
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
+
 <p>Manakai DOM URI Module.</p>
-<p><a href="../../Message/DOM/DOMImplementation.html">the Message::DOM::DOMImplementation manpage</a>.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.</p>
 
-</body>
+<p><a href="../../Message/DOM/DOMImplementation" class="podlinkpod">Message::DOM::DOMImplementation</a>.</p>
 
-</html>
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

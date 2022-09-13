@@ -482,25 +482,25 @@ document and constructs C<Message::Markup::SuikaWikiConfig20::Node>
 tree instance.
 
 SuikaWikiConfig/2.0 
-<http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0>:
+<https://suika.suikawiki.org/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0>:
 Formal specification and informal descriptions of 
 the SuikaWikiConfig/2.0 format.
 
 Latest version of this module is available at the
 manakai CVS repository
-<http://suika.fam.cx/gate/cvs/messaging/manakai/lib/Message/Markup/SuikaWikiConfig20/Parser.pm>.
+<https://suika.suikawiki.org/gate/cvs/messaging/manakai/lib/Message/Markup/SuikaWikiConfig20/Parser.pm>.
 
 =head1 HISTORY
 
 SuikaWikiConfig/2.0 format was originally defined
-for SuikaWiki <http://suika.fam.cx/~wakaba/-temp/wiki?SuikaWiki>.
+for SuikaWiki <https://suika.suikawiki.org/~wakaba/-temp/wiki?SuikaWiki>.
 
 This module, formally known as C<SuikaWiki::Markup::SuikaWikiConfig20>,
 was part of SuikaWiki distribution.
 
 =head1 LICENSE
 
-Copyright 2003-2004 Wakaba <w@suika.fam.cx>
+Copyright 2003-2004 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -1,67 +1,57 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Message::Util::QName::Filter - QName source code filter</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
 
-<p><a name="__index__"></a></p>
-<!-- INDEX BEGIN -->
+        <h1><a href="../../../" rel=top>manakai</a></h1>
 
-<ul>
+        
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-<!-- INDEX END -->
 
-<hr />
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Message::Util::QName::Filter - QName source code filter</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Message::Util::QName::Filter {
+
+
+
+<hgroup><h1><code>Message::Util::QName::Filter</code></h1><h2>QName source code filter</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
+
+<pre><code>  use Message::Util::QName::Filter {
     prefix1 =&gt; q&lt;URI reference 1&gt;,
     prefix2 =&gt; q&lt;URI reference 2&gt;,
     ...
-  };</pre>
-<pre>
-  my $uri = ExpandedURI q&lt;prefix1:local-name&gt;;</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p><code>Message::Util::QName::Filter</code> is a source code filter that 
-expands <code>Message::Util::QName::General</code> style QName specification 
-like <code>ExpandedURI q&lt;prefix:local-name&gt;</code>.</p>
-<p>To enable the filter, use the <code>use</code> statement with a hash reference 
-binding namespace prefixes with namespace URI references.</p>
-<p>Note.  Take care when a QName is written in some delimited structure 
-such as regex.  For example, <code>s/rdf:/ExpandedURI q&lt;rdf:&gt;/g</code> 
-would make syntax errors reported because <code>ExpandedURI q&lt;rdf:&gt;</code> 
-is expanded to the namespace URI and it includes <code>/</code> (SOLIDUS)
-characters so that it is treated as a terminator by Perl parser. 
-Use non-URI characters to delimit, e.g.:</p>
-<pre>
-  s{rdf:}{ExpandedURI q&lt;rdf:&gt;}g</pre>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2004, 2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.</p>
+  };
 
-</body>
+  my $uri = ExpandedURI q&lt;prefix1:local-name&gt;;</code></pre>
 
-</html>
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p><code>Message::Util::QName::Filter</code> is a source code filter that expands <code>Message::Util::QName::General</code> style QName specification like <code>ExpandedURI q&lt;prefix:local-name&gt;</code>.</p>
+
+<p>To enable the filter, use the <code>use</code> statement with a hash reference binding namespace prefixes with namespace URI references.</p>
+
+<p>Note. Take care when a QName is written in some delimited structure such as regex. For example, <code>s/rdf:/ExpandedURI q&lt;rdf:&gt;/g</code> would make syntax errors reported because <code>ExpandedURI q&lt;rdf:&gt;</code> is expanded to the namespace URI and it includes <code>/</code> (SOLIDUS) characters so that it is treated as a terminator by Perl parser. Use non-URI characters to delimit, e.g.:</p>
+
+<pre><code>  s{rdf:}{ExpandedURI q&lt;rdf:&gt;}g</code></pre>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2004, 2007 Wakaba &lt;w@suika.fam.cx&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

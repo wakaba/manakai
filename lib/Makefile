@@ -1,12 +1,18 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "."
+MANAKAI_ROOT_DIR = ..
 
 RM = rm
 RMALL = $(RM) -fv
 MAKE = make
 CD = cd
 
-all: Error.html Message-all Whatpm-all
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
+
+all: build Message-all Whatpm-all
+
+build: Error.html
+	cd Message && $(MAKE) build
+	cd Whatpm && $(MAKE) build
 
 Message-all:
 	$(CD) Message/ && $(MAKE) all
@@ -14,8 +20,9 @@ Message-all:
 Whatpm-all:
 	$(CD) Whatpm/ && $(MAKE) all
 
-%.html: %.pm
-	$(POD2HTML) $< > $@
+%.html: %.pm $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" $< > $@
 
 dataautoupdate:
 	$(CD) Whatpm && $(MAKE) dataautoupdate

@@ -976,12 +976,12 @@ my $parse_color = sub {
   my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
   ## See
-  ## <http://suika.fam.cx/gate/2005/sw/%3Ccolor%3E>,
-  ## <http://suika.fam.cx/gate/2005/sw/rgb>,
-  ## <http://suika.fam.cx/gate/2005/sw/-moz-rgba>,
-  ## <http://suika.fam.cx/gate/2005/sw/hsl>,
-  ## <http://suika.fam.cx/gate/2005/sw/-moz-hsla>, and
-  ## <http://suika.fam.cx/gate/2005/sw/color>
+  ## <https://suika.suikawiki.org/gate/2005/sw/%3Ccolor%3E>,
+  ## <https://suika.suikawiki.org/gate/2005/sw/rgb>,
+  ## <https://suika.suikawiki.org/gate/2005/sw/-moz-rgba>,
+  ## <https://suika.suikawiki.org/gate/2005/sw/hsl>,
+  ## <https://suika.suikawiki.org/gate/2005/sw/-moz-hsla>, and
+  ## <https://suika.suikawiki.org/gate/2005/sw/color>
   ## for browser compatibility issue.
 
   ## NOTE: Implementing CSS3 Color CR (2003), except for attr(),
@@ -2145,7 +2145,7 @@ $Prop->{'z-index'} = {
     }
 
     if ($t->{type} == NUMBER_TOKEN) {
-      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/z-index> for
+      ## ISSUE: See <https://suika.suikawiki.org/gate/2005/sw/z-index> for
       ## browser compatibility issue.
       my $value = $t->{number};
       $t = $tt->get_next_token;
@@ -2241,8 +2241,8 @@ $Prop->{orphans} = {
     }
 
     if ($t->{type} == NUMBER_TOKEN) {
-      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/orphans> and
-      ## <http://suika.fam.cx/gate/2005/sw/widows> for
+      ## ISSUE: See <https://suika.suikawiki.org/gate/2005/sw/orphans> and
+      ## <https://suika.suikawiki.org/gate/2005/sw/widows> for
       ## browser compatibility issue.
       my $value = $t->{number};
       $t = $tt->get_next_token;
@@ -2299,7 +2299,7 @@ $Prop->{opacity} = {
     }
 
     if ($t->{type} == NUMBER_TOKEN) {
-      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/opacity> for
+      ## ISSUE: See <https://suika.suikawiki.org/gate/2005/sw/opacity> for
       ## browser compatibility issue.
       my $value = $t->{number};
       $t = $tt->get_next_token;
@@ -3003,7 +3003,7 @@ $Prop->{width} = {
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute => $compute_length,
-      ## NOTE: See <http://suika.fam.cx/gate/2005/sw/width> for
+      ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/width> for
       ## browser compatibility issues.
 };
 $Attr->{width} = $Prop->{width};
@@ -3057,7 +3057,7 @@ $Prop->{height} = {
   initial => ['KEYWORD', 'auto'],
   #inherited => 0,
   compute => $compute_length,
-      ## NOTE: See <http://suika.fam.cx/gate/2005/sw/height> for
+      ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/height> for
       ## browser compatibility issues.
 };
 $Attr->{height} = $Prop->{height};
@@ -3172,7 +3172,7 @@ $Prop->{'vertical-align'} = {
   initial => ['KEYWORD', 'baseline'],
   #inherited => 0,
   compute => $compute_length,
-      ## NOTE: See <http://suika.fam.cx/gate/2005/sw/vertical-align> for
+      ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/vertical-align> for
       ## browser compatibility issues.
 };
 $Attr->{vertical_align} = $Prop->{'vertical-align'};
@@ -3466,7 +3466,7 @@ $Prop->{'font-weight'} = {
     }
 
     if ($t->{type} == NUMBER_TOKEN) {
-      ## ISSUE: See <http://suika.fam.cx/gate/2005/sw/font-weight> for
+      ## ISSUE: See <https://suika.suikawiki.org/gate/2005/sw/font-weight> for
       ## browser compatibility issue.
       my $value = $t->{number} + 0;
       $t = $tt->get_next_token;
@@ -3861,7 +3861,7 @@ $Prop->{'font-family'} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
-    ## NOTE: See <http://suika.fam.cx/gate/2005/sw/font-family> for
+    ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/font-family> for
     ## how chaotic browsers are!
 
     ## NOTE: Opera 9 allows NUMBER and DIMENSION as part of 
@@ -3944,7 +3944,7 @@ $Prop->{cursor} = {
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
-    ## NOTE: See <http://suika.fam.cx/gate/2005/sw/cursor> for browser
+    ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/cursor> for browser
     ## compatibility issues.
 
     my @prop_value = ('CURSOR');
@@ -5169,7 +5169,7 @@ $Prop->{'border-spacing'} = {
 };
 $Attr->{border_spacing} = $Prop->{'border-spacing'};
 
-## NOTE: See <http://suika.fam.cx/gate/2005/sw/background-position> for
+## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/background-position> for
 ## browser compatibility problems.
 $Prop->{'background-position'} = {
   css => 'background-position',
@@ -6385,7 +6385,7 @@ $Prop->{content} = {
   css => 'content',
   dom => 'content',
   key => 'content',
-  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/content>.
+  ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/content>.
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
@@ -6568,7 +6568,7 @@ $Prop->{'counter-reset'} = {
   css => 'counter-reset',
   dom => 'counter_reset',
   key => 'counter_reset',
-  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/counter-reset>.
+  ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/counter-reset>.
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
@@ -6696,7 +6696,7 @@ $Prop->{clip} = {
   css => 'clip',
   dom => 'clip',
   key => 'clip',
-  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/clip>.
+  ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/clip>.
   parse => sub {
     my ($self, $prop_name, $tt, $t, $onerror) = @_;
 
@@ -6988,7 +6988,7 @@ $Prop->{page} = {
 
 =head1 LICENSE
 
-Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2011 Wakaba <wakaba@suikawiki.org>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

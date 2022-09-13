@@ -1,126 +1,100 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Message::CGI::Util - manakai CGI Utilities</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#functions">FUNCTIONS</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Message::CGI::Util</code></h1><h2>manakai CGI Utilities</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Message::CGI::Util - manakai CGI Utilities</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Message::CGI::Util qw(htescape percent_encode);
+<pre><code>  use Message::CGI::Util qw(htescape percent_encode);
   
-  print htescape &quot;ab &lt; cd&quot;;
-  print q&lt;<a href="http://www.example.com/&gt">http://www.example.com/&gt</a>; . percent_encode &quot;\x{4e00} = 1&quot;;</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Message::CGI::Util</code> module provides various functions which are
-particulary useful in CGI scripts.</p>
-<p>
-</p>
-<hr />
-<h1><a name="functions">FUNCTIONS</a></h1>
-<p>Functions are not exported by default.  You have to explicitly import
-functions you'd like to use as:</p>
-<pre>
-  use Message::CGI::Util qw(function1 function2 ...);</pre>
+  print htescape "ab &lt; cd";
+  print q&lt;http://www.example.com/&gt; . percent_encode "\x{4e00} = 1";</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Message::CGI::Util</code> module provides various functions which are particulary useful in CGI scripts.</p>
+
+</section><section id="FUNCTIONS"><h1>FUNCTIONS</h1>
+
+<p>Functions are not exported by default. You have to explicitly import functions you'd like to use as:</p>
+
+<pre><code>  use Message::CGI::Util qw(function1 function2 ...);</code></pre>
+
 <dl>
-<dt><strong><a name="string_htescape_string" class="item">STRING = htescape STRING</a></strong></dt>
+<dt id="STRING_=_htescape_STRING">STRING = htescape STRING</dt>
 
 <dd>
 <p>Escapes the given string for the use in HTML/XML markups.</p>
-</dd>
-<dt><strong><a name="octets_percent_encode_chars" class="item">OCTETS = percent_encode CHARS</a></strong></dt>
+
+</dd><dt id="OCTETS_=_percent_encode_CHARS">OCTETS = percent_encode CHARS</dt>
 
 <dd>
-<p>Percene-encodes the given character string.  Characters are encode in
-<code>utf8</code> and then percent-encoded.  Any character other than <a href="http://www.ietf.org/rfc/rfc3986.txt" class="rfc">RFC 3986</a>'s
-<code>unreserved</code> characters are encoded.</p>
-</dd>
-<dt><strong><a name="octets_percent_encode_na_chars" class="item">OCTETS = percent_encode_na CHARS</a></strong></dt>
+<p>Percene-encodes the given character string. Characters are encode in <code>utf8</code> and then percent-encoded. Any character other than RFC 3986's <code>unreserved</code> characters are encoded.</p>
+
+</dd><dt id="OCTETS_=_percent_encode_na_CHARS">OCTETS = percent_encode_na CHARS</dt>
 
 <dd>
-<p>Percent-encodes the given character string.  It works as
-<code>percent_encode</code> does, except that this function only encodes
-non-ASCII characters.  Reserved ASCII characters are <em>not</em> encoded.</p>
-</dd>
-<dt><strong><a name="chars_percent_decode_octets" class="item">CHARS = percent_decode OCTETS</a></strong></dt>
+<p>Percent-encodes the given character string. It works as <code>percent_encode</code> does, except that this function only encodes non-ASCII characters. Reserved ASCII characters are <var>not</var> encoded.</p>
+
+</dd><dt id="CHARS_=_percent_decode_OCTETS">CHARS = percent_decode OCTETS</dt>
 
 <dd>
 <p>Percent-decodes the given byte string and then decoded as UTF-8.</p>
-</dd>
-<dt><strong><a name="absurl_get_absolute_url_relurl_baseurl" class="item">ABSURL = get_absolute_url RELURL, BASEURL</a></strong></dt>
+
+</dd><dt id="ABSURL_=_get_absolute_url_RELURL,_BASEURL">ABSURL = get_absolute_url RELURL, BASEURL</dt>
 
 <dd>
-<p>Resolves the relative reference against the given base URL and returns
-the <a href="http://www.ietf.org/rfc/rfc3986.txt" class="rfc">RFC 3986</a> absolute URI.</p>
-</dd>
-<dt><strong><a name="string_datetime_in_content_time_t" class="item">STRING = datetime_in_content TIME_T</a></strong></dt>
+<p>Resolves the relative reference against the given base URL and returns the RFC 3986 absolute URI.</p>
+
+</dd><dt id="STRING_=_datetime_in_content_TIME_T">STRING = datetime_in_content TIME_T</dt>
 
 <dd>
-<p>Formats the given time in the &quot;date or time strings in content&quot; format
-defined in earlier drafts of the Web Applications 1.0 specification.</p>
-</dd>
-<dt><strong><a name="string_datetime_for_http_time_t" class="item">STRING = datetime_for_http TIME_T</a></strong></dt>
+<p>Formats the given time in the "date or time strings in content" format defined in earlier drafts of the Web Applications 1.0 specification.</p>
+
+</dd><dt id="STRING_=_datetime_for_http_TIME_T">STRING = datetime_for_http TIME_T</dt>
 
 <dd>
-<p>Formats the given time in the <a href="http://www.ietf.org/rfc/rfc1123.txt" class="rfc">RFC 1123</a> format defined in the <a href="http://www.ietf.org/rfc/rfc2616.txt" class="rfc">RFC 2616</a>
-(HTTP/1.1).</p>
+<p>Formats the given time in the RFC 1123 format defined in the RFC 2616 (HTTP/1.1).</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>The <a href="../../../URL/PercentEncode.html">the URL::PercentEncode manpage</a> module provides more comprehensive set of
-functions to percent-encode or percent-decode strings.  The module is
-available from &lt;http://suika.fam.cx/gate/git/wi/perl/webutils.git&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2008-2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p>The <a href="../../URL/PercentEncode" class="podlinkpod">URL::PercentEncode</a> module provides more comprehensive set of functions to percent-encode or percent-decode strings. The module is available from <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/git/wi/perl/webutils.git">https://suika.suikawiki.org/gate/git/wi/perl/webutils.git</a>&gt;</code>.</p>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2008-2010 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

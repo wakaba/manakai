@@ -1,164 +1,111 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::WebIDL - A WebIDL Parser and Conformance Checker</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:wakaba@suika.fam.cx" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<ul>
 
-		<li><a href="#whatpm__webidl__parser"><code>Whatpm::WebIDL::Parser</code></a></li>
-		<li><a href="#whatpm__webidl__definitions"><code>Whatpm::WebIDL::Definitions</code></a></li>
-	</ul>
+<hgroup><h1><code>Whatpm::WebIDL</code></h1><h2>A WebIDL Parser and Conformance Checker</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-
-<hr name="index" />
-</div>
-<!-- INDEX END -->
-
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::WebIDL - A WebIDL Parser and Conformance Checker</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::WebIDL;
+<pre><code>  use Whatpm::WebIDL;
   
   my $parser = Whatpm::WebIDL::Parser-&gt;new;
   my $onerror = sub {
     my %arg = @_;
-    warn join &quot;\t&quot;,
+    warn join "\t",
         $arg{line}, $arg{column}, $arg{level},
         $arg{type}, $arg{text} // '', $arg{value} // '';
   };
   
   my $webidl_doc = $parser-&gt;parse_char_string ($webidl_string, $onerror);
-  $webidl_doc-&gt;check ($onerror);</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::WebIDL</code> module provides a WebIDL parser, as well as a
-conformance checker that can be invoked once an IDL fragment has been
-parsed.</p>
+  $webidl_doc-&gt;check ($onerror);</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::WebIDL</code> module provides a WebIDL parser, as well as a conformance checker that can be invoked once an IDL fragment has been parsed.</p>
+
 <p>This is an implementation of W3C Web IDL specification.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
-<p>The <code>Whatpm::WebIDL</code> package itself provides no functionality.  It
-contains various packages including <code>Whatpm::WebIDL::Parser</code>.</p>
-<p>
-</p>
-<h2><a name="whatpm__webidl__parser"><code>Whatpm::WebIDL::Parser</code></a></h2>
-<p>The <code>Whatpm::WebIDL::Parser</code> package, which is contained in the
-<code>Whatpm::WebIDL</code> module, defines a class method and an instance
-method:</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
+<p>The <code>Whatpm::WebIDL</code> package itself provides no functionality. It contains various packages including <code>Whatpm::WebIDL::Parser</code>.</p>
+
+<section id="Whatpm::WebIDL::Parser"><h1><code>Whatpm::WebIDL::Parser</code></h1>
+
+<p>The <code>Whatpm::WebIDL::Parser</code> package, which is contained in the <code>Whatpm::WebIDL</code> module, defines a class method and an instance method:</p>
+
 <dl>
-<dt><strong><a name="new" class="item"><em>$parser</em> = Whatpm::WebIDL::Parser-&gt;new;</a></strong>
+<dt id="$parser_=_Whatpm::WebIDL::Parser->new;"><code><i>$parser</i> = Whatpm::WebIDL::Parser-&gt;new;</code></dt>
 
 <dd>
 <p>This class method creates a new instance of the WebIDL parser.</p>
-</dd>
-</li>
-<dt><strong><a name="parse_char_string" class="item"><em>$webidl_doc</em> = <em>$parser</em>-&gt;parse_char_string (<em>$webidl_fragment</em>, [<em>$onerror</em>]);</a></strong>
+
+</dd><dt id="$webidl_doc_=_$parser->parse_char_string_($webidl_fragment,_[$onerror]);"><code><i>$webidl_doc</i> = <i>$parser</i>-&gt;parse_char_string (<i>$webidl_fragment</i>, [<i>$onerror</i>]);</code></dt>
 
 <dd>
-<p>This instance method of the <em>$parser</em> method parses a WebIDL fragment
-and returns its in-memory representation.</p>
+<p>This instance method of the <var>$parser</var> method parses a WebIDL fragment and returns its in-memory representation.</p>
+
+<p>The first argument, <var>$webidl_fragment</var>, is the IDL fragment to be parsed. It must be a string of characters (not bytes).</p>
+
+<p>As the second argument, <var>$onerror</var>, a <code>CODE</code> reference may be specified. If specified, whenever a parse error is found, or a warning message is raised, the <code>CODE</code> is invoked with arguments describing the error. @@ TODO: ref to degtailed description</p>
+
+<p>Note that the W3C WebIDL specification does not define how invalid WebIDL fragments are parsed. This parse implements a foward compatible parsing rule that is similar to the CSS parsing rule; once a parse error is found, everything until the next <code>;</code> character (or the end-of-file, if there is no <code>;</code> character) is ignored, taking pairs of <code>{</code> and <code>}</code> characters into account. If a fragment prematurely ends inside a block, then a <code>};</code> sequence that closes the block is implied. Any error that does not violate the grammer, e.g. any reference to an undefined interface, does not stop the parser; to detect such errors, the <code>checker</code> has to be invoked later.</p>
+
+<p>The returned object, <code>$webidl_doc</code>, is an in-memory representation of the prased IDL fragment. It is an instance of the <code>Whatpm::WebIDL::Definitions</code> class.</p>
 </dd>
-<dd>
-<p>The first argument, <em>$webidl_fragment</em>, is the IDL fragment to be
-parsed.  It must be a string of characters (not bytes).</p>
-</dd>
-<dd>
-<p>As the second argument, <em>$onerror</em>, a <code>CODE</code> reference may be
-specified.  If specified, whenever a parse error is found, or a
-warning message is raised, the <code>CODE</code> is invoked with arguments
-describing the error. @@ TODO: ref to degtailed description</p>
-</dd>
-<dd>
-<p>Note that the W3C WebIDL specification does not define how invalid
-WebIDL fragments are parsed.  This parse implements a foward
-compatible parsing rule that is similar to the CSS parsing rule; once
-a parse error is found, everything until the next <code>;</code> character (or
-the end-of-file, if there is no <code>;</code> character) is ignored, taking
-pairs of <code>{</code> and <code>}</code> characters into account.  If a fragment
-prematurely ends inside a block, then a <code>};</code> sequence that closes the
-block is implied.  Any error that does not violate the grammer, e.g.
-any reference to an undefined interface, does not stop the parser; to
-detect such errors, the <code>checker</code> has to be invoked later.</p>
-</dd>
-<dd>
-<p>The returned object, <code>$webidl_doc</code>, is an in-memory representation of
-the prased IDL fragment.  It is an instance of the
-<code>Whatpm::WebIDL::Definitions</code> class.</p>
-</dd>
-</li>
 </dl>
-<p>
-</p>
-<h2><a name="whatpm__webidl__definitions"><code>Whatpm::WebIDL::Definitions</code></a></h2>
-<p>An object of the <code>Whatpm::WebIDL::Definitions</code> class represents a
-WebIDL fragment (or <code>Definitions</code> production in the WebIDL
-specification).</p>
+
+</section><section id="Whatpm::WebIDL::Definitions"><h1><code>Whatpm::WebIDL::Definitions</code></h1>
+
+<p>An object of the <code>Whatpm::WebIDL::Definitions</code> class represents a WebIDL fragment (or <code>Definitions</code> production in the WebIDL specification).</p>
+
 <dl>
-<dt><strong><a name="check" class="item"><em>$webidl_doc</em>-&gt;check (<em>$onerror</em>, [<em>$levels</em>]);</a></strong>
+<dt id="$webidl_doc->check_($onerror,_[$levels]);"><code><i>$webidl_doc</i>-&gt;check (<i>$onerror</i>, [<i>$levels</i>]);</code></dt>
 
 <dd>
-<p>This method checks the conformance of the WebIDL objects,
-<em>$webidl_docs</em>.</p>
+<p>This method checks the conformance of the WebIDL objects, <var>$webidl_docs</var>.</p>
+
+<p>@@ TODO: documentation for <var>$onerror</var> and <var>$levels</var>.</p>
 </dd>
-<dd>
-<p>@@ TODO: documentation for <em>$onerror</em> and <em>$levels</em>.</p>
-</dd>
-</li>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>WebIDL Editor's Draft
-&lt;http://dev.w3.org/cvsweb/~checkout~/2006/webapi/WebIDL/Overview.html?content-type=text/html;%20charset=utf-8&gt;</p>
-<p><code>WebHACC::Language::WebIDL</code> module, as an example of the usage of
-this module
-&lt;http://suika.fam.cx/gate/cvs/webroot/gate/2007/html/WebHACC/Language/WebIDL.pm&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.</p>
 
-</body>
+</section></section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p>WebIDL Editor's Draft <code class="url">&lt;<a href="http://dev.w3.org/cvsweb/~checkout~/2006/webapi/WebIDL/Overview.html?content-type=text/html;%20charset=utf-8">http://dev.w3.org/cvsweb/~checkout~/2006/webapi/WebIDL/Overview.html?content-type=text/html;%20charset=utf-8</a>&gt;</code></p>
+
+<p><code>WebHACC::Language::WebIDL</code> module, as an example of the usage of this module <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/cvs/webroot/gate/2007/html/WebHACC/Language/WebIDL.pm">https://suika.suikawiki.org/gate/cvs/webroot/gate/2007/html/WebHACC/Language/WebIDL.pm</a>&gt;</code></p>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2008 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

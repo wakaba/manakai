@@ -1,13 +1,19 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../.."
+MANAKAI_ROOT_DIR = ../../..
+
 WGET = wget
 RM = rm
 RMALL = $(RM) -fr
 
-all: SelectorsParser.html Colors.html Parser.html Tokenizer.html
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
 
-%.html: %.pod
-	$(POD2HTML) $< > $@
+all: build
+
+build: SelectorsParser.html Colors.html Parser.html Tokenizer.html
+
+%.html: %.pod $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Whatpm/CSS/$< > Whatpm/CSS/$@
 
 clean:
 	$(RMALL) *~ *.bak *.tmp pod*.tmp

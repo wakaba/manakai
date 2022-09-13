@@ -1158,11 +1158,11 @@ C<to> part of mailto: URL scheme (for internal use only)
 =head1 SEE ALSO
 
 Message::* Perl modules
-<http://suika.fam.cx/~wakaba/Message-pm/>
+<https://suika.suikawiki.org/~wakaba/Message-pm/>
 
 =head1 LICENSE
 
-Copyright 2002 Wakaba <w@suika.fam.cx>.
+Copyright 2002 Wakaba <wakaba@suikawiki.org>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -134,7 +134,7 @@ sub serialize_selector_text ($$$) {
   my $ident = sub { $_[0] };
   my $str = sub { '"' . $_[0] . '"' };
 
-  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/namespace> for browser
+  ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/namespace> for browser
   ## implementation issues.
 
   my $r = join ", ", map {
@@ -262,7 +262,7 @@ sub serialize_selector_text ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007-2012 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2012 Wakaba <wakaba@suikawiki.org>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

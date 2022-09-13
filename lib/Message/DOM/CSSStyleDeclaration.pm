@@ -204,7 +204,7 @@ sub css_text ($;$) {
   ## NOTE: Where and how white space characters are inserted are 
   ## intentionally changed from those in browsers so that properties are
   ## more prettily printed.
-  ## See <http://suika.fam.cx/gate/2005/sw/cssText> for what browsers do.
+  ## See <https://suika.suikawiki.org/gate/2005/sw/cssText> for what browsers do.
   ## TODO: Ordering issue.
   require Whatpm::CSS::Parser;
   my $self = $_[0];
@@ -382,7 +382,7 @@ sub css_text ($;$) {
   ## NOTE: Where and how white space characters are inserted are 
   ## intentionally changed from those in browsers so that properties are
   ## more prettily printed.
-  ## See <http://suika.fam.cx/gate/2005/sw/cssText> for what browsers do.
+  ## See <https://suika.suikawiki.org/gate/2005/sw/cssText> for what browsers do.
   ## TODO: ordering
   ## TODO: any spec?
   my $r = '';

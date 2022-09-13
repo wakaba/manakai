@@ -1,11 +1,10 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot ".."
-POD2HTML_SUB = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../.."
+MANAKAI_ROOT_DIR = ../..
+
 WGET = wget
 CP = cp
 RM = rm
 RMALL = $(RM) -fr
+PERL = $(MANAKAI_ROOT_DIR)/perl
 
 LANGUAGE_SUBTAG_REGISTRY = language-subtag-registry
 LANGUAGE_TAGEXT_REGISTRY = language-tag-extensions-registry
@@ -21,16 +20,28 @@ LANGTAG_XML_FILES = \
   ../../data/langtag/cldr-bcp47/variant.xml \
   ../../data/langtag/cldr-bcp47/transform.xml
 
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
+
 all: \
   _update \
   Atom-all Charset-all CSS-all HTML-all XML-all ContentChecker-all \
   HTML/Tokenizer.pm HTML/Parser.pm \
   _NamedEntityList.pm _LinkTypeList.pm \
+  build
+
+build: \
   ContentType.html HTML.html NanoDOM.html ContentChecker.html \
   CacheManifest.html WebIDL.html mklinktypelist.html \
   SWML/Parser.html LangTag.html \
   Errors.html \
   WebVTT/Parser.html WebVTT/Checker.html WebVTT/Serializer.html
+	cd Atom && $(MAKE) build
+	cd CSS && $(MAKE) build
+	cd Charset && $(MAKE) build
+	cd HTML && $(MAKE) build
+	cd XML && $(MAKE) build
+	cd ContentChecker && $(MAKE) build
 
 Atom-all:
 	cd Atom && make all
@@ -65,28 +76,34 @@ update-http:
 
 HTML/Tokenizer.pm HTML/Parser.pm:: %: %.src mkhtmlparser.pl
 	perl mkhtmlparser.pl $< > $@
-	perl -I.. -c $@
+	$(PERL) -c $@
 
-%.html: %.pm
-	$(POD2HTML) $< > $@
+%.html: %.pm $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Whatpm/$< > Whatpm/$@
 
 HTML.html ContentChecker.html CacheManifest.html WebIDL.html \
 LangTag.html Errors.html \
-:: %.html: %.pod
-	$(POD2HTML) $< > $@
+:: \
+%.html: %.pod $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Whatpm/$< > Whatpm/$@
 
 SWML/Parser.html \
 WebVTT/Parser.html WebVTT/Checker.html WebVTT/Serializer.html \
-:: %.html: %.pod
-	$(POD2HTML_SUB) $< > $@
+:: \
+%.html: %.pod $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Whatpm/$< > Whatpm/$@
 
 mklinktypelist.html: mklinktypelist.pl
-	$(POD2HTML) $< > $@
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Whatpm/$< > Whatpm/$@
 	perl -n -i -e 's/%s/[gmtime]->[5]+1900/ge; print' $@
 
 _NamedEntityList.pm: mkentitylist.pl Entities.html
 	perl $< > $@.tmp
-	perl -c -w $@.tmp
+	$(PERL) -c -w $@.tmp
 	$(CP) $@.tmp $@
 	$(RMALL) $@.tmp
 
@@ -98,7 +115,7 @@ Entities.html:
 
 _LinkTypeList.pm: mklinktypelist.pl RelExtensions.html
 	perl $< > $@
-	perl -c -w $@
+	$(PERL) -c -w $@
 
 update-_LinkTypeList.pm:
 	$(RMALL) RelExtensions.html

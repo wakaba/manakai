@@ -1,104 +1,95 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::HTML::ParserData - Data for HTML parser</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#constants">CONSTANTS</a></li>
-	<li><a href="#variables">VARIABLES</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::HTML::ParserData</code></h1><h2>Data for HTML parser</h2></hgroup><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::HTML::ParserData - Data for HTML parser</p>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
 <p>The <code>Whatpm::HTML::ParserData</code> module contains data for HTML parser,
 extracted from the HTML Living Standard.</p>
-<p>
-</p>
-<hr />
-<h1><a name="constants">CONSTANTS</a></h1>
-<p>Following constants for namespace URLs are defined (but not exported):
-<code>HTML_NS</code> (HTML namespace), <code>SVG_NS</code> (SVG namespace), <code>MML_NS</code>
-(MathML namespace), <code>XML_NS</code> (XML namespace), <code>XMLNS_NS</code> (XML
-Namespace namespace), and <code>XLINK_NS</code> (XLink namespace).</p>
-<p>
-</p>
-<hr />
-<h1><a name="variables">VARIABLES</a></h1>
+
+</section><section id="CONSTANTS"><h1>CONSTANTS</h1>
+
+<p>Following constants for namespace URLs are defined (but not exported): <code>HTML_NS</code> (HTML namespace),
+<code>SVG_NS</code> (SVG namespace),
+<code>MML_NS</code> (MathML namespace),
+<code>XML_NS</code> (XML namespace),
+<code>XMLNS_NS</code> (XML Namespace namespace),
+and <code>XLINK_NS</code> (XLink namespace).</p>
+
+</section><section id="VARIABLES"><h1>VARIABLES</h1>
+
 <p>Following data from the HTML specification are included:</p>
-<dl>
-<dt><strong><a name="_allvoidelements" class="item">$AllVoidElements</a></strong></dt>
 
-<dt><strong><a name="_mathmltextintegrationpoints" class="item">$MathMLTextIntegrationPoints</a></strong></dt>
+<ul>
+<li><code>$AllVoidElements</code></li>
 
-<dt><strong><a name="_mathmlhtmlintegrationpoints" class="item">$MathMLHTMLIntegrationPoints</a></strong></dt>
+<li><code>$MathMLTextIntegrationPoints</code></li>
 
-<dt><strong><a name="_svghtmlintegrationpoints" class="item">$SVGHTMLIntegrationPoints</a></strong></dt>
+<li><code>$MathMLHTMLIntegrationPoints</code></li>
 
-<dt><strong><a name="_foreigncontentbreakers" class="item">$ForeignContentBreakers</a></strong></dt>
+<li><code>$SVGHTMLIntegrationPoints</code></li>
 
-<dt><strong><a name="_mathmlattrnamefixup" class="item">$MathMLAttrNameFixup</a></strong></dt>
+<li><code>$ForeignContentBreakers</code></li>
 
-<dt><strong><a name="_svgattrnamefixup" class="item">$SVGAttrNameFixup</a></strong></dt>
+<li><code>$MathMLAttrNameFixup</code></li>
 
-<dt><strong><a name="_foreignattrnamespacefixup" class="item">$ForeignAttrNamespaceFixup</a></strong></dt>
+<li><code>$SVGAttrNameFixup</code></li>
 
-<dt><strong><a name="_svgelementnamefixup" class="item">$SVGElementNameFixup</a></strong></dt>
+<li><code>$ForeignAttrNamespaceFixup</code></li>
 
-<dt><strong><a name="_namedcharrefs" class="item">$NamedCharRefs</a></strong></dt>
+<li><code>$SVGElementNameFixup</code></li>
 
-<dt><strong><a name="_charrefreplacements" class="item">$CharRefReplacements</a></strong></dt>
+<li><code>$NamedCharRefs</code></li>
 
-<dt><strong><a name="_noncharactercodepoints" class="item">$NoncharacterCodePoints</a></strong></dt>
+<li><code>$CharRefReplacements</code></li>
 
-<dt><strong><a name="_obsoletepermitteddoctypes" class="item">$ObsoletePermittedDoctypes</a></strong></dt>
+<li><code>$NoncharacterCodePoints</code></li>
 
-<dt><strong><a name="_quirkypublicidprefixes" class="item">$QuirkyPublicIDPrefixes</a></strong></dt>
+<li><code>$ObsoletePermittedDoctypes</code></li>
 
-<dt><strong><a name="_quirkypublicids" class="item">$QuirkyPublicIDs</a></strong></dt>
+<li><code>$QuirkyPublicIDPrefixes</code></li>
 
-</dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>HTML Living Standard
-&lt;http://www.whatwg.org/specs/web-apps/current-work/&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2004-2011 Apple Computer, Inc., Mozilla Foundation, and
-Opera Software ASA.</p>
-<p>You are granted a license to use, reproduce and create derivative
-works of this document.</p>
+<li><code>$QuirkyPublicIDs</code></li>
+</ul>
 
-</body>
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p>HTML Living Standard <code class="url">&lt;<a href="http://www.whatwg.org/specs/web-apps/current-work/">http://www.whatwg.org/specs/web-apps/current-work/</a>&gt;</code>.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2004-2011 Apple Computer,
+Inc.,
+Mozilla Foundation,
+and Opera Software ASA.</p>
+
+<p>You are granted a license to use,
+reproduce and create derivative works of this document.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

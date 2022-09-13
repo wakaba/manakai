@@ -6,8 +6,8 @@ use Scalar::Util qw(weaken);
 use Message::DOM::DOMException;
 
 ## Spec:
-## <http://www.whatwg.org/specs/web-apps/current-work/#texttrack>,
-## <http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions#anchor-59>.
+## <https://www.whatwg.org/specs/web-apps/current-work/#texttrack>,
+## <https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions#anchor-59>.
 
 # XXX EventTarget
 
@@ -111,7 +111,7 @@ sub manakai_clone_track ($) {
 
 =head1 LICENSE
 
-Copyright 2012 Wakaba <w@suika.fam.cx>.
+Copyright 2012 Wakaba <wakaba@suikawiki.org>.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

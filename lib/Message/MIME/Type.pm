@@ -292,7 +292,7 @@ sub validate ($$;%) {
 
   ## NOTE: Attribute duplication are not error, though its semantics
   ## is not defined.  See
-  ## <http://suika.fam.cx/gate/2005/sw/%E5%AA%92%E4%BD%93%E5%9E%8B/%E5%BC%95%E6%95%B0>.
+  ## <https://suika.suikawiki.org/gate/2005/sw/%E5%AA%92%E4%BD%93%E5%9E%8B/%E5%BC%95%E6%95%B0>.
   ## However, a Message::MIME::Type object cannot represent duplicate
   ## attributes and is reported in the parsing phase.
 
@@ -483,7 +483,7 @@ sub validate ($$;%) {
 
 =head1 LICENSE
 
-Copyright 2007-2010 Wakaba <w@suika.fam.cx>
+Copyright 2007-2010 Wakaba <wakaba@suikawiki.org>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

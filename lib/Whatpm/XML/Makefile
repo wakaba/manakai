@@ -1,12 +1,17 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../.."
+MANAKAI_ROOT_DIR = ../../..
 
 HTML_FILES = Parser.html
 
-all: Parser.pm $(HTML_FILES)
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
 
-%.html: %.pod
-	$(POD2HTML) $< > $@
+all: Parser.pm build
+
+build: $(HTML_FILES)
+
+%.html: %.pod $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Whatpm/XML/$< > Whatpm/XML/$@
 
 Parser.pm: Parser.pm.src ../mkhtmlparser.pl
 	perl ../mkhtmlparser.pl $< > $@
@@ -14,3 +19,5 @@ Parser.pm: Parser.pm.src ../mkhtmlparser.pl
 
 clean:
 	rm -frv *~ *.BAK .*~ .*.BAK
+
+## License: Public Domain.

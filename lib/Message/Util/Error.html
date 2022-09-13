@@ -1,59 +1,26 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Message::Util::Error - manakai's Common Error Handling Module</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
 
-<p><a name="__index__"></a></p>
-<!-- INDEX BEGIN -->
+        <h1><a href="../../" rel=top>manakai</a></h1>
 
-<ul>
+        
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#accessing_error_information">ACCESSING ERROR INFORMATION</a></li>
-	<ul>
 
-		<li><a href="#loading_try_and_catch_support">Loading <code>try</code> and <code>catch</code> Support</a></li>
-		<li><a href="#methods_on_error_objects">Methods on Error Objects</a></li>
-	</ul>
 
-	<li><a href="#throwing_errors">THROWING ERRORS</a></li>
-	<ul>
 
-		<li><a href="#error_classes">Error Classes</a></li>
-		<li><a href="#error_type_definitions">Error Type Definitions</a></li>
-		<li><a href="#throwing_an_error">Throwing an Error</a></li>
-		<li><a href="#___report_error_method"><code>___report_error</code> Method</a></li>
-		<li><a href="#error_message_construction">Error Message Construction</a></li>
-		<li><a href="#formatter_message__util__error__formatter">Formatter Message::Util::Error::formatter</a></li>
-	</ul>
 
-	<li><a href="#example">EXAMPLE</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-<!-- INDEX END -->
+<hgroup><h1><code>Message::Util::Error</code></h1><h2>manakai's Common Error Handling Module</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<hr />
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Message::Util::Error - manakai's Common Error Handling Module</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>If you want to catch an exception, whose class
-is <em>YourExceptionClass</em>, throwed by a class <em>YourClass</em>:</p>
-<pre>
-  use YourClass;
+<p>If you want to catch an exception,
+whose class is <var>YourExceptionClass</var>,
+throwed by a class <var>YourClass</var>:</p>
+
+<pre><code>  use YourClass;
   use Message::Util::Error;
   
   my $obj = YourClass-&gt;new;
@@ -67,11 +34,11 @@ is <em>YourExceptionClass</em>, throwed by a class <em>YourClass</em>:</p>
     } else {
       warn $err;
     }
-  };</pre>
-<p>If you want to build a class <em>YourClass</em> that
-throws an exception based on <code>Message::Util::Error</code>:</p>
-<pre>
-  package YourClass;
+  };</code></pre>
+
+<p>If you want to build a class <var>YourClass</var> that throws an exception based on <code>Message::Util::Error</code>:</p>
+
+<pre><code>  package YourClass;
   
   sub method_that_throw_an_exception ($) {
     my $self = shift;
@@ -108,372 +75,261 @@ throws an exception based on <code>Message::Util::Error</code>:</p>
         level =&gt; 'fatal',
       },
     };
-  } # ___error_def</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>Various manakai classes throws exceptions, in particular
-<code>DOMException</code>s in DOM implementation classes.  In addition,
-it might report other kinds of errors, such as <code>DOMError</code>
-as defined in DOM Level 3 Core specification.  This module,
-<code>Message::Util::Error</code>, provides an integrated framework
-for reporting exceptions, errors, warnings, and so on.</p>
-<p>The <code>Message::Util::Error</code> exception framework is built on
-the top of the Perl module <code>Error</code>, which apply to Perl scripts
-the <code>try</code> and <code>catch</code> functionalities.  Exceptions
-thrown using <code>Message::Util::Error</code> exception framework
-are also able to be catched by the <code>catch</code> clause as in
-the original <code>Error</code> module.  For more information on
-usage for <code>try</code>, <code>catch</code>, and other clauses, see
-the documentatin for the <code>Error</code> module.  This document
-describes some <code>Message::Util::Error</code>-specific conventions,
-mainly targeted for manakai module authors.</p>
-<p>For other usages of the framework, such as <code>DOMError</code>,
-see documentation for each module.</p>
+  } # ___error_def</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>Various manakai classes throws exceptions, in particular <code>DOMException</code>s in DOM implementation classes. In addition, it might report other kinds of errors, such as <code>DOMError</code> as defined in DOM Level 3 Core specification. This module, <code>Message::Util::Error</code>, provides an integrated framework for reporting exceptions, errors, warnings, and so on.</p>
+
+<p>The <code>Message::Util::Error</code> exception framework is built on the top of the Perl module <code>Error</code>, which apply to Perl scripts the <code>try</code> and <code>catch</code> functionalities. Exceptions thrown using <code>Message::Util::Error</code> exception framework are also able to be catched by the <code>catch</code> clause as in the original <code>Error</code> module. For more information on usage for <code>try</code>, <code>catch</code>, and other clauses, see the documentatin for the <code>Error</code> module. This document describes some <code>Message::Util::Error</code>-specific conventions, mainly targeted for manakai module authors.</p>
+
+<p>For other usages of the framework, such as <code>DOMError</code>, see documentation for each module.</p>
+
 <p>This module is part of manakai.</p>
-<p>
-</p>
-<hr />
-<h1><a name="accessing_error_information">ACCESSING ERROR INFORMATION</a></h1>
-<p>
-</p>
-<h2><a name="loading_try_and_catch_support">Loading <code>try</code> and <code>catch</code> Support</a></h2>
-<p>If you'd like to use <code>try</code> and <code>catch</code> clauses, you
-have to import these names by:</p>
-<pre>
-  use Message::Util::Error;</pre>
+
+</section><section id="ACCESSING_ERROR_INFORMATION"><h1>ACCESSING ERROR INFORMATION</h1>
+
+<section id="Loading_try_and_catch_Support"><h1>Loading <code>try</code> and <code>catch</code> Support</h1>
+
+<p>If you'd like to use <code>try</code> and <code>catch</code> clauses, you have to import these names by:</p>
+
+<pre><code>  use Message::Util::Error;</code></pre>
+
 <p>Note that the example above is equivalent to:</p>
-<pre>
-  use Error qw(:try);</pre>
-<p>except that in the former example <code>Message::Util::Error</code>
-module is also loaded if not yet.</p>
-<p>
-</p>
-<h2><a name="methods_on_error_objects">Methods on Error Objects</a></h2>
-<p><em>Any method defined on an <code>Error</code> object is also available</em>
-for <code>Message::Util::Error</code> objects with the same semantics
-(though some might be overridden).  In addition,
-a few methods are added for <code>Message::Util::Error</code> objects.</p>
+
+<pre><code>  use Error qw(:try);</code></pre>
+
+<p>except that in the former example <code>Message::Util::Error</code> module is also loaded if not yet.</p>
+
+</section><section id="Methods_on_Error_Objects"><h1>Methods on Error Objects</h1>
+
+<p><var>Any method defined on an <code>Error</code> object is also available</var> for <code>Message::Util::Error</code> objects with the same semantics (though some might be overridden). In addition, a few methods are added for <code>Message::Util::Error</code> objects.</p>
+
 <dl>
-<dt><strong><a name="item_code"><em>$code</em> = <em>$err</em>-&gt;code;</a></strong><br />
-</dt>
+<dt id="$code_=_$err->code;"><code><i>$code</i> = <i>$err</i>-&gt;code;</code></dt>
+
 <dd>
-Returns the code of the error.
-</dd>
-<dd>
-<p>If the definition for the error type has a code associated,
-then it is returned.  Otherwise, <code>0</code> is returned.</p>
-</dd>
-<dd>
+<p>Returns the code of the error.</p>
+
+<p>If the definition for the error type has a code associated, then it is returned. Otherwise, <code>0</code> is returned.</p>
+
 <p>This method is added for DOM compatibility.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item_subtype"><em>$subtype</em> = <em>$err</em>-&gt;subtype;</a></strong><br />
-</dt>
+
+</dd><dt id="$subtype_=_$err->subtype;"><code><i>$subtype</i> = <i>$err</i>-&gt;subtype;</code></dt>
+
 <dd>
-Returns the subtype of the error, if specified when the
-error object is created, or <code>undef</code> otherwise.
-</dd>
-<p></p>
-<dt><strong><a name="item_text"><em>$text</em> = <em>$err</em>-&gt;text;</a></strong><br />
-</dt>
+<p>Returns the subtype of the error, if specified when the error object is created, or <code>undef</code> otherwise.</p>
+
+</dd><dt id="$text_=_$err->text;"><code><i>$text</i> = <i>$err</i>-&gt;text;</code></dt>
+
 <dd>
-Returns the text of the error.
-</dd>
+<p>Returns the text of the error.</p>
+
+<p><var>This method is defined in <code>Error</code> module but overridden.</var> If the definition for the error subtype, if any, has a description, then it is returned. Otherwise, if the definition for the error type has a description, then it is returned. Otherwise, same as <code>Error</code>'s definition, i.e. the text specified when the <code>Error</code> object is created, if any, or <code>undef</code> otherwise, is returned.</p>
+
+</dd><dt id="$text_=_$err->type;"><code><i>$text</i> = <i>$err</i>-&gt;type;</code></dt>
+
 <dd>
-<p><em>This method is defined in <code>Error</code> module but overridden.</em>
-If the definition for the error subtype, if any, has a description,
-then it is returned.  Otherwise, if the definition for the error type
-has a description, then it is returned.  Otherwise, 
-same as <code>Error</code>'s definition, i.e. the text specified
-when the <code>Error</code> object is created, if any, or <code>undef</code> otherwise,
-is returned.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item_type"><em>$text</em> = <em>$err</em>-&gt;type;</a></strong><br />
-</dt>
+<p>Returns the type of the error specified when the error is created.</p>
+
+</dd><dt id="$def_=_$err->type_def;"><code><i>$def</i> = <i>$err</i>-&gt;type_def;</code></dt>
+
 <dd>
-Returns the type of the error specified when the error is created.
-</dd>
-<p></p>
-<dt><strong><a name="item_type_def"><em>$def</em> = <em>$err</em>-&gt;type_def;</a></strong><br />
-</dt>
+<p>Returns the definition for the error type, if any, or the definition for the <code>UNKNOWN</code> type, otherwise. For the content of the error type definition, see <a href="#Error_Type_Definitions" class="podlinkpod">"Error Type Definitions"</a>. Applications MUST NOT modify the error type definition. If modified then the result is undefined and it might make the error handling behaviour inconsistent or incorrect.</p>
+
+</dd><dt id="$value_=_$err->value;_$value_=_0+$err;"><code><i>$value</i> = <i>$err</i>-&gt;value; <i>$value</i> = 0+<i>$err</i>;</code></dt>
+
 <dd>
-Returns the definition for the error type, if any, 
-or the definition for the <code>UNKNOWN</code> type, otherwise.
-For the content of the error type definition,
-see <a href="#error_type_definitions">Error Type Definitions</a>.  Applications
-MUST NOT modify the error type definition.  If modified
-then the result is undefined and it might make the error handling
-behaviour inconsistent or incorrect.
+<p>Returns the value that can be associated with the error.</p>
+
+<p><var>This method is defined in <code>Error</code> module but overridden.</var> If the definition for the error type has a code associated, then it is returned. Otherwise, same as <code>Error</code>'s definition, i.e. the value specified when the <code>Error</code> object is created, if any, or <code>undef</code> otherwise, is returned.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_value"><em>$value</em> = <em>$err</em>-&gt;value; <em>$value</em> = 0+<em>$err</em>;</a></strong><br />
-</dt>
-<dd>
-Returns the value that can be associated with the error.
-</dd>
-<dd>
-<p><em>This method is defined in <code>Error</code> module but overridden.</em>
-If the definition for the error type has a code associated,
-then it is returned.  Otherwise, 
-same as <code>Error</code>'s definition, i.e. the value specified
-when the <code>Error</code> object is created, if any, or <code>undef</code> otherwise,
-is returned.</p>
-</dd>
-<p></p></dl>
-<p>
-</p>
-<hr />
-<h1><a name="throwing_errors">THROWING ERRORS</a></h1>
+</dl>
+
+</section></section><section id="THROWING_ERRORS"><h1>THROWING ERRORS</h1>
+
 <p>@@</p>
+
 <p>1. Define an error class.</p>
-<p>2. Define the <code>___report_error</code> method to the class
-whose methods will report errors.  (REQUIRED
-if you use <code>report</code>.)</p>
-<p>3. Define an error message template class.  (REQUIRED
-if you want to extend the error message parameter set.)</p>
-<p>4. Put <code>report</code> or <code>throw</code> where you want to report
-or throw an error.</p>
-<p>5. Ensure the error class is loaded when any statement
-added by Step 4 is executed.</p>
-<p>
-</p>
-<h2><a name="error_classes">Error Classes</a></h2>
+
+<p>2. Define the <code>___report_error</code> method to the class whose methods will report errors. (REQUIRED if you use <code>report</code>.)</p>
+
+<p>3. Define an error message template class. (REQUIRED if you want to extend the error message parameter set.)</p>
+
+<p>4. Put <code>report</code> or <code>throw</code> where you want to report or throw an error.</p>
+
+<p>5. Ensure the error class is loaded when any statement added by Step 4 is executed.</p>
+
+<section id="Error_Classes"><h1>Error Classes</h1>
+
 <p>@@</p>
-<p>
-</p>
-<h2><a name="error_type_definitions">Error Type Definitions</a></h2>
+
+</section><section id="Error_Type_Definitions"><h1>Error Type Definitions</h1>
+
 <p>@@</p>
+
 <p>Error type:</p>
+
 <dl>
-<dt><strong><a name="item__2dcode">-code</a></strong><br />
-</dt>
+<dt id="-code">-code</dt>
+
 <dd>
-Numeric error code for the type.  If specified,
-it MUST be a number.
-</dd>
-<p></p>
-<dt><strong><a name="item__2ddescription">-description</a></strong><br />
-</dt>
+<p>Numeric error code for the type. If specified, it MUST be a number.</p>
+
+</dd><dt id="-description">-description</dt>
+
 <dd>
-A template that is used to create the description
-for an error with that type.
-@@ See @@ for template syntax.
-</dd>
-<p></p>
-<dt><strong><a name="item__2dsubtype">-subtype</a></strong><br />
-</dt>
+<p>A template that is used to create the description for an error with that type. @@ See @@ for template syntax.</p>
+
+</dd><dt id="-subtype">-subtype</dt>
+
 <dd>
-A reference to hash that contains pairs of 
-error subtype nams and error subtype definitions.
-It MAY contain zero or more error subtypes.
+<p>A reference to hash that contains pairs of error subtype nams and error subtype definitions. It MAY contain zero or more error subtypes.</p>
 </dd>
-<p></p></dl>
+</dl>
+
 <p>Error subtype:</p>
+
 <dl>
-<dt><strong>-description</strong><br />
-</dt>
+<dt id="-description">-description</dt>
+
 <dd>
-A template that is used to create the description
-for an error with that subtype.
-@@ See @@ for template syntax.
+<p>A template that is used to create the description for an error with that subtype. @@ See @@ for template syntax.</p>
 </dd>
-<p></p></dl>
-<p>Any other value starts with <code>-</code> is reserved for future extension
-and MUST NOT be used for any purpose until it is eventually defined.
-Values <em>not</em> start with <code>-</code> MAY be used for subclass-specific
-error type/subtype properties.</p>
-<p>
-</p>
-<h2><a name="throwing_an_error">Throwing an Error</a></h2>
+</dl>
+
+<p>Any other value starts with <code>-</code> is reserved for future extension and MUST NOT be used for any purpose until it is eventually defined. Values <var>not</var> start with <code>-</code> MAY be used for subclass-specific error type/subtype properties.</p>
+
+</section><section id="Throwing_an_Error"><h1>Throwing an Error</h1>
+
 <p>@@</p>
+
 <dl>
-<dt><strong><a name="item_def">-def (MUST NOT be specified)</a></strong><br />
-</dt>
+<dt id="-def_(MUST_NOT_be_specified)">-def (MUST NOT be specified)</dt>
+
 <dd>
-The definition for the error type.
-</dd>
+<p>The definition for the error type.</p>
+
+<p>This parameter MUST NOT be specified when a <code>Message::Util::Error</code> object is created. It will be supplied by the constructor of the error object. If any value is specified, it will be ignored.</p>
+
+<p>If no definition for the error type is found, then the definition for the <code>UNKNOWN</code> type is used; if there is no such definition, then the error constructor <code>die</code>s.</p>
+
+</dd><dt id="-file_(MUST_NOT_be_specified)">-file (MUST NOT be specified)</dt>
+
 <dd>
-<p>This parameter MUST NOT be specified when a 
-<code>Message::Util::Error</code> object is created.
-It will be supplied by the constructor of the error object.
-If any value is specified, it will be ignored.</p>
-</dd>
+<p>The file name where an error is reported.</p>
+
+<p>This parameter MUST NOT be specified when a <code>Message::Util::Error</code> object is created. It will be supplied by the constructor of the error object. If any value is specified, it will be ignored.</p>
+
+</dd><dt id="-line_(MUST_NOT_be_specified)">-line (MUST NOT be specified)</dt>
+
 <dd>
-<p>If no definition for the error type is found,
-then the definition for the <code>UNKNOWN</code> type is used;
-if there is no such definition, then the error constructor
-<code>die</code>s.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item_file">-file (MUST NOT be specified)</a></strong><br />
-</dt>
+<p>The line number where an error is reported.</p>
+
+<p>This parameter MUST NOT be specified when a <code>Message::Util::Error</code> object is created. It will be supplied by the constructor of the error object. If any value is specified, it will be ignored.</p>
+
+</dd><dt id="-object">-object</dt>
+
 <dd>
-The file name where an error is reported.
-</dd>
+<p>The object for which an error is reported.</p>
+
+<p>If specified, the value MUST be an object that has a <code>___report_error</code> method. Otherwise, Perl will report some error.</p>
+
+</dd><dt id="-package_(MUST_NOT_be_specified)">-package (MUST NOT be specified)</dt>
+
 <dd>
-<p>This parameter MUST NOT be specified when a
-<code>Message::Util::Error</code> object is created.
-It will be supplied by the constructor of the error object.
-If any value is specified, it will be ignored.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item_line">-line (MUST NOT be specified)</a></strong><br />
-</dt>
+<p>The package name where an error is reported.</p>
+
+<p>This parameter MUST NOT be specified when a <code>Message::Util::Error</code> object is created. It will be supplied by the constructor of the error object. If any value is specified, it will be ignored.</p>
+
+</dd><dt id="-stacktrace_(MUST_NOT_be_specified)">-stacktrace (MUST NOT be specified)</dt>
+
 <dd>
-The line number where an error is reported.
-</dd>
+<p>The trace of the function call stack (used by <code>Error</code> module).</p>
+
+<p>This parameter MUST NOT be specified when a <code>Message::Util::Error</code> object is created. It will be supplied by the constructor of the error object. If any value is specified, it will be ignored.</p>
+
+</dd><dt id="-stacktrace__(MUST_NOT_be_specified)">-stacktrace_ (MUST NOT be specified)</dt>
+
 <dd>
-<p>This parameter MUST NOT be specified when a
-<code>Message::Util::Error</code> object is created.
-It will be supplied by the constructor of the error object.
-If any value is specified, it will be ignored.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item__2dobject">-object</a></strong><br />
-</dt>
+<p>The trace of the function call stack (used by <code>Message::Util::Error</code> module).</p>
+
+<p>This parameter MUST NOT be specified when a <code>Message::Util::Error</code> object is created. It will be supplied by the constructor of the error object. If any value is specified, it will be ignored.</p>
+
+</dd><dt id="-subtype">-subtype</dt>
+
 <dd>
-The object for which an error is reported.
-</dd>
+<p>The subtype of the error. It may or may not be specified.</p>
+
+</dd><dt id="-text">-text</dt>
+
 <dd>
-<p>If specified, the value MUST be an object
-that has a <code>___report_error</code> method.
-Otherwise, Perl will report some error.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item_package">-package (MUST NOT be specified)</a></strong><br />
-</dt>
+<p>The text of the error. Note that this option is less useful in <code>Message::Util::Error</code> where <code>-description</code> in error type/subtype definitions take precedence in the <code>text</code> method.</p>
+
+</dd><dt id="-type_(REQUIRED)">-type (REQUIRED)</dt>
+
 <dd>
-The package name where an error is reported.
-</dd>
+<p>The error type.</p>
+
+<p>This parameter MUST be specified when a <code>Message::Util::Error</code> object is created. If this option is missing when creating an error object, then the error constructor <code>die</code>s.</p>
+
+</dd><dt id="-value">-value</dt>
+
 <dd>
-<p>This parameter MUST NOT be specified when a
-<code>Message::Util::Error</code> object is created.
-It will be supplied by the constructor of the error object.
-If any value is specified, it will be ignored.</p>
+<p>The value of the error. Note that this option is less useful in <code>Message::Util::Error</code> where <code>-code</code> in error type definition take precedence in the <code>value</code> method.</p>
 </dd>
-<p></p>
-<dt><strong><a name="item_stacktrace">-stacktrace (MUST NOT be specified)</a></strong><br />
-</dt>
-<dd>
-The trace of the function call stack (used by <code>Error</code> module).
-</dd>
-<dd>
-<p>This parameter MUST NOT be specified when a
-<code>Message::Util::Error</code> object is created.
-It will be supplied by the constructor of the error object.
-If any value is specified, it will be ignored.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item_stacktrace_">-stacktrace_ (MUST NOT be specified)</a></strong><br />
-</dt>
-<dd>
-The trace of the function call stack (used by <code>Message::Util::Error</code>
-module).
-</dd>
-<dd>
-<p>This parameter MUST NOT be specified when a
-<code>Message::Util::Error</code> object is created.
-It will be supplied by the constructor of the error object.
-If any value is specified, it will be ignored.</p>
-</dd>
-<p></p>
-<dt><strong>-subtype</strong><br />
-</dt>
-<dd>
-The subtype of the error.  It may or may not be specified.
-</dd>
-<p></p>
-<dt><strong><a name="item__2dtext">-text</a></strong><br />
-</dt>
-<dd>
-The text of the error.  Note that this option is less
-useful in <code>Message::Util::Error</code> where <a href="#item__2ddescription"><code>-description</code></a>
-in error type/subtype definitions take precedence in the <a href="#item_text"><code>text</code></a> method.
-</dd>
-<p></p>
-<dt><strong>-type (REQUIRED)</strong><br />
-</dt>
-<dd>
-The error type.
-</dd>
-<dd>
-<p>This parameter MUST be specified when
-a <code>Message::Util::Error</code> object is created.
-If this option is missing when creating an error object,
-then the error constructor <code>die</code>s.</p>
-</dd>
-<p></p>
-<dt><strong><a name="item__2dvalue">-value</a></strong><br />
-</dt>
-<dd>
-The value of the error.  Note that this option is less
-useful in <code>Message::Util::Error</code> where <a href="#item__2dcode"><code>-code</code></a>
-in error type definition take precedence in the <a href="#item_value"><code>value</code></a> method.
-</dd>
-<p></p></dl>
-<p>Any other value starts with <code>-</code> is reserved for future extension
-and MUST NOT be used for any purpose until it is eventually defined.
-Values <em>not</em> start with <code>-</code> MAY be used for subclass-specific
-error properties.</p>
-<p>
-</p>
-<h2><a name="___report_error_method"><code>___report_error</code> Method</a></h2>
+</dl>
+
+<p>Any other value starts with <code>-</code> is reserved for future extension and MUST NOT be used for any purpose until it is eventually defined. Values <var>not</var> start with <code>-</code> MAY be used for subclass-specific error properties.</p>
+
+</section><section id="___report_error_Method"><h1><code>___report_error</code> Method</h1>
+
 <p>@@</p>
-<p>
-</p>
-<h2><a name="error_message_construction">Error Message Construction</a></h2>
+
+</section><section id="Error_Message_Construction"><h1>Error Message Construction</h1>
+
 <p>@@ NEED TO BE REWRITTEN</p>
-<p>Human readable error message text, returned by <a href="#item_text"><code>text</code></a> method,
-is generated from <code>description</code> parameter of error definition.</p>
-<p>Format defined by <a href="../../Message/Util/Formatter.html">the Message::Util::Formatter manpage</a> is used to specify
-<code>description</code> parameter and it is processed by the formatter.</p>
+
+<p>Human readable error message text, returned by <code>text</code> method, is generated from <code>description</code> parameter of error definition.</p>
+
+<p>Format defined by <a href="../../Message/Util/Formatter" class="podlinkpod">Message::Util::Formatter</a> is used to specify <code>description</code> parameter and it is processed by the formatter.</p>
+
 <dl>
-<dt><strong><a name="item_sub_error_subclass_3a_3a_formatter_package___7b_re">sub ERROR_SUBCLASS::_FORMATTER_PACKAGE_ { return $class_name }</a></strong><br />
-</dt>
+<dt id="sub_ERROR_SUBCLASS::_FORMATTER_PACKAGE__{_return_$class_name_}"><code>sub ERROR_SUBCLASS::_FORMATTER_PACKAGE_ { return $class_name }</code></dt>
+
 <dd>
-Subclass can define <code>_FORMATTER_PACKAGE_</code> method
-to define class name of the formatter.  Defaulted to
-<code>Message::Util::Error::formatter</code>.
+<p>Subclass can define <code>_FORMATTER_PACKAGE_</code> method to define class name of the formatter. Defaulted to <code>Message::Util::Error::formatter</code>.</p>
+
+<p>Unless you wish to use additional rules in template text (<code>description</code> parameter), you don't need to define this method in your subclass.</p>
+
+<p>Class returned by this method MUST be a subclass (descender class) of <code>Message::Util::Formatter::Base</code>.</p>
 </dd>
-<dd>
-<p>Unless you wish to use additional rules in template text 
-(<code>description</code> parameter), you don't need to define this
-method in your subclass.</p>
-</dd>
-<dd>
-<p>Class returned by this method MUST be a subclass (descender class) of
-<code>Message::Util::Formatter::Base</code>.</p>
-</dd>
-<p></p></dl>
-<p>
-</p>
-<h2><a name="formatter_message__util__error__formatter">Formatter Message::Util::Error::formatter</a></h2>
-<p>In addition to rules defined in <code>Message::Util::Formatter::Text</code>,
-formatter <code>Message::Util::Error::formatter</code> defines some rules:</p>
+</dl>
+
+</section><section id="Formatter_Message::Util::Error::formatter"><h1>Formatter Message::Util::Error::formatter</h1>
+
+<p>In addition to rules defined in <code>Message::Util::Formatter::Text</code>, formatter <code>Message::Util::Error::formatter</code> defines some rules:</p>
+
 <dl>
-<dt><strong><a name="item__name_">%name;</a></strong><br />
-</dt>
+<dt id="%name;">%name;</dt>
+
 <dd>
-Error type name (<code>-type</code> parameter specified when error is thrown)
-</dd>
-<p></p>
-<dt><strong><a name="item_t">%t (name =&gt; parameter-name);</a></strong><br />
-</dt>
+<p>Error type name (<code>-type</code> parameter specified when error is thrown)</p>
+
+</dd><dt id="%t_(name_=>_parameter-name);"><code>%t (name =&gt; parameter-name);</code></dt>
+
 <dd>
-Parameter value specified when error is thrown
+<p>Parameter value specified when error is thrown</p>
 </dd>
-<p></p></dl>
-<p>
-</p>
-<hr />
-<h1><a name="example">EXAMPLE</a></h1>
+</dl>
+
+</section></section><section id="EXAMPLE"><h1>EXAMPLE</h1>
+
 <p>@@ MAYBE WE CAN REMOVE THIS SECTION</p>
+
 <p>To make a new error class:</p>
-<pre>
-  package SomeExceptionClass;
+
+<pre><code>  package SomeExceptionClass;
   use Message::Util::Error;
   push our @ISA, 'Message::Util::Error';
   
@@ -497,18 +353,20 @@ Parameter value specified when error is thrown
   
   ## [OPTIONAL] Package name of formatter constructing error message
   ##            (Default: Message::Util::Error::formatter)
-  sub _FORMATTER_PACKAGE_ () { 'SomeFormatterClass' }</pre>
+  sub _FORMATTER_PACKAGE_ () { 'SomeFormatterClass' }</code></pre>
+
 <p>Throwing exception:</p>
-<pre>
-  use SomeExceptionClass;
+
+<pre><code>  use SomeExceptionClass;
   ...
   do something;
   ...
   throw SomeExceptionClass -type =&gt; 'ERROR_NAME',
-                           what =&gt; 'Example';</pre>
+                           what =&gt; 'Example';</code></pre>
+
 <p>If you implements an object-oriented class:</p>
-<pre>
-  package SomeModule;
+
+<pre><code>  package SomeModule;
   use SomeExceptionClass;
   
   sub some_method {
@@ -527,39 +385,50 @@ Parameter value specified when error is thrown
     ...
   }
   
-  ## If you use &quot;report&quot;, you must implements this internal method
+  ## If you use "report", you must implements this internal method
   sub ___report_error ($$;%) {
     my ($self, $err, %option) = @_;
     ## Throwing if fatal
     if ($err-&gt;{def}-&gt;{level} eq 'fatal') {
       $err-&gt;throw;
-      print &quot;This text never printed&quot;;
+      print "This text never printed";
     ## Otherwise warning only
     } else {
       warn $err-&gt;stringify;
-      print &quot;This text IS printed&quot;;
+      print "This text IS printed";
     }
-  }</pre>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><em>Error</em></p>
-<p><a href="../../Message/DOM/DOMException.html">the Message::DOM::DOMException manpage</a></p>
-<p><a href="../../Message/DOM/DOMError.html">the Message::DOM::DOMError manpage</a></p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2003-2007 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.</p>
+  }</code></pre>
 
-</body>
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p><a href="../../Error" class="podlinkpod">Error</a></p>
+
+<p><a href="../../Message/DOM/DOMException" class="podlinkpod">Message::DOM::DOMException</a></p>
+
+<p><a href="../../Message/DOM/DOMError" class="podlinkpod">Message::DOM::DOMError</a></p>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2003-2007 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

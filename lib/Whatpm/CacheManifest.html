@@ -1,44 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::CacheManifest - An HTML5 Cache Manifest Parser</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
 
-<p><a name="__index__"></a></p>
-<!-- INDEX BEGIN -->
+        <h1><a href="../" rel=top>manakai</a></h1>
 
-<ul>
+        
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a></li>
-	<li><a href="#dependency">DEPENDENCY</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#todo">TODO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-<!-- INDEX END -->
 
-<hr />
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::CacheManifest - An HTML5 Cache Manifest Parser</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::CacheManifest;
+
+
+
+<hgroup><h1><code>Whatpm::CacheManifest</code></h1><h2>An HTML5 Cache Manifest Parser</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
+
+<pre><code>  use Whatpm::CacheManifest;
   
-  my $manifest_uri = q&lt;<a href="http://www.example.com/manifest&gt">http://www.example.com/manifest&gt</a>;;
+  my $manifest_uri = q&lt;http://www.example.com/manifest&gt;;
   my ($manifest_data, $manifest_base_uri)
       = some_function_to_retrieve_content ($manifest_uri);
   
@@ -47,183 +27,153 @@
   my $manifest = Whatpm::CacheManifest-&gt;parse_byte_string
       ($manifest_data, $manifest_uri, $manifest_base_uri, sub {
         my %err = @_;
-        warn $err{type}, &quot;\n&quot;;
+        warn $err{type}, "\n";
       });
   
   $manifest_data = Encode::decode ('utf-8', $manifest_data);
   my $manifest = Whatpm::CacheManifest-&gt;parse_char_string
       ($manifest_data, $manifest_uri, $manifest_base_uri, sub {
         my %err = @_;
-        warn $err{type}, &quot;\n&quot;;
+        warn $err{type}, "\n";
       });
   
   # $manifest-&gt;[0]: Array reference of explicit URIs.
   # $manifest-&gt;[1]: Hash reference of fallback URIs.
-  # $manifest-&gt;[2]: Array reference of online whitelist.</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::CacheManifest</code> module implements the parsing algorithm
-for HTML5 cache manifest format, used to describe an offline Web
-application.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
+  # $manifest-&gt;[2]: Array reference of online whitelist.</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::CacheManifest</code> module implements the parsing algorithm for HTML5 cache manifest format, used to describe an offline Web application.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
 <p>This module provides two class methods to parse cache manifests:</p>
-<dl>
-<dt><strong><a name="item_parse_byte_string"><em>$manifest</em> = Whatpm::CacheManifest-&gt;parse_byte_string (<em>$manifest_bytes</em>, <em>$manifest_uri</em>, <em>$manifest_base_uri</em>, <em>$onerror</em>)</a></strong><br />
-</dt>
-<dt><strong><a name="item_parse_char_string"><em>$manifest</em> = Whatpm::CacheManifest-&gt;parse_char_string (<em>$manifest_chars</em>, <em>$manifest_uri</em>, <em>$manifest_base_uri</em>, <em>$onerror</em>)</a></strong><br />
-</dt>
-</dl>
-<p>These methods parse a cache manifest and return that cache manifest
-in the <a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a>.</p>
+
+<ul>
+<li><code><i>$manifest</i> = Whatpm::CacheManifest-&gt;parse_byte_string (<i>$manifest_bytes</i>, <i>$manifest_uri</i>, <i>$manifest_base_uri</i>, <i>$onerror</i>)</code></li>
+
+<li><code><i>$manifest</i> = Whatpm::CacheManifest-&gt;parse_char_string (<i>$manifest_chars</i>, <i>$manifest_uri</i>, <i>$manifest_base_uri</i>, <i>$onerror</i>)</code></li>
+</ul>
+
+<p>These methods parse a cache manifest and return that cache manifest in the <a href="#MANIFEST_DATA_STRUCTURE" class="podlinkpod">"MANIFEST DATA STRUCTURE"</a>.</p>
+
 <p>Parameters:</p>
+
 <dl>
-<dt><strong><a name="item__24manifest_bytes"><em>$manifest_bytes</em></a></strong><br />
-</dt>
+<dt id="$manifest_bytes"><code><i>$manifest_bytes</i></code></dt>
+
 <dd>
-The content of the manifest files, as a Perl byte string.
-It may or may not be a valid cache manifest.  It will be processed
-as defined by HTML5 cache manifest parsing specification.
-It will be interpreted as UTF-8 string, as defined in the specification.
-</dd>
-<p></p>
-<dt><strong><a name="item__24manfiest_chars"><em>$manfiest_chars</em></a></strong><br />
-</dt>
+<p>The content of the manifest files, as a Perl byte string. It may or may not be a valid cache manifest. It will be processed as defined by HTML5 cache manifest parsing specification. It will be interpreted as UTF-8 string, as defined in the specification.</p>
+
+</dd><dt id="$manfiest_chars"><code><i>$manfiest_chars</i></code></dt>
+
 <dd>
-The content of the manifest files, as a Perl character string.
-It may or may not be a valid cache manifest.  It will be processed
-as defined by HTML5 cache manifest parsing specification.  It may 
-contain <code>U+0000</code> <code>NULL</code> characters; they are converted to
-<code>U+FFFD</code> <code>REPLACEMENT CHARACTER</code>s as defined in the specification.
-</dd>
-<p></p>
-<dt><strong><a name="item__24manifest_uri"><em>$manifest_uri</em></a></strong><br />
-</dt>
+<p>The content of the manifest files, as a Perl character string. It may or may not be a valid cache manifest. It will be processed as defined by HTML5 cache manifest parsing specification. It may contain <code>U+0000</code> <code>NULL</code> characters; they are converted to <code>U+FFFD</code> <code>REPLACEMENT CHARACTER</code>s as defined in the specification.</p>
+
+</dd><dt id="$manifest_uri"><code><i>$manifest_uri</i></code></dt>
+
 <dd>
-The IRI of the cache manifest.
-</dd>
-<p></p>
-<dt><strong><a name="item__24manifest_base_uri"><em>$manifest_base_uri</em></a></strong><br />
-</dt>
+<p>The IRI of the cache manifest.</p>
+
+</dd><dt id="$manifest_base_uri"><code><i>$manifest_base_uri</i></code></dt>
+
 <dd>
-The base IRI of the cache manifest.
-</dd>
-<p></p>
-<dt><strong><a name="item__24onerror"><em>$onerror</em></a></strong><br />
-</dt>
+<p>The base IRI of the cache manifest.</p>
+
+</dd><dt id="$onerror"><code><i>$onerror</i></code></dt>
+
 <dd>
-The callback function that will be invoked if the manifest cache
-has an error (or a warning).  It may be omitted.  If omitted, 
-any error (or warning) is <code>warn</code>ed with its <code>type</code>.
-</dd>
-<dd>
+<p>The callback function that will be invoked if the manifest cache has an error (or a warning). It may be omitted. If omitted, any error (or warning) is <code>warn</code>ed with its <code>type</code>.</p>
+
 <p>@@ TBW</p>
+
+<p>For the list of the error types, see Whatpm Error Types <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types">https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types</a>&gt;</code>.</p>
 </dd>
-<dd>
-<p>For the list of the error types, see Whatpm Error Types
-&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
-</dd>
-<p></p></dl>
-<p>In addition, a class method to check conformance of cache manifests
-is provided:</p>
+</dl>
+
+<p>In addition, a class method to check conformance of cache manifests is provided:</p>
+
 <dl>
-<dt><strong><a name="item_check_manifest">Whatpm::CacheManifest-&gt;check_manifest (<em>$manifest</em>, <em>$onerror</em>)</a></strong><br />
-</dt>
+<dt id="Whatpm::CacheManifest->check_manifest_($manifest,_$onerror)"><code>Whatpm::CacheManifest-&gt;check_manifest (<i>$manifest</i>, <i>$onerror</i>)</code></dt>
+
 <dd>
-Check conformance of a cache manifest, given as <em>$manifest</em>.
-</dd>
+<p>Check conformance of a cache manifest, given as <var>$manifest</var>.</p>
+
 <dl>
-<dt><strong><a name="item__24manifest"><em>$manifest</em></a></strong><br />
-</dt>
+<dt><a name="$manifest"><i>$manifest</i></a></dt>
+
 <dd>
-The cache manifest to check, encoded in the <a href="#manifest_data_structure">MANIFEST DATA STRUCTURE</a>.
-</dd>
-<p></p>
-<dt><strong><em>$onerror</em></strong><br />
-</dt>
+<p>The cache manifest to check, encoded in the <a href="#MANIFEST_DATA_STRUCTURE" class="podlinkpod">"MANIFEST DATA STRUCTURE"</a>.</p>
+
+</dd><dt><a name="$onerror"><i>$onerror</i></a></dt>
+
 <dd>
-The callback function that will be invoked if the manifest cache
-has an error (or a warning).  It may be omitted.  If omitted, 
-any error (or warning) is <code>warn</code>ed with its <code>type</code>.
-</dd>
-<dd>
+<p>The callback function that will be invoked if the manifest cache has an error (or a warning). It may be omitted. If omitted, any error (or warning) is <code>warn</code>ed with its <code>type</code>.</p>
+
 <p>@@ TBW</p>
-</dd>
-<dd>
-<p>For the list of the error types, see Whatpm Error Types
-&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
-</dd>
-<dd>
+
+<p>For the list of the error types, see Whatpm Error Types &lt;https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
+
 <p><code>index</code> is the index of the IRI with the error. @@ TBW</p>
 </dd>
-<p></p></dl>
-<p>A cache manifest is conforming if (a) it is correctly labeled
-as a cache manifest (e.g. as Internet media type <code>text/cache-manifest</code>)
-in the transfer layer, (b) parsing the cache manifest by 
-<a href="#item_parse_byte_string"><code>parse_byte_string</code></a> or <a href="#item_parse_char_string"><code>parse_char_string</code></a> raises no error
-with level <code>m</code> or <code>s</code>, and (c) checking the cache manifest by
-<a href="#item_check_manifest"><code>check_manifest</code></a> raises no error with level <code>m</code> or <code>s</code>.</p>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="manifest_data_structure">MANIFEST DATA STRUCTURE</a></h1>
-<p>If <em>$m</em> is in manifest data structure, <em>$m</em> is a reference to
-the array with three items: <em>$explicit_uris</em>, <em>$fallback_uris</em>,
-<em>$online_whitelist</em>, and <em>$manifest_uri</em>.</p>
-<p><em>$explicit_uris</em> is a reference to the array, which
-contains zero or more strings.  The strings are IRI references
-of the explicit entries.</p>
-<p><em>$fallback_uris</em> is a reference to the hash, which
-contains zero or more mappings of strings (keys) to strings (values).
-The keys are IRI references of the oppotunistic caching namespaces.
-The values are IRI references of the fallback entries corresponding
-to the oppotunistic caching namespaces.</p>
-<p><em>$online_whitelist</em> is a reference to the array, which
-contains zero or more strings.  The strings are IRI references
-in the online whitelist.</p>
-<p><em>$manfest_uri</em> is a string which is an IRI reference of the
-manifest itself.</p>
-<p>
-</p>
-<hr />
-<h1><a name="dependency">DEPENDENCY</a></h1>
-<p>This module depends on <a href="../Message/URI/URIReference.html">the Message::URI::URIReference manpage</a>, which is
-part of the manakai-core package.</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>Whatpm Error Types
-&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
-<p>HTML5
-&lt;http://whatwg.org/html5&gt;.</p>
-<p><a href="../Message/URI/URIReference.html">the Message::URI::URIReference manpage</a>
-&lt;http://suika.fam.cx/www/manakai-core/lib/Message/URI/URIReference.html&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="todo">TODO</a></h1>
-<p>``Same scheme/host/port'' comparison algorithm is not correctly implemented
-yet.</p>
+
+<p>A cache manifest is conforming if (a) it is correctly labeled as a cache manifest (e.g. as Internet media type <code>text/cache-manifest</code>) in the transfer layer, (b) parsing the cache manifest by <code>parse_byte_string</code> or <code>parse_char_string</code> raises no error with level <code>m</code> or <code>s</code>, and (c) checking the cache manifest by <code>check_manifest</code> raises no error with level <code>m</code> or <code>s</code>.</p>
+</dd>
+</dl>
+
+</section><section id="MANIFEST_DATA_STRUCTURE"><h1>MANIFEST DATA STRUCTURE</h1>
+
+<p>If <var>$m</var> is in manifest data structure, <var>$m</var> is a reference to the array with three items: <var>$explicit_uris</var>, <var>$fallback_uris</var>, <var>$online_whitelist</var>, and <var>$manifest_uri</var>.</p>
+
+<p><var>$explicit_uris</var> is a reference to the array, which contains zero or more strings. The strings are IRI references of the explicit entries.</p>
+
+<p><var>$fallback_uris</var> is a reference to the hash, which contains zero or more mappings of strings (keys) to strings (values). The keys are IRI references of the oppotunistic caching namespaces. The values are IRI references of the fallback entries corresponding to the oppotunistic caching namespaces.</p>
+
+<p><var>$online_whitelist</var> is a reference to the array, which contains zero or more strings. The strings are IRI references in the online whitelist.</p>
+
+<p><var>$manfest_uri</var> is a string which is an IRI reference of the manifest itself.</p>
+
+</section><section id="DEPENDENCY"><h1>DEPENDENCY</h1>
+
+<p>This module depends on <a href="../Message/URI/URIReference" class="podlinkpod">Message::URI::URIReference</a>, which is part of the manakai-core package.</p>
+
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
+
+<p>Whatpm Error Types <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types">https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types</a>&gt;</code>.</p>
+
+<p>HTML5 <code class="url">&lt;<a href="http://whatwg.org/html5">http://whatwg.org/html5</a>&gt;</code>.</p>
+
+<p><a href="../Message/URI/URIReference" class="podlinkpod">Message::URI::URIReference</a> <code class="url">&lt;<a href="https://suika.suikawiki.org/www/manakai-core/lib/Message/URI/URIReference.html">https://suika.suikawiki.org/www/manakai-core/lib/Message/URI/URIReference.html</a>&gt;</code>.</p>
+
+</section><section id="TODO"><h1>TODO</h1>
+
+<p>"Same scheme/host/port" comparison algorithm is not correctly implemented yet.</p>
+
 <p>Test suite.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
 
-</html>
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2008 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

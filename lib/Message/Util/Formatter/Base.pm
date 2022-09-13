@@ -209,7 +209,7 @@ sub ___error_def () {+{
 
 =head1 LICENSE
 
-Copyright 2003, 2007 Wakaba <w@suika.fam.cx>
+Copyright 2003, 2007 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

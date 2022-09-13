@@ -306,21 +306,21 @@ RFC 3875 (CGI/1.1) <http://tools.ietf.org/html/rfc3875>.
 =head1 HISTORY
 
 This module was originally developed as part of the SuikaWiki project
-<http://suika.fam.cx/~wakaba/wiki/sw/n/SuikaWiki> to implement the
+<https://suika.suikawiki.org/~wakaba/wiki/sw/n/SuikaWiki> to implement the
 SuikaWiki CGI script and then transfered to the manakai project.
 
 There is outdated draft specification of the DOM-like CGI scripting
 interface module
-<http://suika.fam.cx/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04>,
+<https://suika.suikawiki.org/gate/2005/sw/manakai/%E3%83%A1%E3%83%A2/2005-07-04>,
 although this module does not strictly conform to the specification.
 
 =head1 AUTHOR
 
-Wakaba <w@suika.fam.cx>
+Wakaba <wakaba@suikawiki.org>
 
 =head1 LICENSE
 
-Copyright 2003-2010 Wakaba <w@suika.fam.cx>
+Copyright 2003-2010 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

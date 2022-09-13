@@ -1,107 +1,82 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::WebVTT::Serializer - A WebVTT serializer</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::WebVTT::Serializer</code></h1><h2>A WebVTT serializer</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::WebVTT::Serializer - A WebVTT serializer</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::WebVTT::Serializer;
+<pre><code>  use Whatpm::WebVTT::Serializer;
   
   $string = Whatpm::WebVTT::Serializer
       -&gt;track_to_char_string ($track);
   
   $text = Whatpm::WebVTT::Serializer-&gt;dom_to_text
-      ($document_fragment)</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::WebVTT::Serializer</code> module provides methods to convert
-in-memory representation of WebVTT into strings in the WebVTT format.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
+      ($document_fragment)</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::WebVTT::Serializer</code> module provides methods to convert in-memory representation of WebVTT into strings in the WebVTT format.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
 <dl>
-<dt><strong><a name="track_to_char_string" class="item">$string = Whatpm::WebVTT::Serializer-&gt;track_to_char_string ($track)</a></strong></dt>
+<dt id="$string_=_Whatpm::WebVTT::Serializer->track_to_char_string_($track)"><code>$string = Whatpm::WebVTT::Serializer-&gt;<strong id="member-track_to_char_string">track_to_char_string</strong> ($track)</code></dt>
 
 <dd>
-<p>Serialize the specified track object (DOM <code>TextTrack</code>,
-<a href="../../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a> into WebVTT format.  The serializer does
-its best effort to output a valid WebVTT file, while keeping original
-semantics as far as possible.  Please note that some <code>TextTrack</code>
-object cannot serialize as is.  For example, the <code>TextTrack</code> object
-containing a cue with ID <code>--&gt;</code> cannot represent in WebVTT, such
-that the serializer replace it by <code>--&amp;gt;</code>.</p>
-<p>The output of this method is a character string, i.e. a possibly
-utf8-flagged string of characters, not bytes.</p>
-</dd>
-<dt><strong><a name="dom_to_text" class="item">$text = Whatpm::WebVTT::Serializer-&gt;dom_to_text ($node)</a></strong></dt>
+<p>Serialize the specified track object (DOM <code>TextTrack</code>, <a href="../../Message/DOM/TextTrack" class="podlinkpod">Message::DOM::TextTrack</a> into WebVTT format. The serializer does its best effort to output a valid WebVTT file, while keeping original semantics as far as possible. Please note that some <code>TextTrack</code> object cannot serialize as is. For example, the <code>TextTrack</code> object containing a cue with ID <code>--&gt;</code> cannot represent in WebVTT, such that the serializer replace it by <code>--&amp;gt;</code>.</p>
+
+<p>The output of this method is a character string, i.e. a possibly utf8-flagged string of characters, not bytes.</p>
+
+</dd><dt id="$text_=_Whatpm::WebVTT::Serializer->dom_to_text_($node)"><code>$text = Whatpm::WebVTT::Serializer-&gt;<strong id="member-dom_to_text">dom_to_text</strong> ($node)</code></dt>
 
 <dd>
-<p>Serialize the specified DOM node into WebVTT cue text format.  The
-specified node is expected to have structure that could be generated
-by the WebVTT's DOM construction rule (or <a href="../../Whatpm/WebVTT/Parser.html">the Whatpm::WebVTT::Parser manpage</a>'s
-<code>text_to_dom</code> method), otherwise no meaningful result would be
-returned.</p>
-<p>The output of this method is a character string.  It is expected to be
-used to set the new value of the <code>$cue-&gt;text</code> attribute.</p>
+<p>Serialize the specified DOM node into WebVTT cue text format. The specified node is expected to have structure that could be generated by the WebVTT's DOM construction rule (or <a href="../../Whatpm/WebVTT/Parser" class="podlinkpod">Whatpm::WebVTT::Parser</a>'s <code>text_to_dom</code> method), otherwise no meaningful result would be returned.</p>
+
+<p>The output of this method is a character string. It is expected to be used to set the new value of the <code>$cue-&gt;text</code> attribute.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>WebVTT Standard &lt;http://dev.w3.org/html5/webvtt/&gt;.</p>
-<p><a href="../../Whatpm/WebVTT/Parser.html">the Whatpm::WebVTT::Parser manpage</a>.</p>
-<p><a href="../../Message/DOM/TextTrack.html">the Message::DOM::TextTrack manpage</a>.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p>WebVTT Standard <code class="url">&lt;<a href="http://dev.w3.org/html5/webvtt/">http://dev.w3.org/html5/webvtt/</a>&gt;</code>.</p>
+
+<p><a href="../../Whatpm/WebVTT/Parser" class="podlinkpod">Whatpm::WebVTT::Parser</a>.</p>
+
+<p><a href="../../Message/DOM/TextTrack" class="podlinkpod">Message::DOM::TextTrack</a>.</p>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;w@suika.fam.cx&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2012 Wakaba &lt;w@suika.fam.cx&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

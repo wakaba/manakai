@@ -1,8 +1,3 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../.."
-POD2HTML2 = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../../.."
-
 MANAKAI_ROOT_DIR = ../../../
 MANAKAI_LIB_DIR = $(MANAKAI_ROOT_DIR)lib/
 
@@ -26,16 +21,22 @@ HTML_FILES = Error.html \
 
 GENERATED_FILES = $(HTML_FILES)
 
-all: $(GENERATED_FILES)
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
 
-Error.html:: %.html: %.pod
-	$(POD2HTML) $< > $@	
+all: build
 
-%.html: %.pm
-	$(POD2HTML) $< > $@	
+build: $(GENERATED_FILES)
 
-Formatter/%.html: %.pm
-	$(POD2HTML2) $< > $@	
+Error.html:: %.html: %.pod $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Message/Util/$< > Message/Util/$@
+%.html: %.pm $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Message/Util/$< > Message/Util/$@
+Formatter/%.html: %.pm $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Message/Util/$< > Message/Util/$@
 
 clean:
 	$(RMALL) *.tmp .*.tmp *~ .*~
@@ -45,5 +46,4 @@ clean:
 distclean: clean
 	$(RMALL) $(GENERATED_FILES)
 
-## $Date: 2007/09/21 08:10:04 $
 ## License: Public Domain.

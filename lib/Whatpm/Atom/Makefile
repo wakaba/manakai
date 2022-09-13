@@ -1,11 +1,16 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../.."
+MANAKAI_ROOT_DIR = ../../..
 
 HTML_FILES = Aggregator.html
 
-all: $(HTML_FILES)
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
 
-%.html: %.pod
-	$(POD2HTML) $< > $@
+all: build
+
+build: $(HTML_FILES)
+
+%.html: %.pod $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Whatpm/Atom/$< > Whatpm/Atom/$@
 
 ## License: Public Domain.

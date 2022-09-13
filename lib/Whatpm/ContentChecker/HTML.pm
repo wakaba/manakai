@@ -65,7 +65,7 @@ use constant FEATURE_HTML5_OBSOLETE => 0;
 
 ## The manakai specification for conformance checking of obsolete HTML
 ## vocabulary,
-## <http://suika.fam.cx/www/markup/html/exts/manakai-obsvocab>.  The
+## <https://suika.suikawiki.org/www/markup/html/exts/manakai-obsvocab>.  The
 ## document defines conformance checking requirements for numbers of
 ## obsolete HTML elements and attributes historically specified or
 ## implemented but no longer considered part of the HTML language
@@ -8444,7 +8444,7 @@ $Element->{+HTML_NS}->{button} = {
     datafld => sub { },
     dataformatas => $GetHTMLEnumeratedAttrChecker->({
       text => 1, html => 1, 'localized-text' => 1,
-      ## See <http://suika.fam.cx/~wakaba/wiki/sw/n/dataformatas>.
+      ## See <https://suika.suikawiki.org/~wakaba/wiki/sw/n/dataformatas>.
     }),
     datasrc => $NonEmptyURLChecker,
     disabled => $GetHTMLBooleanAttrChecker->('disabled'),
@@ -9829,11 +9829,11 @@ $Whatpm::ContentChecker::Namespace->{+HTML_NS}->{loaded} = 1;
 
 =head1 AUTHOR
 
-Wakaba <w@suika.fam.cx>.
+Wakaba <wakaba@suikawiki.org>.
 
 =head1 LICENSE
 
-Copyright 2007-2011 Wakaba <w@suika.fam.cx>
+Copyright 2007-2011 Wakaba <wakaba@suikawiki.org>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

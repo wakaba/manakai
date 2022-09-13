@@ -82,7 +82,7 @@ sub ___rule_def () {+{
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

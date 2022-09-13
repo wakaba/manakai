@@ -434,11 +434,11 @@ HTML5 - Determining the type of a new resource in a browsing context
 
 =head1 AUTHOR
 
-Wakaba <w@suika.fam.cx>.
+Wakaba <wakaba@suikawiki.org>.
 
 =head1 LICENSE
 
-Copyright 2007-2008 Wakaba <w@suika.fam.cx>
+Copyright 2007-2008 Wakaba <wakaba@suikawiki.org>
 
 This library is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

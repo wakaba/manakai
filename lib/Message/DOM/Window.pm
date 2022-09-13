@@ -80,7 +80,7 @@ sub ___reset_css ($) {
 
 ## NOTE: An Opera extension.
 sub set_document ($$) {
-  ## NOTE: See <http://suika.fam.cx/gate/2005/sw/setDocument>.
+  ## NOTE: See <https://suika.suikawiki.org/gate/2005/sw/setDocument>.
 
   my $self = shift;
 

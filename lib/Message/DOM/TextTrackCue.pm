@@ -5,9 +5,9 @@ our $VERSION = '1.0';
 use Message::DOM::DOMException;
 
 ## Spec:
-## <http://www.whatwg.org/specs/web-apps/current-work/#texttrackcue>
+## <https://www.whatwg.org/specs/web-apps/current-work/#texttrackcue>
 ## and
-## <http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions#anchor-56>.
+## <https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions#anchor-56>.
 
 ## XXX constructor
 

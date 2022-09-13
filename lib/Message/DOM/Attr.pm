@@ -102,7 +102,7 @@ sub owner_element ($);
 
 sub prefix ($;$) {
   ## NOTE: No check for new value as Firefox doesn't do.
-  ## See <http://suika.fam.cx/gate/2005/sw/prefix>.
+  ## See <https://suika.suikawiki.org/gate/2005/sw/prefix>.
 
   ## NOTE: Same as trivial setter except "" -> undef
 
@@ -723,7 +723,7 @@ sub create_attribute_ns ($$$) {
 
 =head1 LICENSE
 
-Copyright 2007 Wakaba <w@suika.fam.cx>
+Copyright 2007 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

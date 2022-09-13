@@ -3,10 +3,13 @@ PERL_VERSION = latest
 PERL_PATH = $(abspath local/perlbrew/perls/perl-$(PERL_VERSION)/bin)
 PROVE = prove
 WGET = wget
+CURL = curl
 
-all: 
+all: build
 
 ## ------ Deps ------
+
+P2H = local/p2h
 
 Makefile-setupenv: Makefile.setupenv
 	$(MAKE) --makefile Makefile.setupenv setupenv-update \
@@ -20,6 +23,16 @@ perl-exec perl-version \
 pmb-update pmb-install \
 : %: Makefile-setupenv
 	$(MAKE) --makefile Makefile.setupenv $@
+
+build: $(P2H)
+	cd lib && $(MAKE) build
+
+local:
+	mkdir -p local
+
+$(P2H): local
+	$(CURL) -sSfL https://raw.githubusercontent.com/manakai/manakai.github.io/master/p2h > $@
+	chmod u+x $@
 
 ## ------ Tests ------
 

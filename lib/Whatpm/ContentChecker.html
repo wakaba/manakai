@@ -1,225 +1,166 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::ContentChecker - DOM Conformance Checker</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#supported_standards">SUPPORTED STANDARDS</a></li>
-	<li><a href="#bugs">BUGS</a></li>
-	<li><a href="#notes_on_implementation_details">NOTES ON IMPLEMENTATION DETAILS</a></li>
-	<ul>
 
-		<li><a href="#the__self___flag__structure">The <code>$self-&gt;{flag}</code> Structure</a></li>
-		<li><a href="#the__element_state_structure">The <code>$element_state</code> Structure</a></li>
-	</ul>
+<hgroup><h1><code>Whatpm::ContentChecker</code></h1><h2>DOM Conformance Checker</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-
-<hr name="index" />
-</div>
-<!-- INDEX END -->
-
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::ContentChecker - DOM Conformance Checker</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::ContentChecker;
+<pre><code>  use Whatpm::ContentChecker;
   
   Whatpm::ContentChecker-&gt;check_document ($doc, sub {
     my %arg = @_;
-    warn get_node_path ($arg{node}), &quot;: &quot;,
-        ($arg{level} || &quot;Error&quot;), &quot;: &quot;,
-        $arg{type}, &quot;\n&quot;;
+    warn get_node_path ($arg{node}), ": ",
+        ($arg{level} || "Error"), ": ",
+        $arg{type}, "\n";
   });
   
   Whatpm::ContentChecker-&gt;check_element ($doc, sub {
     my %arg = @_;
-    warn get_node_path ($arg{node}), &quot;: &quot;,
-        ($arg{level} || &quot;Error&quot;), &quot;: &quot;,
-        $arg{type}, &quot;\n&quot;;
-  });</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The Perl module <code>Whatpm::ContentChecker</code> contains methods for
-validation of entire or part of DOM tree with regard to relevant Web
-standards such as HTML.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
+    warn get_node_path ($arg{node}), ": ",
+        ($arg{level} || "Error"), ": ",
+        $arg{type}, "\n";
+  });</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The Perl module <code>Whatpm::ContentChecker</code> contains methods for validation of entire or part of DOM tree with regard to relevant Web standards such as HTML.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
 <p>This module contains two class methods:</p>
+
 <dl>
-<dt><strong><a name="check_document" class="item">Whatpm::ContentChecker-&gt;check_document (<em>$document</em>, <em>$onerror</em>)</a></strong></dt>
+<dt id="Whatpm::ContentChecker->check_document_($document,_$onerror)"><code>Whatpm::ContentChecker-&gt;check_document (<i>$document</i>, <i>$onerror</i>)</code></dt>
 
 <dd>
-<p>Checks a document, <em>$document</em>, and its descendant for their
-conformance.  If there is an error or a warnign, then the
-<em>$onerror</em> <code>CODE</code> is invoked with named arguments same
-as ones for the method <a href="#check_element"><code>check_element</code></a>.</p>
-</dd>
-<dt><strong><a name="check_element" class="item">Whatpm::ContentChecker-&gt;check_element (<em>$element</em>, <em>$onerror</em>)</a></strong></dt>
+<p>Checks a document, <var>$document</var>, and its descendant for their conformance. If there is an error or a warnign, then the <var>$onerror</var> <code>CODE</code> is invoked with named arguments same as ones for the method <code>check_element</code>.</p>
+
+</dd><dt id="Whatpm::ContentChecker->check_element_($element,_$onerror)"><code>Whatpm::ContentChecker-&gt;check_element (<i>$element</i>, <i>$onerror</i>)</code></dt>
 
 <dd>
-<p>Checks an element, <em>$element</em>, and its descendant for their conformance.
-If there is an error or a warning, then the <em>$onerror</em> <code>CODE</code>
-is invoked with named arguments:</p>
+<p>Checks an element, <var>$element</var>, and its descendant for their conformance. If there is an error or a warning, then the <var>$onerror</var> <code>CODE</code> is invoked with named arguments:</p>
+
 <dl>
-<dt><strong><a name="level" class="item">level (Might be <code>undef</code>)</a></strong></dt>
+<dt><a name="level_(Might_be_undef)">level (Might be <code>undef</code>)</a></dt>
 
 <dd>
-<p>A string which describes the severity of the error or warning.
-For the list of the severities, see
-&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
-</dd>
-<dt><strong><a name="node" class="item">node (Always specified)</a></strong></dt>
+<p>A string which describes the severity of the error or warning. For the list of the severities, see &lt;https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
+
+</dd><dt><a name="node_(Always_specified)">node (Always specified)</a></dt>
 
 <dd>
 <p>The node with which the error is detected.</p>
-</dd>
-<dt><strong><a name="type" class="item">type (Always specified)</a></strong></dt>
+
+</dd><dt><a name="type_(Always_specified)">type (Always specified)</a></dt>
 
 <dd>
-<p>A string which describes the type of the error or warning.
-For the list of the errors and warnings, see
-&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
-</dd>
-<dt><strong><a name="text" class="item">text (Sometimes specified)</a></strong></dt>
+<p>A string which describes the type of the error or warning. For the list of the errors and warnings, see &lt;https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types&gt;.</p>
+
+</dd><dt><a name="text_(Sometimes_specified)">text (Sometimes specified)</a></dt>
 
 <dd>
-<p>An optional string argumenting the type of the error, e.g. an element
-name.</p>
-</dd>
-<dt><strong><a name="value" class="item">value (Sometimes specified)</a></strong></dt>
+<p>An optional string argumenting the type of the error, e.g. an element name.</p>
+
+</dd><dt><a name="value_(Sometimes_specified)">value (Sometimes specified)</a></dt>
 
 <dd>
-<p>An optional string in which the error occurs.  For example, a URL
-extracted from a complex attribute value, in whcih a conformance error
-is detected.</p>
+<p>An optional string in which the error occurs. For example, a URL extracted from a complex attribute value, in whcih a conformance error is detected.</p>
 </dd>
 </dl>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="supported_standards">SUPPORTED STANDARDS</a></h1>
-<p><a href="../Whatpm/ContentChecker.html">the Whatpm::ContentChecker manpage</a> - XML 1.0, XML 1.1, XML Namespaces 1.0, XML
-Namespaces 1.1, <code>xml:base</code>, <code>xml:id</code>.</p>
-<p><a href="../Whatpm/ContentChecker/HTML.html">the Whatpm::ContentChecker::HTML manpage</a> - Web Applications 1.0 (including HTML
-Living Standard and HTML5), manakai's Conformance Checking Guideline
-for Obsolete HTML Elements and Attributes.</p>
-<p><a href="../Whatpm/ContentChecker/Atom.html">the Whatpm::ContentChecker::Atom manpage</a> - Atom 1.0, Atom Threading Extension.</p>
-<p>For more information, see
-&lt;http://suika.fam.cx/gate/2007/html/standards&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="bugs">BUGS</a></h1>
-<p>This conformance checker is work in progress; it <em>might</em> not be
-able to detect all the errors in the DOM tree, and it <em>might</em> 
-detect an error for a node that is conforming in fact.</p>
-<p>
-</p>
-<hr />
-<h1><a name="notes_on_implementation_details">NOTES ON IMPLEMENTATION DETAILS</a></h1>
-<p><em>This section is not complete.</em></p>
-<p>This section describes various internal constructions used in
-<a href="../Whatpm/ContentChecker.html">the Whatpm::ContentChecker manpage</a> and relevant modules.  These data structures
-are not public interfaces -- they should not be accessed or modified
-by applications.  They are documented here for the convenience of
-development only.</p>
-<p>
-</p>
-<h2><a name="the__self___flag__structure">The <code>$self-&gt;{flag}</code> Structure</a></h2>
+
+</section><section id="SUPPORTED_STANDARDS"><h1>SUPPORTED STANDARDS</h1>
+
+<p><a href="../Whatpm/ContentChecker" class="podlinkpod">Whatpm::ContentChecker</a> - XML 1.0, XML 1.1, XML Namespaces 1.0, XML Namespaces 1.1, <code>xml:base</code>, <code>xml:id</code>.</p>
+
+<p><a href="../Whatpm/ContentChecker/HTML" class="podlinkpod">Whatpm::ContentChecker::HTML</a> - Web Applications 1.0 (including HTML Living Standard and HTML5), manakai's Conformance Checking Guideline for Obsolete HTML Elements and Attributes.</p>
+
+<p><a href="../Whatpm/ContentChecker/Atom" class="podlinkpod">Whatpm::ContentChecker::Atom</a> - Atom 1.0, Atom Threading Extension.</p>
+
+<p>For more information, see <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/2007/html/standards">https://suika.suikawiki.org/gate/2007/html/standards</a>&gt;</code>.</p>
+
+</section><section id="BUGS"><h1>BUGS</h1>
+
+<p>This conformance checker is work in progress; it <var>might</var> not be able to detect all the errors in the DOM tree, and it <var>might</var> detect an error for a node that is conforming in fact.</p>
+
+</section><section id="NOTES_ON_IMPLEMENTATION_DETAILS"><h1>NOTES ON IMPLEMENTATION DETAILS</h1>
+
+<p><var>This section is not complete.</var></p>
+
+<p>This section describes various internal constructions used in <a href="../Whatpm/ContentChecker" class="podlinkpod">Whatpm::ContentChecker</a> and relevant modules. These data structures are not public interfaces -- they should not be accessed or modified by applications. They are documented here for the convenience of development only.</p>
+
+<section id="The_$self->{flag}_Structure"><h1>The <code>$self-&gt;{flag}</code> Structure</h1>
+
 <dl>
-<dt><strong><a name="_self___flag____has_label_" class="item"><code>$self-&gt;{flag}-&gt;{has_label}</code></a></strong></dt>
+<dt id="$self->{flag}->{has_label}"><code><code>$self-&gt;{flag}-&gt;{has_label}</code></code></dt>
 
 <dd>
-<p>This flag is set to a true value if and only if there is a <code>label</code>
-element ancestor of the current node.</p>
-</dd>
-<dt><strong><a name="_self___flag____has_labelable_" class="item"><code>$self-&gt;{flag}-&gt;{has_labelable}</code></a></strong></dt>
+<p>This flag is set to a true value if and only if there is a <code>label</code> element ancestor of the current node.</p>
+
+</dd><dt id="$self->{flag}->{has_labelable}"><code><code>$self-&gt;{flag}-&gt;{has_labelable}</code></code></dt>
 
 <dd>
-<p>This flag is set to <code>1</code> if and only if a nearest ancestor <code>label</code>
-element has the <code>for</code> attribute and there is no labelable
-form-associated element that is a descendant of the <code>label</code> element
-and precedes the current node in tree order.  This flag is set to <code>2</code>
-if and only if there is a labelable form-associated element that is a
-descendant of the nearest ancestor <code>label</code> element of the current
-node and precedes the current node in tree order.  This flag is
-otherwise set to a false value.  <strong>However</strong>, when there is no ancestor
-<code>label</code> element of the current node, i.e. when 
-<a href="#_self___flag____has_label_"><code>$self-&gt;{flag}-&gt;{has_label}</code></a> is false, the value of the
-<a href="#_self___flag____has_labelable_"><code>$self-&gt;{flag}-&gt;{has_labelable}</code></a> flag is <em>undefined</em>.</p>
+<p>This flag is set to <code>1</code> if and only if a nearest ancestor <code>label</code> element has the <code>for</code> attribute and there is no labelable form-associated element that is a descendant of the <code>label</code> element and precedes the current node in tree order. This flag is set to <code>2</code> if and only if there is a labelable form-associated element that is a descendant of the nearest ancestor <code>label</code> element of the current node and precedes the current node in tree order. This flag is otherwise set to a false value. <b>However</b>, when there is no ancestor <code>label</code> element of the current node, i.e. when <code>$self-&gt;{flag}-&gt;{has_label}</code> is false, the value of the <code>$self-&gt;{flag}-&gt;{has_labelable}</code> flag is <var>undefined</var>.</p>
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="the__element_state_structure">The <code>$element_state</code> Structure</a></h2>
+
+</section><section id="The_$element_state_Structure"><h1>The <code>$element_state</code> Structure</h1>
+
 <dl>
-<dt><strong><a name="_element_state___has_label_original_" class="item"><code>$element_state-&gt;{has_label_original}</code></a></strong></dt>
+<dt id="$element_state->{has_label_original}"><code><code>$element_state-&gt;{has_label_original}</code></code></dt>
 
 <dd>
-<p>Used to preserve the value of <a href="#_self___flag____has_label_"><code>$self-&gt;{flag}-&gt;{has_label}</code></a> at the
-time of invocation of the method <code>element_start</code> for the element
-being checked.</p>
-</dd>
-<dt><strong><a name="_element_state___has_labelable_original_" class="item"><code>$element_state-&gt;{has_labelable_original}</code></a></strong></dt>
+<p>Used to preserve the value of <code>$self-&gt;{flag}-&gt;{has_label}</code> at the time of invocation of the method <code>element_start</code> for the element being checked.</p>
+
+</dd><dt id="$element_state->{has_labelable_original}"><code><code>$element_state-&gt;{has_labelable_original}</code></code></dt>
 
 <dd>
-<p>Used to preserve the value of <a href="#_self___flag____has_labelable_"><code>$self-&gt;{flag}-&gt;{has_labelable}</code></a> at
-the time of invocation of the method <code>element_start</code> for the element
-being checked.</p>
+<p>Used to preserve the value of <code>$self-&gt;{flag}-&gt;{has_labelable}</code> at the time of invocation of the method <code>element_start</code> for the element being checked.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="../Whatpm/ContentChecker/Atom.html">the Whatpm::ContentChecker::Atom manpage</a></p>
-<p><a href="../Whatpm/ContentChecker/HTML.html">the Whatpm::ContentChecker::HTML manpage</a></p>
-<p>&lt;http://suika.fam.cx/gate/2005/sw/Whatpm%20Error%20Types&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2011 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section></section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p><a href="../Whatpm/ContentChecker/Atom" class="podlinkpod">Whatpm::ContentChecker::Atom</a></p>
+
+<p><a href="../Whatpm/ContentChecker/HTML" class="podlinkpod">Whatpm::ContentChecker::HTML</a></p>
+
+<p><code class="url">&lt;<a href="https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types">https://suika.suikawiki.org/gate/2005/sw/Whatpm%20Error%20Types</a>&gt;</code></p>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2011 Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

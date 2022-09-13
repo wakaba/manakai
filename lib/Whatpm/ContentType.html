@@ -1,45 +1,22 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::ContentType - HTML5 Content Type Sniffer</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:wakaba@suika.fam.cx" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#method">METHOD</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::ContentType</code></h1><h2>HTML5 Content Type Sniffer</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::ContentType - HTML5 Content Type Sniffer</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  ## Content-Type Sniffing
+<pre><code>  ## Content-Type Sniffing
   
   require Whatpm::ContentType;
   my $sniffed_type = Whatpm::ContentType-&gt;get_sniffed_type (
@@ -51,131 +28,92 @@
     supported_image_types =&gt; {
       'image/jpeg' =&gt; 1, 'image/png' =&gt; 1, 'image/gif' =&gt; 1, # for example
     },
-  );</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::ContentType</code> module contains media type sniffer
-for Web user agents.  It implements the content type sniffing
-algorithm as defined in the HTML5 specification.</p>
-<p>
-</p>
-<hr />
-<h1><a name="method">METHOD</a></h1>
+  );</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::ContentType</code> module contains media type sniffer for Web user agents. It implements the content type sniffing algorithm as defined in the HTML5 specification.</p>
+
+</section><section id="METHOD"><h1>METHOD</h1>
+
 <dl>
-<dt><strong><a name="get_sniffed_type" class="item"><em>$sniffed_type</em> = Whatpm::ContentType-&gt;get_sniffed_type (<em>named-parameters</em>)</a></strong>
+<dt id="$sniffed_type_=_Whatpm::ContentType->get_sniffed_type_(named-parameters)"><code><i>$sniffed_type</i> = Whatpm::ContentType-&gt;get_sniffed_type (<i>named-parameters</i>)</code></dt>
 
 <dd>
-<p>Returns the sniffed type of an entity.  The sniffed type
-is always represented in lowercase.</p>
-</dd>
-<dd>
-<p><strong>In list context</strong>, this method returns a list of 
-official type and sniffed type.  Official type is the media
-type as specified in the transfer protocol metadata,
-without any parameters and in lowercase.</p>
-</dd>
-<dd>
-<p>Arguments to this method MUST be specified as name-value pairs.
-Valid named parameters defined for this method is as follows:</p>
-</dd>
+<p>Returns the sniffed type of an entity. The sniffed type is always represented in lowercase.</p>
+
+<p><b>In list context</b>, this method returns a list of official type and sniffed type. Official type is the media type as specified in the transfer protocol metadata, without any parameters and in lowercase.</p>
+
+<p>Arguments to this method MUST be specified as name-value pairs. Valid named parameters defined for this method is as follows:</p>
+
 <dl>
-<dt><strong><a name="content_type_metadata_media_type" class="item">content_type_metadata =&gt; <em>media-type</em></a></strong>
+<dt><a name="content_type_metadata_=>_media-type">content_type_metadata =&gt; <i>media-type</i></a></dt>
 
 <dd>
-<p>The Content-Type metadata, in character string, as defined in HTML5.
-The value of this parameter MUST be an Internet Media Type (with
-any parameters), that match to the <code>media-type</code> rule
-defined in <a href="http://www.ietf.org/rfc/rfc2616.txt" class="rfc">RFC 2616</a>.</p>
-</dd>
-<dd>
-<p>If the <code>http_content_type_byte</code> parameter is specified,
-then the <code>content_type_metadata</code> parameter has no effect.  Otherwise,
-the <code>content_type_metadata</code> parameter MUST be specified if and only
-if any Content-Type metadata is available.</p>
-</dd>
-</li>
-<dt><strong><a name="get_file_head_code" class="item">get_file_head =&gt; <em>CODE</em></a></strong>
+<p>The Content-Type metadata, in character string, as defined in HTML5. The value of this parameter MUST be an Internet Media Type (with any parameters), that match to the <code>media-type</code> rule defined in RFC 2616.</p>
+
+<p>If the <code>http_content_type_byte</code> parameter is specified, then the <code>content_type_metadata</code> parameter has no effect. Otherwise, the <code>content_type_metadata</code> parameter MUST be specified if and only if any Content-Type metadata is available.</p>
+
+</dd><dt><a name="get_file_head_=>_CODE">get_file_head =&gt; <i>CODE</i></a></dt>
 
 <dd>
-<p>The code reference used to obtain first <em>$n</em> bytes of the 
-entity sniffed.  The value of this parameter MUST be a
-reference to a subroutine that returns a string.</p>
-</dd>
-<dd>
-<p>This parameter MUST be specified.  If missing, an empty
-(zero-length) entity is assumed.</p>
-</dd>
-<dd>
-<p>When invoked, the code receives a parameter <em>$n</em> that 
-represents the number of bytes expected.  The code SHOULD
-return <em>$n</em> bytes at the beginning of the entity.
-If more than <em>$n</em> bytes are returned, then <em>$n</em> + 1
-byte and later are discarded.  The code MAY return
-a string whose length is less than <em>$n</em> bytes
-if no more bytes is available.</p>
-</dd>
-</li>
-<dt><strong><a name="has_http_content_encoding_boolean" class="item">has_http_content_encoding =&gt; <em>boolean</em></a></strong>
+<p>The code reference used to obtain first <i>$n</i> bytes of the entity sniffed. The value of this parameter MUST be a reference to a subroutine that returns a string.</p>
+
+<p>This parameter MUST be specified. If missing, an empty (zero-length) entity is assumed.</p>
+
+<p>When invoked, the code receives a parameter <i>$n</i> that represents the number of bytes expected. The code SHOULD return <i>$n</i> bytes at the beginning of the entity. If more than <i>$n</i> bytes are returned, then <i>$n</i> + 1 byte and later are discarded. The code MAY return a string whose length is less than <i>$n</i> bytes if no more bytes is available.</p>
+
+</dd><dt><a name="has_http_content_encoding_=>_boolean">has_http_content_encoding =&gt; <i>boolean</i></a></dt>
 
 <dd>
-<p><em>This parameter is obsolete and has no effect.</em></p>
-</dd>
-</li>
-<dt><strong><a name="http_content_type_byte_content_type_field_body" class="item">http_content_type_byte =&gt; <em>Content-Type-field-body</em></a></strong>
+<p><i>This parameter is obsolete and has no effect.</i></p>
+
+</dd><dt><a name="http_content_type_byte_=>_Content-Type-field-body">http_content_type_byte =&gt; <i>Content-Type-field-body</i></a></dt>
 
 <dd>
-<p>The byte sequence of the <code>field-body</code> part of the HTTP
-<code>Content-Type</code> header field of the entity.</p>
-</dd>
-<dd>
-<p>This parameter MUST be set to the byte sequence of
-the <code>Content-Type</code> header field's <code>field-body</code> of
-the entity if and only if it is transfered over HTTP
-and the HTTP response entity contains the <code>Content-Type</code>
-header field.</p>
-</dd>
-</li>
-<dt><strong><a name="supported_image_types_media_type_boolean" class="item">supported_image_types =&gt; {<em>media-type</em> =&gt; <em>boolean</em>, ...}</a></strong>
+<p>The byte sequence of the <code>field-body</code> part of the HTTP <code>Content-Type</code> header field of the entity.</p>
+
+<p>This parameter MUST be set to the byte sequence of the <code>Content-Type</code> header field's <code>field-body</code> of the entity if and only if it is transfered over HTTP and the HTTP response entity contains the <code>Content-Type</code> header field.</p>
+
+</dd><dt><a name="supported_image_types_=>_{media-type_=>_boolean,_...}">supported_image_types =&gt; {<i>media-type</i> =&gt; <i>boolean</i>, ...}</a></dt>
 
 <dd>
-<p>A reference to the hash that contains the list of supported
-image types.</p>
+<p>A reference to the hash that contains the list of supported image types.</p>
+
+<p>This parameter MUST be set to a reference to the hash whose keys are Internet Media Types (without any parameter) and whose values are whether image formats with those Internet Media Types are supported or not. A value MUST be true if and only if the Internet Media Type is supported.</p>
+
+<p>If this parameter is missing, then no image types are considered as supported.</p>
 </dd>
-<dd>
-<p>This parameter MUST be set to a reference to the hash
-whose keys are Internet Media Types (without any parameter)
-and whose values are whether image formats with those Internet Media Types
-are supported or not.  A value MUST be true if and only
-if the Internet Media Type is supported.</p>
-</dd>
-<dd>
-<p>If this parameter is missing, then no image types are 
-considered as supported.</p>
-</dd>
-</li>
 </dl>
+</dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>HTML5 - Determining the type of a new resource in a browsing context
-&lt;http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2008 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This library is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p><code>HTML5</code></p><p>Determining the type of a new resource in a browsing context <code class="url">&lt;<a href="http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing">http://www.whatwg.org/specs/web-apps/current-work/#content-type-sniffing</a>&gt;</code></p>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2008 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

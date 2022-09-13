@@ -63,7 +63,7 @@ sub css_text ($;$) {
   ## NOTE: Where and how white space characters are inserted are 
   ## intentionally changed from those in browsers so that properties are
   ## more prettily printed.
-  ## See <http://suika.fam.cx/gate/2005/sw/cssText> for what browsers do.
+  ## See <https://suika.suikawiki.org/gate/2005/sw/cssText> for what browsers do.
   local $Error::Depth = $Error::Depth + 1;
   return $_[0]->selector_text . " {\n" . $_[0]->style->css_text . '}';
 } # css_text

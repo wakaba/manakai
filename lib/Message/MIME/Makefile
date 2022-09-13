@@ -1,14 +1,20 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../.."
+MANAKAI_ROOT_DIR = ../../..
+
 RM = rm
 RMALL = $(RM) -fv
 
 HTML_FILES = Type.html
 
-all: $(HTML_FILES)
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
 
-%.html: %.pod
-	$(POD2HTML) $< > $@
+all: build
+
+build: $(HTML_FILES)
+
+%.html: %.pod $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Message/MIME/$< > Message/MIME/$@
 
 clean:
 	$(RMALL) *.tmp .*.tmp *~ .*~ *.BAK .*.BAK

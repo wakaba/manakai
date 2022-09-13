@@ -1,94 +1,81 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::HTML::Tokenizer - An HTML and XML tokenizer</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#specifications">SPECIFICATIONS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::HTML::Tokenizer</code></h1><h2>An HTML and XML tokenizer</h2></hgroup><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::HTML::Tokenizer - An HTML and XML tokenizer</p>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::HTML::Tokenizer</code> module provides an implementation of
-HTML and XML tokenizer.  Unlike its name, this module can be used for
-XML documents as well as HTML.  It is not intended to be used directly
-from general-purpose applications; instead it is used as part of HTML
-or XML parser, such as <a href="../../Whatpm/HTML/Parser.html">the Whatpm::HTML::Parser manpage</a> and
-<a href="../../Whatpm/XML/Parser.html">the Whatpm::XML::Parser manpage</a>.</p>
-<p>The module is intended to be a conforming HTML tokenizer according to
-Web Applications 1.0 specification (though it is meaningless to
-discuess the conformance of the tokenizer standalone).  By setting the
-XML flag, it can also tokenize XML documents in a way consistent with
-the HTML tokenization specification.  You might consider it as an
-implementation of the XML5 tokenization algorithm as &quot;patched&quot; by
-later HTML5 development.</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="../../Whatpm/HTML/Parser.html">the Whatpm::HTML::Parser manpage</a>, <a href="../../Whatpm/XML/Parser.html">the Whatpm::XML::Parser manpage</a>.</p>
-<p><a href="../../Whatpm/HTML/InputStream.html">the Whatpm::HTML::InputStream manpage</a>.</p>
-<p>
-</p>
-<hr />
-<h1><a name="specifications">SPECIFICATIONS</a></h1>
+<p>The <code>Whatpm::HTML::Tokenizer</code> module provides an implementation of HTML and XML tokenizer.
+Unlike its name,
+this module can be used for XML documents as well as HTML.
+It is not intended to be used directly from general-purpose applications; instead it is used as part of HTML or XML parser,
+such as <a href="../../Whatpm/HTML/Parser" class="podlinkpod">Whatpm::HTML::Parser</a> and <a href="../../Whatpm/XML/Parser" class="podlinkpod">Whatpm::XML::Parser</a>.</p>
+
+<p>The module is intended to be a conforming HTML tokenizer according to Web Applications 1.0 specification (though it is meaningless to discuess the conformance of the tokenizer standalone).
+By setting the XML flag,
+it can also tokenize XML documents in a way consistent with the HTML tokenization specification.
+You might consider it as an implementation of the XML5 tokenization algorithm as "patched" by later HTML5 development.</p>
+
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
+
+<p><a href="../../Whatpm/HTML/Parser" class="podlinkpod">Whatpm::HTML::Parser</a>,
+<a href="../../Whatpm/XML/Parser" class="podlinkpod">Whatpm::XML::Parser</a>.</p>
+
+<p><a href="../../Whatpm/HTML/InputStream" class="podlinkpod">Whatpm::HTML::InputStream</a>.</p>
+
+</section><section id="SPECIFICATIONS"><h1>SPECIFICATIONS</h1>
+
 <dl>
-<dt><strong><a name="html" class="item">[HTML]</a></strong></dt>
+<dt id="[HTML]">[HTML]</dt>
 
 <dd>
-<p>HTML Living Standard
-&lt;http://www.whatwg.org/specs/web-apps/current-work/complete.html#tokenization&gt;.</p>
-</dd>
-<dt><strong><a name="xml" class="item">[XML]</a></strong></dt>
+<p>HTML Living Standard <code class="url">&lt;<a href="http://www.whatwg.org/specs/web-apps/current-work/complete.html#tokenization">http://www.whatwg.org/specs/web-apps/current-work/complete.html#tokenization</a>&gt;</code>.</p>
+
+</dd><dt id="[XML]">[XML]</dt>
 
 <dd>
-<p>XML 1.0 &lt;http://www.w3.org/TR/xml/&gt;.</p>
-<p>XML 1.1 &lt;http://www.w3.org/TR/xml11/&gt;.</p>
-<p>XML5.  See &lt;http://suika.fam.cx/~wakaba/wiki/sw/n/XML5&gt; for
-references.</p>
+<p>XML 1.0 <code class="url">&lt;<a href="http://www.w3.org/TR/xml/">http://www.w3.org/TR/xml/</a>&gt;</code>.</p>
+
+<p>XML 1.1 <code class="url">&lt;<a href="http://www.w3.org/TR/xml11/">http://www.w3.org/TR/xml11/</a>&gt;</code>.</p>
+
+<p>XML5.
+See <code class="url">&lt;<a href="https://suika.suikawiki.org/~wakaba/wiki/sw/n/XML5">https://suika.suikawiki.org/~wakaba/wiki/sw/n/XML5</a>&gt;</code> for references.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
 
-</html>
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2012 Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

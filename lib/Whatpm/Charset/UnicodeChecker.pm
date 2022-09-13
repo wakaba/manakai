@@ -3,7 +3,7 @@ use strict;
 
 ## NOTE: For more information (including rationals of checks performed
 ## in this module), see
-## <http://suika.fam.cx/gate/2005/sw/Unicode%E7%AC%A6%E5%8F%B7%E5%8C%96%E6%96%87%E5%AD%97%E5%88%97%E3%81%AE%E9%81%A9%E5%90%88%E6%80%A7>.
+## <https://suika.suikawiki.org/gate/2005/sw/Unicode%E7%AC%A6%E5%8F%B7%E5%8C%96%E6%96%87%E5%AD%97%E5%88%97%E3%81%AE%E9%81%A9%E5%90%88%E6%80%A7>.
 
 ## NOTE: Unicode's definition for character string conformance is 
 ## very, very vague so that it is difficult to determine what error

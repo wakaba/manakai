@@ -1,94 +1,74 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::SWML::Parser - SWML Parser</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::SWML::Parser</code></h1><h2>SWML Parser</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::SWML::Parser - SWML Parser</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::SWML::Parser;
+<pre><code>  use Whatpm::SWML::Parser;
   my $parser = Whatpm::SWML::Parser-&gt;new;
-  $parser-&gt;parse_char_string ($string =&gt; $doc, $onerror);</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::SWML::Parser</code> module is an SWML parser.  SWML is a
-markup language used in SuikaWiki.  The parser converts a text
-representing an SWML document into a DOM tree.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
+  $parser-&gt;parse_char_string ($string =&gt; $doc, $onerror);</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::SWML::Parser</code> module is an SWML parser. SWML is a markup language used in SuikaWiki. The parser converts a text representing an SWML document into a DOM tree.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
 <dl>
-<dt><strong><a name="new" class="item">my $parser = Whatpm::SWML::Parser-&gt;new</a></strong></dt>
+<dt id="my_$parser_=_Whatpm::SWML::Parser->new"><code>my $parser = Whatpm::SWML::Parser-&gt;<strong id="member-new">new</strong></code></dt>
 
 <dd>
 <p>Creates an instance of the SWML parser.</p>
-</dd>
-<dt><strong><a name="parse_char_string" class="item">$parser-&gt;parse_char_string ($string, $doc, $onerror)</a></strong></dt>
+
+</dd><dt id="$parser->parse_char_string_($string,_$doc,_$onerror)"><code>$parser-&gt;<strong id="member-parse_char_string">parse_char_string</strong> ($string, $doc, $onerror)</code></dt>
 
 <dd>
 <p>Parses a character string and constructs a DOM tree.</p>
-<p>The first argument, <em>$string</em>, is a <em>character</em> string to be parsed.</p>
-<p>The second argument, <em>$doc</em> is a DOM <code>Document</code> object (an instance
-of <a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a> class) to which the parsed result is
-constructed.  Any existing child node is removed before parsing.</p>
-<p>The third argument, <em>$onerror</em>, is a code reference which is invoked
-whenever a parse error is detected or a warning is emitted during the
-parsing process.  The code reference would receive a set of arguments
-which describe the kind and situation of the error or warnings.  It
-shares the same reporting format as the <em>$onerror</em> code reference
-used in <code>Whatpm::HTML</code> and other modules.</p>
+
+<p>The first argument, <var>$string</var>, is a <var>character</var> string to be parsed.</p>
+
+<p>The second argument, <var>$doc</var> is a DOM <code>Document</code> object (an instance of <a href="../../Message/DOM/Document" class="podlinkpod">Message::DOM::Document</a> class) to which the parsed result is constructed. Any existing child node is removed before parsing.</p>
+
+<p>The third argument, <var>$onerror</var>, is a code reference which is invoked whenever a parse error is detected or a warning is emitted during the parsing process. The code reference would receive a set of arguments which describe the kind and situation of the error or warnings. It shares the same reporting format as the <var>$onerror</var> code reference used in <code>Whatpm::HTML</code> and other modules.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>SuikaWiki Markup Language (SWML)
-&lt;http://suika.fam.cx/www/markup/suikawiki/spec/swml-work&gt;.</p>
-<p><a href="../../Message/DOM/DOMImplementation.html">the Message::DOM::DOMImplementation manpage</a></p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2008-2011 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p>SuikaWiki Markup Language (SWML) <code class="url">&lt;<a href="https://suika.suikawiki.org/www/markup/suikawiki/spec/swml-work">https://suika.suikawiki.org/www/markup/suikawiki/spec/swml-work</a>&gt;</code>.</p>
+
+<p><a href="../../Message/DOM/DOMImplementation" class="podlinkpod">Message::DOM::DOMImplementation</a></p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2008-2011 Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

@@ -162,8 +162,8 @@ sub option ($$;$) {
 =head1 SEE ALSO
 
 Message::Markup::SuikaWikiConfig20::Node,
-SuikaWiki <http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWiki>,
-<http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0>
+SuikaWiki <https://suika.suikawiki.org/~wakaba/-temp/wiki/wiki?SuikaWiki>,
+<https://suika.suikawiki.org/~wakaba/-temp/wiki/wiki?SuikaWikiConfig/2.0>
 
 =head1 HISTORY
 
@@ -172,7 +172,7 @@ C<SuikaWiki::Markup::SuikaWikiConfig20::Parser>.
 
 =head1 LICENSE
 
-Copyright 2003 Wakaba <w@suika.fam.cx>
+Copyright 2003 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

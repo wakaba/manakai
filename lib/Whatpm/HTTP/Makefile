@@ -26,6 +26,6 @@ http-status-codes.xml:
 	$(WGET) -O $@ http://www.iana.org/assignments/http-status-codes/http-status-codes.xml
 
 http-methods.xml:
-	$(WGET) -O $@ http://suika.fam.cx/~wakaba/wiki/sw/n/HTTP%20method?format=xml
+	$(WGET) -O $@ https://suika.suikawiki.org/~wakaba/wiki/sw/n/HTTP%20method?format=xml
 
 ## License: Public Domain.

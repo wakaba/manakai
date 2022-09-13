@@ -1,181 +1,141 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::HTML::Parser - An HTML parser</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#specifications">SPECIFICATIONS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::HTML::Parser</code></h1><h2>An HTML parser</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::HTML::Parser - An HTML parser</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::HTML::Parser;
+<pre><code>  use Whatpm::HTML::Parser;
   use Message::DOM::DOMImplementation;
   $parser = Whatpm::HTML::Parser-&gt;new;
   $dom = Message::DOM::DOMImplementation-&gt;new;
   $doc = $dom-&gt;create_document;
   
   $parser-&gt;parse_char_string ($chars =&gt; $doc);
-  $parser-&gt;parse_byte_string ($encoding, $bytes =&gt; $doc);</pre>
-<pre>
+  $parser-&gt;parse_byte_string ($encoding, $bytes =&gt; $doc);
+
   ## Or, just use DOM attribute:
   $doc-&gt;manakai_is_html (1);
-  $doc-&gt;inner_html ($chars);</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::HTML::Parser</code> module is an implementation of the HTML
-parser.  It implements the HTML parsing algorithm as defined by HTML
-Living Standard.  Therefore, it's parsing behavior is fully compatible
-with Web browsers with HTML5 parser enabled.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
-<p>It is recommended to use standard DOM interface, such as <code>inner_html</code>
-method of the <code>Document</code> object, to parse an HTML string, where
-possible.  The <a href="../../Whatpm/HTML/Parser.html">the Whatpm::HTML::Parser manpage</a> module, which, in fact, is used
-to implement the <code>inner_html</code> method, offers more control on how
-parser behaves, which would not be useful unless you are writing a
-complex user agent such as browser or validator.</p>
-<p>The <a href="../../Whatpm/HTML/Parser.html">the Whatpm::HTML::Parser manpage</a> module provides following methods:</p>
+  $doc-&gt;inner_html ($chars);</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::HTML::Parser</code> module is an implementation of the HTML parser. It implements the HTML parsing algorithm as defined by HTML Living Standard. Therefore, it's parsing behavior is fully compatible with Web browsers with HTML5 parser enabled.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
+<p>It is recommended to use standard DOM interface, such as <code>inner_html</code> method of the <code>Document</code> object, to parse an HTML string, where possible. The <a href="../../Whatpm/HTML/Parser" class="podlinkpod">Whatpm::HTML::Parser</a> module, which, in fact, is used to implement the <code>inner_html</code> method, offers more control on how parser behaves, which would not be useful unless you are writing a complex user agent such as browser or validator.</p>
+
+<p>The <a href="../../Whatpm/HTML/Parser" class="podlinkpod">Whatpm::HTML::Parser</a> module provides following methods:</p>
+
 <dl>
-<dt><strong><a name="new" class="item">$parser = Whatpm::HTML::Parser-&gt;new</a></strong></dt>
+<dt id="$parser_=_Whatpm::HTML::Parser->new"><code>$parser = Whatpm::HTML::Parser-&gt;<strong id="member-new">new</strong></code></dt>
 
 <dd>
 <p>Create a new parser.</p>
-</dd>
-<dt><strong><a name="parse_char_string" class="item">$parser-&gt;parse_char_string ($chars =&gt; $doc)</a></strong></dt>
+
+</dd><dt id="$parser->parse_char_string_($chars_=>_$doc)"><code>$parser-&gt;<strong id="member-parse_char_string">parse_char_string</strong> ($chars =&gt; $doc)</code></dt>
 
 <dd>
-<p>Parse a string of characters (i.e. a possibly utf8-flagged string) as
-HTML and construct the DOM tree.</p>
-<p>The first argument to the method must be a string to parse.  It may or
-may not be a valid HTML document.</p>
-<p>The second argument to the method must be a DOM <code>Document</code> object
-(<a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a>).  Any child nodes of the document is first
-removed by the parser.</p>
-</dd>
-<dt><strong><a name="parse_byte_string" class="item">$parser-&gt;parse_byte_string ($encoding, $bytes =&gt; $doc)</a></strong></dt>
+<p>Parse a string of characters (i.e. a possibly utf8-flagged string) as HTML and construct the DOM tree.</p>
+
+<p>The first argument to the method must be a string to parse. It may or may not be a valid HTML document.</p>
+
+<p>The second argument to the method must be a DOM <code>Document</code> object (<a href="../../Message/DOM/Document" class="podlinkpod">Message::DOM::Document</a>). Any child nodes of the document is first removed by the parser.</p>
+
+</dd><dt id="$parser->parse_byte_string_($encoding,_$bytes_=>_$doc)"><code>$parser-&gt;<strong id="member-parse_byte_string">parse_byte_string</strong> ($encoding, $bytes =&gt; $doc)</code></dt>
 
 <dd>
 <p>Parse a string of bytes as HTML and construct the DOM tree.</p>
-<p>The first argument to the method must be the label of a (character)
-encoding, as specified by the Encoding Standard.  The <code>undef</code> value
-can be specified if the encoding is not known.</p>
-<p>The second argument to the method must be a string to parse.  It may
-or may not be a valid HTML document.</p>
-<p>The third argument to the method must be a DOM <code>Document</code> object
-(<a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a>).  Any child nodes of the document is first
-removed by the parser.</p>
-</dd>
-<dt><strong><a name="set_inner_html" class="item">$parser-&gt;set_inner_html ($node, $chars)</a></strong></dt>
+
+<p>The first argument to the method must be the label of a (character) encoding, as specified by the Encoding Standard. The <code>undef</code> value can be specified if the encoding is not known.</p>
+
+<p>The second argument to the method must be a string to parse. It may or may not be a valid HTML document.</p>
+
+<p>The third argument to the method must be a DOM <code>Document</code> object (<a href="../../Message/DOM/Document" class="podlinkpod">Message::DOM::Document</a>). Any child nodes of the document is first removed by the parser.</p>
+
+</dd><dt id="$parser->set_inner_html_($node,_$chars)"><code>$parser-&gt;<strong id="member-set_inner_html">set_inner_html</strong> ($node, $chars)</code></dt>
 
 <dd>
-<p>Parse a string of characters in the context of a node.  If the node is
-a <code>Document</code>, this is equivalent to the <a href="#parse_char_string"><code>parse_char_string</code></a> method.
-If the node is an <code>Element</code>, parsing is performed in the fragment
-mode.</p>
-<p>The first argument to the method must be a DOM <code>Node</code> object
-(<a href="../../Message/DOM/Node.html">the Message::DOM::Node manpage</a>) that is also a <code>Document</code>
-(<a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a>) or an <code>Element</code>
-(<a href="../../Message/DOM/Element.html">the Message::DOM::Element manpage</a>).  The node is used to give the context to
-the parser and to receive the parsed subtree.  Any existing child
-node of the node is removed first.</p>
+<p>Parse a string of characters in the context of a node. If the node is a <code>Document</code>, this is equivalent to the <code>parse_char_string</code> method. If the node is an <code>Element</code>, parsing is performed in the fragment mode.</p>
+
+<p>The first argument to the method must be a DOM <code>Node</code> object (<a href="../../Message/DOM/Node" class="podlinkpod">Message::DOM::Node</a>) that is also a <code>Document</code> (<a href="../../Message/DOM/Document" class="podlinkpod">Message::DOM::Document</a>) or an <code>Element</code> (<a href="../../Message/DOM/Element" class="podlinkpod">Message::DOM::Element</a>). The node is used to give the context to the parser and to receive the parsed subtree. Any existing child node of the node is removed first.</p>
+
 <p>The second argument to the method must be a string of characters.</p>
-</dd>
-<dt><strong><a name="onerror" class="item">$code = $parser-&gt;onerror</a></strong></dt>
 
-<dt><strong>$parser-&gt;onerror ($new_code)</strong></dt>
+</dd><dt id="$code_=_$parser->onerror"><code>$code = $parser-&gt;<strong id="member-onerror">onerror</strong></code></dt>
+
+<dt id="$parser->onerror_($new_code)"><code>$parser-&gt;<strong>onerror</strong> ($new_code)</code></dt>
 
 <dd>
-<p>Get or set the error handler for the parser.  Any parse error, as well
-as warning and information, is reported to the handler.  See
-<a href="../../Whatpm/Errors.html">the Whatpm::Errors manpage</a> for more information.</p>
+<p>Get or set the error handler for the parser. Any parse error, as well as warning and information, is reported to the handler. See <a href="../../Whatpm/Errors" class="podlinkpod">Whatpm::Errors</a> for more information.</p>
 </dd>
 </dl>
-<p>Parsed document structure is reflected to the <code>Document</code> object
-specified as an argument to parse methods.  The character encoding
-used to parse the document can be retrieved by the <code>input_encoding</code>
-method of the <code>Document</code>.</p>
-<p>Although the parser is intended to be fully conformant to the HTML
-Living Standard, it might not implement latest spec changes yet.  See
-list of bugs on the HTML parser
-&lt;http://manakai.g.hatena.ne.jp/task/2/&gt; for the current implementation
-status.</p>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="../../Message/DOM/Document.html">the Message::DOM::Document manpage</a>, <a href="../../Message/DOM/Element.html">the Message::DOM::Element manpage</a>.</p>
-<p><a href="../../Whatpm/HTML/Serializer.html">the Whatpm::HTML::Serializer manpage</a>.</p>
-<p><a href="../../Whatpm/ContentChecker.html">the Whatpm::ContentChecker manpage</a>.</p>
-<p><a href="../../Whatpm/XML/Parser.html">the Whatpm::XML::Parser manpage</a>.</p>
-<p>
-</p>
-<hr />
-<h1><a name="specifications">SPECIFICATIONS</a></h1>
+
+<p>Parsed document structure is reflected to the <code>Document</code> object specified as an argument to parse methods. The character encoding used to parse the document can be retrieved by the <code>input_encoding</code> method of the <code>Document</code>.</p>
+
+<p>Although the parser is intended to be fully conformant to the HTML Living Standard, it might not implement latest spec changes yet. See list of bugs on the HTML parser <code class="url">&lt;<a href="http://manakai.g.hatena.ne.jp/task/2/">http://manakai.g.hatena.ne.jp/task/2/</a>&gt;</code> for the current implementation status.</p>
+
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
+
+<p><a href="../../Message/DOM/Document" class="podlinkpod">Message::DOM::Document</a>, <a href="../../Message/DOM/Element" class="podlinkpod">Message::DOM::Element</a>.</p>
+
+<p><a href="../../Whatpm/HTML/Serializer" class="podlinkpod">Whatpm::HTML::Serializer</a>.</p>
+
+<p><a href="../../Whatpm/ContentChecker" class="podlinkpod">Whatpm::ContentChecker</a>.</p>
+
+<p><a href="../../Whatpm/XML/Parser" class="podlinkpod">Whatpm::XML::Parser</a>.</p>
+
+</section><section id="SPECIFICATIONS"><h1>SPECIFICATIONS</h1>
+
 <dl>
-<dt><strong><a name="html" class="item">[HTML]</a></strong></dt>
+<dt id="[HTML]">[HTML]</dt>
 
 <dd>
-<p>HTML Living Standard - Parsing HTML documents
-&lt;http://www.whatwg.org/specs/web-apps/current-work/#parsing&gt;.</p>
-<p>HTML Living Standard - Parsing HTML fragments
-&lt;http://www.whatwg.org/specs/web-apps/current-work/#parsing-html-fragments&gt;.</p>
-</dd>
-<dt><strong><a name="encoding" class="item">[ENCODING]</a></strong></dt>
+<p>HTML Living Standard - Parsing HTML documents <code class="url">&lt;<a href="http://www.whatwg.org/specs/web-apps/current-work/#parsing">http://www.whatwg.org/specs/web-apps/current-work/#parsing</a>&gt;</code>.</p>
+
+<p>HTML Living Standard - Parsing HTML fragments <code class="url">&lt;<a href="http://www.whatwg.org/specs/web-apps/current-work/#parsing-html-fragments">http://www.whatwg.org/specs/web-apps/current-work/#parsing-html-fragments</a>&gt;</code>.</p>
+
+</dd><dt id="[ENCODING]">[ENCODING]</dt>
 
 <dd>
-<p>Encoding Standard
-&lt;http://dvcs.w3.org/hg/encoding/raw-file/tip/Overview.html&gt;.</p>
+<p>Encoding Standard <code class="url">&lt;<a href="http://dvcs.w3.org/hg/encoding/raw-file/tip/Overview.html">http://dvcs.w3.org/hg/encoding/raw-file/tip/Overview.html</a>&gt;</code>.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
 
-</html>
+<p>Wakaba &lt;w@suika.fam.cx&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2012 Wakaba &lt;w@suika.fam.cx&gt;.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

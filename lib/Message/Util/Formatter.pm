@@ -275,11 +275,11 @@ sub count ($;%) {
   print "Attr2: ", $param->{param1}, "\n";
 
 For more practical examples, see L<Message::Field::Date> and
-SuikaWiki <http://suika.fam.cx/~wakaba/-temp/wiki/wiki?SuikaWiki>.
+SuikaWiki <https://suika.suikawiki.org/~wakaba/-temp/wiki/wiki?SuikaWiki>.
 
 =head1 LICENSE
 
-Copyright 2002-2003 Wakaba <w@suika.fam.cx>.
+Copyright 2002-2003 Wakaba <wakaba@suikawiki.org>.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

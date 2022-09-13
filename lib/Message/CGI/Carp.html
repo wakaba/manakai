@@ -1,80 +1,74 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>SuikaWiki::Output::CGICarp --- SuikaWiki : CGI::Carp modification to
-return 500 status code</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<link rev="made" href="mailto:admin@suika.fam.cx" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
 
-<p><a name="__index__"></a></p>
-<!-- INDEX BEGIN -->
+        <h1><a href="../../" rel=top>manakai</a></h1>
 
-<ul>
+        
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#options">OPTIONS</a></li>
-	<li><a href="#example">EXAMPLE</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-<!-- INDEX END -->
 
-<hr />
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>SuikaWiki::Output::CGICarp --- SuikaWiki : CGI::Carp modification to
-return 500 status code</p>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>At the time of writing, latest version of CGI::Carp (1.27)
-does not output error dying message with 500 (Internal Server Error)
-HTTP status code unless it is working on mod_perl.</p>
-<p>This module overrides some of CGI::Carp functions to return 500 status
-code.  Users of this module should take attention whether later revision
-of CGI::Carp provides improved version of CGI outputing methods.</p>
+
+
+
+<section id="NAME"><h1>NAME</h1>
+
+<p>SuikaWiki::Output::CGICarp --- SuikaWiki : CGI::Carp modification to return 500 status code</p>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>At the time of writing,
+latest version of CGI::Carp (1.27) does not output error dying message with 500 (Internal Server Error) HTTP status code unless it is working on mod_perl.</p>
+
+<p>This module overrides some of CGI::Carp functions to return 500 status code.
+Users of this module should take attention whether later revision of CGI::Carp provides improved version of CGI outputing methods.</p>
+
 <p>This module is part of SuikaWiki.</p>
-<p>
-</p>
-<hr />
-<h1><a name="options">OPTIONS</a></h1>
+
+</section><section id="OPTIONS"><h1>OPTIONS</h1>
+
 <dl>
-<dt><strong><a name="item_custom_reason_text">$SuikaWiki::Output::CGICarp::CUSTOM_REASON_TEXT (Default : Internal CGI Script Error)</a></strong><br />
-</dt>
+<dt id="$SuikaWiki::Output::CGICarp::CUSTOM_REASON_TEXT_(Default_:_Internal_CGI_Script_Error)"><code>$SuikaWiki::Output::CGICarp::CUSTOM_REASON_TEXT (Default : Internal CGI Script Error)</code></dt>
+
 <dd>
-Short description of error status.  This string should contains only
-printable ASCII characters (including SPACE) for interoperability
-and line break characters (CR and LF) MUST NOT be used.
-</dd>
-<p></p>
-<dt><strong><a name="item_custom_status_code">$SuikaWiki::Output::CGICarp::CUSTOM_STATUS_CODE (Default : 500)</a></strong><br />
-</dt>
+<p>Short description of error status.
+This string should contains only printable ASCII characters (including SPACE) for interoperability and line break characters (CR and LF) MUST NOT be used.</p>
+
+</dd><dt id="$SuikaWiki::Output::CGICarp::CUSTOM_STATUS_CODE_(Default_:_500)"><code>$SuikaWiki::Output::CGICarp::CUSTOM_STATUS_CODE (Default : 500)</code></dt>
+
 <dd>
-Three digit status code defined by HTTP specifications.
+<p>Three digit status code defined by HTTP specifications.</p>
 </dd>
-<p></p></dl>
-<p>
-</p>
-<hr />
-<h1><a name="example">EXAMPLE</a></h1>
-<pre>
-  use CGI::Carp qw/fatalsToBrowser/;
+</dl>
+
+</section><section id="EXAMPLE"><h1>EXAMPLE</h1>
+
+<pre><code>  use CGI::Carp qw/fatalsToBrowser/;
   require SuikaWiki::Output::CGICarp;
   
-  die 'Something wrong';</pre>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2003-2004 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.</p>
+  die 'Something wrong';</code></pre>
 
-</body>
+</section><section id="LICENSE"><h1>LICENSE</h1>
 
-</html>
+<p>Copyright 2003-2004 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

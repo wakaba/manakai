@@ -1,456 +1,355 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::LangTag - Language Tag Parsing, Conformance Checking, and Normalization</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<ul>
 
-		<li><a href="#parsing">PARSING</a></li>
-		<li><a href="#serialization">SERIALIZATION</a></li>
-		<li><a href="#conformance_checking">CONFORMANCE CHECKING</a></li>
-		<li><a href="#normalization">NORMALIZATION</a></li>
-		<li><a href="#comparison">COMPARISON</a></li>
-	</ul>
+<hgroup><h1><code>Whatpm::LangTag</code></h1><h2>Language Tag Parsing,
+Conformance Checking,
+and Normalization</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-	<li><a href="#errors">ERRORS</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#history">HISTORY</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
-
-<hr name="index" />
-</div>
-<!-- INDEX END -->
-
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::LangTag - Language Tag Parsing, Conformance Checking, and Normalization</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  use Whatpm::LangTag;
+<pre><code>  use Whatpm::LangTag;
   
   $parsed = Whatpm::LangTag-&gt;parse_rfc5646_tag ($tag, $onerror);
   Whatpm::LangTag-&gt;check_rfc5646_parsed_tag ($parsed, $onerror);
-  $tag = Whatpm::LangTag-&gt;normalize_rfc5646_tag ($tag);</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::LangTag</code> module contains methods to handle language tags
-as defined by BCP 47.  It can be used to parse, validate, or normalize
-language tags according to relevant standard.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
-<p>For the following strings, if an input or output is a language tag or
-a language range, it is a character string (or possibly utf8 flagged
-string of characters), not a byte string.  Although language tags and
-ranges are specified as a string of ASCII characters, illegal tags and
-ranges can always contain any non-ASCII characters.</p>
-<p>
-</p>
-<h2><a name="parsing">PARSING</a></h2>
+  $tag = Whatpm::LangTag-&gt;normalize_rfc5646_tag ($tag);</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::LangTag</code> module contains methods to handle language tags as defined by BCP 47. It can be used to parse, validate, or normalize language tags according to relevant standard.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
+<p>For the following strings, if an input or output is a language tag or a language range, it is a character string (or possibly utf8 flagged string of characters), not a byte string. Although language tags and ranges are specified as a string of ASCII characters, illegal tags and ranges can always contain any non-ASCII characters.</p>
+
+<section id="PARSING"><h1>PARSING</h1>
+
 <dl>
-<dt><strong><a name="parse_tag" class="item">$parsed = Whatpm::LangTag-&gt;parse_tag ($tag, $onerror)</a></strong></dt>
+<dt id="$parsed_=_Whatpm::LangTag->parse_tag_($tag,_$onerror)"><code>$parsed = Whatpm::LangTag-&gt;<strong id="member-parse_tag">parse_tag</strong> ($tag, $onerror)</code></dt>
 
 <dd>
-<p>Parses a language tag into subtags.  This method interprets the
-language tag using the latest version of the language tag
-specification.  At the time of writing, the latest version is <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC
-5646</a>.</p>
-</dd>
-<dt><strong><a name="parse_rfc5646_tag" class="item">$parsed = Whatpm::LangTag-&gt;parse_rfc5646_tag ($tag, $onerror)</a></strong></dt>
+<p>Parses a language tag into subtags. This method interprets the language tag using the latest version of the language tag specification. At the time of writing, the latest version is RFC 5646.</p>
+
+</dd><dt id="$parsed_=_Whatpm::LangTag->parse_rfc5646_tag_($tag,_$onerror)"><code>$parsed = Whatpm::LangTag-&gt;<strong id="member-parse_rfc5646_tag">parse_rfc5646_tag</strong> ($tag, $onerror)</code></dt>
 
 <dd>
-<p>Parses a language tag into subtags.  This method interprets the
-language tag using the definition in <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-<p>Any errors and warnings would be reported to the code refeference
-specified as the second argument.</p>
-</dd>
-<dt><strong><a name="parse_rfc4646_tag" class="item">$parsed = Whatpm::LangTag-&gt;parse_rfc4646_tag ($tag, $onerror)</a></strong></dt>
+<p>Parses a language tag into subtags. This method interprets the language tag using the definition in RFC 5646.</p>
+
+<p>Any errors and warnings would be reported to the code refeference specified as the second argument.</p>
+
+</dd><dt id="$parsed_=_Whatpm::LangTag->parse_rfc4646_tag_($tag,_$onerror)"><code>$parsed = Whatpm::LangTag-&gt;<strong id="member-parse_rfc4646_tag">parse_rfc4646_tag</strong> ($tag, $onerror)</code></dt>
 
 <dd>
-<p>Parses a language tag into subtags.  This method interprets the
-language tag using the definition in <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a>.</p>
-<p>Any errors and warnings would be reported to the code refeference
-specified as the second argument.</p>
+<p>Parses a language tag into subtags. This method interprets the language tag using the definition in RFC 4646.</p>
+
+<p>Any errors and warnings would be reported to the code refeference specified as the second argument.</p>
 </dd>
 </dl>
-<p>These methods return a hash reference, which contains one or more
-key-value pairs from the following list:</p>
+
+<p>These methods return a hash reference, which contains one or more key-value pairs from the following list:</p>
+
 <dl>
-<dt><strong><a name="language" class="item">language (string)</a></strong></dt>
+<dt id="language_(string)">language (string)</dt>
 
 <dd>
-<p>The language subtag.  There is always a language subtag, even if the
-input is illegal, unless there is <a href="#grandfathered"><code>grandfathered</code></a> tag.  E.g. <code>'ja'</code>
-for input <code>ja-JP</code>.</p>
-</dd>
-<dt><strong><a name="extlang" class="item">extlang (arrayref of strings)</a></strong></dt>
+<p>The language subtag. There is always a language subtag, even if the input is illegal, unless there is <code>grandfathered</code> tag. E.g. <code>'ja'</code> for input <code>ja-JP</code>.</p>
+
+</dd><dt id="extlang_(arrayref_of_strings)">extlang (arrayref of strings)</dt>
 
 <dd>
-<p>The extlang subtags.  E.g. <code>'yue'</code> for input <code>zh-yue</code>.</p>
-</dd>
-<dt><strong><a name="script" class="item">script (string or undef)</a></strong></dt>
+<p>The extlang subtags. E.g. <code>'yue'</code> for input <code>zh-yue</code>.</p>
+
+</dd><dt id="script_(string_or_undef)">script (string or undef)</dt>
 
 <dd>
-<p>The script subtag.  E.g. <code>'Latn'</code> for input <code>ja-Latn-JP</code>.</p>
-</dd>
-<dt><strong><a name="region" class="item">region (string or undef)</a></strong></dt>
+<p>The script subtag. E.g. <code>'Latn'</code> for input <code>ja-Latn-JP</code>.</p>
+
+</dd><dt id="region_(string_or_undef)">region (string or undef)</dt>
 
 <dd>
-<p>The region subtag.  E.g. <code>'JP'</code> for input <code>en-JP</code>.</p>
-</dd>
-<dt><strong><a name="variant" class="item">variant (arrayref of strings)</a></strong></dt>
+<p>The region subtag. E.g. <code>'JP'</code> for input <code>en-JP</code>.</p>
+
+</dd><dt id="variant_(arrayref_of_strings)">variant (arrayref of strings)</dt>
 
 <dd>
-<p>The variant subtags.  E.g. <code>['fonipa']</code> for input <code>en-JP-fonipa</code>.</p>
-</dd>
-<dt><strong><a name="extension" class="item">extension (arrayref of arrayrefs of strings)</a></strong></dt>
+<p>The variant subtags. E.g. <code>['fonipa']</code> for input <code>en-JP-fonipa</code>.</p>
+
+</dd><dt id="extension_(arrayref_of_arrayrefs_of_strings)">extension (arrayref of arrayrefs of strings)</dt>
 
 <dd>
-<p>The extension subtags.  E.g. <code>[['u', 'islamCal']]</code> for input
-<code>en-US-u-islamCal</code>.</p>
-</dd>
-<dt><strong><a name="privateuse" class="item">privateuse (arrayref of strings)</a></strong></dt>
+<p>The extension subtags. E.g. <code>[['u', 'islamCal']]</code> for input <code>en-US-u-islamCal</code>.</p>
+
+</dd><dt id="privateuse_(arrayref_of_strings)">privateuse (arrayref of strings)</dt>
 
 <dd>
-<p>The privateuse subtags.  E.g. <code>['x', 'pig', 'latin']</code> for input
-<code>x-pig-latin</code>.</p>
-</dd>
-<dt><strong><a name="illegal" class="item">illegal (arrayref of strings)</a></strong></dt>
+<p>The privateuse subtags. E.g. <code>['x', 'pig', 'latin']</code> for input <code>x-pig-latin</code>.</p>
+
+</dd><dt id="illegal_(arrayref_of_strings)">illegal (arrayref of strings)</dt>
 
 <dd>
-<p>Illegal (syntactically non-conforming) string fragments.
-E.g. <code>['1234', 'xyz', 'abc']</code> for input <code>1234-xyz-abc</code>.</p>
-</dd>
-<dt><strong><a name="grandfathered" class="item">grandfathered (string or undef)</a></strong></dt>
+<p>Illegal (syntactically non-conforming) string fragments. E.g. <code>['1234', 'xyz', 'abc']</code> for input <code>1234-xyz-abc</code>.</p>
+
+</dd><dt id="grandfathered_(string_or_undef)">grandfathered (string or undef)</dt>
 
 <dd>
-<p>&quot;Grandfathered&quot; language tag.  E.g. <code>'i-default'</code> for input
-<code>i-default</code>.</p>
-</dd>
-<dt><strong><a name="u" class="item">u</a></strong></dt>
+<p>"Grandfathered" language tag. E.g. <code>'i-default'</code> for input <code>i-default</code>.</p>
+
+</dd><dt id="u">u</dt>
 
 <dd>
-<p>If the tag contains a <a href="#u"><code>u</code></a> extension, parse result of the extension is
-contained here.  The value is an array reference of array references
-of strings.  The first inner array reference contains the attributes
-in the extension.  The remaining inner array references, if any,
-represents the keywords (i.e. the key-type pairs) in the extension in
-order.  E.g. <code>[[], ['ca', 'japanese'], ['va', '0061', '0061']]</code> for
-input <code>ja-u-ca-japanese-va-0061-0061</code>.</p>
+<p>If the tag contains a <code>u</code> extension, parse result of the extension is contained here. The value is an array reference of array references of strings. The first inner array reference contains the attributes in the extension. The remaining inner array references, if any, represents the keywords (i.e. the key-type pairs) in the extension in order. E.g. <code>[[], ['ca', 'japanese'], ['va', '0061', '0061']]</code> for input <code>ja-u-ca-japanese-va-0061-0061</code>.</p>
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="serialization">SERIALIZATION</a></h2>
+
+</section><section id="SERIALIZATION"><h1>SERIALIZATION</h1>
+
 <dl>
-<dt><strong><a name="serialize_parsed_tag" class="item">$tag = Whatpm::LangTag-&gt;serialize_parsed_tag ($parsed_tag)</a></strong></dt>
+<dt id="$tag_=_Whatpm::LangTag->serialize_parsed_tag_($parsed_tag)"><code>$tag = Whatpm::LangTag-&gt;<strong id="member-serialize_parsed_tag">serialize_parsed_tag</strong> ($parsed_tag)</code></dt>
 
 <dd>
-<p>Convert a parsed language tag into a language tag string.  The
-argument must be a parsed tag as defined in the previous section; a
-broken value would not be processed properly.</p>
-<p>If the given parsed tag does not represent a well-formed language tag,
-the result string would not be a well-formed language tag.</p>
+<p>Convert a parsed language tag into a language tag string. The argument must be a parsed tag as defined in the previous section; a broken value would not be processed properly.</p>
+
+<p>If the given parsed tag does not represent a well-formed language tag, the result string would not be a well-formed language tag.</p>
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="conformance_checking">CONFORMANCE CHECKING</a></h2>
+
+</section><section id="CONFORMANCE_CHECKING"><h1>CONFORMANCE CHECKING</h1>
+
 <dl>
-<dt><strong><a name="check_parsed_tag" class="item">Whatpm::LangTag-&gt;check_parsed_tag ($parsed, $onerror)</a></strong></dt>
+<dt id="Whatpm::LangTag->check_parsed_tag_($parsed,_$onerror)"><code>Whatpm::LangTag-&gt;<strong id="member-check_parsed_tag">check_parsed_tag</strong> ($parsed, $onerror)</code></dt>
 
 <dd>
-<p>Checks for conformance errors in the parsed language tag, against the
-latest version of the language tag specification.  At the time of
-writing, the latest version is <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-</dd>
-<dt><strong><a name="check_rfc5646_parsed_tag" class="item">Whatpm::LangTag-&gt;check_rfc5646_parsed_tag ($parsed, $onerror)</a></strong></dt>
+<p>Checks for conformance errors in the parsed language tag, against the latest version of the language tag specification. At the time of writing, the latest version is RFC 5646.</p>
+
+</dd><dt id="Whatpm::LangTag->check_rfc5646_parsed_tag_($parsed,_$onerror)"><code>Whatpm::LangTag-&gt;<strong id="member-check_rfc5646_parsed_tag">check_rfc5646_parsed_tag</strong> ($parsed, $onerror)</code></dt>
 
 <dd>
-<p>Checks for conformance errors in the parsed language tag, against <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC
-5646</a>.</p>
-<p>This method does not report any parse erros, as this method receives a
-<strong>parsed</strong> language tag.</p>
-<p>Any errors and warnings would be reported to the code refeference
-specified as the second argument.</p>
-<p>The method returns a hash reference with two keys: <code>well-formed</code> and
-<code>valid</code>.  They represent whether the given language tag is
-well-formed or valid or not as per <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-</dd>
-<dt><strong><a name="check_rfc4646_parsed_tag" class="item">Whatpm::LangTag-&gt;check_rfc4646_parsed_tag ($parsed, $onerror)</a></strong></dt>
+<p>Checks for conformance errors in the parsed language tag, against RFC 5646.</p>
+
+<p>This method does not report any parse erros, as this method receives a <b>parsed</b> language tag.</p>
+
+<p>Any errors and warnings would be reported to the code refeference specified as the second argument.</p>
+
+<p>The method returns a hash reference with two keys: <code>well-formed</code> and <code>valid</code>. They represent whether the given language tag is well-formed or valid or not as per RFC 5646.</p>
+
+</dd><dt id="Whatpm::LangTag->check_rfc4646_parsed_tag_($parsed,_$onerror)"><code>Whatpm::LangTag-&gt;<strong id="member-check_rfc4646_parsed_tag">check_rfc4646_parsed_tag</strong> ($parsed, $onerror)</code></dt>
 
 <dd>
-<p>Checks for conformance errors in the parsed language tag, against <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC
-4646</a>.</p>
-<p>This method does not report any parse erros, as this method receives a
-<strong>parsed</strong> language tag.</p>
-<p>Any errors and warnings would be reported to the code refeference
-specified as the second argument.</p>
-<p>The method returns a hash reference with two keys: <code>well-formed</code> and
-<code>valid</code>.  They represent whether the given language tag is
-well-formed or valid or not as per <a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a>.</p>
-</dd>
-<dt><strong><a name="check_rfc3066_tag" class="item">Whatpm::LangTag-&gt;check_rfc3066_tag ($tag, $onerror)</a></strong></dt>
+<p>Checks for conformance errors in the parsed language tag, against RFC 4646.</p>
+
+<p>This method does not report any parse erros, as this method receives a <b>parsed</b> language tag.</p>
+
+<p>Any errors and warnings would be reported to the code refeference specified as the second argument.</p>
+
+<p>The method returns a hash reference with two keys: <code>well-formed</code> and <code>valid</code>. They represent whether the given language tag is well-formed or valid or not as per RFC 4646.</p>
+
+</dd><dt id="Whatpm::LangTag->check_rfc3066_tag_($tag,_$onerror)"><code>Whatpm::LangTag-&gt;<strong id="member-check_rfc3066_tag">check_rfc3066_tag</strong> ($tag, $onerror)</code></dt>
 
 <dd>
-<p>Parses and checks for conformance errors in the parsed language tag,
-against <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a>.</p>
-<p>Any errors and warnings would be reported to the code refeference
-specified as the second argument.</p>
-</dd>
-<dt><strong><a name="check_rfc1766_tag" class="item">Whatpm::LangTag-&gt;check_rfc1766_tag ($tag, $onerror)</a></strong></dt>
+<p>Parses and checks for conformance errors in the parsed language tag, against RFC 3066.</p>
+
+<p>Any errors and warnings would be reported to the code refeference specified as the second argument.</p>
+
+</dd><dt id="Whatpm::LangTag->check_rfc1766_tag_($tag,_$onerror)"><code>Whatpm::LangTag-&gt;<strong id="member-check_rfc1766_tag">check_rfc1766_tag</strong> ($tag, $onerror)</code></dt>
 
 <dd>
-<p>Parses and checks for conformance errors in the parsed language tag,
-against <a href="http://www.ietf.org/rfc/rfc1766.txt" class="rfc">RFC 1766</a>.</p>
-<p>Any errors and warnings would be reported to the code refeference
-specified as the second argument.</p>
+<p>Parses and checks for conformance errors in the parsed language tag, against RFC 1766.</p>
+
+<p>Any errors and warnings would be reported to the code refeference specified as the second argument.</p>
 </dd>
 </dl>
-<p>Note that specs sometimes contain semantic or contextual conformance
-rules, such as: &quot;strongly RECOMMENDED that users not define their own
-rules for language tag choice&quot; (<a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a> 4.1.), &quot;Subtags SHOULD only
-be used where they add useful distinguishing information&quot; (<a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a>
-4.1.), and &quot;Use as precise a tag as possible, but no more specific
-than is justified&quot; (<a href="http://www.ietf.org/rfc/rfc4646.txt" class="rfc">RFC 4646</a> 4.1. 1.).  These kinds of requirements
-cannot be tested without human interpretation, and therefore the
-methods in this module do not (or cannot) try to detect violation to
-these rules.</p>
-<p>
-</p>
-<h2><a name="normalization">NORMALIZATION</a></h2>
+
+<p>Note that specs sometimes contain semantic or contextual conformance rules, such as: "strongly RECOMMENDED that users not define their own rules for language tag choice" (RFC 4646 4.1.), "Subtags SHOULD only be used where they add useful distinguishing information" (RFC 4646 4.1.), and "Use as precise a tag as possible, but no more specific than is justified" (RFC 4646 4.1. 1.). These kinds of requirements cannot be tested without human interpretation, and therefore the methods in this module do not (or cannot) try to detect violation to these rules.</p>
+
+</section><section id="NORMALIZATION"><h1>NORMALIZATION</h1>
+
 <dl>
-<dt><strong><a name="normalize_tag" class="item">$tag = Whatpm::LangTag-&gt;normalize_tag ($tag_orig)</a></strong></dt>
+<dt id="$tag_=_Whatpm::LangTag->normalize_tag_($tag_orig)"><code>$tag = Whatpm::LangTag-&gt;<strong id="member-normalize_tag">normalize_tag</strong> ($tag_orig)</code></dt>
 
 <dd>
-<p>Normalize the language tag by folding cases, following the latest
-version of the language tag specification.  At the time of writing,
-the latest version is <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-</dd>
-<dt><strong><a name="normalize_rfc5646_tag" class="item">$tag = Whatpm::LangTag-&gt;normalize_rfc5646_tag ($tag_orig)</a></strong></dt>
+<p>Normalize the language tag by folding cases, following the latest version of the language tag specification. At the time of writing, the latest version is RFC 5646.</p>
+
+</dd><dt id="$tag_=_Whatpm::LangTag->normalize_rfc5646_tag_($tag_orig)"><code>$tag = Whatpm::LangTag-&gt;<strong id="member-normalize_rfc5646_tag">normalize_rfc5646_tag</strong> ($tag_orig)</code></dt>
 
 <dd>
-<p>Normalize the language tag by folding cases, following <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>
-2.1. and 2.2.6.  Note that this method does not replace any subtag
-into its preferred alternative; this method does not rearrange
-ordering of subtags.</p>
-<p>Although this method does not completely convert language tags into
-their canonical form, its result will be good enough for comparison in
-most usual situations.</p>
-</dd>
-<dt><strong><a name="canonicalize_tag" class="item">$tag = Whatpm::LangTag-&gt;canonicalize_tag ($tag_orig)</a></strong></dt>
+<p>Normalize the language tag by folding cases, following RFC 5646 2.1. and 2.2.6. Note that this method does not replace any subtag into its preferred alternative; this method does not rearrange ordering of subtags.</p>
+
+<p>Although this method does not completely convert language tags into their canonical form, its result will be good enough for comparison in most usual situations.</p>
+
+</dd><dt id="$tag_=_Whatpm::LangTag->canonicalize_tag_($tag_orig)"><code>$tag = Whatpm::LangTag-&gt;<strong id="member-canonicalize_tag">canonicalize_tag</strong> ($tag_orig)</code></dt>
 
 <dd>
-<p>Normalize the language tag into its canonicalized form, as per the
-latest version of the language tag specification.  At the time of
-writing, the latest version is <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-</dd>
-<dt><strong><a name="canonicalize_rfc5646_tag" class="item">$tag = Whatpm::LangTag-&gt;canonicalize_rfc5646_tag ($tag_orig)</a></strong></dt>
+<p>Normalize the language tag into its canonicalized form, as per the latest version of the language tag specification. At the time of writing, the latest version is RFC 5646.</p>
+
+</dd><dt id="$tag_=_Whatpm::LangTag->canonicalize_rfc5646_tag_($tag_orig)"><code>$tag = Whatpm::LangTag-&gt;<strong id="member-canonicalize_rfc5646_tag">canonicalize_rfc5646_tag</strong> ($tag_orig)</code></dt>
 
 <dd>
-<p>Normalize the language tag into its canonicalized form, as per <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC
-5646</a> 4.5.  That is, replace any subtag into its Preferred-Value form
-if possible and sort any extension subtags.  Note that this method
-does NOT do any case folding.  In addition, the &quot;canonicalized form&quot;
-of a langauge tag is not necessary a fully canonicalized form at all -
-for example, variant subtags might not be in the recommended order.</p>
-<p>Note that if the input is not a well-formed language tag according to
-<a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>, the result string might not be a well-formed language tag as
-well.  Sometimes the canonicalization would turn a valid langauge tag
-into an invalid language tag.</p>
-</dd>
-<dt><strong><a name="to_extlang_form_tag" class="item">$tag = Whatpm::LangTag-&gt;to_extlang_form_tag ($tag_orig)</a></strong></dt>
+<p>Normalize the language tag into its canonicalized form, as per RFC 5646 4.5. That is, replace any subtag into its Preferred-Value form if possible and sort any extension subtags. Note that this method does NOT do any case folding. In addition, the "canonicalized form" of a langauge tag is not necessary a fully canonicalized form at all - for example, variant subtags might not be in the recommended order.</p>
+
+<p>Note that if the input is not a well-formed language tag according to RFC 5646, the result string might not be a well-formed language tag as well. Sometimes the canonicalization would turn a valid langauge tag into an invalid language tag.</p>
+
+</dd><dt id="$tag_=_Whatpm::LangTag->to_extlang_form_tag_($tag_orig)"><code>$tag = Whatpm::LangTag-&gt;<strong id="member-to_extlang_form_tag">to_extlang_form_tag</strong> ($tag_orig)</code></dt>
 
 <dd>
-<p>Normalize the language tag into its extlang form, as per the latest
-version of the language tag specification.  At the time of writing,
-the latest version is <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.</p>
-</dd>
-<dt><strong><a name="to_extlang_form_rfc5646_tag" class="item">$tag = Whatpm::LangTag-&gt;to_extlang_form_rfc5646_tag ($tag_orig)</a></strong></dt>
+<p>Normalize the language tag into its extlang form, as per the latest version of the language tag specification. At the time of writing, the latest version is RFC 5646.</p>
+
+</dd><dt id="$tag_=_Whatpm::LangTag->to_extlang_form_rfc5646_tag_($tag_orig)"><code>$tag = Whatpm::LangTag-&gt;<strong id="member-to_extlang_form_rfc5646_tag">to_extlang_form_rfc5646_tag</strong> ($tag_orig)</code></dt>
 
 <dd>
-<p>Normalize the language tag into its extlang form, as per <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a> 4.5.
-The extlang form is same as the canonicalized form, except that use of
-extlang subtags is preferred to language-only (or extlang-free)
-representation.</p>
-<p>Note that if the input is not a well-formed language tag according to
-<a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>, the result string might not be a well-formed language tag as
-well.  Sometimes the canonicalization would turn a valid langauge tag
-into an invalid language tag.</p>
+<p>Normalize the language tag into its extlang form, as per RFC 5646 4.5. The extlang form is same as the canonicalized form, except that use of extlang subtags is preferred to language-only (or extlang-free) representation.</p>
+
+<p>Note that if the input is not a well-formed language tag according to RFC 5646, the result string might not be a well-formed language tag as well. Sometimes the canonicalization would turn a valid langauge tag into an invalid language tag.</p>
 </dd>
 </dl>
-<p>
-</p>
-<h2><a name="comparison">COMPARISON</a></h2>
+
+</section><section id="COMPARISON"><h1>COMPARISON</h1>
+
 <dl>
-<dt><strong><a name="basic_filtering_range" class="item">BOOL = Whatpm::LangTag-&gt;basic_filtering_range ($range, $tag)</a></strong></dt>
+<dt id="BOOL_=_Whatpm::LangTag->basic_filtering_range_($range,_$tag)"><code>BOOL = Whatpm::LangTag-&gt;<strong id="member-basic_filtering_range">basic_filtering_range</strong> ($range, $tag)</code></dt>
 
 <dd>
-<p>Compares a basic language range to a language tag, according to the
-latest version of the language range specification.  At the time of
-writing, the latest version is <a href="http://www.ietf.org/rfc/rfc4645.txt" class="rfc">RFC 4645</a>.</p>
-</dd>
-<dt><strong><a name="basic_filtering_rfc4647_range" class="item">BOOL = Whatpm::LangTag-&gt;basic_filtering_rfc4647_range ($range, $tag)</a></strong></dt>
+<p>Compares a basic language range to a language tag, according to the latest version of the language range specification. At the time of writing, the latest version is RFC 4645.</p>
+
+</dd><dt id="BOOL_=_Whatpm::LangTag->basic_filtering_rfc4647_range_($range,_$tag)"><code>BOOL = Whatpm::LangTag-&gt;<strong id="member-basic_filtering_rfc4647_range">basic_filtering_rfc4647_range</strong> ($range, $tag)</code></dt>
 
 <dd>
-<p>Compares a basic language range to a language tag, according to <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC
-4647</a> Section 3.3.1.  This method returns whether the range matches to
-the tag or not.</p>
-<p>A basic language range is either a language tag or <code>*</code>.  (For more
-information, see <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a> Section 2.1.).</p>
-</dd>
-<dt><strong><a name="match_rfc3066_range" class="item">BOOL = Whatpm::LangTag-&gt;match_rfc3066_range ($range, $tag)</a></strong></dt>
+<p>Compares a basic language range to a language tag, according to RFC 4647 Section 3.3.1. This method returns whether the range matches to the tag or not.</p>
+
+<p>A basic language range is either a language tag or <code>*</code>. (For more information, see RFC 4647 Section 2.1.).</p>
+
+</dd><dt id="BOOL_=_Whatpm::LangTag->match_rfc3066_range_($range,_$tag)"><code>BOOL = Whatpm::LangTag-&gt;<strong id="member-match_rfc3066_range">match_rfc3066_range</strong> ($range, $tag)</code></dt>
 
 <dd>
-<p>Compares a language-range to a language tag according to <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a>
-Section 2.5.  This method returns whether the range matches to the tag
-or not.  Note that <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a> is obsoleted by <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a>.</p>
-<p>A language range is either a language tag or <code>*</code>.  (For more
-information, see <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a> 2.5).</p>
-<p>Note that this method is equivalent to
-<a href="#basic_filtering_rfc4647_range"><code>basic_filtering_rfc4647_range</code></a> by definition.</p>
-</dd>
-<dt><strong><a name="extended_filtering_range" class="item">BOOL = Whatpm::LangTag-&gt;extended_filtering_range ($range, $tag)</a></strong></dt>
+<p>Compares a language-range to a language tag according to RFC 3066 Section 2.5. This method returns whether the range matches to the tag or not. Note that RFC 3066 is obsoleted by RFC 4647.</p>
+
+<p>A language range is either a language tag or <code>*</code>. (For more information, see RFC 3066 2.5).</p>
+
+<p>Note that this method is equivalent to <code>basic_filtering_rfc4647_range</code> by definition.</p>
+
+</dd><dt id="BOOL_=_Whatpm::LangTag->extended_filtering_range_($range,_$tag)"><code>BOOL = Whatpm::LangTag-&gt;<strong id="member-extended_filtering_range">extended_filtering_range</strong> ($range, $tag)</code></dt>
 
 <dd>
-<p>Compares an extended language range to a language tag, according to
-the latest version of the language range specification.  At the time
-of writing, the latest version is <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a>.</p>
-</dd>
-<dt><strong><a name="extended_filtering_rfc4647_range" class="item">BOOL = Whatpm::LangTag-&gt;extended_filtering_rfc4647_range ($range, $tag)</a></strong></dt>
+<p>Compares an extended language range to a language tag, according to the latest version of the language range specification. At the time of writing, the latest version is RFC 4647.</p>
+
+</dd><dt id="BOOL_=_Whatpm::LangTag->extended_filtering_rfc4647_range_($range,_$tag)"><code>BOOL = Whatpm::LangTag-&gt;<strong id="member-extended_filtering_rfc4647_range">extended_filtering_rfc4647_range</strong> ($range, $tag)</code></dt>
 
 <dd>
-<p>Compares an extended language range to a language tag, according to
-<a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a> Section 3.3.2.  This method returns whether the range matches
-to the tag or not.</p>
-<p>An extended language range is a language tag whose subtags can be
-<code>*</code>s.  (For more information, see <a href="http://www.ietf.org/rfc/rfc4647.txt" class="rfc">RFC 4647</a> Section 2.2.).</p>
+<p>Compares an extended language range to a language tag, according to RFC 4647 Section 3.3.2. This method returns whether the range matches to the tag or not.</p>
+
+<p>An extended language range is a language tag whose subtags can be <code>*</code>s. (For more information, see RFC 4647 Section 2.2.).</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="errors">ERRORS</a></h1>
-<p>For methods with argument <em>$onerror</em>, any error and warning detected
-during the parsing or conformance checking would be reporeted by
-invoking the specified code reference with the description of the
-error or warning.</p>
-<p>Following name-value pairs describing the error are given to the code
-reference as arguments:</p>
+
+</section></section><section id="ERRORS"><h1>ERRORS</h1>
+
+<p>For methods with argument <var>$onerror</var>, any error and warning detected during the parsing or conformance checking would be reporeted by invoking the specified code reference with the description of the error or warning.</p>
+
+<p>Following name-value pairs describing the error are given to the code reference as arguments:</p>
+
 <dl>
-<dt><strong><a name="type" class="item">type (string, always specified)</a></strong></dt>
+<dt id="type_(string,_always_specified)">type (string, always specified)</dt>
 
 <dd>
-<p>A short string describing the kind of the error.  Descriptions of
-error types are available at
-&lt;http://suika.fam.cx/gate/2007/html/error-description#{type}&gt;, where
-<em>{type}</em> is an error type string.</p>
-<p>For the list of error types, see
-&lt;http://suika.fam.cx/gate/2007/html/error-description#langtag-errors&gt;.</p>
-</dd>
-<dt><strong><a name="text" class="item">text (string, possibily missing)</a></strong></dt>
+<p>A short string describing the kind of the error. Descriptions of error types are available at <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/2007/html/error-description#{type}">https://suika.suikawiki.org/gate/2007/html/error-description#{type}</a>&gt;</code>, where <var>{type}</var> is an error type string.</p>
+
+<p>For the list of error types, see <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/2007/html/error-description#langtag-errors">https://suika.suikawiki.org/gate/2007/html/error-description#langtag-errors</a>&gt;</code>.</p>
+
+</dd><dt id="text_(string,_possibily_missing)">text (string, possibily missing)</dt>
 
 <dd>
-<p>A short string, which arguments the error type.  Its semantics depends
-on the error type.</p>
-</dd>
-<dt><strong><a name="value" class="item">value (string, possibly missing)</a></strong></dt>
+<p>A short string, which arguments the error type. Its semantics depends on the error type.</p>
+
+</dd><dt id="value_(string,_possibly_missing)">value (string, possibly missing)</dt>
 
 <dd>
 <p>A part of the input, in which an error is detected.</p>
-</dd>
-<dt><strong><a name="level" class="item">level (string, always specified)</a></strong></dt>
+
+</dd><dt id="level_(string,_always_specified)">level (string, always specified)</dt>
 
 <dd>
-<p>A character representing the level or severity of the error, which is
-one of the following characters: <code>m</code> (violation to a MUST-level
-requirement), <code>s</code> (violation to a SHOULD-level requirement), <code>w</code> (a
-warning), and <code>i</code> (an informational notification).</p>
+<p>A character representing the level or severity of the error, which is one of the following characters: <code>m</code> (violation to a MUST-level requirement), <code>s</code> (violation to a SHOULD-level requirement), <code>w</code> (a warning), and <code>i</code> (an informational notification).</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>RFC 1766 &lt;http://tools.ietf.org/html/rfc1766&gt;.</p>
-<p>RFC 3066 &lt;http://tools.ietf.org/html/rfc3066&gt;.</p>
-<p>RFC 4646 &lt;http://tools.ietf.org/html/rfc4646&gt;.</p>
-<p>RFC 4647 &lt;http://tools.ietf.org/html/rfc4647&gt;.</p>
-<p>RFC 5646 &lt;http://tools.ietf.org/html/rfc5646&gt;.</p>
-<p>IANA Language Subtag Registry
-&lt;http://www.iana.org/assignments/language-subtag-registry&gt;.</p>
-<p>Language Tag Extensions Registry
-&lt;http://www.iana.org/assignments/language-tag-extensions-registry&gt;.</p>
-<p>UTS #35: Unicode Locale Data Markup Language
-&lt;http://unicode.org/reports/tr35/&gt;.</p>
-<p>Unicode Locale Extension (‘u’) for BCP 47
-&lt;http://cldr.unicode.org/index/bcp47-extension&gt;,
-&lt;http://unicode.org/repos/cldr/trunk/common/bcp47/&gt;.</p>
-<p>SuikaWiki:Language Tags
-&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/language%20tags&gt;</p>
-<p>
-</p>
-<hr />
-<h1><a name="history">HISTORY</a></h1>
-<ol>
-<li><strong><a name="09_09" class="item">-09-09</a></strong>
 
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
+
+<p>RFC 1766 <code class="url">&lt;<a href="http://tools.ietf.org/html/rfc1766">http://tools.ietf.org/html/rfc1766</a>&gt;</code>.</p>
+
+<p>RFC 3066 <code class="url">&lt;<a href="http://tools.ietf.org/html/rfc3066">http://tools.ietf.org/html/rfc3066</a>&gt;</code>.</p>
+
+<p>RFC 4646 <code class="url">&lt;<a href="http://tools.ietf.org/html/rfc4646">http://tools.ietf.org/html/rfc4646</a>&gt;</code>.</p>
+
+<p>RFC 4647 <code class="url">&lt;<a href="http://tools.ietf.org/html/rfc4647">http://tools.ietf.org/html/rfc4647</a>&gt;</code>.</p>
+
+<p>RFC 5646 <code class="url">&lt;<a href="http://tools.ietf.org/html/rfc5646">http://tools.ietf.org/html/rfc5646</a>&gt;</code>.</p>
+
+<p>IANA Language Subtag Registry <code class="url">&lt;<a href="http://www.iana.org/assignments/language-subtag-registry">http://www.iana.org/assignments/language-subtag-registry</a>&gt;</code>.</p>
+
+<p>Language Tag Extensions Registry <code class="url">&lt;<a href="http://www.iana.org/assignments/language-tag-extensions-registry">http://www.iana.org/assignments/language-tag-extensions-registry</a>&gt;</code>.</p>
+
+<p>UTS #35: Unicode Locale Data Markup Language <code class="url">&lt;<a href="http://unicode.org/reports/tr35/">http://unicode.org/reports/tr35/</a>&gt;</code>.</p>
+
+<p>Unicode Locale Extension (‘u’) for BCP 47 <code class="url">&lt;<a href="http://cldr.unicode.org/index/bcp47-extension">http://cldr.unicode.org/index/bcp47-extension</a>&gt;</code>, <code class="url">&lt;<a href="http://unicode.org/repos/cldr/trunk/common/bcp47/">http://unicode.org/repos/cldr/trunk/common/bcp47/</a>&gt;</code>.</p>
+
+<p>SuikaWiki:Language Tags <code class="url">&lt;<a href="https://suika.suikawiki.org/~wakaba/wiki/sw/n/language%20tags">https://suika.suikawiki.org/~wakaba/wiki/sw/n/language%20tags</a>&gt;</code></p>
+
+</section><section id="HISTORY"><h1>HISTORY</h1>
+
+<dl>
+<dt id="2007-09-09">2007-09-09</dt>
+
+<dd>
 <p>First version.</p>
-</li>
-<li><strong><a name="09_24" class="item">-09-24</a></strong>
 
-<p>Implemented <a href="http://www.ietf.org/rfc/rfc5646.txt" class="rfc">RFC 5646</a>.  Implemented comparison.  Implemented <a href="http://www.ietf.org/rfc/rfc1766.txt" class="rfc">RFC 1766</a>.</p>
-</li>
-<li><strong><a name="10_01" class="item">-10-01</a></strong>
+</dd><dt id="2011-09-24">2011-09-24</dt>
 
-<p>Implemented the <a href="#u"><code>u</code></a> extension.</p>
-</li>
-<li><strong><a name="10_02" class="item">-10-02</a></strong>
+<dd>
+<p>Implemented RFC 5646. Implemented comparison. Implemented RFC 1766.</p>
 
-<p>Implemented full validation of <a href="http://www.ietf.org/rfc/rfc3066.txt" class="rfc">RFC 3066</a> and <a href="http://www.ietf.org/rfc/rfc1766.txt" class="rfc">RFC 1766</a> language tags.
-Added unversioned aliases for operations.</p>
-</li>
-</ol>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2011 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
+</dd><dt id="2011-10-01">2011-10-01</dt>
 
-</body>
+<dd>
+<p>Implemented the <code>u</code> extension.</p>
 
-</html>
+</dd><dt id="2011-10-02">2011-10-02</dt>
+
+<dd>
+<p>Implemented full validation of RFC 3066 and RFC 1766 language tags. Added unversioned aliases for operations.</p>
+</dd>
+</dl>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2011 Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

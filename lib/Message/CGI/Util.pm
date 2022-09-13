@@ -71,7 +71,7 @@ sub datetime_for_http ($) {
 
 =head1 LICENSE
 
-Copyright 2008-2010 Wakaba <w@suika.fam.cx>
+Copyright 2008-2010 Wakaba <wakaba@suikawiki.org>
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

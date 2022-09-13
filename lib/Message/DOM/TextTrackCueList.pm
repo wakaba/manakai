@@ -4,7 +4,7 @@ use warnings;
 our $VERSION = '1.0';
 
 ## Spec:
-## <http://www.whatwg.org/specs/web-apps/current-work/#texttrackcuelist>.
+## <https://www.whatwg.org/specs/web-apps/current-work/#texttrackcuelist>.
 
 sub ____new_from_arrayref ($$) {
   return bless $_[1], $_[0];
@@ -36,7 +36,7 @@ sub get_cue_by_id ($$) {
 
 =head1 LICENSE
 
-Copyright 2012 Wakaba <w@suika.fam.cx>.
+Copyright 2012 Wakaba <wakaba@suikawiki.org>.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

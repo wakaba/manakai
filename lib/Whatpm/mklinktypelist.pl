@@ -298,7 +298,7 @@ RelExtensions - WHATWG Wiki
 
 =head1 AUTHORS
 
-The author of C<mklinktypelist.pl> is Wakaba <w@suika.fam.cx>.
+The author of C<mklinktypelist.pl> is Wakaba <wakaba@suikawiki.org>.
 
 Authors of the "RelExtensions" page in the WHATWG Wiki, from which the
 C<_LinkTypeList.pm> Perl module is generated, are WHATWG contributors.
@@ -309,7 +309,7 @@ For the revision history of the wiki pgae, see
 
 Copyright (C) 2006 The WHATWG Contributors
 
-Copyright 2007-%s Wakaba <w@suika.fam.cx>.
+Copyright 2007-%s Wakaba <wakaba@suikawiki.org>.
 
 Permission is hereby granted, free of charge, to any person obtaining a 
 copy of this software and associated documentation files (the "Software"), 

@@ -1,123 +1,109 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Message::DOM::NodeList - DOM |NodeList| interface</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#methods">METHODS</a></li>
-	<li><a href="#specifications">SPECIFICATIONS</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Message::DOM::NodeList</code></h1><h2>DOM <a href="https://suika.suikawiki.org/~wakaba/wiki/sw/n/NodeList"><code>NodeList</code></a> interface</h2></hgroup><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Message::DOM::NodeList - DOM |NodeList| interface</p>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Message::DOM::NodeList</code> implements the DOM <code>NodeList</code>
-interface.</p>
-<p>
-</p>
-<hr />
-<h1><a name="methods">METHODS</a></h1>
+<p>The <code>Message::DOM::NodeList</code> implements the DOM <code>NodeList</code> interface.</p>
+
+</section><section id="METHODS"><h1>METHODS</h1>
+
 <p>The <code>NodeList</code> object has following methods:</p>
+
 <dl>
-<dt><strong><a name="_length" class="item">$length = scalar @$nodelist</a></strong></dt>
+<dt id="$length_=_scalar_@$nodelist"><code>$length = scalar @$nodelist</code></dt>
 
-<dt><strong><a name="length" class="item">$length = $nodelist-&gt;length</a></strong></dt>
-
-<dd>
-<p>Return the number of the items in the list.  [DOM] [DOMPERL]</p>
-</dd>
-<dt><strong><a name="_item" class="item">$item = $nodelist-&gt;[$index]</a></strong></dt>
-
-<dt><strong><a name="item" class="item">$item = $nodelist-&gt;item ($index)</a></strong></dt>
+<dt id="$length_=_$nodelist->length"><code>$length = $nodelist-&gt;<strong id="member-length">length</strong></code></dt>
 
 <dd>
-<p>Return an item in the list.  [DOM] [DOMPERL]</p>
-</dd>
-<dt><strong><a name="to_a" class="item">$arrayref = $nodelist-&gt;to_a</a></strong></dt>
+<p>Return the number of the items in the list. <cite class="ref">[<a href="#DOM">DOM</a>]</cite> <cite class="ref">[<a href="#DOMPERL">DOMPERL</a>]</cite></p>
+
+</dd><dt id="$item_=_$nodelist->[$index]"><code>$item = $nodelist-&gt;<strong id="member-[$index]">[$index]</strong></code></dt>
+
+<dt id="$item_=_$nodelist->item_($index)"><code>$item = $nodelist-&gt;<strong id="member-item">item</strong> ($index)</code></dt>
 
 <dd>
-<p>Return an array reference containing the items in the list.  [DOMPERL]</p>
-</dd>
-<dt><strong><a name="to_list" class="item">($item0, $item1, ...) = $nodelist-&gt;to_list</a></strong></dt>
+<p>Return an item in the list. <cite class="ref">[<a href="#DOM">DOM</a>]</cite> <cite class="ref">[<a href="#DOMPERL">DOMPERL</a>]</cite></p>
+
+</dd><dt id="$arrayref_=_$nodelist->to_a"><code>$arrayref = $nodelist-&gt;<strong id="member-to_a">to_a</strong></code></dt>
 
 <dd>
-<p>Return the items in the list as a Perl list.  [DOMPERL]</p>
-</dd>
-<dt><strong><a name="manakai_read_only" class="item">$boolean = $nodelist-&gt;manakai_read_only</a></strong></dt>
+<p>Return an array reference containing the items in the list. <cite class="ref">[<a href="#DOMPERL">DOMPERL</a>]</cite></p>
+
+</dd><dt id="($item0,_$item1,_...)_=_$nodelist->to_list"><code>($item0,
+$item1,
+...) = $nodelist-&gt;<strong id="member-to_list">to_list</strong></code></dt>
 
 <dd>
-<p>Return whether the list is read-only or not.  [MANAKAI]</p>
-</dd>
-<dt><strong><a name="__nodelist" class="item">@$nodelist = ()</a></strong></dt>
+<p>Return the items in the list as a Perl list. <cite class="ref">[<a href="#DOMPERL">DOMPERL</a>]</cite></p>
+
+</dd><dt id="$boolean_=_$nodelist->manakai_read_only"><code>$boolean = $nodelist-&gt;<strong id="member-manakai_read_only">manakai_read_only</strong></code></dt>
 
 <dd>
-<p>Remove all items from the list.  This operation is not supported for
-read-only lists.  [DOMPERL]</p>
+<p>Return whether the list is read-only or not. <cite class="ref">[<a href="#MANAKAI">MANAKAI</a>]</cite></p>
+
+</dd><dt id="@$nodelist_=_()"><code>@$nodelist = ()</code></dt>
+
+<dd>
+<p>Remove all items from the list.
+This operation is not supported for read-only lists. <cite class="ref">[<a href="#DOMPERL">DOMPERL</a>]</cite></p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="specifications">SPECIFICATIONS</a></h1>
+
+</section><section id="SPECIFICATIONS"><h1>SPECIFICATIONS</h1>
+
 <dl>
-<dt><strong><a name="dom" class="item">[DOM]</a></strong></dt>
+<dt id="[DOM]">[DOM]</dt>
 
 <dd>
-<p>DOM
-&lt;http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#interface-nodelist&gt;.</p>
-</dd>
-<dt><strong><a name="manakai" class="item">[MANAKAI]</a></strong></dt>
+<p>DOM <code class="url">&lt;<a href="http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#interface-nodelist">http://dvcs.w3.org/hg/domcore/raw-file/tip/Overview.html#interface-nodelist</a>&gt;</code>.</p>
+
+</dd><dt id="[MANAKAI]">[MANAKAI]</dt>
 
 <dd>
-<p>manakai DOM Extensions
-&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions&gt;.</p>
-</dd>
-<dt><strong><a name="domperl" class="item">[DOMPERL]</a></strong></dt>
+<p>manakai DOM Extensions <code class="url">&lt;<a href="https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions">https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai%20DOM%20Extensions</a>&gt;</code>.</p>
+
+</dd><dt id="[DOMPERL]">[DOMPERL]</dt>
 
 <dd>
-<p>manakai's DOM Perl Binding
-&lt;http://suika.fam.cx/~wakaba/wiki/sw/n/manakai's%20DOM%20Perl%20Binding&gt;.</p>
+<p>manakai's DOM Perl Binding <code class="url">&lt;<a href="https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai's%20DOM%20Perl%20Binding">https://suika.suikawiki.org/~wakaba/wiki/sw/n/manakai's%20DOM%20Perl%20Binding</a>&gt;</code>.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2012 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>This program is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
 
-</html>
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2012 Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

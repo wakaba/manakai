@@ -1,181 +1,147 @@
-<?xml version="1.0" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<title>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet Character Encoding Detection</title>
-<link rel="stylesheet" href="http://suika.fam.cx/www/style/html/pod.css" type="text/css" />
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@localhost" />
-</head>
 
-<body>
+      <!DOCTYPE HTML>
+      <html lang=en>
+        <meta charset=utf-8>
+        <title>manakai</title>
+        <link rel=stylesheet href="https://manakai.github.io/css/pod.css">
+        <meta name=viewport content="width=device-width">
+
+        <h1><a href="../../" rel=top>manakai</a></h1>
+
+        
 
 
-<!-- INDEX BEGIN -->
-<div name="index">
-<p><a name="__index__"></a></p>
 
-<ul>
 
-	<li><a href="#name">NAME</a></li>
-	<li><a href="#synopsis">SYNOPSIS</a></li>
-	<li><a href="#description">DESCRIPTION</a></li>
-	<li><a href="#method">METHOD</a></li>
-	<li><a href="#dependency">DEPENDENCY</a></li>
-	<li><a href="#troubleshooting">TROUBLESHOOTING</a></li>
-	<li><a href="#see_also">SEE ALSO</a></li>
-	<li><a href="#author">AUTHOR</a></li>
-	<li><a href="#license">LICENSE</a></li>
-</ul>
 
-<hr name="index" />
-</div>
-<!-- INDEX END -->
+<hgroup><h1><code>Whatpm::Charset::UniversalCharDet</code></h1><h2>A Perl Interface to universalchardet Character Encoding Detection</h2></hgroup><section id="SYNOPSIS"><h1>SYNOPSIS</h1>
 
-<p>
-</p>
-<h1><a name="name">NAME</a></h1>
-<p>Whatpm::Charset::UniversalCharDet - A Perl Interface to universalchardet Character Encoding Detection</p>
-<p>
-</p>
-<hr />
-<h1><a name="synopsis">SYNOPSIS</a></h1>
-<pre>
-  require Whatpm::Charset::UniversalCharDet;
+<pre><code>  require Whatpm::Charset::UniversalCharDet;
   $charset_name = Whatpm::Charset::UniversalCharDet
       -&gt;detect_byte_string ($byte_string);
-  # $charset_name: charset name (in lowercase) or undef</pre>
-<p>
-</p>
-<hr />
-<h1><a name="description">DESCRIPTION</a></h1>
-<p>The <code>Whatpm::Charset::UniversalCharDet</code> module is a Perl interface to
-the universalchardet character encoding detection.</p>
-<p>The universalchardet is originally developed by Mozilla project and
-then ported to other platforms.  The
-<code>Whatpm::Charset::UniversalCharDet</code> module provides a Perl interface
-to Universal Encoding Detector, a Python port of the Mozilla's
-universalchardet code.  Future version of this module might provide an
-interface to another port of the universalchardet.</p>
-<p>
-</p>
-<hr />
-<h1><a name="method">METHOD</a></h1>
+  # $charset_name: charset name (in lowercase) or undef</code></pre>
+
+</section><section id="DESCRIPTION"><h1>DESCRIPTION</h1>
+
+<p>The <code>Whatpm::Charset::UniversalCharDet</code> module is a Perl interface to the universalchardet character encoding detection.</p>
+
+<p>The universalchardet is originally developed by Mozilla project and then ported to other platforms. The <code>Whatpm::Charset::UniversalCharDet</code> module provides a Perl interface to Universal Encoding Detector, a Python port of the Mozilla's universalchardet code. Future version of this module might provide an interface to another port of the universalchardet.</p>
+
+</section><section id="METHOD"><h1>METHOD</h1>
+
 <dl>
-<dt><strong><a name="detect_byte_string" class="item"><em>$charset</em> = Whatpm::Charset::UniversalCharDet-&gt;detect_byte_string (<em>$s</em>)</a></strong></dt>
+<dt id="$charset_=_Whatpm::Charset::UniversalCharDet->detect_byte_string_($s)"><code><i>$charset</i> = Whatpm::Charset::UniversalCharDet-&gt;detect_byte_string (<i>$s</i>)</code></dt>
 
 <dd>
 <p>Detect the character encoding of the specified byte string.</p>
+
 <dl>
-<dt><strong><a name="_s" class="item"><em>$s</em></a></strong></dt>
+<dt><a name="$s"><i>$s</i></a></dt>
 
 <dd>
 <p>The byte string.</p>
-</dd>
-<dt><strong><a name="_charset" class="item"><em>$charset</em></a></strong></dt>
+
+</dd><dt><a name="$charset"><i>$charset</i></a></dt>
 
 <dd>
-<p>The name of the character encoding, detected by universalchardet, in
-lowercase.  If no character encoding can be detected, because, e.g.,
-no implementation for universalchardet is found, <code>undef</code> is returned.</p>
-<p>For the list of supported encodings, see documentation for Universal
-Encoding Detector
-&lt;http://chardet.feedparser.org/docs/supported-encodings.html&gt;.</p>
+<p>The name of the character encoding, detected by universalchardet, in lowercase. If no character encoding can be detected, because, e.g., no implementation for universalchardet is found, <code>undef</code> is returned.</p>
+
+<p>For the list of supported encodings, see documentation for Universal Encoding Detector &lt;http://chardet.feedparser.org/docs/supported-encodings.html&gt;.</p>
 </dd>
 </dl>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="dependency">DEPENDENCY</a></h1>
+
+</section><section id="DEPENDENCY"><h1>DEPENDENCY</h1>
+
 <dl>
-<dt><strong><a name="inline_python" class="item"><a href="../../Inline/Python.html">the Inline::Python manpage</a></a></strong></dt>
+<dt><a href="../../Inline/Python" class="podlinkpod">Inline::Python</a></dt>
 
 <dd>
-<p>A Perl module which enables Python support for <em>Inline</em> code
-embedding, available from
-&lt;http://search.cpan.org/dist/Inline-Python/&gt;.</p>
-<p>To install the module using <em>CPAN</em>:</p>
-<pre>
-  root# perl -MCPAN -eshell
-  cpan&gt; install Inline::Python</pre>
-</dd>
-<dt><strong><a name="python" class="item">Python</a></strong></dt>
+<p>A Perl module which enables Python support for <a href="../../Inline" class="podlinkpod">Inline</a> code embedding, available from <code class="url">&lt;<a href="http://search.cpan.org/dist/Inline-Python/">http://search.cpan.org/dist/Inline-Python/</a>&gt;</code>.</p>
+
+<p>To install the module using <a href="../../CPAN" class="podlinkpod">CPAN</a>:</p>
+
+<pre><code>  root# perl -MCPAN -eshell
+  cpan&gt; install Inline::Python</code></pre>
+
+</dd><dt id="Python">Python</dt>
 
 <dd>
-<p>Available at &lt;http://www.python.org/download/&gt;.</p>
-</dd>
-<dt><strong><a name="universal_encoding_detector" class="item">Universal Encoding Detector</a></strong></dt>
+<p>Available at <code class="url">&lt;<a href="http://www.python.org/download/">http://www.python.org/download/</a>&gt;</code>.</p>
+
+</dd><dt id="Universal_Encoding_Detector">Universal Encoding Detector</dt>
 
 <dd>
-<p>Available at &lt;http://chardet.feedparser.org/download/&gt;.</p>
-<p>Expand the archive and then execute <code>python setup.py install</code> in the
-expanded directory.</p>
+<p>Available at <code class="url">&lt;<a href="http://chardet.feedparser.org/download/">http://chardet.feedparser.org/download/</a>&gt;</code>.</p>
+
+<p>Expand the archive and then execute <code>python setup.py install</code> in the expanded directory.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="troubleshooting">TROUBLESHOOTING</a></h1>
-<p>The <code>Whatpm::Charset::UniversalCharDet</code> module does not raise error
-even when it fails to load the universalchardet library; it simply
-<code>warn</code>s the error message.</p>
-<p>This behavior can be changed by setting a true value to the flag
-<code>$Whatpm::Charset::UniversalCharDet::DEBUG</code> - it will make any error
-invoke <code>die</code> instead of <code>warn</code>.</p>
+
+</section><section id="TROUBLESHOOTING"><h1>TROUBLESHOOTING</h1>
+
+<p>The <code>Whatpm::Charset::UniversalCharDet</code> module does not raise error even when it fails to load the universalchardet library; it simply <code>warn</code>s the error message.</p>
+
+<p>This behavior can be changed by setting a true value to the flag <code>$Whatpm::Charset::UniversalCharDet::DEBUG</code> - it will make any error invoke <code>die</code> instead of <code>warn</code>.</p>
+
 <p>Common error messages are as follows:</p>
+
 <dl>
-<dt><strong><a name="can_t_locate_inline_pm_in_inc" class="item">Can't locate Inline.pm in @INC</a></strong></dt>
+<dt id="Can't_locate_Inline.pm_in_@INC">Can't locate Inline.pm in @INC</dt>
 
 <dd>
-<p>Module <em>Inline</em> is not installed.</p>
-</dd>
-<dt><strong><a name="error_you_have_specified_python_as_an_inline_programming_language" class="item">Error. You have specified 'Python' as an Inline programming language.</a></strong></dt>
+<p>Module <a href="../../Inline" class="podlinkpod">Inline</a> is not installed.</p>
+
+</dd><dt id="Error._You_have_specified_'Python'_as_an_Inline_programming_language.">Error. You have specified 'Python' as an Inline programming language.</dt>
 
 <dd>
-<p>Module <a href="../../Inline/Python.html">the Inline::Python manpage</a> is not installed.  If you <strong>did</strong> install the
-module, please find &quot;the Inline DIRECTORY&quot; (e.g. <code>./_Inline</code>) and
-remove it.</p>
-</dd>
-<dt><strong><a name="couldn_t_find_an_appropriate_directory_for_inline_to_use" class="item">Couldn't find an appropriate DIRECTORY for Inline to use.</a></strong></dt>
+<p>Module <a href="../../Inline/Python" class="podlinkpod">Inline::Python</a> is not installed. If you <b>did</b> install the module, please find "the Inline DIRECTORY" (e.g. <code>./_Inline</code>) and remove it.</p>
+
+</dd><dt id="Couldn't_find_an_appropriate_DIRECTORY_for_Inline_to_use.">Couldn't find an appropriate DIRECTORY for Inline to use.</dt>
 
 <dd>
-<p>The temporary directory for the <em>Inline</em> module is not available.
-See <a href="../../Inline/Python.html#the_inline_directory">The Inline DIRECTORY in the Inline::Python manpage</a> or
-&lt;http://search.cpan.org/dist/Inline/Inline.pod#The_Inline_DIRECTORY&gt;.</p>
-</dd>
-<dt><strong><a name="error_py_eval_raised_an_exception" class="item">Error -- py_eval raised an exception</a></strong></dt>
+<p>The temporary directory for the <a href="../../Inline" class="podlinkpod">Inline</a> module is not available. See <a href="../../Inline/Python#The_Inline_DIRECTORY" class="podlinkpod">"The Inline DIRECTORY" in Inline::Python</a> or <code class="url">&lt;<a href="http://search.cpan.org/dist/Inline/Inline.pod#The_Inline_DIRECTORY">http://search.cpan.org/dist/Inline/Inline.pod#The_Inline_DIRECTORY</a>&gt;</code>.</p>
+
+</dd><dt id="Error_--_py_eval_raised_an_exception">Error -- py_eval raised an exception</dt>
 
 <dd>
 <p>Universal Encoding Detector is not installed.</p>
 </dd>
 </dl>
-<p>
-</p>
-<hr />
-<h1><a name="see_also">SEE ALSO</a></h1>
-<p>UNIVCHARDET - SuikaWiki
-&lt;http://suika.fam.cx/gate/2005/sw/UNIVCHARDET&gt;.</p>
-<p>Universal Encoding Detector: character encoding auto-detection in
-Python &lt;http://chardet.feedparser.org/&gt;.</p>
-<p>A composite approach to language/encoding detection
-&lt;http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html&gt;.</p>
-<p>Web Applications 1.0 - Determining the character encoding
-&lt;http://www.whatwg.org/specs/web-apps/current-work/complete.html#determining-the-character-encoding&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="author">AUTHOR</a></h1>
-<p>Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;.</p>
-<p>
-</p>
-<hr />
-<h1><a name="license">LICENSE</a></h1>
-<p>Copyright 2007-2010 Wakaba &lt;<a href="mailto:w@suika.fam.cx">w@suika.fam.cx</a>&gt;</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
 
-</body>
+</section><section id="SEE_ALSO"><h1>SEE ALSO</h1>
 
-</html>
+<p><code>UNIVCHARDET</code></p><p>SuikaWiki <code class="url">&lt;<a href="https://suika.suikawiki.org/gate/2005/sw/UNIVCHARDET">https://suika.suikawiki.org/gate/2005/sw/UNIVCHARDET</a>&gt;</code>.</p>
+
+<p>Universal Encoding Detector: character encoding auto-detection in Python <code class="url">&lt;<a href="http://chardet.feedparser.org/">http://chardet.feedparser.org/</a>&gt;</code>.</p>
+
+<p>A composite approach to language/encoding detection <code class="url">&lt;<a href="http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html">http://www.mozilla.org/projects/intl/UniversalCharsetDetection.html</a>&gt;</code>.</p>
+
+<p>Web Applications 1.0 - Determining the character encoding <code class="url">&lt;<a href="http://www.whatwg.org/specs/web-apps/current-work/complete.html#determining-the-character-encoding">http://www.whatwg.org/specs/web-apps/current-work/complete.html#determining-the-character-encoding</a>&gt;</code>.</p>
+
+</section><section id="AUTHOR"><h1>AUTHOR</h1>
+
+<p>Wakaba &lt;wakaba@suikawiki.org&gt;.</p>
+
+</section><section id="LICENSE"><h1>LICENSE</h1>
+
+<p>Copyright 2007-2010 Wakaba &lt;wakaba@suikawiki.org&gt;</p>
+
+<p>This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+
+
+
+
+</section>
+
+        <sw-ads normal></sw-ads>
+        <script src="https://manakai.github.io/js/global.js" async></script>
+
+        <footer>
+          <ul>
+          <li><a href="../../" rel=top>Top</a>
+          </ul>
+        </footer>
+        <sw-ads-notes></sw-ads-notes>
+    

@@ -625,11 +625,11 @@ Selectors API Editor's Draft 29 August 2007
 <http://dev.w3.org/cvsweb/~checkout~/2006/webapi/selectors-api/Overview.html?rev=1.28&content-type=text/html;%20charset=utf-8>
 
 manakai Selectors Extensions
-<http://suika.fam.cx/gate/2005/sw/manakai/Selectors%20Extensions>
+<https://suika.suikawiki.org/gate/2005/sw/manakai/Selectors%20Extensions>
 
 =head1 LICENSE
 
-Copyright 2007-2011 Wakaba <w@suika.fam.cx>.
+Copyright 2007-2011 Wakaba <wakaba@suikawiki.org>.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

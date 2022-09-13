@@ -174,7 +174,7 @@ sub get_specified_value_no_inherit ($$$) {
   if (defined $specified and $specified->[0] eq 'INHERIT') {
     ## ISSUE: CSS 2.1 does not say to resolve computed value of the parent.
     ## However, it is necessary for some cases (see
-    ## <http://suika.fam.cx/gate/2005/sw/inherit>).  In addition,
+    ## <https://suika.suikawiki.org/gate/2005/sw/inherit>).  In addition,
     ## the initial value is not a computed value for some properties.
     my $parent_element = $element->manakai_parent_element;
     if (defined $parent_element) {

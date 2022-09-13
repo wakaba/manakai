@@ -73,5 +73,5 @@ for (
   print STDOUT $_->[0] . ': ' . (defined $value ? '"' . $value . '"' : '(undef)') . "\n";
 }
 
-## Author: Wakaba <w@suika.fam.cx>.
+## Author: Wakaba <wakaba@suikawiki.org>.
 ## License: Public Domain.

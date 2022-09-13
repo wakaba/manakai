@@ -5,13 +5,15 @@ RMALL = $(RM) -fv
 
 PM_SUFFIX = .pm
 
-all:
-	$(CD) Util && $(MAKE) all
-	$(CD) Markup && $(MAKE) all
-	$(CD) DOM && $(MAKE) all
-	$(CD) MIME && $(MAKE) all
-	$(CD) URI && $(MAKE) all
-	$(CD) CGI && $(MAKE) all
+all: build
+
+build:
+	cd Util && $(MAKE) build
+	cd Markup && $(MAKE) build
+	cd DOM && $(MAKE) build
+	cd MIME && $(MAKE) build
+	cd URI && $(MAKE) build
+	cd CGI && $(MAKE) build
 
 clean:
 	$(RMALL) *.BAK .*.BAK *~ .*~
@@ -35,5 +37,4 @@ distclean:
 	$(CD) URI && $(MAKE) distclean
 	$(CD) CGI && $(MAKE) distclean
 
-## $Date: 2007/08/11 13:37:09 $
 ## License: Public Domain.

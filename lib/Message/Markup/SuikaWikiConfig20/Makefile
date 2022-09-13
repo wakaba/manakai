@@ -1,10 +1,17 @@
-POD2HTML = pod2html --css "http://suika.fam.cx/www/style/html/pod.css" \
-  --htmlroot "../../.."
+MANAKAI_ROOT_DIR = ../../../..
+
 HTML_FILES = Node.html Parser.html
 
-all: $(HTML_FILES)
+_P2H = local/p2h
+P2H = $(MANAKAI_ROOT_DIR)/$(_P2H)
 
-%.html: %.pm
-	$(POD2HTML) $< > $@
+all: build
+
+build: $(HTML_FILES)
+
+$(HTML_FILES):: %.html: %.pm $(P2H)
+	cd $(MANAKAI_ROOT_DIR)/lib && \
+	../$(_P2H) "manakai" Message/Markup/SuikaWikiConfig20/$< > \
+	    Message/Markup/SuikaWikiConfig20/$@
 
 ## License: Public Domain.
