@@ -4,18 +4,20 @@ MANAKAI_LIB_DIR = $(MANAKAI_DIR)lib/
 WHATPM_DIR = ../../../markup/html/whatpm/
 WHATPM_LIB_DIR = $(WHATPM_DIR)
 
-HARUSAME = harusame
+HARUSAME = $(MANAKAI_DIR)/local/harusame
 
 PERL_ = perl
 PERL_LIB_OPTIONS = -I$(MANAKAI_LIB_DIR) -I$(WHATPM_LIB_DIR)
 PERL = $(PERL_) $(PERL_LIB_OPTIONS)
 
-all: cover.ja.html cover.en.html features.en.html features.ja.html
+all: build
 
-%.en.html: %.html.src
+build: cover.ja.html cover.en.html features.en.html features.ja.html
+
+%.en.html: %.html.src $(HARUSAME)
 	$(HARUSAME) --lang=en < $< > $@
 
-%.ja.html: %.html.src
+%.ja.html: %.html.src $(HARUSAME)
 	$(HARUSAME) --lang=ja < $< > $@
 
 ## License: Public Domain.

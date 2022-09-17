@@ -24,11 +24,18 @@ pmb-update pmb-install \
 : %: Makefile-setupenv
 	$(MAKE) --makefile Makefile.setupenv $@
 
-build: $(P2H)
+build: $(P2H) $(HARUSAME)
 	cd lib && $(MAKE) build
+	cd doc && $(MAKE) build
 
 local:
 	mkdir -p local
+
+HARUSAME = local/harusame
+
+$(HARUSAME): local
+	$(CURL) -sSLf https://raw.githubusercontent.com/wakaba/harusame/master/harusame > $@
+	chmod u+x $@
 
 $(P2H): local
 	$(CURL) -sSfL https://raw.githubusercontent.com/manakai/manakai.github.io/master/p2h > $@
